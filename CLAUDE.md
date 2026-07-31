@@ -107,7 +107,7 @@ sdfa > nul     →     grt     →     war     →     sr     →     grte
 
 | 檔案 | 大小 | 觀察 |
 |---|---|---|
-| `WAR.EXE` | 375,568 B | 最大的一個，**未打包**，Borland Turbo C runtime（`Copyright (c) 1983,90 Borland`）。字串表裡有大量小寫檔名（`book1.tpc`、`menu1.tpc`、`head1.rgb`）與 `b:` 前綴的雙磁碟路徑 |
+| `WAR.EXE` | 375,568 B | 最大的一個，**未打包**，**Borland Turbo Pascal**（RTL + Graph unit，見 `docs/re/01`）。字串表裡有大量小寫檔名（`book1.tpc`、`menu1.tpc`、`head1.rgb`）與 `b:` 前綴的雙磁碟路徑 |
 | `GRT.EXE` | 34,708 B | **PKLITE 打包**（`Copyright 1990-92 PKWARE`）|
 | `GRTE.EXE` | 57,168 B | PKLITE 打包 |
 | `SDFA.EXE` | 10,243 B | PKLITE 打包。`play.bat` 第一個跑且丟棄輸出，疑似音效／環境偵測 |
@@ -241,8 +241,9 @@ image 來源 `/home/anr2/ida_94_official/dist`（`ida-pro-9.4-ver2`），16-bit 
    linear address，同時引用 Ghidra 位址時要明講是哪一套。
 3. `.i64`、`.asm`、解包後的 binary 全部 gitignore。
 
-Turbo C 編譯的程式有一個額外優勢：BGI 呼叫（`putimage`／`setpalette`）的參數形狀固定，
-可以拿來當函式識別的錨點，比逐段猜語意快得多。
+Turbo Pascal 編譯的程式有一個額外優勢：Graph unit 的呼叫（`PUTIMAGE`／`SETRGBPALETTE`）
+會被 IDA 直接認出名字，不必自己辨識。但**呼叫慣例是 Pascal**（參數由左至右壓棧、
+被呼叫者清棧），字串是長度前綴——用 C 的直覺讀參數順序會全部反過來。
 
 ---
 

@@ -30,6 +30,7 @@
 | 敘事文本 | ⬜ 未找到。候選：`NEWSDATA.DAT`(29,784 B，開頭 `d600 0f00` + 大量 `ffff`，像索引表) |
 | `.RGB` 調色盤 | ✅ 純文字 DAC 三元組 |
 | **`.GLB`／`.GTB` 圖庫** | ✅ **confirmed**：PKWARE DCL implode + 13 B 目錄，45 筆全解。**逐像素 round-trip 通過**。見 `docs/formats/02-glb-image-library.md` |
+| **`WAR.EXE` 反組譯** | 🔶 進行中。**是 Turbo Pascal 不是 Turbo C**；字模槽寬與圖集分割已從 recsize 確認。見 `docs/re/01-war-exe-turbo-pascal.md` |
 | **`PLACD.SAV`** | ✅ **是 ZIP**：整包遊戲的 1993 年備份，145/147 檔與 `game/` byte-identical。見 `docs/formats/03-placd-archive.md` |
 | `.MUS`／`.TIM` | ⬜ 未開始；音源未確認 |
 | `.DAT` 資料表 | 🔶 線索：`MAN(1).DAT` 9,042 B ÷ 274 位將領 = **33 B/人整除** |
@@ -53,7 +54,7 @@
 | `docs/formats/03-placd-archive.md` | **`PLACD.SAV` = 1993 年整包 ZIP 備份**（真實年代、逐檔比對）| ✅ |
 | `docs/playtest/01-dosbox-probe.md` | DOSBox 探路（兩種顯示模式、磁片檢查範圍）| ✅ |
 | `docs/formats/glyph-tables/` | 還原出的字表與詞條（`_slots.json` 為完整詞條）| ✅ |
-| `docs/re/` | 反組譯筆記，一個發現一份，編號流水 | 空 |
+| `docs/re/01-war-exe-turbo-pascal.md` | **`WAR.EXE` 是 Turbo Pascal**；字模槽寬、圖集分割、雙磁碟路徑、磁片提示 | ✅ |
 | `docs/spec/` | 實作規格，標 DRAFT / READY | 空 |
 | `docs/playtest/` | 實跑驗收紀錄與截圖 | 空 |
 | `docs/reference/` | 外部中文資料整理（來源 + 抓取日期）| 空 |
@@ -107,6 +108,20 @@
   這正是 `rulebook/83`「同類檔先列舉全再做 pipeline」的踩坑點。
 - **受影響**：`CLAUDE.md` §3.4 已更正。
 
+### 5.4 「`WAR.EXE` 是 Turbo C 編譯的」→ 是 Turbo Pascal
+
+- **原結論**（`CLAUDE.md` §3.1）：`WAR.EXE` 未打包，Borland Turbo C runtime。
+- **當初憑什麼**：檔案裡有 `Copyright (c) 1983,90 Borland` 字串。
+- **新證據**：IDA 自動辨識出的 RTL 全是 Turbo Pascal——`BlockRead`、`Concat`、
+  `Copy`、`Insert`、`ASSIGNCRT`、`IOResult`，以及 **Graph unit**（`CLOSEGRAPH`、
+  `BAR`、`CIRCLE`、`DRAWPOLY`）。字串也是 Pascal 長度前綴形式
+  （`db 33,'Please remove Disk MARK-A from A:'`）。
+- **為什麼會錯**：Borland 的版權字串在 Turbo C 與 Turbo Pascal 都有，
+  光憑它分不出來。
+- **受影響**：**後續每一份反組譯筆記**——呼叫慣例是 Pascal（參數由左至右壓棧、
+  被呼叫者清棧），字串是長度前綴而非 NUL 結尾。用 C 的直覺讀參數順序會全部反過來。
+  `CLAUDE.md` §3.1、§4.1 已更正。
+
 ### 5.3 「繪圖是 BGI，與 mode 13h 完全是兩套」→ 兩種模式並用
 
 - **原結論**（`CLAUDE.md` §3.2）：遊戲用 BGI 繪圖，640×350 或 640×480 16 色 planar，
@@ -145,6 +160,7 @@ DOSBox oracle 可走到「選擇歷史背景」，政略端沒有磁片檢查。
 | 3 | Go 資產解碼層 | `internal/assets`：`.TPC`／`.15`／`.RGB`／`.GLB`，含 byte-for-byte round-trip 測試 |
 | 4 | 走到戰鬥模組 | 確認 `WAR.EXE` 的 `Please remove Disk MARK-A` 何時觸發。**磁片檢查真正的風險點** |
 | 5 | 字模 round-trip | 拿字表 + 倚天字模重繪主選單的「載入遊戲」，與截圖比對（`.GLB` 已用這招驗過，可複製做法）|
+| 5b | `MAN(N).DAT` 欄位 | 33 B/人。`+0/+1/+2` 是三個 0-100 能力值（蔣中正 100/100/100 全滿）。其餘待反組譯確認 |
 | 6 | 開場動畫轉場 | `.GLB` 的圖與截圖索引對不上（Jaccard ≈ 0.01），轉場機制未確認 |
 | 7 | `WAR.EXE` 進 IDA | 未打包，最大。先定位 BGI 呼叫當錨點，順便確認字模槽寬與 `TN15.N` 省份對應 |
 | 8 | 解 PKLITE | `GRT`／`GRTE`／`SDFA` 三支 |
