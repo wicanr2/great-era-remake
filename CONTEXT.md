@@ -38,7 +38,8 @@
 | **DOSBox oracle** | ✅ **跑得起來**，可走到「選擇歷史背景」。見 `docs/playtest/01-dosbox-probe.md` |
 | **顯示模式** | ✅ **兩種並用**：開場／標題 320×200 256 色（mode 13h）、主遊戲 640×350 16 色（BGI）|
 | 防拷／磁片檢查 | 🔶 政略端（`GRT.EXE`）**未觸發**；`WAR.EXE` 的 `Please remove Disk MARK-A` 尚未走到 |
-| Go 引擎 | ⬜ 未開始 |
+| **Go 解碼層** | ✅ `internal/assets`：DCL、BGI、`.RGB`、`.15`、`.GLB`。測試全綠，**輸出對實機逐像素相同** |
+| Go 規則層／Ebiten | ⬜ 未開始（M4／M5，要等 M2 反組譯出規則）|
 | 多語系 | ⬜ 未開始。字形來源已定案：倚天點陣字（使用者指示 2026-08-01）|
 
 ---
@@ -169,3 +170,5 @@ DOSBox oracle 可走到「選擇歷史背景」，政略端沒有磁片檢查。
 | `tools/entropy.py` | 全檔熵與結構特徵掃描（判「壓縮或加密」前先跑這支）|
 | `tools/dcl.py` | PKWARE DCL implode 解壓（`blast.c` 移植，過官方測試向量）|
 | `tools/glb.py` | `.GLB` 圖庫解包（`list` / `extract`），輸出 PNG |
+| `tools/bgi.py` | BGI `getimage` 解碼（`.TPC`／`NEWSDATA.DAT`）與 `.RGB` 調色盤 |
+| `cmd/assetdump` | Go 版解碼器的 CLI：把原版素材匯出成 PNG（139 張），端到端驗證用 |
