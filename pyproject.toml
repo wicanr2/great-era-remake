@@ -1,0 +1,11 @@
+[project]
+name = "dsds-tools"
+version = "0.1.0"
+description = "《大時代的故事》逆向工具（字模反查、資產解碼驗證）"
+requires-python = ">=3.12"
+dependencies = [
+    "pillow>=10.0",   # 字模/圖像的視覺驗證輸出
+]
+
+[tool.uv]
+package = false
