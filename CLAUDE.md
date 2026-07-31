@@ -117,11 +117,18 @@ sdfa > nul     →     grt     →     war     →     sr     →     grte
 
 DOSBox 設定 `machine=svga_s3`，但這是打包者選的，不代表原版需要 SVGA。
 
-### 3.2 繪圖：Borland BGI，不是 mode 13h
+### 3.2 繪圖：BGI 與 mode 13h **兩種都用**（DOSBox 實測）
 
 `EGAVGA.BGI` 是 Borland Graphics Interface 的 EGA/VGA driver 2.00（1988-03-21）。
-遊戲用 Turbo C 的 BGI 繪圖，也就是 **640×350 或 640×480、16 色 planar**，
-與大富翁2 的 mode 13h chunky 完全是兩套。
+主遊戲用 Turbo C 的 BGI 繪圖，**640×350、16 色 planar**。
+
+但開場動畫與標題畫面是 **320×200、256 色（mode 13h）**——2026-08-01 的 DOSBox
+實測量到視窗在標題階段是 320×200、單張畫面 217 個獨立色，進主選單才切到 640×350。
+所以**不是「BGI 一套走到底」**，兩種模式並用。呈現層要兩套都做。
+詳見 `docs/playtest/01-dosbox-probe.md`。
+
+開場的 256 色圖不可能是 `.TPC`（`.TPC` 是 4-plane 16 色，§3.3 已驗算），
+存在別處；`GRT.GLB` 的高熵是候選解釋。
 
 **這件事對專案是好消息**：BGI 的 API 語意是公開的（`getimage`／`putimage`／
 `setpalette`／`setfillstyle`），反組譯時可以直接對照函式語意，不必從零推繪圖管線。

@@ -1,53 +1,42 @@
 #!/usr/bin/env bash
 # DOSBox oracle 包裝（CLAUDE.md §4：DOSBox 實測是最高位階的 oracle）。
 #
-#   tools/dosbox.sh probe            最小探路：跑起來、截一張圖就退出
-#   tools/dosbox.sh run [conf]       用指定 conf 跑
+#   tools/dosbox.sh probe                     跑 play.bat，等間隔截三張
+#   tools/dosbox.sh run "GRT.EXE" "wait:8;shot:a;key:Return;wait:3;shot:b"
 #
-# 原版素材唯讀：game/ 以 :ro 掛入，遊戲的寫入導到 workplace/dosbox/drive_c。
-# 截圖輸出在 workplace/dosbox/capture/。
+# 沿用現成的 dosbox image（含 Xvfb / xdotool / ImageMagick），不自建。
+# 原版素材唯讀：每次把 game/ 複製一份到可寫的 workplace/dosbox/drive_c，不動原始檔。
+# 截圖輸出在 workplace/dosbox/shots/。
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-IMAGE="dsds-dosbox:x"
+IMAGE="${DSDS_DOSBOX_IMAGE:-fd2-dosbox-screenshot-local}"
 WORK="$ROOT/workplace/dosbox"
 ORIG="$ROOT/workplace/orig/game"
 
-mkdir -p "$WORK/drive_c" "$WORK/capture" "$WORK/conf"
+mkdir -p "$WORK/drive_c" "$WORK/shots"
 
-build() {
-  docker build -f "$ROOT/tools/Dockerfile.dosbox" -t "$IMAGE" "$ROOT/tools"
-}
-
-if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
-  echo "[dosbox.sh] image 不存在，先建一次…" >&2
-  build
-fi
-
-# 原版唯讀：每次把 game/ 複製一份到可寫的 drive_c（不動原始檔）
 sync_game() {
-  rsync -a --delete "$ORIG/" "$WORK/drive_c/" 2>/dev/null \
-    || { rm -rf "$WORK/drive_c"; mkdir -p "$WORK/drive_c"; cp -r "$ORIG/." "$WORK/drive_c/"; }
+  rm -rf "$WORK/drive_c"
+  mkdir -p "$WORK/drive_c"
+  cp -r "$ORIG/." "$WORK/drive_c/"
   chmod -R u+w "$WORK/drive_c"
 }
 
+cmd="${2:-play.bat}"
+timeline="${3:-wait:6;shot:01-boot;wait:6;shot:02-after;wait:8;shot:03-later}"
+cycles="${4:-fixed 12000}"
+
 case "${1:-probe}" in
-  probe)
+  probe|run)
     sync_game
     docker run --rm \
-      -v "$WORK:/dos" \
-      -u "$(id -u):$(id -g)" \
-      -e HOME=/tmp \
-      "$IMAGE" \
-      dosbox -conf /dos/conf/probe.conf -exit
-    echo "[dosbox.sh] 截圖 → $WORK/capture"
+      -v "$WORK/drive_c:/game" \
+      -v "$WORK/shots:/shots" \
+      -v "$ROOT/tools/dosbox_runner.sh:/runner.sh:ro" \
+      --entrypoint bash \
+      "$IMAGE" /runner.sh "$cmd" "$timeline" "$cycles"
+    echo "[dosbox.sh] 截圖 → $WORK/shots"
     ;;
-  run)
-    sync_game
-    conf="${2:-/dos/conf/probe.conf}"
-    docker run --rm -v "$WORK:/dos" -u "$(id -u):$(id -g)" -e HOME=/tmp \
-      "$IMAGE" dosbox -conf "$conf"
-    ;;
-  build) build ;;
-  *) sed -n '2,10p' "$0"; exit 1 ;;
+  *) sed -n '2,9p' "$0"; exit 1 ;;
 esac

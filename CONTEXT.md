@@ -34,7 +34,9 @@
 | `.DAT` 資料表 | 🔶 線索：`MAN(1).DAT` 9,042 B ÷ 274 位將領 = **33 B/人整除** |
 | 存檔 `.DT1`/`.DT2` | ⬜ 未開始；`SAVE(1)`／`SAVE(2)` 可做 diff |
 | 反組譯 | ⬜ 未開始。`WAR.EXE` 未打包可直接進 IDA；`GRT`/`GRTE`/`SDFA` 需先解 PKLITE |
-| 防拷／磁片檢查 | ⬜ 已知存在（`Please remove Disk MARK-A from A:`），未處理 |
+| **DOSBox oracle** | ✅ **跑得起來**，可走到「選擇歷史背景」。見 `docs/playtest/01-dosbox-probe.md` |
+| **顯示模式** | ✅ **兩種並用**：開場／標題 320×200 256 色（mode 13h）、主遊戲 640×350 16 色（BGI）|
+| 防拷／磁片檢查 | 🔶 政略端（`GRT.EXE`）**未觸發**；`WAR.EXE` 的 `Please remove Disk MARK-A` 尚未走到 |
 | Go 引擎 | ⬜ 未開始 |
 | 多語系 | ⬜ 未開始。字形來源已定案：倚天點陣字（使用者指示 2026-08-01）|
 
@@ -97,6 +99,21 @@
   這正是 `rulebook/83`「同類檔先列舉全再做 pipeline」的踩坑點。
 - **受影響**：`CLAUDE.md` §3.4 已更正。
 
+### 5.3 「繪圖是 BGI，與 mode 13h 完全是兩套」→ 兩種模式並用
+
+- **原結論**（`CLAUDE.md` §3.2）：遊戲用 BGI 繪圖，640×350 或 640×480 16 色 planar，
+  「與大富翁2 的 mode 13h chunky 完全是兩套」。
+- **當初憑什麼**：`EGAVGA.BGI` 存在，且 `.TPC` 經驗算確實是 BGI `getimage` 的
+  4-plane 16 色格式，`w=640` 也對得上。**這些證據本身沒錯，錯在外推。**
+- **新證據**：DOSBox 實測用 `xdotool getwindowgeometry` 量到——標題階段視窗是
+  **320×200**、單張畫面 217 個獨立色（mode 13h 256 色）；進主選單才切成 **640×350**、
+  5–16 色（BGI）。兩種模式都在用。
+- **為什麼會錯**：從「`.TPC` 是 BGI 格式」推到「整個遊戲都是 BGI」，
+  正是 `CLAUDE.md` §7 第 9 條的「不要跨檔案外推」。`.TPC` 只證明了 `.TPC` 自己。
+- **受影響**：`CLAUDE.md` §3.2 已改寫；remake 呈現層要支援兩種模式。
+- **順帶的線索**：開場的 256 色圖不可能是 `.TPC`，存在別處；
+  `GRT.GLB` 熵 7.96 bit/byte 一直沒解釋，壓縮過的 256 色圖是合理候選。
+
 ---
 
 ## 6. Worklist（狀態的單一真相來源）
@@ -104,21 +121,26 @@
 ### 6.0 一句話現況
 
 **文本還原鏈的詞表層已打通**：51 個字模檔全部還原成可讀繁中詞條，字形 100% 出自倚天字庫。
-下一個關卡是**敘事文本在哪裡**（詞表只有地名／人名／UI 詞彙，沒有事件與劇情），
+**DOSBox oracle 也通了**，可走到「選擇歷史背景」，政略端沒有磁片檢查。
+
+下一個關卡是**敘事文本在哪裡**——實測畫面上的「北伐時期 — 國民革命軍崛起」這類長句
+不在 51 個字模檔的任何一個裡，詞表只涵蓋地名／人名／番號／UI 詞彙。
 候選是 `NEWSDATA.DAT` 與 `GRT2.GLB`。
 
 ### 6.1 下一步
 
 | # | 項目 | 說明 |
 |---|---|---|
-| 1 | 找敘事文本 | `NEWSDATA.DAT`(29,784 B，不整除 30) 與 `GRT2.GLB`(138,660 B，整除 30) 先量熵再拆 |
+| 1 | 找敘事文本 | `NEWSDATA.DAT`(29,784 B，不整除 30) 與 `GRT2.GLB`(138,660 B，整除 30) 先量熵再拆。**實測已證實長句不在字模檔裡** |
 | 2 | 解 `MAN(N).DAT` | 9,042 ÷ 274 = 33 B/人。將領屬性表，與 `MAN115` 的人名對齊即可標欄位 |
-| 3 | `WAR.EXE` 進 IDA | 未打包，最大。先定位 BGI 呼叫當錨點，順便確認槽寬與 `TN15.N` 省份對應 |
-| 4 | 解 PKLITE | `GRT`／`GRTE`／`SDFA` 三支 |
-| 5 | DOSBox oracle | 探路中：先確認磁片檢查會不會擋路 |
-| 6 | `.TPC` +20 差額 | 差額固定 20 B 的那批是什麼；`AC.TPC` 圖集的分割規則 |
-| 7 | 整理外部資料 | 巴哈攻略百科等頁面人工抓下來放 `docs/reference/`，標來源與日期 |
-| 8 | `JAPAN1` vs `JAPAN2` | 各 85 人，兩檔差異未比對 |
+| 3 | 走到戰鬥模組 | 確認 `WAR.EXE` 的 `Please remove Disk MARK-A` 何時觸發、會不會擋住實測。**這才是磁片檢查真正的風險點** |
+| 4 | 逐像素 round-trip | 拿字表 + 倚天字模重繪主選單的「載入遊戲」，與截圖比對。`CLAUDE.md` §5 步驟 3 的驗收標準 |
+| 5 | 找 256 色圖來源 | 開場／標題是 mode 13h 256 色，不是 `.TPC`。先量 `GRT.GLB` 以外各檔的熵 |
+| 6 | `WAR.EXE` 進 IDA | 未打包，最大。先定位 BGI 呼叫當錨點，順便確認槽寬與 `TN15.N` 省份對應 |
+| 7 | 解 PKLITE | `GRT`／`GRTE`／`SDFA` 三支 |
+| 8 | `.TPC` +20 差額 | 差額固定 20 B 的那批是什麼；`AC.TPC` 圖集的分割規則 |
+| 9 | 整理外部資料 | 巴哈攻略百科等頁面人工抓下來放 `docs/reference/`，標來源與日期 |
+| 10 | `JAPAN1` vs `JAPAN2` | 各 85 人，兩檔差異未比對 |
 
 ### 6.2 已建好的工具
 
@@ -127,7 +149,9 @@
 | `tools/py.sh` | Python 執行包裝（docker + uv venv，venv 持久化在 `workplace/.venv-py`）|
 | `tools/go.sh` | Go 執行包裝（docker，module cache 在 `workplace/.gocache`）|
 | `tools/ida.sh` | IDA Pro 9.4 headless（`analyze` / `script` / `raw`）|
-| `tools/dosbox.sh` | DOSBox oracle（原版唯讀，寫入導到 `workplace/dosbox/drive_c`）|
+| `tools/dosbox.sh` | DOSBox oracle。沿用現成 image，原版唯讀，寫入導到 `workplace/dosbox/drive_c` |
+| `tools/dosbox_runner.sh` | 容器內的 Xvfb + DOSBox + timeline 送鍵截圖（`wait`／`key`／`type`／`shot`）|
+| `tools/deny_scan.sh` | 原版資產 deny-list 掃描。commit 前與發行前都要跑 |
 | `tools/eten.py` | 倚天字庫讀取 + Big5 分區索引（含 oracle 自我驗證）|
 | `tools/glyph_lookup.py` | 字模反查 Big5（`oracle` / `dump` / `match`）|
 | `tools/glyph_slots.py` | 槽寬偵測與詞條切分 |
