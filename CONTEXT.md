@@ -33,8 +33,8 @@
 | **執行檔反組譯（M2）** | 🔶 **4/5 已進 IDA**。編譯器：`WAR`/`SR` = Turbo Pascal，`GRT`/`GRTE` = Borland C++，`SDFA` 解不開。見 `docs/re/01`、`docs/re/02` |
 | **`PLACD.SAV`** | ✅ **是 ZIP**：整包遊戲的 1993 年備份，145/147 檔與 `game/` byte-identical。見 `docs/formats/03-placd-archive.md` |
 | `.MUS`／`.TIM` | ⬜ 未開始；音源未確認 |
-| `.DAT` 資料表 | 🔶 `MAN(N).DAT` 33 B/人；`+0/+1/+2` 是三個 0-100 能力值（蔣中正 100/100/100）。其餘欄位未解 |
-| 存檔 `.DT1`/`.DT2` | ⬜ 未開始；`SAVE(1)`／`SAVE(2)` 可做 diff |
+| **`.DAT` 資料表** | 🔶 **39 省是核心維度**：`TERNAME`／`WARPOS` 每省 196 B、`MEM_WAR` 每省 469 B。`MAN(N).DAT` 33 B/人。欄位語意未解 |
+| 存檔 `.DT1`/`.DT2` | 🔶 `.DT2` = **39 省 × 469 B**（餘 0）。`SAVE(1)` vs `SAVE(2)` 差 8 省；欄位語意未解 |
 | **DOSBox oracle** | ✅ **跑得起來**，可走到「選擇歷史背景」。見 `docs/playtest/01-dosbox-probe.md` |
 | **顯示模式** | ✅ **兩種並用**：開場／標題 320×200 256 色（mode 13h）、主遊戲 640×350 16 色（BGI）|
 | 防拷／磁片檢查 | 🔶 目前看到的是**雙磁片換片提示**（I/O 失敗的後備路徑），不是主動防拷。`sub_10AB5` 未細讀 |
@@ -55,6 +55,7 @@
 | `docs/formats/glyph-tables/` | 還原出的字表與詞條（`_slots.json` 為完整詞條）| ✅ |
 | `docs/re/01-war-exe-turbo-pascal.md` | **`WAR.EXE` 是 Turbo Pascal**；字模槽寬、圖集分割、雙磁碟路徑、磁片提示 | ✅ |
 | `docs/re/02-grt-exe-borland-c.md` | **五支執行檔盤點**：編譯器、角色、PKLITE 自動解包、DCL 字串佐證 | ✅ |
+| `docs/re/03-war-exe-is-the-game.md` | **`WAR.EXE` 是遊戲本體**；39 省資料表結構、存檔 `.DT2` = 39×469 | ✅ |
 | `docs/spec/` | 實作規格，標 DRAFT / READY | 空 |
 | `docs/playtest/` | 實跑驗收紀錄與截圖 | 空 |
 | `docs/reference/` | 外部中文資料整理（來源 + 抓取日期）| 空 |
@@ -107,6 +108,19 @@
   `grep '\.15$'` 篩會篩掉大半——**過濾器自己有洞**。
   這正是 `rulebook/83`「同類檔先列舉全再做 pipeline」的踩坑點。
 - **受影響**：`CLAUDE.md` §3.4 已更正。
+
+### 5.5 「`GRT` 是政略主程式、`WAR` 是戰鬥模組」→ 反了，`WAR` 是遊戲本體
+
+- **原結論**（`CLAUDE.md` §3.7）：`GRT` 政略主程式、`WAR` 戰鬥模組
+  （375 KB 最大，且戰棋的戰鬥系統最重）。
+- **當初憑什麼**：`play.bat` 的順序 `grt → war`，加上「戰鬥系統最重」的直覺。
+  **兩者都只是類比，沒有證據。**
+- **新證據**：比對每支引用的資料檔字串——`WAR.EXE` 引用 80 個以上
+  （全部字模、全部 `.RGB`、`nwmap`／`tername`／`warpos`／`mem_war`／`NewsData`、
+  以及 `save(1).dt2` 到 `save(10).dt2`），另外三支各自只引用兩三個檔。
+  `GRT`／`GRTE` 的字串表全是資源載入與記憶體管理，沒有任何政略或戰鬥的東西。
+- **受影響**：M3 規則規格要挖的東西全部集中在 `WAR.EXE` 一支。
+  `CLAUDE.md` §3.7 已更正，詳見 `docs/re/03-war-exe-is-the-game.md`。
 
 ### 5.3 「繪圖是 BGI，與 mode 13h 完全是兩套」→ 兩種模式並用
 
@@ -162,8 +176,9 @@ DOSBox oracle 可走到「選擇歷史背景」。
 
 | # | 項目 | 說明 |
 |---|---|---|
-| 1 | **找政略規則在哪一支** | `GRT.EXE` 的字串全是資源載入，34 KB 偏小。可能在 `SR`、overlay、或散在多支。**不要因 `play.bat` 順序就假設** |
-| 2 | 模組間交接 | `GRT`→`WAR`→`SR`→`GRTE` 靠哪些檔案傳狀態（`Config.dat`／`MEM_WAR.DAT` 是候選）|
+| 1 | **`.DT2` 省狀態的 469 B 欄位** | 已知 39 省 × 469 B。`MEM_WAR` 與 `SAVE(1)` 只差 2 省，是最好的 diff 素材。從 `WAR.EXE` 讀寫偏移量的程式碼反追定名 |
+| 2 | 模組間交接 | `GRT`→`WAR`→`SR`→`GRTE` 靠哪些檔案傳狀態。`Config.dat`（2 B，四支都讀）是最可能的媒介 |
+| 2b | `NWMAP.DAT` recsize | 15,360 / 392 = 39.18 不整除，recsize 可能抓錯。待查 |
 | 2b | `SDFA.EXE` 解包 | IDA 自動解包對這支失效（0 函式）。要動態 dump 或自寫解包器。優先度低 |
 | 3 | `MAN(N).DAT` 欄位 | 33 B/人，`+0/+1/+2` 已知是能力值。從 `WAR.EXE` 讀取該檔的程式碼反追其餘欄位 |
 | 4 | `byte_6FE88` 語意 | 值 1/4 才載字模，推測是幕別或階段（`docs/re/01` §2）|
