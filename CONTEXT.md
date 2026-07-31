@@ -4,7 +4,7 @@
 > 就能重建完整全局，再依索引跳到需要的文件。硬規則與工作紀律在
 > [`CLAUDE.md`](./CLAUDE.md)。
 >
-> 最後更新：2026-08-01（文本還原鏈打通詞表層）
+> 最後更新：2026-08-01（M0 資產解密完成、Go 解碼層上線、M2 反組譯起步）
 
 ---
 
@@ -23,22 +23,21 @@
 | 原版素材 | ✅ 已搬進 `workplace/orig/`（gitignore）：`game/` 148 檔 + js-dos zip |
 | 發行資料 | ✅ 漢堂國際資訊，1992-10-15，回合制戰棋（`CLAUDE.md` §1.5，維基百科）|
 | 首輪偵查 | ✅ 執行檔鏈、packer、BGI 繪圖、資產檔頭（`CLAUDE.md` §3）|
-| `.TPC` 圖像 | ✅ **已驗證**：BGI `getimage` 緩衝（`w-1`,`h-1` + 4 planes），4 檔差額為 0 |
+| **`.TPC` 圖像** | ✅ **confirmed**：BGI `getimage`，逐列交錯 plane、plane 0 為最高位。**逐像素 round-trip 通過**；`+20` 差額 = `palt` |
 | `.15` 字模格式 | ✅ **已驗證**：16×15、30 B/字，51 檔全部整除 30 |
 | **文本儲存機制** | ✅ **已解**：不是索引，是**定長槽位的字模序列**。見 `docs/formats/01-glyph-text.md` |
 | **詞表還原** | ✅ **已完成**：51 檔 6,174 字模，倚天命中 4,799、空白 1,374、例外 1（位移的逗號）|
-| 敘事文本 | ⬜ 未找到。候選：`NEWSDATA.DAT`(29,784 B，開頭 `d600 0f00` + 大量 `ffff`，像索引表) |
-| `.RGB` 調色盤 | ✅ 純文字 DAC 三元組 |
+| **敘事文本** | ✅ **是畫成圖的**：`NEWSDATA.DAT` = 17 條新聞橫幅（215×16 BGI 圖）。不是字模序列 |
+| `.RGB` 調色盤 | ✅ 純文字，16 行 RGB **百分比**（不是 DAC）。見 `docs/formats/04-tpc-bgi-image.md` |
 | **`.GLB`／`.GTB` 圖庫** | ✅ **confirmed**：PKWARE DCL implode + 13 B 目錄，45 筆全解。**逐像素 round-trip 通過**。見 `docs/formats/02-glb-image-library.md` |
 | **`WAR.EXE` 反組譯** | 🔶 進行中。**是 Turbo Pascal 不是 Turbo C**；字模槽寬與圖集分割已從 recsize 確認。見 `docs/re/01-war-exe-turbo-pascal.md` |
 | **`PLACD.SAV`** | ✅ **是 ZIP**：整包遊戲的 1993 年備份，145/147 檔與 `game/` byte-identical。見 `docs/formats/03-placd-archive.md` |
 | `.MUS`／`.TIM` | ⬜ 未開始；音源未確認 |
-| `.DAT` 資料表 | 🔶 線索：`MAN(1).DAT` 9,042 B ÷ 274 位將領 = **33 B/人整除** |
+| `.DAT` 資料表 | 🔶 `MAN(N).DAT` 33 B/人；`+0/+1/+2` 是三個 0-100 能力值（蔣中正 100/100/100）。其餘欄位未解 |
 | 存檔 `.DT1`/`.DT2` | ⬜ 未開始；`SAVE(1)`／`SAVE(2)` 可做 diff |
-| 反組譯 | ⬜ 未開始。`WAR.EXE` 未打包可直接進 IDA；`GRT`/`GRTE`/`SDFA` 需先解 PKLITE |
 | **DOSBox oracle** | ✅ **跑得起來**，可走到「選擇歷史背景」。見 `docs/playtest/01-dosbox-probe.md` |
 | **顯示模式** | ✅ **兩種並用**：開場／標題 320×200 256 色（mode 13h）、主遊戲 640×350 16 色（BGI）|
-| 防拷／磁片檢查 | 🔶 政略端（`GRT.EXE`）**未觸發**；`WAR.EXE` 的 `Please remove Disk MARK-A` 尚未走到 |
+| 防拷／磁片檢查 | 🔶 目前看到的是**雙磁片換片提示**（I/O 失敗的後備路徑），不是主動防拷。`sub_10AB5` 未細讀 |
 | **Go 解碼層** | ✅ `internal/assets`：DCL、BGI、`.RGB`、`.15`、`.GLB`。測試全綠，**輸出對實機逐像素相同** |
 | Go 規則層／Ebiten | ⬜ 未開始（M4／M5，要等 M2 反組譯出規則）|
 | 多語系 | ⬜ 未開始。字形來源已定案：倚天點陣字（使用者指示 2026-08-01）|
@@ -108,20 +107,6 @@
   這正是 `rulebook/83`「同類檔先列舉全再做 pipeline」的踩坑點。
 - **受影響**：`CLAUDE.md` §3.4 已更正。
 
-### 5.4 「`WAR.EXE` 是 Turbo C 編譯的」→ 是 Turbo Pascal
-
-- **原結論**（`CLAUDE.md` §3.1）：`WAR.EXE` 未打包，Borland Turbo C runtime。
-- **當初憑什麼**：檔案裡有 `Copyright (c) 1983,90 Borland` 字串。
-- **新證據**：IDA 自動辨識出的 RTL 全是 Turbo Pascal——`BlockRead`、`Concat`、
-  `Copy`、`Insert`、`ASSIGNCRT`、`IOResult`，以及 **Graph unit**（`CLOSEGRAPH`、
-  `BAR`、`CIRCLE`、`DRAWPOLY`）。字串也是 Pascal 長度前綴形式
-  （`db 33,'Please remove Disk MARK-A from A:'`）。
-- **為什麼會錯**：Borland 的版權字串在 Turbo C 與 Turbo Pascal 都有，
-  光憑它分不出來。
-- **受影響**：**後續每一份反組譯筆記**——呼叫慣例是 Pascal（參數由左至右壓棧、
-  被呼叫者清棧），字串是長度前綴而非 NUL 結尾。用 C 的直覺讀參數順序會全部反過來。
-  `CLAUDE.md` §3.1、§4.1 已更正。
-
 ### 5.3 「繪圖是 BGI，與 mode 13h 完全是兩套」→ 兩種模式並用
 
 - **原結論**（`CLAUDE.md` §3.2）：遊戲用 BGI 繪圖，640×350 或 640×480 16 色 planar，
@@ -137,38 +122,59 @@
 - **順帶的線索**：開場的 256 色圖不可能是 `.TPC`，存在別處；
   `GRT.GLB` 熵 7.96 bit/byte 一直沒解釋，壓縮過的 256 色圖是合理候選。
 
+### 5.4 「`WAR.EXE` 是 Turbo C 編譯的」→ 是 Turbo Pascal
+
+- **原結論**（`CLAUDE.md` §3.1）：`WAR.EXE` 未打包，Borland Turbo C runtime。
+- **當初憑什麼**：檔案裡有 `Copyright (c) 1983,90 Borland` 字串。
+- **新證據**：IDA 自動辨識出的 RTL 全是 Turbo Pascal——`BlockRead`、`Concat`、
+  `Copy`、`Insert`、`ASSIGNCRT`、`IOResult`，以及 **Graph unit**（`CLOSEGRAPH`、
+  `BAR`、`CIRCLE`、`DRAWPOLY`）。字串也是 Pascal 長度前綴形式
+  （`db 33,'Please remove Disk MARK-A from A:'`）。
+- **為什麼會錯**：Borland 的版權字串在 Turbo C 與 Turbo Pascal 都有，
+  光憑它分不出來。
+- **受影響**：**後續每一份反組譯筆記**——呼叫慣例是 Pascal（參數由左至右壓棧、
+  被呼叫者清棧），字串是長度前綴而非 NUL 結尾。用 C 的直覺讀參數順序會全部反過來。
+  `CLAUDE.md` §3.1、§4.1 已更正。
+
 ---
 
 ## 6. Worklist（狀態的單一真相來源）
 
 ### 6.0 一句話現況
 
-M0 資產解密進度良好：**`.15` 字模、`.GLB`／`.GTB` 圖庫、`PLACD.SAV` 三個格式已解**，
-其中 `.GLB` 通過逐像素 round-trip（書法標題疊在 (259,13)，4,005 個非透明像素零差異）。
-DOSBox oracle 可走到「選擇歷史背景」，政略端沒有磁片檢查。
+**M0 資產解密完成**：`.15` 字模、`.TPC`／`.RGB`、`.GLB`／`.GTB`、`PLACD.SAV`、
+`NEWSDATA.DAT` 全部解開，其中 `.TPC` 與 `.GLB` 通過逐像素 round-trip。
+**Go 解碼層 `internal/assets` 上線**，輸出對實機逐像素相同。
+DOSBox oracle 可走到「選擇歷史背景」。
 
-下一個關卡仍是**敘事文本在哪裡**——實測畫面上的「北伐時期 — 國民革命軍崛起」
-不在 51 個字模檔的任何一個裡。`.GLB` 已排除（裡面是圖不是文字），
-最強的候選剩 `NEWSDATA.DAT`（開頭 `d600 0f00` + 大量 `ffff`，形狀像索引表）。
+**敘事文本的答案是「畫成圖」**：`NEWSDATA.DAT` 是 17 條新聞橫幅的點陣圖
+（「調動軍隊至」「爆發大規模示威遊行」），不是字模序列。所以 remake 的翻譯
+工作要處理的是「把圖轉回文字」，而不是改字串表。
+
+**M2 已起步**：`WAR.EXE` 是 Turbo Pascal（不是 Turbo C），字模槽寬與圖集分割
+都已從 `Reset` 的 recsize 直接讀出來，把先前 5 個弱證據升級為 confirmed。
 
 ### 6.1 下一步
 
+**M2 是現在的關鍵路徑**——規則層與 Ebiten 呈現層必須等 M2/M3 出規格才能動手
+（`CLAUDE.md` §2：spec 齊了才實作）。
+
 | # | 項目 | 說明 |
 |---|---|---|
-| 1 | 找敘事文本 | `NEWSDATA.DAT` 開頭 `d600 0f00` 後接大量 `ffff`（空槽標記），形狀像索引表。從這裡拆 |
-| 2 | 解 `MAN(N).DAT` | 9,042 ÷ 274 = 33 B/人。將領屬性表，與 `MAN115` 的人名對齊即可標欄位 |
-| 3 | Go 資產解碼層 | `internal/assets`：`.TPC`／`.15`／`.RGB`／`.GLB`，含 byte-for-byte round-trip 測試 |
-| 4 | 走到戰鬥模組 | 確認 `WAR.EXE` 的 `Please remove Disk MARK-A` 何時觸發。**磁片檢查真正的風險點** |
-| 5 | 字模 round-trip | 拿字表 + 倚天字模重繪主選單的「載入遊戲」，與截圖比對（`.GLB` 已用這招驗過，可複製做法）|
-| 5b | `MAN(N).DAT` 欄位 | 33 B/人。`+0/+1/+2` 是三個 0-100 能力值（蔣中正 100/100/100 全滿）。其餘待反組譯確認 |
-| 6 | 開場動畫轉場 | `.GLB` 的圖與截圖索引對不上（Jaccard ≈ 0.01），轉場機制未確認 |
-| 7 | `WAR.EXE` 進 IDA | 未打包，最大。先定位 BGI 呼叫當錨點，順便確認字模槽寬與 `TN15.N` 省份對應 |
-| 8 | 解 PKLITE | `GRT`／`GRTE`／`SDFA` 三支 |
-| 9 | 找其他 `.GLB` | 目前只有 `GRT`／`GRT2` 兩組，`WAR`／`GRTE` 的 256 色圖裝在哪未查 |
-| 10 | `.TPC` +20 差額 | 差額固定 20 B 的那批是什麼；`AC.TPC` 圖集的分割規則 |
-| 11 | 存檔 diff | `SAVE(1)` 是 1993-03-23、`SAVE(2)` 是 1993-01-10，兩份不同時間的進度可做 diff |
-| 12 | 整理外部資料 | 巴哈攻略百科等頁面人工抓下來放 `docs/reference/`，標來源與日期 |
-| 13 | `JAPAN1` vs `JAPAN2` | 各 85 人，兩檔差異未比對 |
+| 1 | `WAR.EXE` 主迴圈 | 從 `PROGRAM` 進入點往下追。模組間交接（`GRT`→`WAR`→`SR`→`GRTE`）靠哪些檔案 |
+| 2 | 解 PKLITE | `GRT`／`GRTE`／`SDFA` 三支。`GRT` 是政略主程式，規則大半在裡面 |
+| 3 | `MAN(N).DAT` 欄位 | 33 B/人，`+0/+1/+2` 已知是能力值。從 `WAR.EXE` 讀取該檔的程式碼反追其餘欄位 |
+| 4 | `byte_6FE88` 語意 | 值 1/4 才載字模，推測是幕別或階段（`docs/re/01` §2）|
+| 5 | `sub_10AB5` | MARK-A → MARK-C 換片流程，確認是否有主動防拷 |
+| 6 | 戰鬥規則 | 六角格、機動力、地形防禦（社群說法，全部待驗）|
+| 7 | 存檔格式 | `SAVE(1)` 1993-03-23、`SAVE(2)` 1993-01-10，兩份可做 diff；`MEM_WAR.DAT` 與 `.DT2` 同為 18,291 B |
+| 8 | `NEWSDATA` 字型 | 17 張新聞圖用倚天反查全部落空，字形較粗、字高 14，來源待查 |
+| 9 | `RAIL.TPC` | 不是 BGI，是 chunky 資料（值 0/7/8），格式待查 |
+| 10 | 開場動畫轉場 | `.GLB` 的圖與截圖索引對不上（Jaccard ≈ 0.01），轉場機制未確認 |
+| 11 | 找其他 `.GLB` | 只有 `GRT`／`GRT2` 兩組，`WAR`／`GRTE` 的 256 色圖裝在哪未查 |
+| 12 | `NEWICON`／`NEWTERR` | recsize 是整檔，切張在記憶體裡做。296×18、408×22 整除但未經反組譯確認 |
+| 13 | 整理外部資料 | 巴哈攻略百科等頁面人工抓下來放 `docs/reference/`，標來源與日期 |
+| 14 | `JAPAN1` vs `JAPAN2` | 各 85 人，兩檔差異未比對 |
 
 ### 6.2 已建好的工具
 
