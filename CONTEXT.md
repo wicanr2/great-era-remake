@@ -27,9 +27,10 @@
 | `.15` 字模格式 | ✅ **已驗證**：16×15、30 B/字，51 檔全部整除 30 |
 | **文本儲存機制** | ✅ **已解**：不是索引，是**定長槽位的字模序列**。見 `docs/formats/01-glyph-text.md` |
 | **詞表還原** | ✅ **已完成**：51 檔 6,174 字模，倚天命中 4,799、空白 1,374、例外 1（位移的逗號）|
-| 敘事文本 | ⬜ 未找到。候選：`NEWSDATA.DAT`(29,784 B)、`GRT2.GLB`(138,660 B，整除 30) |
+| 敘事文本 | ⬜ 未找到。候選：`NEWSDATA.DAT`(29,784 B，開頭 `d600 0f00` + 大量 `ffff`，像索引表) |
 | `.RGB` 調色盤 | ✅ 純文字 DAC 三元組 |
-| `.GLB` 封裝 | ⬜ `GRT.GLB` 熵 7.96 bit/byte（壓縮或加密）；`GRT2.GLB` 未量熵 |
+| **`.GLB`／`.GTB` 圖庫** | ✅ **confirmed**：PKWARE DCL implode + 13 B 目錄，45 筆全解。**逐像素 round-trip 通過**。見 `docs/formats/02-glb-image-library.md` |
+| **`PLACD.SAV`** | ✅ **是 ZIP**：整包遊戲的 1993 年備份，145/147 檔與 `game/` byte-identical。見 `docs/formats/03-placd-archive.md` |
 | `.MUS`／`.TIM` | ⬜ 未開始；音源未確認 |
 | `.DAT` 資料表 | 🔶 線索：`MAN(1).DAT` 9,042 B ÷ 274 位將領 = **33 B/人整除** |
 | 存檔 `.DT1`/`.DT2` | ⬜ 未開始；`SAVE(1)`／`SAVE(2)` 可做 diff |
@@ -47,6 +48,9 @@
 | 路徑 | 內容 | 目前 |
 |---|---|---|
 | `docs/formats/01-glyph-text.md` | **`.15` 字模與文本儲存機制**（定長槽位、51 檔用途、例外記帳）| ✅ |
+| `docs/formats/02-glb-image-library.md` | **`.GLB`／`.GTB` 256 色圖庫**（DCL implode、調色盤、透明色、round-trip）| ✅ |
+| `docs/formats/03-placd-archive.md` | **`PLACD.SAV` = 1993 年整包 ZIP 備份**（真實年代、逐檔比對）| ✅ |
+| `docs/playtest/01-dosbox-probe.md` | DOSBox 探路（兩種顯示模式、磁片檢查範圍）| ✅ |
 | `docs/formats/glyph-tables/` | 還原出的字表與詞條（`_slots.json` 為完整詞條）| ✅ |
 | `docs/re/` | 反組譯筆記，一個發現一份，編號流水 | 空 |
 | `docs/spec/` | 實作規格，標 DRAFT / READY | 空 |
@@ -65,7 +69,10 @@
 | 數字佔位 | `FAN(2)/(3).15` 詞條**中間**的空白，執行期填入 `1.15` 的數字字模（「第␣集團軍」）|
 | 場景字模檔 | 51 個 `.15` 族檔案。每個場景／類別各帶一份自己的詞表 |
 | 字模索引 | ⚠️ **已推翻的說法**，見 §5。原本以為文字存索引，實際字模序列本身就是文本 |
-| BGI 緩衝 | Borland `getimage` 的記憶體格式，`.TPC` 用的就是它 |
+| BGI 緩衝 | Borland `getimage` 的記憶體格式，`.TPC` 用的就是它（4-plane、16 色 planar）|
+| DCL implode | PKWARE Data Compression Library 的壓縮法，`.GLB` 每一筆各自是一段。header `00 06` |
+| 透明色索引 | `.GLB` 圖像的索引 0 不寫入，露出底圖。書法標題就是這樣疊上去的 |
+| DAC 6-bit | VGA 調色盤是 6-bit（0–63）。轉 8-bit 要用 `(v<<2)\|(v>>4)`，不是 `v*255/63` |
 | 命令數 | 政略階段每個省份可下的指令上限（社群資料，待驗）|
 | oracle | 判斷「原版怎麼做」的證據來源，優先序見 `CLAUDE.md` §4 |
 
@@ -120,27 +127,31 @@
 
 ### 6.0 一句話現況
 
-**文本還原鏈的詞表層已打通**：51 個字模檔全部還原成可讀繁中詞條，字形 100% 出自倚天字庫。
-**DOSBox oracle 也通了**，可走到「選擇歷史背景」，政略端沒有磁片檢查。
+M0 資產解密進度良好：**`.15` 字模、`.GLB`／`.GTB` 圖庫、`PLACD.SAV` 三個格式已解**，
+其中 `.GLB` 通過逐像素 round-trip（書法標題疊在 (259,13)，4,005 個非透明像素零差異）。
+DOSBox oracle 可走到「選擇歷史背景」，政略端沒有磁片檢查。
 
-下一個關卡是**敘事文本在哪裡**——實測畫面上的「北伐時期 — 國民革命軍崛起」這類長句
-不在 51 個字模檔的任何一個裡，詞表只涵蓋地名／人名／番號／UI 詞彙。
-候選是 `NEWSDATA.DAT` 與 `GRT2.GLB`。
+下一個關卡仍是**敘事文本在哪裡**——實測畫面上的「北伐時期 — 國民革命軍崛起」
+不在 51 個字模檔的任何一個裡。`.GLB` 已排除（裡面是圖不是文字），
+最強的候選剩 `NEWSDATA.DAT`（開頭 `d600 0f00` + 大量 `ffff`，形狀像索引表）。
 
 ### 6.1 下一步
 
 | # | 項目 | 說明 |
 |---|---|---|
-| 1 | 找敘事文本 | `NEWSDATA.DAT`(29,784 B，不整除 30) 與 `GRT2.GLB`(138,660 B，整除 30) 先量熵再拆。**實測已證實長句不在字模檔裡** |
+| 1 | 找敘事文本 | `NEWSDATA.DAT` 開頭 `d600 0f00` 後接大量 `ffff`（空槽標記），形狀像索引表。從這裡拆 |
 | 2 | 解 `MAN(N).DAT` | 9,042 ÷ 274 = 33 B/人。將領屬性表，與 `MAN115` 的人名對齊即可標欄位 |
-| 3 | 走到戰鬥模組 | 確認 `WAR.EXE` 的 `Please remove Disk MARK-A` 何時觸發、會不會擋住實測。**這才是磁片檢查真正的風險點** |
-| 4 | 逐像素 round-trip | 拿字表 + 倚天字模重繪主選單的「載入遊戲」，與截圖比對。`CLAUDE.md` §5 步驟 3 的驗收標準 |
-| 5 | 找 256 色圖來源 | 開場／標題是 mode 13h 256 色，不是 `.TPC`。先量 `GRT.GLB` 以外各檔的熵 |
-| 6 | `WAR.EXE` 進 IDA | 未打包，最大。先定位 BGI 呼叫當錨點，順便確認槽寬與 `TN15.N` 省份對應 |
-| 7 | 解 PKLITE | `GRT`／`GRTE`／`SDFA` 三支 |
-| 8 | `.TPC` +20 差額 | 差額固定 20 B 的那批是什麼；`AC.TPC` 圖集的分割規則 |
-| 9 | 整理外部資料 | 巴哈攻略百科等頁面人工抓下來放 `docs/reference/`，標來源與日期 |
-| 10 | `JAPAN1` vs `JAPAN2` | 各 85 人，兩檔差異未比對 |
+| 3 | Go 資產解碼層 | `internal/assets`：`.TPC`／`.15`／`.RGB`／`.GLB`，含 byte-for-byte round-trip 測試 |
+| 4 | 走到戰鬥模組 | 確認 `WAR.EXE` 的 `Please remove Disk MARK-A` 何時觸發。**磁片檢查真正的風險點** |
+| 5 | 字模 round-trip | 拿字表 + 倚天字模重繪主選單的「載入遊戲」，與截圖比對（`.GLB` 已用這招驗過，可複製做法）|
+| 6 | 開場動畫轉場 | `.GLB` 的圖與截圖索引對不上（Jaccard ≈ 0.01），轉場機制未確認 |
+| 7 | `WAR.EXE` 進 IDA | 未打包，最大。先定位 BGI 呼叫當錨點，順便確認字模槽寬與 `TN15.N` 省份對應 |
+| 8 | 解 PKLITE | `GRT`／`GRTE`／`SDFA` 三支 |
+| 9 | 找其他 `.GLB` | 目前只有 `GRT`／`GRT2` 兩組，`WAR`／`GRTE` 的 256 色圖裝在哪未查 |
+| 10 | `.TPC` +20 差額 | 差額固定 20 B 的那批是什麼；`AC.TPC` 圖集的分割規則 |
+| 11 | 存檔 diff | `SAVE(1)` 是 1993-03-23、`SAVE(2)` 是 1993-01-10，兩份不同時間的進度可做 diff |
+| 12 | 整理外部資料 | 巴哈攻略百科等頁面人工抓下來放 `docs/reference/`，標來源與日期 |
+| 13 | `JAPAN1` vs `JAPAN2` | 各 85 人，兩檔差異未比對 |
 
 ### 6.2 已建好的工具
 
@@ -155,3 +166,6 @@
 | `tools/eten.py` | 倚天字庫讀取 + Big5 分區索引（含 oracle 自我驗證）|
 | `tools/glyph_lookup.py` | 字模反查 Big5（`oracle` / `dump` / `match`）|
 | `tools/glyph_slots.py` | 槽寬偵測與詞條切分 |
+| `tools/entropy.py` | 全檔熵與結構特徵掃描（判「壓縮或加密」前先跑這支）|
+| `tools/dcl.py` | PKWARE DCL implode 解壓（`blast.c` 移植，過官方測試向量）|
+| `tools/glb.py` | `.GLB` 圖庫解包（`list` / `extract`），輸出 PNG |
