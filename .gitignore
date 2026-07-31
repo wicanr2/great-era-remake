@@ -1,0 +1,52 @@
+# 原版素材一律不進版控
+workplace/
+/game/
+*.zip
+*.rar
+
+# 原版資產副檔名（雙保險，deny-list 掃描也認這份）
+*.TPC
+*.15
+*.RGB
+*.MUS
+*.TIM
+*.DAT
+*.GLB
+*.GTB
+*.DT1
+*.DT2
+*.SAV
+*.CPS
+*.BGI
+*.EXE
+*.exe
+MAN115
+MAN215
+MAN315
+
+# 倚天字型（不得散布）
+STDFONT.*
+SPCFONT.*
+ASCFONT.*
+
+# IDA / 反組譯產物
+*.i64
+*.idb
+*.asm
+*.til
+*.nam
+*.id0
+*.id1
+*.id2
+
+# 建置產物
+/dist/
+/bin/
+*.test
+
+# 暫存
+/tmp/
+*.log
+.DS_Store
+__pycache__/
+*.pyc
