@@ -30,7 +30,7 @@
 | **敘事文本** | ✅ **是畫成圖的**：`NEWSDATA.DAT` = 17 條新聞橫幅（215×16 BGI 圖）。不是字模序列 |
 | `.RGB` 調色盤 | ✅ 純文字，16 行 RGB **百分比**（不是 DAC）。見 `docs/formats/04-tpc-bgi-image.md` |
 | **`.GLB`／`.GTB` 圖庫** | ✅ **confirmed**：PKWARE DCL implode + 13 B 目錄，45 筆全解。**逐像素 round-trip 通過**。見 `docs/formats/02-glb-image-library.md` |
-| **`WAR.EXE` 反組譯** | 🔶 進行中。**是 Turbo Pascal 不是 Turbo C**；字模槽寬與圖集分割已從 recsize 確認。見 `docs/re/01-war-exe-turbo-pascal.md` |
+| **執行檔反組譯（M2）** | 🔶 **4/5 已進 IDA**。編譯器：`WAR`/`SR` = Turbo Pascal，`GRT`/`GRTE` = Borland C++，`SDFA` 解不開。見 `docs/re/01`、`docs/re/02` |
 | **`PLACD.SAV`** | ✅ **是 ZIP**：整包遊戲的 1993 年備份，145/147 檔與 `game/` byte-identical。見 `docs/formats/03-placd-archive.md` |
 | `.MUS`／`.TIM` | ⬜ 未開始；音源未確認 |
 | `.DAT` 資料表 | 🔶 `MAN(N).DAT` 33 B/人；`+0/+1/+2` 是三個 0-100 能力值（蔣中正 100/100/100）。其餘欄位未解 |
@@ -54,6 +54,7 @@
 | `docs/playtest/01-dosbox-probe.md` | DOSBox 探路（兩種顯示模式、磁片檢查範圍）| ✅ |
 | `docs/formats/glyph-tables/` | 還原出的字表與詞條（`_slots.json` 為完整詞條）| ✅ |
 | `docs/re/01-war-exe-turbo-pascal.md` | **`WAR.EXE` 是 Turbo Pascal**；字模槽寬、圖集分割、雙磁碟路徑、磁片提示 | ✅ |
+| `docs/re/02-grt-exe-borland-c.md` | **五支執行檔盤點**：編譯器、角色、PKLITE 自動解包、DCL 字串佐證 | ✅ |
 | `docs/spec/` | 實作規格，標 DRAFT / READY | 空 |
 | `docs/playtest/` | 實跑驗收紀錄與截圖 | 空 |
 | `docs/reference/` | 外部中文資料整理（來源 + 抓取日期）| 空 |
@@ -161,8 +162,9 @@ DOSBox oracle 可走到「選擇歷史背景」。
 
 | # | 項目 | 說明 |
 |---|---|---|
-| 1 | `WAR.EXE` 主迴圈 | 從 `PROGRAM` 進入點往下追。模組間交接（`GRT`→`WAR`→`SR`→`GRTE`）靠哪些檔案 |
-| 2 | 解 PKLITE | `GRT`／`GRTE`／`SDFA` 三支。`GRT` 是政略主程式，規則大半在裡面 |
+| 1 | **找政略規則在哪一支** | `GRT.EXE` 的字串全是資源載入，34 KB 偏小。可能在 `SR`、overlay、或散在多支。**不要因 `play.bat` 順序就假設** |
+| 2 | 模組間交接 | `GRT`→`WAR`→`SR`→`GRTE` 靠哪些檔案傳狀態（`Config.dat`／`MEM_WAR.DAT` 是候選）|
+| 2b | `SDFA.EXE` 解包 | IDA 自動解包對這支失效（0 函式）。要動態 dump 或自寫解包器。優先度低 |
 | 3 | `MAN(N).DAT` 欄位 | 33 B/人，`+0/+1/+2` 已知是能力值。從 `WAR.EXE` 讀取該檔的程式碼反追其餘欄位 |
 | 4 | `byte_6FE88` 語意 | 值 1/4 才載字模，推測是幕別或階段（`docs/re/01` §2）|
 | 5 | `sub_10AB5` | MARK-A → MARK-C 換片流程，確認是否有主動防拷 |

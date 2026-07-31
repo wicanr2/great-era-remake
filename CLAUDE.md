@@ -108,12 +108,13 @@ sdfa > nul     →     grt     →     war     →     sr     →     grte
 | 檔案 | 大小 | 觀察 |
 |---|---|---|
 | `WAR.EXE` | 375,568 B | 最大的一個，**未打包**，**Borland Turbo Pascal**（RTL + Graph unit，見 `docs/re/01`）。字串表裡有大量小寫檔名（`book1.tpc`、`menu1.tpc`、`head1.rgb`）與 `b:` 前綴的雙磁碟路徑 |
-| `GRT.EXE` | 34,708 B | **PKLITE 打包**（`Copyright 1990-92 PKWARE`）|
-| `GRTE.EXE` | 57,168 B | PKLITE 打包 |
-| `SDFA.EXE` | 10,243 B | PKLITE 打包。`play.bat` 第一個跑且丟棄輸出，疑似音效／環境偵測 |
-| `SR.EXE` | 36,288 B | 無 packer 標記也無 Borland 標記，來歷待查 |
+| `GRT.EXE` | 34,708 B | PKLITE 打包，**IDA 自動解得開**。**Borland C++ 1991**，178 函式。GF 資源載入（`grt.GTB`）、DCL 解壓 |
+| `GRTE.EXE` | 57,168 B | 同上，**Borland C++**，191 函式。與 `GRT` 幾乎同一套程式但用 `grt2.GTB` + `final` 音樂 → **結局** |
+| `SDFA.EXE` | 10,243 B | PKLITE 打包，**IDA 解不開**（0 函式 0 字串）。`play.bat` 第一個跑且丟棄輸出，疑似環境偵測 |
+| `SR.EXE` | 36,288 B | **Turbo Pascal**，118 函式。**劇情過場**：`scene141/142/271/272.tpc` + 五首音樂 |
 
-反組譯前 **PKLITE 那三個要先解包**。`WAR.EXE` 可以直接進 IDA。
+反組譯前 PKLITE 那三個原本要先解包，**但實測 IDA 9.4 對 `GRT`／`GRTE` 會自動解開**，
+只有 `SDFA` 解不開。`WAR.EXE` 沒打包，直接進 IDA。
 
 DOSBox 設定 `machine=svga_s3`，但這是打包者選的，不代表原版需要 SVGA。
 
@@ -196,9 +197,10 @@ DOSBox 設定 `machine=svga_s3`，但這是打包者選的，不代表原版需�
 `.DAT` 十二個資料表的語意、`.GTB`（2 個，200–380 B）、`SR.EXE` 的來歷、
 `.TPC` 那 20 byte 的差額。
 
-配合 §1.5 的類型（回合制戰棋），五個執行檔的**假說**是：`GRT` 政略主程式、
-`WAR` 戰鬥模組（375 KB 最大，且戰棋的戰鬥系統最重）、`GRTE` 結局或事件、
-`SDFA` 環境偵測、`SR` 未知。`play.bat` 把它們串成一條鏈，代表模組間靠**檔案**交接狀態
+五個執行檔的角色（2026-08-01 反組譯，見 `docs/re/02`）：`SR` = **劇情過場**、
+`GRTE` = **結局**（兩者有字串證據）；`WAR` = 戰鬥（375 KB 最大，仍是推論）；
+`SDFA` 環境偵測（未解包）。**`GRT` 是不是政略主程式尚未證實**——它的字串全是
+資源載入與記憶體管理，34 KB／178 函式偏小，政略規則可能在別處或以 overlay 載入。`play.bat` 把它們串成一條鏈，代表模組間靠**檔案**交接狀態
 （`Config.dat`、`PLACD.SAV` 是候選）。這條交接鏈解開之前，不要假設任何模組可以獨立執行。
 
 ---
