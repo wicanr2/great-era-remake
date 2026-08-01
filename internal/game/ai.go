@@ -337,7 +337,7 @@ func (w *AIWorld) generalTransfer(p ProvinceID, mode int) AIAction {
 		}
 		// sub_36BC7：模式 2 還要過特殊省份的檢查。
 		if mode == 2 {
-			if !isSpecial(n) {
+			if !w.nearSpecial(n) {
 				continue
 			}
 			if np.Flags&ProvinceFlagInBattle != 0 {
@@ -411,13 +411,43 @@ func (w *AIWorld) neighbours(prov *Province) []ProvinceID {
 // 兩處毫不相干卻一模一樣——那五個省有共同的特殊性質，**語意未定**。
 var SpecialProvinces = [5]ProvinceID{7, 11, 20, 21, 36}
 
-// isSpecial 是 `sub_36BC7` 的簡化版：只實作「這個省本身在清單裡」那一條。
+// nearSpecial 是 `sub_36BC7`（`70-ai.md` §6m）：目標省要與那五個特殊省
+// 之一有關聯——是它本身、或與它相鄰且同勢力。
 //
-// ⚠️ 原版還有兩條分支（`sub_5B76E` 與 `sub_5BF74`，都**未讀**），
-// 所以這裡比原版嚴格——會擋掉一些原版放行的情況。
-func isSpecial(p ProvinceID) bool {
-	for _, s := range SpecialProvinces {
-		if s == p {
+// ⚠️ 原版還有第三條分支：兩者不相鄰時做**省份層的路徑搜尋**
+// （`sub_5BF74`，配置 39×39 的矩陣），有路徑就放行。那支還沒讀，
+// 所以這裡比原版嚴格——會擋掉一些原版放行的遠距離情況。
+func (w *AIWorld) nearSpecial(target ProvinceID) bool {
+	tp, err := w.Table.At(target)
+	if err != nil {
+		return false
+	}
+	for _, sp := range SpecialProvinces {
+		if sp == target {
+			return true
+		}
+		// sub_5B76E：兩者相鄰嗎。
+		if !w.adjacentProvinces(sp, target) {
+			continue // 原版在這裡改走路徑搜尋，我們還沒實作
+		}
+		if p, err := w.Table.At(sp); err == nil && p.Commander == tp.Commander {
+			return true
+		}
+	}
+	return false
+}
+
+// adjacentProvinces 是 `sub_5B76E`：a 在不在 b 的鄰省表裡。
+func (w *AIWorld) adjacentProvinces(a, b ProvinceID) bool {
+	if !a.Valid() || !b.Valid() {
+		return false
+	}
+	bp, err := w.Table.At(b)
+	if err != nil {
+		return false
+	}
+	for _, n := range w.neighbours(bp) {
+		if n == a {
 			return true
 		}
 	}

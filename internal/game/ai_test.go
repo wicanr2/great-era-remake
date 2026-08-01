@@ -1,6 +1,10 @@
 package game
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/wicanr2/great-era-remake/internal/assets"
+)
 
 // 用 SAVE(1) 的真實局面建 AI 世界。
 func realWorld(t *testing.T) *AIWorld {
@@ -242,4 +246,105 @@ func TestPortsOriginalIndexingBug(t *testing.T) {
 	if w.generalsLoyalTo(99, 100) {
 		t.Error("省編號超出將領表時應回 false")
 	}
+}
+
+// sub_5B76E 的鄰接檢查：與地圖導出的鄰接表比對。
+//
+// 兩邊是不同的資料路徑（一個讀省份記錄 +22 的鄰省表、一個從 WARPOS 導），
+// **已知有三筆差異**，全是隔海／隔境那一段（`SPEC-03` §4）：
+//
+//	福建(24) 的鄰省表缺 臺灣(37)
+//	雲南(34) 缺 緬甸(39)
+//	廣東(36) 缺 海南島(38)
+//
+// 把它們釘成明確的例外而不是放寬條件——差異變多或變少都要被抓到。
+func TestAdjacentProvincesMatchesMap(t *testing.T) {
+	known := map[[2]ProvinceID]bool{
+		{24, 37}: true, // 福建 → 臺灣
+		{34, 39}: true, // 雲南 → 緬甸
+		{36, 38}: true, // 廣東 → 海南島
+	}
+	seen := map[[2]ProvinceID]bool{}
+
+	w := realWorld(t)
+	m := loadTestMap(t)
+	checked := 0
+	for p := ProvinceID(1); p <= ProvinceCount; p++ {
+		ns, err := m.Neighbours(p)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, n := range ns {
+			if !w.adjacentProvinces(n, p) {
+				k := [2]ProvinceID{p, n}
+				if !known[k] {
+					t.Errorf("地圖說 %d 與 %d 相鄰，鄰省表卻說不是（不在已知例外裡）", p, n)
+				}
+				seen[k] = true
+			}
+			checked++
+		}
+		// 不相鄰的也要對：隨便挑一個不在鄰省表裡的省。
+		for q := ProvinceID(1); q <= ProvinceCount; q++ {
+			inList := false
+			for _, n := range ns {
+				if n == q {
+					inList = true
+				}
+			}
+			if !inList && q != p && w.adjacentProvinces(q, p) {
+				t.Errorf("鄰省表說 %d 與 %d 相鄰，地圖卻說不是", p, q)
+			}
+		}
+	}
+	for k := range known {
+		if !seen[k] {
+			t.Errorf("已知例外 %d→%d 消失了——資料或解讀變了，重看 SPEC-03 §4", k[0], k[1])
+		}
+	}
+	t.Logf("比對 %d 組鄰接，已知例外 %d 筆全部出現", checked, len(known))
+}
+
+// 五個特殊省的清單不能悄悄變動——它與 WARPOS 的哨兵 40 完全相同，
+// 那個巧合本身就是證據（70-ai.md §6m）。
+func TestSpecialProvincesMatchWarposSentinel(t *testing.T) {
+	want := []ProvinceID{7, 11, 20, 21, 36}
+	if len(SpecialProvinces) != len(want) {
+		t.Fatalf("特殊省清單長度 = %d，應為 %d", len(SpecialProvinces), len(want))
+	}
+	for i, p := range want {
+		if SpecialProvinces[i] != p {
+			t.Errorf("特殊省[%d] = %d，應為 %d", i, SpecialProvinces[i], p)
+		}
+	}
+
+	// 與 WARPOS 的哨兵 40 對照——這是清單的出處旁證。
+	grids, err := assetsProvinceGrids(t)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var withSentinel []ProvinceID
+	for k := 0; k < ProvinceCount; k++ {
+		for _, v := range grids[k] {
+			if v == 40 {
+				withSentinel = append(withSentinel, ProvinceID(k+1))
+				break
+			}
+		}
+	}
+	if len(withSentinel) != len(want) {
+		t.Fatalf("WARPOS 帶哨兵 40 的省有 %d 個，應為 %d：%v",
+			len(withSentinel), len(want), withSentinel)
+	}
+	for i, p := range want {
+		if withSentinel[i] != p {
+			t.Errorf("哨兵 40 的省[%d] = %d，應為 %d", i, withSentinel[i], p)
+		}
+	}
+}
+
+// assetsProvinceGrids 讀 WARPOS.DAT 的原始格子圖。
+func assetsProvinceGrids(t *testing.T) (*assets.ProvinceGrids, error) {
+	t.Helper()
+	return assets.ParseProvinceGrids(readGame(t, "WARPOS.DAT"))
 }
