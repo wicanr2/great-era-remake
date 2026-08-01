@@ -147,3 +147,42 @@ func TestRosterIsAttackerDefender(t *testing.T) {
 	}
 	t.Logf("河南：攻方 %v，守方 %v", att, def)
 }
+
+// TestUnitAreaIsWordArray 驗證 200 B 的單位區切成 100 個 u16 之後，
+// 仍然通過 byte-for-byte round-trip。
+//
+// [訂正] 這一區原本切成 [200]byte 並假設「10 個單位 × 20 B」。
+// 實際上 sub_545B0／sub_5446D 遍歷它時迴圈上限是 100、以 word 為單位，
+// 所以是 100 個 u16。切法改了但 round-trip 必須照樣過——
+// 那是「改寫而非重建」的底線。
+func TestUnitAreaIsWordArray(t *testing.T) {
+	if BattleUnits*2 != BattleUnitArea {
+		t.Fatalf("100 個 u16 應該正好是 %d bytes，實得 %d",
+			BattleUnitArea, BattleUnits*2)
+	}
+	data := readGame(t, "MEM_WAR.DAT")
+	sts, err := ParseBattleStates(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// 緬甸（省 39）那筆有未初始化殘料，正好拿來驗非零資料的 round-trip
+	st := sts[38]
+	nonzero := 0
+	for _, v := range st.UnitsA {
+		if v != 0 {
+			nonzero++
+		}
+	}
+	if nonzero == 0 {
+		t.Fatal("省 39 的 UnitsA 應該有殘料，測試前提不成立")
+	}
+	out := st.Bytes()
+	orig := data[38*BattleStateSize : 39*BattleStateSize]
+	for k := 0; k < BattleStateSize; k++ {
+		if out[k] != orig[k] {
+			t.Fatalf("省 39 round-trip 在 offset %d 不同：%#x vs %#x",
+				k, out[k], orig[k])
+		}
+	}
+	t.Logf("省 39 的 UnitsA 有 %d 個非零 word，round-trip 通過", nonzero)
+}
