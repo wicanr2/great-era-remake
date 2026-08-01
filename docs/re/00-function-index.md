@@ -241,8 +241,8 @@
 | `sub_3C26A` | ⚠️ 幾支函式**寫不只一個值**（`sub_47EAA` 寫 1 與 3、`sub_3C26A` 寫 3 與 4）， | `docs/re/31-battle-ai-chain.md`（另 1 份） | 11 |
 | `sub_3C40C` | sub_3C40C(狀態, &var_22) | `docs/re/31-battle-ai-chain.md` | 1 |
 | `sub_3C633` | sub_3C633(狀態) | `docs/re/31-battle-ai-chain.md` | 1 |
-| `sub_3C777` | 變數 \| `sub_3C777`(cl)、`sub_3D0AC`(cx)、`sub_3ED4F`(cx) \| — \| | `docs/re/31-battle-ai-chain.md` | 3 |
-| `sub_3C89A` | 3 \| `sub_3C89A` \| `sub_3AA51`／**預設** \| | `docs/re/31-battle-ai-chain.md`（另 1 份） | 7 |
+| `sub_3C777` | 26. `sub_3C777`（143 行）：收尾補救，而且**保存-呼叫-還原** | `docs/re/31-battle-ai-chain.md` | 4 |
+| `sub_3C89A` | 3 \| `sub_3C89A` \| `sub_3AA51`／**預設** \| | `docs/re/31-battle-ai-chain.md`（另 1 份） | 8 |
 | `sub_3CA09` | `sub_3CA09` \| 1 \| **1.5** \| 同上 \| 成立才繼續 \| | `docs/re/31-battle-ai-chain.md` | 6 |
 | `sub_3CBD9` | +0 \| byte \| `sub_3CBD9`／`sub_3D57B`／`sub_3DD05`／`sub_3DED9` \| **2** \| | `docs/re/31-battle-ai-chain.md` | 5 |
 | `sub_3D0AC` | ⚠️ `CONTEXT.md` 把 `+9` 記成「所屬省」。這裡 `sub_3D0AC` 在**戰鬥中**寫它， | `docs/re/31-battle-ai-chain.md` | 17 |
@@ -258,7 +258,7 @@
 | `sub_3ED4F` | 變數 \| `sub_3C777`(cl)、`sub_3D0AC`(cx)、`sub_3ED4F`(cx) \| — \| | `docs/re/31-battle-ai-chain.md` | 1 |
 | `sub_3EF98` | if byte_6FFCA & 4: sub_3EF98 | `docs/re/31-battle-ai-chain.md` | 2 |
 | `sub_3F0EF` | if byte_6AA84 & 1Fh != 2: sub_3F0EF | `docs/re/31-battle-ai-chain.md` | 3 |
-| `sub_3F623` | if byte_6AA84 & 1Fh != 2: sub_3F623 | `docs/re/31-battle-ai-chain.md` | 7 |
+| `sub_3F623` | if byte_6AA84 & 1Fh != 2: sub_3F623 | `docs/re/31-battle-ai-chain.md` | 8 |
 | `sub_3F698` | **戰鬥中的 AI** \| ✅ **骨架已解**（`docs/re/31`）：`sub_3F698` 主入口 → `sub_3AB99` 決策鏈（與政略同構：兩分支、優先序、已決定旗標）→ 分派到 **13 種行動… | `docs/mechanics/70-ai.md`（另 1 份） | 4 |
 | `sub_41513` | +5 \| **戰場格編號 0..195**，`0xFF` = 不在場上 \| `sub_50FF5`、`sub_41513`（`docs/re/07` §2）\| | `docs/mechanics/30-combat.md`（另 5 份） | 11 |
 | `sub_4166E` | `cl`（`or al, 4`）\| `sub_41513`、`sub_4166E`、`sub_4E239` \| **只在戰鬥中** \| | `docs/re/21-develop-and-general-state.md`（另 1 份） | 2 |
@@ -357,7 +357,7 @@
 | `sub_567B9` | 10. `sub_567B9` = **移動單位** — **confirmed（欄位）** | `docs/re/31-battle-ai-chain.md` | 19 |
 | `sub_57B15` | sub_57B15(arg_2, arg_4) ; 遠程攻擊 | `docs/re/09-ranged-attack.md` | 2 |
 | `sub_58172` | sub_58172(單位) | `docs/re/07-battlefield-geometry.md` | 1 |
-| `sub_58209` | sub_58209(1, 旗標陣列, 數量, &清單, u) | `docs/re/31-battle-ai-chain.md` | 1 |
+| `sub_58209` | **`sub_58209` 會改 `+9`，但這個呼叫端不要那個副作用**，只要它做的其他事 | `docs/re/31-battle-ai-chain.md` | 4 |
 | `sub_5867E` | if 單位.+21 != 1 and sub_5867E(格) != 0: | `docs/re/07-battlefield-geometry.md` | 3 |
 | `sub_58854` | ⚠️ 仍未證實：`sub_58854`（494 行，產生格子清單的那支）還沒讀完。 | `docs/formats/05-tpc-tilesets.md`（另 1 份） | 5 |
 | `sub_58D4A` | if (byte_6AA84 & 0C0h) != 0C0h 或 sub_58D4A() == 0 | `docs/re/31-battle-ai-chain.md`（另 1 份） | 8 |
