@@ -176,46 +176,83 @@ func (w *AIWorld) Decide(p ProvinceID) AIAction {
 	return w.decideRear(p)
 }
 
-// decideFrontline 是前線省的鏈（4 步）。
-func (w *AIWorld) decideFrontline(p ProvinceID) AIAction {
-	if a := w.pullBack(p); a.Kind != AINone {
-		return a
-	}
-	if a := w.generalTransfer(p, 2); a.Kind != AINone {
-		return a
-	}
-	if a := w.attack(p); a.Kind != AINone {
-		return a
+// chain 回傳某省該走的決策鏈，順序就是原版的優先序。
+//
+// 前線 4 步、後方 6 步。**後方比前線長**——後方要做內政與分兵，
+// 前線只管打。
+func (w *AIWorld) chain(p ProvinceID) []func(ProvinceID) AIAction {
+	var steps []func(ProvinceID) AIAction
+	if w.Hostile(p) != 0 {
+		steps = []func(ProvinceID) AIAction{
+			w.pullBack,
+			func(q ProvinceID) AIAction { return w.generalTransfer(q, 2) },
+			w.attack,
+		}
+	} else {
+		steps = []func(ProvinceID) AIAction{
+			w.spreadOut,
+			func(q ProvinceID) AIAction { return w.generalTransfer(q, 1) },
+			w.reinforceFront,
+			w.attack,
+		}
 	}
 	if w.EnableExtra {
-		if a := w.supplyTransfer(p); a.Kind != AINone {
+		steps = append(steps, w.supplyTransfer)
+	}
+	return steps
+}
+
+// decideFrontline 是前線省的鏈（4 步）。
+func (w *AIWorld) decideFrontline(p ProvinceID) AIAction {
+	return firstAction(w.chain(p), p)
+}
+
+// decideRear 是後方省的鏈（6 步）。
+func (w *AIWorld) decideRear(p ProvinceID) AIAction {
+	return firstAction(w.chain(p), p)
+}
+
+func firstAction(steps []func(ProvinceID) AIAction, p ProvinceID) AIAction {
+	for _, f := range steps {
+		if a := f(p); a.Kind != AINone {
 			return a
 		}
 	}
 	return AIAction{From: p}
 }
 
-// decideRear 是後方省的鏈（6 步）。**比前線省長**——
-// 後方要做內政與分兵，前線只管打。
-func (w *AIWorld) decideRear(p ProvinceID) AIAction {
-	if a := w.spreadOut(p); a.Kind != AINone {
-		return a
-	}
-	if a := w.generalTransfer(p, 1); a.Kind != AINone {
-		return a
-	}
-	if a := w.reinforceFront(p); a.Kind != AINone {
-		return a
-	}
-	if a := w.attack(p); a.Kind != AINone {
-		return a
-	}
-	if w.EnableExtra {
-		if a := w.supplyTransfer(p); a.Kind != AINone {
-			return a
+// Step 走一次決策鏈並**實際執行**，回傳做成的那一件事。
+//
+// 與 `Decide` 的差別是這裡把執行結果回饋進鏈裡，語意照
+// `sub_14F9A`（`docs/re/10` §4）：
+//
+//	call    sub_1408F
+//	cmp     [bp+var_1], 0
+//	jz      短路              ; ← 沒搬成就不立「已決定」旗標
+//	...
+//	mov     byte ptr ss:[di-7], 1
+//
+// **決策層與執行層的條件不一樣**：`sub_1541E` 只看「省內有缺員的部隊」，
+// 而 `sub_1408F` 模式 4 要求「低於四分之一滿」。缺員但沒那麼缺的時候
+// 決策說要調、執行挑不到人——這時旗標沒立，鏈**繼續往下走**。
+//
+// 少了這個回饋，電腦會有大量「決定了但什麼也沒發生」的空轉回合。
+func (w *AIWorld) Step(p ProvinceID) (AIAction, TransferReport) {
+	for _, f := range w.chain(p) {
+		a := f(p)
+		switch a.Kind {
+		case AINone:
+			continue
+		case AIAttack:
+			// 攻打不走 `sub_1408F`，直接算決定完成。
+			return a, TransferReport{}
 		}
+		if rep := w.ApplyAction(a); len(rep.Moved) > 0 {
+			return a, rep
+		}
+		// 一個人都沒搬動 → 旗標沒立 → 試下一步。
 	}
-	return AIAction{From: p}
+	return AIAction{From: p}, TransferReport{}
 }
 
 // pullBack 是 `sub_1541E`（§6h）：前線省把缺員的部隊撤到後方。
@@ -252,6 +289,18 @@ func (w *AIWorld) pullBack(p ProvinceID) AIAction {
 }
 
 // spreadOut 是 `sub_15667`（§6j）：後方省往將領更少的後方省分兵。
+//
+// 六道篩選全部照原版，順序也一樣：
+//
+//	鄰省 != 0 且 != 0FFh
+//	sub_5B7DC(鄰省) == 0        目標必須是後方
+//	省份[鄰省].+32 & 40h == 0   沒在交戰
+//	sub_13F4E(當前省, 鄰省)     那道守門（含照抄的 bug）
+//	sub_5A881(鄰省) < sub_5A881(當前省)   目標的將領比自己少
+//
+// 候選依 `sub_5B983`（戰力總和）**升序**排序，挑最小的那個。
+// 調動用**模式 3**（`mov al, 3`）——只看清單最後兩個、且未達半滿，
+// 是八個模式裡最保守的一個。
 func (w *AIWorld) spreadOut(p ProvinceID) AIAction {
 	if w.ManpowerFlags(p)&2 == 0 {
 		return AIAction{}
@@ -273,6 +322,9 @@ func (w *AIWorld) spreadOut(p ProvinceID) AIAction {
 		if w.Hostile(n) != 0 || np.Flags&ProvinceFlagInBattle != 0 {
 			continue
 		}
+		if !w.generalsLoyalTo(n, prov.Commander) {
+			continue
+		}
 		if w.GeneralCount(n) >= here {
 			continue // 只往人比自己少的地方分
 		}
@@ -283,7 +335,8 @@ func (w *AIWorld) spreadOut(p ProvinceID) AIAction {
 	if best == 0 {
 		return AIAction{}
 	}
-	return AIAction{Kind: AITransfer, From: p, To: best, TransferKind: 4, Step: "sub_15667 分兵"}
+	return AIAction{Kind: AITransfer, From: p, To: best,
+		TransferKind: int(TransferUnderHalfTwo), Step: "sub_15667 分兵"}
 }
 
 // reinforceFront 是 `sub_1527A`（§6f）：後方省把滿員部隊送去自己人的前線。
@@ -313,47 +366,62 @@ func (w *AIWorld) reinforceFront(p ProvinceID) AIAction {
 	return AIAction{}
 }
 
-// generalTransfer 是 `sub_150FC`（§6e）：一般調動。
+// generalTransfer 是 `sub_150FC`（§6e）：一般調動 = **往無主省擴張**。
 //
-// 目標是任何**有主**的鄰省；模式 2 額外跳過正在打仗的省。
-// 調動類型依目標省的處境定。
+//	cmp     word ptr [di-6221h], 0   ; 省份[鄰省].+20（司令）
+//	jnz     short loc_15219          ; ← 不等於 0 就跳過
+//
+// `jnz` 跳的是 skip，所以留下來的只有**司令 == 0** 的省。
+// 配上 `sub_14F9A` 調動成功後把目標省的司令改成我方（`docs/re/10` §4），
+// 整件事就是：**把部隊調進無人的省份，那個省就歸我了**。
+//
+// 接受條件是兩選一：
+//
+//	後方鏈（mode 1）：sub_1401E(鄰省, 當前省) 為真——目標比自己窮
+//	前線鏈（mode 2）：sub_36BC7(鄰省) 為真——通向那五個特殊省
+//
+// 兩條路徑最後都要過「沒在交戰」。候選**不排序**，原版用覆蓋式賦值
+// （`ss:[di-3]` 每次符合就蓋掉），所以挑到的是**最後一個**符合的鄰省。
+//
+// 調動模式：前線鏈用 4；後方鏈看目標省有沒有敵對鄰省，有用 1、沒有用 0。
 func (w *AIWorld) generalTransfer(p ProvinceID, mode int) AIAction {
 	prov, err := w.Table.At(p)
 	if err != nil {
 		return AIAction{}
 	}
+	best := ProvinceID(0)
 	for _, n := range w.neighbours(prov) {
 		np, err := w.Table.At(n)
-		if err != nil || np.Commander == 0 {
-			continue // 無主省不調
+		if err != nil || np.Commander != 0 {
+			continue // 只往**無主**省調
 		}
-		// sub_13F4E：鄰省裡要有效忠我方的（含那個疑似 bug 的索引）。
+		// sub_13F4E：那道守門（含照抄的 bug）。
 		if !w.generalsLoyalTo(n, prov.Commander) {
 			continue
 		}
-		// sub_1401E：模式 1 時，目標省要比當前省窮。
-		if mode == 1 && !w.poorerThan(n, p) {
+		// 後方鏈走「比我窮」，前線鏈走「通向五省」。
+		if !(mode == 1 && w.poorerThan(n, p)) {
+			if !w.nearSpecial(n) || mode != 2 {
+				continue
+			}
+		}
+		if np.Flags&ProvinceFlagInBattle != 0 {
 			continue
 		}
-		// sub_36BC7：模式 2 還要過特殊省份的檢查。
-		if mode == 2 {
-			if !w.nearSpecial(n) {
-				continue
-			}
-			if np.Flags&ProvinceFlagInBattle != 0 {
-				continue
-			}
-		}
-		kind := 0
-		switch {
-		case mode == 2:
-			kind = 4
-		case w.Hostile(n) != 0:
-			kind = 1
-		}
-		return AIAction{Kind: AITransfer, From: p, To: n, TransferKind: kind, Step: "sub_150FC 一般調動"}
+		best = n // 覆蓋式：留最後一個
 	}
-	return AIAction{}
+	if best == 0 {
+		return AIAction{}
+	}
+	kind := 0
+	switch {
+	case mode == 2:
+		kind = int(TransferQuarterHalfRoster)
+	case w.Hostile(best) != 0:
+		kind = int(TransferFullOnly)
+	}
+	return AIAction{Kind: AITransfer, From: p, To: best, TransferKind: kind,
+		Step: "sub_150FC 一般調動"}
 }
 
 // supplyTransfer 是 `sub_15A9A`（§6k）：往補給充足的省調動。
