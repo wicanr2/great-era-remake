@@ -175,3 +175,86 @@ func TestWithinTwoSteps(t *testing.T) {
 		t.Error("NoCell 一律不成立")
 	}
 }
+
+func TestAssignTargetFromPicksFirstReachable(t *testing.T) {
+	cells := map[GeneralID]CellIndex{1: 10, 2: 20, 3: 30}
+	cellOf := func(id GeneralID) CellIndex { return cells[id] }
+	// 只有 2 走得通。
+	route := func(to, from CellIndex) CellIndex {
+		if to == 20 {
+			return 11
+		}
+		return NoCell
+	}
+	got := AssignTargetFrom([]GeneralID{1, 2, 3}, 0, cellOf, route)
+	if got.Target != 2 || got.NextCell != 11 {
+		t.Errorf("該選走得通的 2（下一跳 11），實際 %+v", got)
+	}
+
+	// 順序決定結果：1 也走得通時就選 1。
+	route2 := func(to, from CellIndex) CellIndex {
+		if to == 10 || to == 20 {
+			return 5
+		}
+		return NoCell
+	}
+	if got := AssignTargetFrom([]GeneralID{1, 2, 3}, 0, cellOf, route2); got.Target != 1 {
+		t.Errorf("該選清單裡第一個走得通的，實際 %+v", got)
+	}
+
+	// 全部走不到。
+	none := func(to, from CellIndex) CellIndex { return NoCell }
+	got = AssignTargetFrom([]GeneralID{1, 2, 3}, 0, cellOf, none)
+	if got.Target != 0 || got.NextCell != NoCell {
+		t.Errorf("全部走不到時 Target 要是 0，實際 %+v", got)
+	}
+	if got := AssignTargetFrom(nil, 0, cellOf, route); got.Target != 0 {
+		t.Errorf("空清單要回 0，實際 %+v", got)
+	}
+}
+
+func TestSortCandidatesByDistance(t *testing.T) {
+	at := func(col, row int) CellIndex {
+		c, err := CellAt(col, row)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return c
+	}
+	cells := map[GeneralID]CellIndex{
+		1: at(9, 0), // 距離 9
+		2: at(2, 0), // 距離 2
+		3: at(5, 0), // 距離 5
+		4: NoCell,   // 不在場上 → 排最後
+	}
+	cellOf := func(id GeneralID) CellIndex { return cells[id] }
+	list := []GeneralID{1, 2, 3, 4}
+	SortCandidatesByDistance(list, 0, cellOf)
+	want := []GeneralID{2, 3, 1, 4}
+	for i := range want {
+		if list[i] != want[i] {
+			t.Fatalf("排序後 %v，要 %v", list, want)
+		}
+	}
+}
+
+func TestSortCandidatesKeepsOrderOnTie(t *testing.T) {
+	// 原版的交換條件是 dA > dB，相等時不換——順序要穩定。
+	at := func(col, row int) CellIndex {
+		c, err := CellAt(col, row)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return c
+	}
+	cells := map[GeneralID]CellIndex{7: at(3, 0), 8: at(0, 3), 9: at(1, 0)}
+	cellOf := func(id GeneralID) CellIndex { return cells[id] }
+	list := []GeneralID{7, 8, 9} // 7 與 8 距離都是 3
+	SortCandidatesByDistance(list, 0, cellOf)
+	if list[0] != 9 {
+		t.Fatalf("最近的該排第一，實際 %v", list)
+	}
+	if list[1] != 7 || list[2] != 8 {
+		t.Errorf("距離相等時要保持原順序（7 在 8 前），實際 %v", list)
+	}
+}

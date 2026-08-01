@@ -159,3 +159,57 @@ func WithinTwoSteps(a, b CellIndex) bool {
 	}
 	return false
 }
+
+// ── 派工：從候選清單挑一個走得通的當目標 ────────────────────────────
+
+// TargetAssignment 是一次派工的結果。
+type TargetAssignment struct {
+	// Target 是選中的目標單位，0 表示一個都走不到。
+	Target GeneralID
+	// NextCell 是往目標走的下一格，`NoCell` 表示走不到。
+	NextCell CellIndex
+}
+
+// AssignTargetFrom 是**三支同構函式**的共同內容
+// （`sub_3BF6A` §24、`sub_3CA09` §29、`sub_58209` §27）：
+//
+//	逐一試候選 → 第一個尋路走得通的就是目標
+//
+// 三支的差別只有兩項：清單從哪來（城市周圍／敵方主力周圍），
+// 以及**要不要先照距離排序**（只有 `sub_58209` 排）。
+//
+//	candidates 候選單位，順序就是嘗試順序
+//	from       出發格（`將領[u].+5`）
+//	cellOf     查一個單位站在哪一格
+//	route      尋路，回下一跳；走不到回 `NoCell`（原版的 `sub_567B9`）
+//
+// 回傳 `Target == 0` 表示全部走不到——原版這時另外呼叫 `sub_3B8B0`
+// （`sub_3BF6A`）或什麼都不做（`sub_3CA09`），由呼叫端決定。
+func AssignTargetFrom(candidates []GeneralID, from CellIndex,
+	cellOf func(GeneralID) CellIndex,
+	route func(to, fromCell CellIndex) CellIndex) TargetAssignment {
+	for _, c := range candidates {
+		next := route(cellOf(c), from)
+		if next != NoCell {
+			return TargetAssignment{Target: c, NextCell: next}
+		}
+	}
+	return TargetAssignment{NextCell: NoCell}
+}
+
+// SortCandidatesByDistance 是 `sub_58209` 比另外兩支多做的那一步：
+// 把候選照**到 `from` 的曼哈頓距離**由近而遠排。
+//
+// 原版是選擇排序，交換條件 `dA > dB`，所以**相等時不換**——
+// 用 `SliceStable` 對應。站不在場上的候選（`+5 == 0xFF`）原版直接跳過
+// 不參與比較，這裡排到最後面。
+func SortCandidatesByDistance(candidates []GeneralID, from CellIndex,
+	cellOf func(GeneralID) CellIndex) {
+	sort.SliceStable(candidates, func(i, j int) bool {
+		ci, cj := cellOf(candidates[i]), cellOf(candidates[j])
+		if !ci.Valid() || !cj.Valid() {
+			return ci.Valid() && !cj.Valid()
+		}
+		return CellManhattan(from, ci) < CellManhattan(from, cj)
+	})
+}
