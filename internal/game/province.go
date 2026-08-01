@@ -104,8 +104,10 @@ type Province struct {
 	// Coastal 表示鄰省表裡帶 SeaBorder，也就是這個省臨海或臨國境。
 	Coastal bool
 
-	// Flags 是 +32 的位元旗標。已知 bit 2（疑似已徵稅）與 bit 6（程式會檢查，
-	// 語意未解）；其餘位元沒觀察到。
+	// Flags 是 +32 的位元旗標。bit 2 疑似「已徵稅」（假說），
+	// **bit 6 = 這個省正在打仗**（confirmed：`sub_15925` 挑目標時跳過、
+	// `sub_54DAC` 戰後清除、`sub_534FF` 挑增援來源時也跳過）。
+	// 其餘位元沒觀察到。
 	Flags uint8
 
 	// Raw 是完整的 37 bytes，寫回時以它為基底只蓋已解欄位。
@@ -316,4 +318,85 @@ func (p *Province) Capture(winner GeneralID) {
 	if winner.Valid() {
 		p.Commander = winner
 	}
+}
+
+// AvailableGenerals 數某省有幾個「效忠該省司令且可用」的將領，
+// 語意照 `sub_5A881`（`docs/re/07` §9）：
+//
+//	for 每個將領:
+//	    if 將領.所屬省 != 省:          continue
+//	    if !(將領.+16 & 1):            continue   ← 不可用
+//	    if 將領.效忠勢力 != 省.司令:    continue
+//	    count++
+//
+// 三個條件缺一不可——**所屬省對了但效忠別人的將領不算**，
+// 這是易主之後會出現的情況。
+func (t *ProvinceTable) AvailableGenerals(p ProvinceID, units []CombatUnit) (int, error) {
+	prov, err := t.At(p)
+	if err != nil {
+		return 0, err
+	}
+	n := 0
+	for i := range units {
+		u := &units[i]
+		if u.General == 0 || u.Province != p || !u.Active {
+			continue
+		}
+		if u.Faction != prov.Commander {
+			continue
+		}
+		n++
+	}
+	return n, nil
+}
+
+// ReinforcementSources 收集可以對 defender 省提供增援的鄰省，
+// 語意照 `sub_534FF`（`docs/re/07` §9）：
+//
+//	for k = 1..7:                       ← 鄰省表有 8 格，原版只掃 7 格
+//	    省 = 鄰省表[k]
+//	    if 省 == 0 或 255:               continue   ← 填充／海洋境外
+//	    if 省.司令 == 0:                 停止掃描    ← 無主省直接收工
+//	    if 省.司令 != 單位.效忠勢力:      continue
+//	    if 省.+32 & 40h:                 continue   ← 那個省正在打仗
+//	    if 該省可用將領數 >= 100:         continue
+//	    收下
+//
+// ⚠️ 那道 `< 100` 的門檻**實質恆真**——第一期全遊戲才 274 位將領，
+// 一個省不可能有 100 位。它比較像是上限保護，不是真正的條件。
+// 照抄是為了忠實，不是因為它會生效。
+func (t *ProvinceTable) ReinforcementSources(defender ProvinceID, faction GeneralID, units []CombatUnit) ([]ProvinceID, error) {
+	prov, err := t.At(defender)
+	if err != nil {
+		return nil, err
+	}
+	var out []ProvinceID
+	// 讀 Raw 而不是 Neighbours——原版對**原始排列**敏感（遇到無主省就
+	// 停止掃描），而 Neighbours 已經濾掉填充與 SeaBorder，順序不一樣。
+	for k := 0; k < 7; k++ { // 原版只掃 7 格，第 8 格不看
+		b := prov.Raw[provOffNeighbour+k]
+		if b == 0 || b == SeaBorder {
+			continue
+		}
+		n := ProvinceID(b)
+		np, err := t.At(n)
+		if err != nil {
+			continue
+		}
+		if np.Commander == 0 {
+			break // 原版遇到無主省就結束掃描，不是 continue
+		}
+		if np.Commander != faction {
+			continue
+		}
+		if np.Flags&ProvinceFlagInBattle != 0 {
+			continue
+		}
+		cnt, err := t.AvailableGenerals(n, units)
+		if err != nil || cnt >= 100 {
+			continue
+		}
+		out = append(out, n)
+	}
+	return out, nil
 }

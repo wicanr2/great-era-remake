@@ -225,6 +225,8 @@ func (o *Occupancy) Deploy(zone []CellIndex, unit GeneralID, enemy func(GeneralI
 }
 
 // enemyNeighbours 數某格周圍六格裡的敵方單位，對應 `sub_55CEC` 的 `arg_0 == 1`。
+//
+// 原版的敵我判定是比 `+14`（效忠的勢力領袖），見 `CombatUnit.Faction`。
 func (o *Occupancy) enemyNeighbours(c CellIndex, enemy func(GeneralID) bool) int {
 	n := 0
 	for _, nb := range c.Neighbours() {

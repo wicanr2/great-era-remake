@@ -368,3 +368,81 @@ func TestProvinceFlags(t *testing.T) {
 		}
 	}
 }
+
+// 增援來源：同勢力、未交戰的鄰省。用 SAVE(1) 的真實局面驗。
+func TestReinforcementSources(t *testing.T) {
+	tbl, err := ParseSaveProvinces(readGame(t, "SAVE(1).DT1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// 湖北(26) 與河南(19) 在 SAVE(1) 都是吳佩孚(58) 的。
+	hubei, err := tbl.At(26)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := tbl.ReinforcementSources(26, hubei.Commander, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// 收下的每一個都必須是同司令、未交戰的鄰省。
+	for _, n := range got {
+		np, err := tbl.At(n)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if np.Commander != hubei.Commander {
+			t.Errorf("省 %d 的司令是 %d，不該當作 %d 的增援來源",
+				n, np.Commander, hubei.Commander)
+		}
+		if np.Flags&ProvinceFlagInBattle != 0 {
+			t.Errorf("省 %d 正在打仗，不該當增援來源", n)
+		}
+	}
+	t.Logf("湖北的增援來源 = %v（司令 %d）", got, hubei.Commander)
+
+	// 無主的省不該有任何增援來源——原版遇到司令 0 就停止掃描。
+	for id := ProvinceID(1); id <= ProvinceCount; id++ {
+		p, err := tbl.At(id)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if p.Commander != 0 {
+			continue
+		}
+		src, err := tbl.ReinforcementSources(id, 0, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(src) != 0 {
+			t.Errorf("無主省 %d 竟有增援來源 %v", id, src)
+		}
+	}
+}
+
+// 可用將領數：三個條件缺一不可，尤其「效忠對象」——
+// 省易主之後，人還在但不效忠新司令的將領不能算。
+func TestAvailableGeneralsChecksLoyaltyNotJustLocation(t *testing.T) {
+	tbl, err := ParseSaveProvinces(readGame(t, "SAVE(1).DT1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	hubei, err := tbl.At(26)
+	if err != nil {
+		t.Fatal(err)
+	}
+	units := []CombatUnit{
+		{General: 1, Province: 26, Active: true, Faction: hubei.Commander},
+		{General: 2, Province: 26, Active: true, Faction: hubei.Commander},
+		{General: 3, Province: 26, Active: true, Faction: 999}, // 人在但效忠別人
+		{General: 4, Province: 26, Active: false, Faction: hubei.Commander},
+		{General: 5, Province: 19, Active: true, Faction: hubei.Commander}, // 不在這省
+	}
+	got, err := tbl.AvailableGenerals(26, units)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != 2 {
+		t.Errorf("可用將領數 = %d，應為 2（效忠別人的、不可用的、不在本省的都不算）", got)
+	}
+}
