@@ -134,3 +134,73 @@ func (w *AIWorld) RecruitToFull(p ProvinceID, branch uint8) int {
 	}
 	return added
 }
+
+// ---------------------------------------------------------------------------
+// 徵稅（政略指令 4），出自 `sub_303CD`（`docs/re/18`）。
+// ---------------------------------------------------------------------------
+
+// 徵稅的常數，全部從 `sub_303CD` 讀出來。
+const (
+	// TaxGoldBase 是黃金收入的固定加成（`add ax, 12Ch`）。
+	TaxGoldBase = 300
+	// TaxFoodBase 是糧食收入的固定加成（`add ax, 0BB8h`）。
+	TaxFoodBase = 3000
+	// TaxGoldMax / TaxGoldMin 是黃金收入的上下限（`1964h` / `5DCh`）。
+	//
+	// **下限 1,500 解開了實機三個樣本裡「+1500 出現兩次」的謎**
+	// （`docs/playtest/12` §3）——那不是巧合，是被夾到下限。
+	TaxGoldMax = 6500
+	TaxGoldMin = 1500
+	// TaxLoyaltyDrop 是徵稅的忠誠度代價（`sub ax, 1Eh`），
+	// 不足 30 就歸 0。
+	TaxLoyaltyDrop = 30
+	// 資源上限用 `resource.go` 的 `ResourceCap`（同一個 `sub_5A467`）。
+	// TaxRandScale 是丟進 `Random()` 的倍率（Real 常數 `0x83/0/0x2000`）。
+	TaxRandScale = 5
+	// TaxFoodDivisor 是糧食那條的除數（Real 常數 `0x8E/0/0x1C40`）。
+	TaxFoodDivisor = 10000
+)
+
+// TaxResult 是一次徵稅的結果。
+type TaxResult struct {
+	Gold, Food   int
+	LoyaltyAfter uint8
+}
+
+// Tax 對某省徵稅，語意照 `sub_303CD`：
+//
+//	黃金 = clamp(Random(Round(Sqrt(人口) × 5)) + 300, 1500, 6500)
+//	糧食 = Random(Round(人口 ÷ 10000 × 5)) + 3000
+//	忠誠度 -= 30（不足 30 歸 0）
+//
+// 兩筆收入都經 `sub_5A467` 加上去，欄位上限 60,000。
+//
+// ⚠️ **公式的結構與常數是 confirmed，但代入實機樣本對不上**
+// （`docs/re/18` §4）：三個樣本裡兩個落在下限、一個在中段，
+// 與均勻亂數的期望不符。可能是人口欄位的單位、`Random` 的呼叫次序，
+// 或樣本 1 那次還有別的收入來源。**照反組譯實作，差異記在文件裡。**
+func (w *AIWorld) Tax(p ProvinceID, rng *Rand) (TaxResult, error) {
+	prov, err := w.Table.At(p)
+	if err != nil {
+		return TaxResult{}, err
+	}
+	pop := float64(prov.Population)
+
+	gold := rng.Int(round(sqrt(pop)*TaxRandScale)) + TaxGoldBase
+	if gold > TaxGoldMax {
+		gold = TaxGoldMax
+	}
+	if gold < TaxGoldMin {
+		gold = TaxGoldMin
+	}
+	food := rng.Int(round(pop/TaxFoodDivisor*TaxRandScale)) + TaxFoodBase
+
+	prov.Gold = AddResource(prov.Gold, uint16(gold))
+	prov.Food = AddResource(prov.Food, uint16(food))
+	if prov.Loyalty < TaxLoyaltyDrop {
+		prov.Loyalty = 0
+	} else {
+		prov.Loyalty -= TaxLoyaltyDrop
+	}
+	return TaxResult{Gold: gold, Food: food, LoyaltyAfter: prov.Loyalty}, nil
+}
