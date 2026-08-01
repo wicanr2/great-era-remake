@@ -54,7 +54,6 @@ func TestExecuteActionReportsUnimplemented(t *testing.T) {
 	// ——測試會在你忘了移除時紅給你看（2026-08-02 值 12/13/14/15 實作後就發生過）。
 	for _, a := range []BattleAction{
 		ActADecisive, // 11／1 必勝結算：要接九步結算，不是指派命令
-		ActAWeakest,  // 18 挑最弱（sub_3E24F 的統計段未讀完，先不做）
 	} {
 		got := sim.ExecuteAction(a, sim.Defender, sim.Attacker, noRoute)
 		if got.Implemented {
@@ -369,5 +368,64 @@ func TestExecStrikeForceDoesNotSetAssignedBit(t *testing.T) {
 	}
 	if got.Assigned > 0 && a.TargetUnit == 0 {
 		t.Error("該設目標單位")
+	}
+}
+
+func TestExecWeakestPicksWeakestBesieger(t *testing.T) {
+	// §46：候選來自「守方城市周圍的攻方單位」，照戰力升序取最弱的。
+	sim := mkTracedBattle(t, 20000, 18000)
+	cities := CityCells(sim.Field)
+	if len(cities) == 0 {
+		t.Skip("這張戰場沒有城市")
+	}
+
+	// 讓守方佔一個城市。
+	d := sim.Defender[0]
+	sim.Occ[d.Cell] = 0
+	d.Cell = cities[0]
+	sim.Occ[cities[0]] = d.General
+
+	// 在城市周圍擺兩個攻方單位，戰力一強一弱。
+	ring := RingCells(cities[0], 1)
+	var placed []*Combatant
+	for _, c := range ring[1:] {
+		if sim.Occ[c] != 0 {
+			continue
+		}
+		col, row := c.ColRow()
+		if sim.Field.Tiles[row][col].MoveCost() >= 255 {
+			continue
+		}
+		force := uint16(20000)
+		if len(placed) == 1 {
+			force = 3000 // 第二個弱很多
+		}
+		u := mkUnit(GeneralID(500+len(placed)), 58, Branch1, force)
+		u.Cell, u.NextCell, u.Attacking = c, NoCell, true
+		sim.Occ[c] = u.General
+		sim.Attacker = append(sim.Attacker, u)
+		sim.byID[u.General] = u
+		placed = append(placed, u)
+		if len(placed) == 2 {
+			break
+		}
+	}
+	if len(placed) < 2 {
+		t.Skip("城市周圍沒有兩個可站的空格")
+	}
+
+	route := func(to, from CellIndex) CellIndex { return to }
+	got := sim.ExecuteAction(ActAWeakest, sim.Defender, sim.Attacker, route)
+	if !got.Implemented {
+		t.Fatal("挑最弱已經實作了")
+	}
+	if got.Assigned == 0 {
+		t.Fatalf("該指派到目標（%s）", got.Note)
+	}
+	// 兩個候選裡，戰力低的那個該被選中。
+	weak := placed[1]
+	if d.TargetUnit != weak.General {
+		t.Errorf("該挑最弱的 %d（力 %d），實際挑了 %d",
+			weak.General, weak.Strength.Force, d.TargetUnit)
 	}
 }

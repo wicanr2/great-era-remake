@@ -271,7 +271,7 @@
 | `sub_3DAEF` | if 將領[u].+12 == 0FFh: sub_3DAEF(...) | `docs/re/31-battle-ai-chain.md` | 7 |
 | `sub_3DD05` | +0 \| byte \| `sub_3CBD9`／`sub_3D57B`／`sub_3DD05`／`sub_3DED9` \| **2** \| | `docs/re/31-battle-ai-chain.md` | 13 |
 | `sub_3DED9` | +0 \| byte \| `sub_3CBD9`／`sub_3D57B`／`sub_3DD05`／`sub_3DED9` \| **2** \| | `docs/re/31-battle-ai-chain.md` | 23 |
-| `sub_3E24F` | `sub_3E24F`／`sub_3E691` 未讀。**這是下一步最有價值的目標。** | `docs/re/31-battle-ai-chain.md` | 7 |
+| `sub_3E24F` | `sub_3E24F`／`sub_3E691` 未讀。**這是下一步最有價值的目標。** | `docs/re/31-battle-ai-chain.md` | 8 |
 | `sub_3E691` | `sub_3E24F`／`sub_3E691` 未讀。**這是下一步最有價值的目標。** | `docs/re/31-battle-ai-chain.md` | 14 |
 | `sub_3E81F` | +13 \| 每回合歸零；**bit 7 = 本回合已指派目標**（`docs/re/31` §31）\| `sub_5446D`／`sub_3E81F` \| | `docs/mechanics/30-combat.md`（另 1 份） | 7 |
 | `sub_3E93A` | 3 \| **11** \| `sub_3B9D8` `sub_3BF6A` `sub_3C0D5` `sub_3C26A` `sub_3C4E5` `sub_3CA09` `sub_3DED9` `sub_3E93A… | `docs/re/31-battle-ai-chain.md` | 4 |
@@ -385,16 +385,16 @@
 | `sub_54CFD` | 3i. 誰是攻方：`sub_54391` 與 `sub_54CFD` — **confirmed** | `docs/mechanics/30-combat.md`（另 1 份） | 5 |
 | `sub_54DAC` | 3f. 佔領：`sub_54DAC` — **confirmed** | `docs/mechanics/30-combat.md`（另 2 份） | 9 |
 | `sub_54E3B` | 3 \| `scene` \| 2 \| `WAR.EXE`：程式啟動、`sub_1BDC6`、`sub_368A8`、`sub_3752F`、`sub_54E3B`（戰鬥九步結算收尾）\| | `docs/formats/06-mus-tim-audio.md`（另 2 份） | 10 |
-| `sub_55632` | sub_55632(&清單, 1, 主將格) ; 收集 **37 格** | `docs/re/31-battle-ai-chain.md` | 14 |
+| `sub_55632` | sub_55632(&清單, 1, 主將格) ; 收集 **37 格** | `docs/re/31-battle-ai-chain.md` | 16 |
 | `sub_55AB7` | sub_55BCC(a, b) = sub_510E0(a, b) 或 sub_55AB7(a, b) | `docs/re/31-battle-ai-chain.md` | 3 |
 | `sub_55BCC` | `sub_55BCC(a, b)` 是兩個判斷的 or： | `docs/re/31-battle-ai-chain.md` | 5 |
 | `sub_55CEC` | `sub_55CEC(unit, cell, n)` 用六鄰位移表數**該格周圍的敵方單位數**， | `docs/mechanics/30-combat.md`（另 2 份） | 13 |
-| `sub_55FBE` | 決策鏈開頭先跑 `sub_55FBE`： | `docs/re/31-battle-ai-chain.md` | 9 |
+| `sub_55FBE` | 決策鏈開頭先跑 `sub_55FBE`： | `docs/re/31-battle-ai-chain.md` | 10 |
 | `sub_560D7` | 格 = sub_560D7(2, 將領[u].+5) | `docs/re/31-battle-ai-chain.md` | 5 |
 | `sub_567B9` | 10. `sub_567B9` = **移動單位** — **confirmed（欄位）** | `docs/re/31-battle-ai-chain.md` | 31 |
 | `sub_56D13` | 城市未滿 = sub_56D13() ; 「某個計數 < 城市數」 | `docs/re/31-battle-ai-chain.md` | 1 |
 | `sub_56D49` | if 城市未滿 且 sub_56D49(0) 且 byte_64900 ≤ 4: 城市未滿 = 0 | `docs/re/31-battle-ai-chain.md`（另 1 份） | 14 |
-| `sub_579F4` | 旗標[sub_579F4(mode, u)] = 1 ; 標記「這個單位有任務了」 | `docs/re/31-battle-ai-chain.md` | 4 |
+| `sub_579F4` | 旗標[sub_579F4(mode, u)] = 1 ; 標記「這個單位有任務了」 | `docs/re/31-battle-ai-chain.md` | 5 |
 | `sub_57B15` | sub_57B15(arg_2, arg_4) ; 遠程攻擊 | `docs/re/09-ranged-attack.md` | 2 |
 | `sub_58172` | sub_58172(單位) | `docs/re/07-battlefield-geometry.md` | 1 |
 | `sub_58209` | 27. ⭐⭐ `sub_58209`（289 行）：照距離排序，逐一試路 | `docs/re/31-battle-ai-chain.md` | 11 |
@@ -404,7 +404,7 @@
 | `sub_58DF9` | 敵方單位數 = sub_58DF9(0) | `docs/re/31-battle-ai-chain.md` | 2 |
 | `sub_59CBF` | sub_37EAE 2字 #210 欠糧 sub_59CBF 2字 #64 檔案 | `docs/re/24-glyph-draw-family.md`（另 1 份） | 4 |
 | `sub_5A031` | +7 = +6 sub_5A031(id) | `docs/mechanics/30-combat.md` | 1 |
-| `sub_5A0B9` | （`sub_5A0B9`，`docs/re/08` §4e）： | `docs/mechanics/70-ai.md`（另 8 份） | 32 |
+| `sub_5A0B9` | （`sub_5A0B9`，`docs/re/08` §4e）： | `docs/mechanics/70-ai.md`（另 8 份） | 33 |
 | `sub_5A3B2` | sub_5A3B2(5, B) / sub_5A3B2(5, A) | `docs/re/08-combat-damage.md` | 1 |
 | `sub_5A467` | ⚠️ 這與 `AddResource`（`sub_5A467`）的「直接截斷」是**不同的行為**。 | `docs/mechanics/40-economy.md`（另 2 份） | 13 |
 | `sub_5A4BC` | **但不是。** 每個分支做的事是把一組座標傳給 `sub_5A4BC`： | `docs/re/04-battle-module.md`（另 1 份） | 2 |

@@ -102,6 +102,8 @@ func (s *BattleSim) ExecuteAction(a BattleAction, units, foes []*Combatant,
 		return s.execStandbyOnly(units, foes, route)
 	case ActARecompute:
 		return s.execRecompute(units, route)
+	case ActAWeakest:
+		return s.execWeakest(units, foes, route)
 	}
 	return BattleExecResult{
 		Note: "行動「" + BattleActionName(a) + "」還沒實作（docs/re/31 §41 有語意，執行層待補）",
@@ -568,4 +570,92 @@ func (s *BattleSim) execRecompute(units []*Combatant,
 		}
 	}
 	return BattleExecResult{Assigned: n, Implemented: true, Note: "重算全軍的下一格"}
+}
+
+
+// execWeakest 是值 18：**在圍著我方城市的敵軍裡，挑最弱的打**（§46）。
+//
+//	候選 = 對每個「守方佔據的城市」，收集它周圍的**攻方**單位
+//	→ 照攻擊力**升序**排（弱的在前）
+//	→ 派工
+//
+// ⭐ 這是分支 A 九種行動裡**唯一比戰力**的一支——其他行動比的是
+// 距離或位置關係。三種目標選法各有性格：
+//
+//	值 3      最近的城市
+//	值 14／15 敵方主帥（斬首）
+//	值 18     圍住我的人裡最弱的
+//
+// ⚠️ `friendly` 判定用 `Attacking`：候選是攻方、城市要守方佔著。
+// 這一支只在分支 A（守方）被選中，所以方向是固定的。
+func (s *BattleSim) execWeakest(units, foes []*Combatant,
+	route func(to, from CellIndex) CellIndex) BattleExecResult {
+	cities := CityCells(s.Field)
+	if len(cities) == 0 {
+		return BattleExecResult{Implemented: true, Note: "戰場上沒有城市"}
+	}
+
+	seen := map[GeneralID]bool{}
+	var pool []GeneralID
+	for _, c := range cities {
+		holder := s.Occ[c]
+		if holder == 0 {
+			continue
+		}
+		h := s.Unit(holder)
+		if h == nil || h.Attacking {
+			continue // 只看守方佔據的城市
+		}
+		for _, n := range RingCells(c, 1) {
+			v := s.Occ[n]
+			if v == 0 || seen[v] {
+				continue
+			}
+			t := s.Unit(v)
+			if t == nil || !t.Attacking {
+				continue // 只收攻方單位
+			}
+			seen[v] = true
+			pool = append(pool, v)
+		}
+	}
+	if len(pool) == 0 {
+		return BattleExecResult{Implemented: true, Note: "沒有敵軍圍在我方城市周圍"}
+	}
+
+	// 照攻擊力升序——弱的排前面（§38 的排序方向）。
+	strengthOf := func(id GeneralID) int {
+		if u := s.Unit(id); u != nil {
+			return s.StrengthOf(u)
+		}
+		return 0
+	}
+	for i := 0; i < len(pool); i++ {
+		for j := i + 1; j < len(pool); j++ {
+			if strengthOf(pool[i]) > strengthOf(pool[j]) {
+				pool[i], pool[j] = pool[j], pool[i]
+			}
+		}
+	}
+
+	cellOf := func(id GeneralID) CellIndex {
+		if u := s.Unit(id); u != nil {
+			return u.Cell
+		}
+		return NoCell
+	}
+	n := 0
+	for _, u := range units {
+		if u == nil || !u.Alive() {
+			continue
+		}
+		got := AssignTargetFrom(pool, u.Cell, cellOf, route)
+		if got.Target == 0 {
+			continue
+		}
+		u.AssignTo(got.Target, got.NextCell)
+		n++
+	}
+	return BattleExecResult{Assigned: n, Implemented: true,
+		Note: "挑最弱：圍城敵軍 " + itoa(len(pool)) + " 個"}
 }
