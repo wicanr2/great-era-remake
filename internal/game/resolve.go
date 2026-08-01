@@ -118,14 +118,20 @@ func (w *AIWorld) combatants(p ProvinceID, faction GeneralID) ([]*Combatant, []i
 	return out, idx
 }
 
-// writeBack 把戰損寫回世界狀態。兵力歸零的將領標記為不可用
-// ——原版陣亡的處理還沒解，這裡只確保它不會再被派上場。
+// writeBack 把戰損寫回世界狀態。
+//
+// ⛔ 這裡原本多做一件事：「兵力歸零的將領標記為不可用」。
+// **那條規則是我們發明的，原版沒有依據**——`sub_28259`（徵兵）
+// 檢查的是 `+16 == 1`，跟兵力無關，所以兵力 0 的將領照樣能被補兵。
+//
+// 那條規則的代價：`docs/playtest/09` 的長跑會枯竭，而且補上徵兵之後
+// **仍然**枯竭——因為被標成不可用的將領再也回不來（`docs/playtest/11`）。
+//
+// 原版兵力歸零的將領會怎樣仍未解（`+16` 的 `{0, 1, 32}` 三個值、
+// 畫面上的「狀態：任用」都還沒對上），**所以這裡什麼都不做**。
+// `CLAUDE.md` §9：不准為了讓行為看起來合理而編規則。
 func (w *AIWorld) writeBack(us []*Combatant, idx []int) {
 	for k, u := range us {
-		i := idx[k]
-		w.Strengths[i].Force = u.Strength.Force
-		if u.Strength.Force == 0 {
-			w.Units[i].Active = false
-		}
+		w.Strengths[idx[k]].Force = u.Strength.Force
 	}
 }

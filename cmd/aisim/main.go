@@ -28,15 +28,18 @@ func main() {
 		"每回合讓前線省對敵省各打一場（**不是原版 AI 行為**，見下）")
 	until := flag.Bool("until-unified", false,
 		"跑到只剩一個勢力為止（配 -fight 才有意義）")
+	recruit := flag.Bool("recruit", false,
+		"每回合讓每個省徵兵補滿（**remake 行為**：原版徵兵是玩家的指令 5，"+
+			"電腦怎麼徵還沒解）")
 	flag.Parse()
 
-	if err := run(*dir, *turns, *verbose, *fight, *until); err != nil {
+	if err := run(*dir, *turns, *verbose, *fight, *until, *recruit); err != nil {
 		fmt.Fprintln(os.Stderr, "錯誤:", err)
 		os.Exit(1)
 	}
 }
 
-func run(dir string, turns int, verbose, fight, until bool) error {
+func run(dir string, turns int, verbose, fight, until, recruit bool) error {
 	read := func(name string) ([]byte, error) {
 		return os.ReadFile(filepath.Join(dir, name))
 	}
@@ -84,7 +87,7 @@ func run(dir string, turns int, verbose, fight, until bool) error {
 	fmt.Println("開局：", summary(w))
 
 	stats := map[string]int{}
-	moved, battles, captured := 0, 0, 0
+	moved, battles, captured, recruited := 0, 0, 0, 0
 	for t := 1; t <= turns; t++ {
 		for p := game.ProvinceID(1); p <= game.ProvinceCount; p++ {
 			prov, err := tbl.At(p)
@@ -104,6 +107,13 @@ func run(dir string, turns int, verbose, fight, until bool) error {
 				if verbose && len(rep.Moved) > 0 {
 					fmt.Printf("  T%02d 省 %2d → %2d　%s　模式 %d　搬 %d 人%s\n",
 						t, a.From, a.To, a.Step, a.TransferKind, len(rep.Moved), alertMark(rep))
+				}
+			}
+		}
+		if recruit {
+			for p := game.ProvinceID(1); p <= game.ProvinceCount; p++ {
+				if prov, err := tbl.At(p); err == nil && prov.Commander != 0 {
+					recruited += w.RecruitToFull(p, game.BranchInfantry)
 				}
 			}
 		}
@@ -132,8 +142,8 @@ func run(dir string, turns int, verbose, fight, until bool) error {
 	for _, k := range keys {
 		fmt.Printf("  %-28s %4d\n", k, stats[k])
 	}
-	fmt.Printf("\n累計搬動 %d 人次；打了 %d 場，攻方拿下 %d 省\n",
-		moved, battles, captured)
+	fmt.Printf("\n累計搬動 %d 人次；打了 %d 場，攻方拿下 %d 省；徵兵 %d 人\n",
+		moved, battles, captured, recruited)
 	return nil
 }
 

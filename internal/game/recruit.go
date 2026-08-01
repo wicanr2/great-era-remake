@@ -1,0 +1,136 @@
+package game
+
+import "fmt"
+
+// 徵兵（政略指令 5）。
+//
+// `docs/playtest/09` 的端到端實跑暴露了一個真實缺口：**規則層只有消耗
+// 沒有補充**，300 回合後 31 個有主省裡 20 個一個將領都沒有。
+// 徵兵是原版五條補充管道裡最直接的一條，先補它。
+//
+// 成本與上限來自實機（`docs/playtest/10` §2），兩個獨立樣本 + 一次
+// 實際計算，零誤差。**分配規則只解了一半**，見 `Recruit` 的說明。
+
+// RecruitSoldiersPerGold 是一塊黃金能徵幾個兵。
+//
+// 實機兩個樣本：
+//
+//	湖北 黃金 4,150 → 徵兵上限 (0-41,500)
+//	河南 黃金 5,950 → 徵兵上限 (0-59,500)
+//
+// 加上輸入 1,000 兵時畫面顯示「共須黃金 100」——**10 兵 = 1 金**。
+const RecruitSoldiersPerGold = 10
+
+// RecruitLimit 是這個省這次最多能徵幾個兵。
+//
+// 原版把它直接印在提示裡：「司令，欲徵多少步兵？ (0-41500)」。
+func (w *AIWorld) RecruitLimit(p ProvinceID) int {
+	prov, err := w.Table.At(p)
+	if err != nil {
+		return 0
+	}
+	return int(prov.Gold) * RecruitSoldiersPerGold
+}
+
+// RecruitCost 是徵 n 個兵要花多少黃金。
+func RecruitCost(n int) int {
+	return n / RecruitSoldiersPerGold
+}
+
+// RecruitBranchOrder 是徵兵子選單的四個兵種，**照畫面順序**：
+//
+//  1. 徵步兵    2. 徵裝甲兵
+//  3. 徵砲兵    4. 徵騎兵
+//
+// ⚠️ 選單順序與**兵種編號**不同（步 1、砲 4、裝甲 5、騎 6，
+// `docs/mechanics/20-military.md` §0）。UI 照這個順序，規則層用編號。
+var RecruitBranchOrder = [4]uint8{
+	BranchInfantry, BranchArmour, BranchArtiller, BranchCavalry,
+}
+
+// Recruit 對某省徵 n 個某兵種的兵，回傳實際補進去的人數。
+//
+// **分配規則只解了一半。** `sub_28259` 掃該省的將領時檢查五個條件：
+//
+//	將領.+21 == 兵種        同兵種
+//	將領.+4  == 目標省
+//	將領.+16 == 1           可用
+//	將領.+14 == 我方勢力
+//	將領.+17 與滿員數比較   ← 補到滿為止
+//
+// 這裡照這五條實作「依清單順序補到滿」，但**原版補的先後次序沒解**
+// ——`sub_28259` 有 630 行，中間還有幾段 Real 運算沒讀。
+// 順序會影響誰先補滿，所以標為 remake 差異。
+func (w *AIWorld) Recruit(p ProvinceID, branch uint8, n int) (int, error) {
+	prov, err := w.Table.At(p)
+	if err != nil {
+		return 0, err
+	}
+	if n <= 0 {
+		return 0, nil
+	}
+	if limit := w.RecruitLimit(p); n > limit {
+		return 0, fmt.Errorf("game: 省 %d 最多徵 %d 人，要求 %d", p, limit, n)
+	}
+	full := int(BranchFullStrength(branch))
+	if full == 0 {
+		return 0, fmt.Errorf("game: 兵種 %d 沒有滿員數", branch)
+	}
+
+	added := 0
+	for _, i := range w.RosterOf(p).ids {
+		if n <= 0 {
+			break
+		}
+		if i >= len(w.Strengths) {
+			continue
+		}
+		s := &w.Strengths[i]
+		if s.Branch != branch {
+			continue
+		}
+		room := full - int(s.Force)
+		if room <= 0 {
+			continue
+		}
+		take := room
+		if take > n {
+			take = n
+		}
+		s.Force += uint16(take)
+		n -= take
+		added += take
+	}
+	if added > 0 {
+		cost := RecruitCost(added)
+		if int(prov.Gold) < cost {
+			cost = int(prov.Gold)
+		}
+		prov.Gold -= uint16(cost)
+	}
+	return added, nil
+}
+
+// RecruitToFull 把某省所有同兵種的將領補到滿，受黃金上限約束。
+//
+// 這是規則層自己的便利函式（原版沒有這個一鍵操作），
+// `cmd/aisim` 用它讓長跑不會枯竭。**標為 remake 行為。**
+func (w *AIWorld) RecruitToFull(p ProvinceID, branch uint8) int {
+	need := 0
+	full := int(BranchFullStrength(branch))
+	for _, i := range w.RosterOf(p).ids {
+		if i < len(w.Strengths) && w.Strengths[i].Branch == branch {
+			if room := full - int(w.Strengths[i].Force); room > 0 {
+				need += room
+			}
+		}
+	}
+	if limit := w.RecruitLimit(p); need > limit {
+		need = limit
+	}
+	added, err := w.Recruit(p, branch, need)
+	if err != nil {
+		return 0
+	}
+	return added
+}
