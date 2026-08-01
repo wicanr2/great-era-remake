@@ -76,20 +76,35 @@ for _ in $(seq 1 40); do
 done
 [[ -n "$window" ]] || { echo "找不到 DOSBox 視窗" >&2; cat /tmp/dosbox.log >&2; exit 1; }
 
+# focus_window 把滑鼠移進 DOSBox 視窗中央。
+#
+# 沒有 WM 時 X 的輸入焦點是 PointerRoot（跟著滑鼠），所以這一步就是
+# 「把鍵盤焦點交給 DOSBox」。windowfocus 當備援，有 WM 的環境下也能用。
+focus_window() {
+    xdotool windowraise "$window" 2>/dev/null || true
+    xdotool mousemove --window "$window" 320 175 2>/dev/null || true
+    xdotool windowfocus "$window" 2>/dev/null || true
+    sleep 0.3
+}
+
 IFS=';' read -ra steps <<< "$timeline"
 for step in "${steps[@]}"; do
     action="${step%%:*}"; arg="${step#*:}"
     case "$action" in
         wait) echo "[probe] wait ${arg}s"; sleep "$arg" ;;
-        # [雷] DOSBox 忽略 XSendEvent，所以不能用 `xdotool key --window`——
-        # 那條路徑送出去的事件會被丟掉，畫面完全沒反應。
-        # 要走 XTEST（不帶 --window），而且視窗必須先 activate 而不只是 focus。
+        # [雷] Xvfb 裡沒有 window manager，X 的輸入焦點是 **PointerRoot**
+        # （`XGetInputFocus` 回傳 1）。那表示「焦點跟著滑鼠走」，
+        # 而滑鼠預設停在 root window 上——所以 XTEST 送出的鍵盤事件
+        # 全部進了 root，DOSBox 一個都收不到，畫面完全沒反應。
+        #
+        # `windowactivate` 也救不了：它需要 WM 支援 `_NET_ACTIVE_WINDOW`，
+        # 沒有 WM 就會直接失敗。
+        #
+        # 修法是**把滑鼠移進視窗**——PointerRoot 模式下這就等於把焦點給它。
         key)  echo "[probe] key $arg"
-              xdotool windowactivate --sync "$window" 2>/dev/null || xdotool windowfocus "$window"
-              sleep 0.2; xdotool key --clearmodifiers "$arg" ;;
+              focus_window; xdotool key --clearmodifiers "$arg" ;;
         type) echo "[probe] type $arg"
-              xdotool windowactivate --sync "$window" 2>/dev/null || xdotool windowfocus "$window"
-              sleep 0.2; xdotool type --clearmodifiers --delay 120 "$arg" ;;
+              focus_window; xdotool type --clearmodifiers --delay 120 "$arg" ;;
         shot)
             # 視窗幾何要跟截圖一起記：DOSBox 視窗大小 = 遊戲當下的顯示模式，
             # 光看截圖內容 trim 出來的 bounding box 會被黑邊誤導。
