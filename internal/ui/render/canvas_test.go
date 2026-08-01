@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/wicanr2/great-era-remake/internal/game"
+
 	"github.com/wicanr2/great-era-remake/internal/assets"
 )
 
@@ -218,5 +220,47 @@ func TestDrawEntryKeepsPadding(t *testing.T) {
 	}
 	if c.Bounds().Dx() != GlyphAdvance*3 {
 		t.Errorf("畫布寬 = %d，預期 %d", c.Bounds().Dx(), GlyphAdvance*3)
+	}
+}
+
+// 兵種 → 圖示：四個兵種各自對到正確的圖，砲兵還要分六個朝向。
+func TestBranchIconMapping(t *testing.T) {
+	cases := []struct {
+		branch uint8
+		red    bool
+		facing uint8
+		want   int
+		why    string
+	}{
+		{game.BranchInfantry, false, 1, 0, "步兵綠 = 鋼盔"},
+		{game.BranchInfantry, true, 1, 1, "步兵紅"},
+		{game.BranchArmour, false, 1, 2, "裝甲兵綠 = 戰車"},
+		{game.BranchArmour, true, 1, 3, "裝甲兵紅"},
+		{game.BranchCavalry, false, 1, 4, "騎兵綠 = 馬頭"},
+		{game.BranchCavalry, true, 1, 5, "騎兵紅"},
+		{game.BranchArtiller, false, 1, 6, "砲兵綠，朝向 1"},
+		{game.BranchArtiller, false, 6, 11, "砲兵綠，朝向 6"},
+		{game.BranchArtiller, true, 1, 12, "砲兵紅，朝向 1"},
+		{game.BranchArtiller, true, 6, 17, "砲兵紅，朝向 6"},
+		{game.BranchArtiller, false, 0, 6, "朝向超出範圍當 1"},
+		{game.BranchArtiller, false, 99, 6, "同上"},
+	}
+	for _, c := range cases {
+		if got := BranchIcon(c.branch, c.red, c.facing); got != c.want {
+			t.Errorf("%s：得到 %d，應為 %d", c.why, got, c.want)
+		}
+	}
+
+	// 全部落在 0..17 之內——超出去會讓 DrawUnitAtCell 報錯。
+	for _, b := range []uint8{game.BranchInfantry, game.BranchArtiller,
+		game.BranchArmour, game.BranchCavalry} {
+		for _, red := range []bool{false, true} {
+			for f := uint8(1); f <= 6; f++ {
+				if i := BranchIcon(b, red, f); i < 0 || i >= IconCount {
+					t.Errorf("兵種 %d red=%v 朝向 %d 的圖示 %d 超出 0..%d",
+						b, red, f, i, IconCount-1)
+				}
+			}
+		}
 	}
 }

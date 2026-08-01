@@ -209,3 +209,51 @@ func (c *Canvas) DrawCellCursor(originX, originY int, cell game.CellIndex, col a
 	dx, dy := cell.ScreenXY()
 	c.strokeRect(originX+dx, originY+dy, TileW, TileH, col)
 }
+
+// 兵種 → 圖示的對應。四個兵種全部對上（`docs/formats/05` §3）：
+//
+//	步兵   → 鋼盔  0 / 1
+//	裝甲兵 → 戰車  2 / 3
+//	騎兵   → 馬頭  4 / 5
+//	砲兵   → 大砲  6–11 / 12–17（六個朝向）
+//
+// 綠是第一方、紅是第二方。
+const (
+	iconInfantry = 0 // 綠，+1 是紅
+	iconArmour   = 2
+	iconCavalry  = 4
+	iconArtiller = 6 // 綠的六個朝向 6..11，紅的 12..17
+)
+
+// BranchIcon 回傳某個兵種該畫哪一張圖示。
+//
+// `red` 為 true 取紅色那一份。`facing` 只有砲兵用得到——它有六個朝向
+// （`+31`，`docs/re/09`），其餘兵種忽略。facing 超出 1..6 一律當 1。
+func BranchIcon(branch uint8, red bool, facing uint8) int {
+	if facing < 1 || facing > 6 {
+		facing = 1
+	}
+	switch branch {
+	case game.BranchInfantry:
+		return iconInfantry + boolToInt(red)
+	case game.BranchArmour:
+		return iconArmour + boolToInt(red)
+	case game.BranchCavalry:
+		return iconCavalry + boolToInt(red)
+	case game.BranchArtiller:
+		// 砲兵佔 12 張：綠 6..11、紅 12..17。
+		base := iconArtiller
+		if red {
+			base += 6
+		}
+		return base + int(facing) - 1
+	}
+	return iconInfantry + boolToInt(red)
+}
+
+func boolToInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}

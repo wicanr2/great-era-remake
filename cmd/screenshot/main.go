@@ -199,7 +199,8 @@ func drawLiveBattle(c *render.Canvas, m *game.Map, tbl *game.ProvinceTable,
 			out = append(out, &game.Combatant{
 				CombatUnit: game.CombatUnit{
 					General: id, Faction: game.GeneralID(prov), Cell: game.NoCell,
-					Province: prov, Max: 12, Current: 12, Active: true, Decaying: 80,
+					Province: prov, Max: 12, Current: 12, Active: true,
+					Decaying: 80, Facing: gs[i].Range,
 				},
 				Strength: game.StrengthInput{
 					Ability: gs[i].AbilityA, Force: gs[i].Force,
@@ -248,12 +249,14 @@ func drawLiveBattle(c *render.Canvas, m *game.Map, tbl *game.ProvinceTable,
 			u.General, u.Cell, col, row, bf.Owner[row][col])
 	}
 	for _, u := range sim.Defender {
-		if err := c.DrawUnitAtCell(icons, 1, assets.EGADefaultPalette, 190, 0, u.Cell); err != nil {
+		idx := render.BranchIcon(u.Branch(), true, u.Facing)
+		if err := c.DrawUnitAtCell(icons, idx, assets.EGADefaultPalette, 190, 0, u.Cell); err != nil {
 			return err
 		}
 	}
 	for _, u := range sim.Attacker {
-		if err := c.DrawUnitAtCell(icons, 0, assets.EGADefaultPalette, 190, 0, u.Cell); err != nil {
+		idx := render.BranchIcon(u.Branch(), false, u.Facing)
+		if err := c.DrawUnitAtCell(icons, idx, assets.EGADefaultPalette, 190, 0, u.Cell); err != nil {
 			return err
 		}
 	}

@@ -25,13 +25,9 @@ var dirKeys = [...]ebiten.Key{
 	ebiten.Key4, ebiten.Key5, ebiten.Key6,
 }
 
-// 圖示編號。綠紅成對是敵我兩方（`docs/formats/05` §3）；
-// 兵種編號與圖示編號的對應**還沒解出來**，所以只用第一對鋼盔，
-// 不假裝畫得出兵種差異。
-const (
-	iconOurs   = 0 // 鋼盔（綠）
-	iconTheirs = 1 // 鋼盔（紅）
-)
+// 圖示由兵種決定（`render.BranchIcon`，`docs/formats/05` §3）：
+// 步兵是鋼盔、裝甲兵是戰車、騎兵是馬頭、砲兵是大砲（六個朝向）。
+// 綠是攻方、紅是守方。
 
 var (
 	cursorOurs   = assets.RGB{R: 0xFF, G: 0xFF, B: 0x55}
@@ -245,7 +241,8 @@ func (a *app) drawBattle(c *render.Canvas) error {
 		if !u.Alive() || !u.Cell.Valid() {
 			continue
 		}
-		if err := c.DrawUnitAtCell(a.icons, iconTheirs, assets.EGADefaultPalette,
+		idx := render.BranchIcon(u.Branch(), true, u.Facing)
+		if err := c.DrawUnitAtCell(a.icons, idx, assets.EGADefaultPalette,
 			fieldX, fieldY, u.Cell); err != nil {
 			return err
 		}
@@ -254,7 +251,8 @@ func (a *app) drawBattle(c *render.Canvas) error {
 		if !u.Alive() || !u.Cell.Valid() {
 			continue
 		}
-		if err := c.DrawUnitAtCell(a.icons, iconOurs, assets.EGADefaultPalette,
+		idx := render.BranchIcon(u.Branch(), false, u.Facing)
+		if err := c.DrawUnitAtCell(a.icons, idx, assets.EGADefaultPalette,
 			fieldX, fieldY, u.Cell); err != nil {
 			return err
 		}
