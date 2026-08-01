@@ -51,11 +51,19 @@ func LoadTileSet(newterr, rail []byte, pal assets.Palette) (*TileSet, error) {
 
 // DrawTiledBattlefield 用原版圖塊把一個省的戰場畫到 (x, y)。
 //
+// 版面照原版的**六角格**排列——奇數欄下移半格（`game.CellIndex.ScreenXY`，
+// 出自 `sub_50FF5`）。這裡曾經是方格排列，那是排版猜測，不是原版。
+//
 // 邊界格（Owner != 0，屬於鄰省）疊一圈邊框色標示進入方向。
 func (c *Canvas) DrawTiledBattlefield(bf *game.Battlefield, ts *TileSet, x, y int) error {
 	for gy := 0; gy < assets.GridH; gy++ {
 		for gx := 0; gx < assets.GridW; gx++ {
-			px, py := x+gx*TileW, y+gy*TileH
+			cell, err := game.CellAt(gx, gy)
+			if err != nil {
+				return err
+			}
+			dx, dy := cell.ScreenXY()
+			px, py := x+dx, y+dy
 			t := bf.Tiles[gy][gx]
 			idx := t.Kind.TileIndex()
 			if idx < 0 {

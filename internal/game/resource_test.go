@@ -8,7 +8,7 @@ func TestAddResourceClamps(t *testing.T) {
 		{0, 0, 0},
 		{100, 200, 300},
 		{59000, 500, 59500},
-		{59000, 2000, ResourceCap},   // 剛好超過
+		{59000, 2000, ResourceCap},    // 剛好超過
 		{ResourceCap, 1, ResourceCap}, // 已經在上限
 		{50000, 20000, ResourceCap},   // u16 會溢位成 4464，原版給 60000
 		{65535, 1, ResourceCap},
