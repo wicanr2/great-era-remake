@@ -43,7 +43,7 @@
 | **地圖／地形（M3）** | ✅ **SPEC-01 READY**：39 省鄰接表（對稱性 + 實機雙重驗證）、每省 14×14 戰場格子。地形編號 0–22 語意未解 |
 | **將領（M3）** | ✅ **SPEC-02 READY**：33 B/人、三個能力值、兵力 u16@17、**省兵力 = 將領加總**（實機 97500 零誤差）|
 | **Go 規則層（M4）** | 🔶 `internal/game`：地圖層（SPEC-01）+ 將領層（SPEC-02，274 人 byte-for-byte round-trip）|
-| Ebiten 呈現層（M5）| ⬜ 未開始 |
+| **Ebiten 呈現層（M5）** | 🔶 **可執行**：`cmd/dsds` 顯示原版畫面。合成層 `internal/ui/render` 不依賴 Ebiten，**640×350 全畫面逐像素通過** |
 | 多語系 | ⬜ 未開始。字形來源已定案：倚天點陣字（使用者指示 2026-08-01）|
 
 ---
@@ -211,7 +211,7 @@ DOSBox oracle 可走到「選擇歷史背景」。
 | 工具 | 用途 |
 |---|---|
 | `tools/py.sh` | Python 執行包裝（docker + uv venv，venv 持久化在 `workplace/.venv-py`）|
-| `tools/go.sh` | Go 執行包裝（docker，module cache 在 `workplace/.gocache`）|
+| `tools/go.sh` | Go 執行包裝（docker，自建 `dsds-go` image 含 X11/OpenGL 供 Ebiten CGO 用）|
 | `tools/ida.sh` | IDA Pro 9.4 headless（`analyze` / `script` / `raw`）|
 | `tools/dosbox.sh` | DOSBox oracle。沿用現成 image，原版唯讀，寫入導到 `workplace/dosbox/drive_c` |
 | `tools/dosbox_runner.sh` | 容器內的 Xvfb + DOSBox + timeline 送鍵截圖（`wait`／`key`／`type`／`shot`）|

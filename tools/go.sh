@@ -9,14 +9,21 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-IMAGE="golang:1.25-bookworm"
+IMAGE="${DSDS_GO_IMAGE:-dsds-go:1.25}"
 CACHE="$ROOT/workplace/.gocache"
 
-mkdir -p "$CACHE/mod" "$CACHE/build"
+# mount 整個 /go/pkg（不只 pkg/mod），否則 sumdb 寫不進去、go get 會失敗
+mkdir -p "$CACHE/pkg" "$CACHE/build"
+
+# Ebiten 走 CGO，需要 X11/OpenGL 標頭檔，官方 golang image 沒有 → 自建一份
+if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+  echo "[go.sh] 建 image $IMAGE（含 X11/OpenGL 開發套件）…" >&2
+  docker build -f "$ROOT/tools/go.dockerfile" -t "$IMAGE" "$ROOT/tools" >&2
+fi
 
 exec docker run --rm -i \
   -v "$ROOT:/work" \
-  -v "$CACHE/mod:/go/pkg/mod" \
+  -v "$CACHE/pkg:/go/pkg" \
   -v "$CACHE/build:/.cache/go-build" \
   -u "$(id -u):$(id -g)" \
   -w /work \
