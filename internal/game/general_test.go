@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/wicanr2/great-era-remake/internal/assets"
 )
 
 func readGame(t *testing.T, name string) []byte {
@@ -100,5 +102,95 @@ func TestTotalForce(t *testing.T) {
 func TestParseGeneralsRejectsShortData(t *testing.T) {
 	if _, err := ParseGenerals(make([]byte, 10), 1); err == nil {
 		t.Fatal("資料不足應該報錯")
+	}
+}
+
+// TestGeneralProvinceAgainstScreen 是「+4 是所屬省」的決定性驗證。
+//
+// 兩個省的將領數與兵力加總都要對上 DOSBox 實機截圖，零誤差。
+// 這兩個數字是獨立的：將領數來自計數、兵力來自加總，欄位抓錯不可能兩個都對。
+func TestGeneralProvinceAgainstScreen(t *testing.T) {
+	data := readGame(t, "MAN(1).DAT")
+	gs, err := ParseGenerals(data, len(data)/GeneralRecordSize)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []struct {
+		prov  ProvinceID
+		count int
+		force uint32
+		name  string
+	}{
+		{26, 15, 97500, "湖北"},
+		{19, 25, 140500, "河南"},
+	} {
+		if got := CountOf(gs, c.prov); got != c.count {
+			t.Errorf("%s 的將領數：實機 %d，解出 %d", c.name, c.count, got)
+		}
+		if got := ForceOf(gs, c.prov); got != c.force {
+			t.Errorf("%s 的兵力：實機 %d，解出 %d", c.name, c.force, got)
+		}
+	}
+	// 實機派將列表第一行是「1. 吳佩孚 20000」，吳佩孚是 MAN115 的第 58 位。
+	hubei := GeneralsOf(gs, 26)
+	if len(hubei) == 0 || hubei[0].Force != 20000 {
+		t.Errorf("湖北派將列表第一位的兵力應為 20000")
+	}
+	if gs[57].Province != 26 {
+		t.Errorf("吳佩孚（第 58 位）的所屬省應為 26（湖北），解出 %d", gs[57].Province)
+	}
+}
+
+// TestGeneralProvinceRange 所屬省必須是 0 或 1..39。
+//
+// [雷] 三個 MAN(N).DAT 都是 9,042 B（274 筆的空間），**但實際筆數不同**：
+// 第一期 274 位、第二三期各 106 位，其餘是殘料（`+4` 會讀出 180 這種越界值）。
+// 筆數要以對應的 MAN{N}15 名表為準，不能用「檔案大小 ÷ 33」。
+func TestGeneralProvinceRange(t *testing.T) {
+	for _, c := range []struct {
+		dat, names string
+	}{
+		{"MAN(1).DAT", "MAN115"},
+		{"MAN(2).DAT", "MAN215"},
+		{"MAN(3).DAT", "MAN315"},
+	} {
+		gf, err := assets.ParseGlyphFile(readGame(t, c.names))
+		if err != nil {
+			t.Fatalf("%s: %v", c.names, err)
+		}
+		count := len(gf.Glyphs) / GeneralNameSlotWidth
+
+		data := readGame(t, c.dat)
+		gs, err := ParseGenerals(data, count)
+		if err != nil {
+			t.Fatal(err)
+		}
+		unassigned := 0
+		for i := range gs {
+			p := gs[i].Province
+			if p == 0 {
+				unassigned++
+				continue
+			}
+			if !p.Valid() {
+				t.Fatalf("%s 第 %d 位將領的所屬省 %d 超出 1..%d",
+					c.dat, i+1, p, ProvinceCount)
+			}
+		}
+		t.Logf("%s：名表 %d 位，%d 位無所屬", c.dat, count, unassigned)
+
+		// 殘料驗證：名表之後的空間確實有越界值，證明不能整檔解析。
+		if extra := len(data)/GeneralRecordSize - count; extra > 0 {
+			bad := 0
+			for i := count; i < len(data)/GeneralRecordSize; i++ {
+				if data[i*GeneralRecordSize+4] > ProvinceCount {
+					bad++
+				}
+			}
+			if bad == 0 {
+				t.Errorf("%s 名表之後的 %d 筆沒有越界值，筆數上限可能抓錯",
+					c.dat, extra)
+			}
+		}
 	}
 }

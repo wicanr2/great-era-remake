@@ -31,19 +31,19 @@ import (
 // 邏輯解析度仍是原版的 640×350。
 const scale = 2
 
-// 版面。戰場是 14×14 格 × 32×24 = 448×336，放進 640×350 之後
-// 右側剩 192 寬給側欄——這個比例與原版政略畫面（左側面板 + 右側地圖）一致，
-// 但**座標本身是 remake 的排版選擇，不是還原原版數值**。
+// 版面。原版政略畫面是左側面板（約 190 寬）+ 右側地圖，
+// 戰場畫面是 14×14 格 × 32×24 = 448×336。兩者都放得進 640×350。
+// **座標是 remake 的排版選擇，不是還原原版數值。**
 const (
-	fieldX, fieldY = 0, 14
-	sideX          = 452
-	nameY          = 16
+	fieldX, fieldY = 190, 14
 )
 
 type app struct {
 	m        *game.Map
-	provName *assets.GlyphFile // 3.15：前 39 個三字詞條是省名
-	tiles    *render.TileSet   // NEWTERR.TPC 的 22 張地形圖塊
+	tbl      *game.ProvinceTable // 39 省的狀態（存檔或初始檔）
+	generals []game.General      // 該期的將領表
+	fonts    render.PanelFonts   // 面板用的三個字模檔
+	tiles    *render.TileSet     // NEWTERR + RAIL 的圖塊
 	current  game.ProvinceID
 	dirty    bool
 	frame    *ebiten.Image
@@ -77,14 +77,25 @@ func (a *app) compose() error {
 	if err != nil {
 		return err
 	}
-	// 用原版的 NEWTERR 圖塊畫戰場：NWMAP 的地物編號減 1 就是圖塊索引。
+	// 用原版的 NEWTERR 圖塊畫戰場，有鐵路的格子疊 RAIL.TPC。
 	if err := c.DrawTiledBattlefield(bf, a.tiles, fieldX, fieldY); err != nil {
 		return err
 	}
 
-	// 側欄：省名（3.15 的第 current-1 個三字詞條）
-	if err := c.DrawEntry(a.provName, int(a.current)-1, 3,
-		assets.RGB{R: 0xFF, G: 0xFF, B: 0xA2}, sideX, nameY, true); err != nil {
+	p, err := a.tbl.At(a.current)
+	if err != nil {
+		return err
+	}
+	data := render.PanelData{
+		ID:       a.current,
+		Province: p,
+		Force:    game.ForceOf(a.generals, a.current),
+		Generals: game.CountOf(a.generals, a.current),
+	}
+	if a.tbl.Date != nil {
+		data.Year, data.Month = a.tbl.Date.Year, a.tbl.Date.Month
+	}
+	if err := c.DrawStrategyPanel(data, a.fonts); err != nil {
 		return err
 	}
 
@@ -147,11 +158,36 @@ func run(dir string, start game.ProvinceID) error {
 		return err
 	}
 
-	names, err := read("3.15")
+	w2, err := read("2.15")
 	if err != nil {
 		return err
 	}
-	gf, err := assets.ParseGlyphFile(names)
+	w3, err := read("3.15")
+	if err != nil {
+		return err
+	}
+	gnames, err := read("MAN115")
+	if err != nil {
+		return err
+	}
+	fonts, err := render.LoadPanelFonts(w2, w3, gnames)
+	if err != nil {
+		return err
+	}
+
+	// 省份狀態：優先讀存檔，沒有就用第一期的初始檔。
+	tbl, err := loadProvinces(read)
+	if err != nil {
+		return err
+	}
+
+	mandat, err := read("MAN(1).DAT")
+	if err != nil {
+		return err
+	}
+	// 筆數以名表為準——MAN(N).DAT 都是 274 筆的空間，但二三期只有 106 位。
+	generals, err := game.ParseGenerals(mandat,
+		len(fonts.Gen.Glyphs)/game.GeneralNameSlotWidth)
 	if err != nil {
 		return err
 	}
@@ -172,6 +208,22 @@ func run(dir string, start game.ProvinceID) error {
 	ebiten.SetWindowSize(render.ModeBGIW*scale, render.ModeBGIH*scale)
 	ebiten.SetWindowTitle("大時代的故事")
 	return ebiten.RunGame(&app{
-		m: m, provName: gf, tiles: ts, current: start, dirty: true,
+		m: m, tbl: tbl, generals: generals, fonts: fonts, tiles: ts,
+		current: start, dirty: true,
 	})
+}
+
+// loadProvinces 讀省份狀態：優先用存檔 SAVE(1).DT1，讀不到就退回
+// 第一期的初始檔 TOWN(1).DAT。
+//
+// 兩個檔案是同一個結構，只差 4 bytes 的相位（docs/spec/03 §1）。
+func loadProvinces(read func(string) ([]byte, error)) (*game.ProvinceTable, error) {
+	if b, err := read("SAVE(1).DT1"); err == nil {
+		return game.ParseSaveProvinces(b)
+	}
+	b, err := read("TOWN(1).DAT")
+	if err != nil {
+		return nil, err
+	}
+	return game.ParseTownFile(b)
 }
