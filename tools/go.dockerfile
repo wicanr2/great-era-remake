@@ -5,7 +5,7 @@ FROM golang:1.25-bookworm
 RUN apt-get update && apt-get install -y --no-install-recommends \
       libx11-dev libxrandr-dev libxcursor-dev libxinerama-dev libxi-dev \
       libgl1-mesa-dev libxxf86vm-dev libasound2-dev pkg-config \
-      xvfb imagemagick libgl1 libglx-mesa0 mesa-utils x11-utils \
+      xvfb imagemagick libgl1 libglx-mesa0 mesa-utils x11-utils xdotool \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /work

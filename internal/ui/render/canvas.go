@@ -88,6 +88,9 @@ func (c *Canvas) DrawSprite(sp *assets.Sprite, pal assets.Palette, x, y int) err
 	return nil
 }
 
+// colorOf 把 assets.RGB 轉成 color.RGBA（不透明）。
+func colorOf(c assets.RGB) color.RGBA { return color.RGBA{c.R, c.G, c.B, 0xFF} }
+
 // DiffCount 回傳兩張圖有多少像素不同，用於對照原版截圖。
 //
 // 尺寸不同直接回錯——比對前必須先確認範圍一致，否則「差異少」沒有意義。
