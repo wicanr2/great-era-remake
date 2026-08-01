@@ -227,3 +227,63 @@ func AIBreakoutSkipsProvince(p ProvinceID) bool {
 	}
 	return false
 }
+
+// ── 步驟 5：依戰力排序候選（`sub_16047`）────────────────────────────────
+
+// SortProvincesByStrength 依**省份戰力總和**（`sub_5B983`）就地排序候選清單
+// （`sub_16047`）。
+//
+//	mode 1（ascending = true）  → 升序，**戰力最弱的排最前面**
+//	mode 2（ascending = false） → 降序，**戰力最強的排最前面**
+//
+// 呼叫端都只取排序後的第一個，所以實際語意是「挑最弱的／挑最強的」：
+//
+//	決策鏈 A 步驟 5（`sub_17ADA+4E2`）：mode 1 → **挑最弱的鄰省打**
+//	                                    → `sub_174C9(狀態, 3)` 出兵模式 3
+//	`sub_1655C+45`（未解）：            mode 2 → 取**最強的敵對鄰省**做比較
+//
+// 步驟 5 的前置門檻很高（`byte_6FFCA & 2`、`[-234h] > 3`、
+// `[-236h] ≥ 63,392`），所以它是「**兵多將廣時的擴張**」——
+// 而擴張的對象是**柿子挑軟的捏**。
+//
+// ⚠️ 這是**就地排序**，會改動呼叫端的陣列，不是回傳一個省。
+// `docs/re/28` 的欄位掃描把 `es:[di-1]` 記成「回傳值」，
+// 實際上那是寫回候選陣列本身。
+//
+// ⚠️ 原版是雙迴圈選擇排序，相等時不交換（`jbe`／`jnb` 都跳過）。
+// 這種寫法**不是穩定排序**——交換會打亂中間元素的相對順序。
+// 這裡照抄同樣的雙迴圈而不用 `sort.SliceStable`，
+// 因為呼叫端可能依賴「第一名以外的排列」，兩者在並列時結果不同。
+func SortProvincesByStrength(list []ProvinceID, ascending bool,
+	strength func(ProvinceID) int) {
+	for i := 0; i+1 < len(list); i++ {
+		for j := i + 1; j < len(list); j++ {
+			a, b := strength(list[i]), strength(list[j])
+			swap := a > b
+			if !ascending {
+				swap = a < b
+			}
+			if swap {
+				list[i], list[j] = list[j], list[i]
+			}
+		}
+	}
+}
+
+// WeakestNeighbourTarget 是決策鏈 A 步驟 5 挑目標的完整語意：
+// **候選鄰省裡戰力總和最小的那一個**。
+//
+// 候選的收集條件在呼叫端（`sub_17ADA` `loc_17ED1`）：
+// 有效鄰省、**跳過交戰中的**（省份 `+32` bit 6）。
+//
+// 回 0 表示沒有候選。
+func (w *AIWorld) WeakestNeighbourTarget(cands []ProvinceID) ProvinceID {
+	if len(cands) == 0 {
+		return 0
+	}
+	sorted := append([]ProvinceID(nil), cands...)
+	SortProvincesByStrength(sorted, true, func(p ProvinceID) int {
+		return ProvinceStrength(p, w.Units, w.Strengths, w.Opts)
+	})
+	return sorted[0]
+}

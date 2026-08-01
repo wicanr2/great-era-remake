@@ -252,3 +252,67 @@ func TestSkippedProvinceLists(t *testing.T) {
 		t.Error("省 1 不該被排除")
 	}
 }
+
+// 排序方向：mode 1 升序（最弱在前）、mode 2 降序（最強在前）。
+func TestSortProvincesByStrength(t *testing.T) {
+	str := map[ProvinceID]int{1: 300, 2: 100, 3: 200}
+	get := func(p ProvinceID) int { return str[p] }
+
+	asc := []ProvinceID{1, 2, 3}
+	SortProvincesByStrength(asc, true, get)
+	if asc[0] != 2 || asc[len(asc)-1] != 1 {
+		t.Errorf("升序結果 %v，最弱的省 2 應該在最前、最強的省 1 在最後", asc)
+	}
+
+	desc := []ProvinceID{1, 2, 3}
+	SortProvincesByStrength(desc, false, get)
+	if desc[0] != 1 || desc[len(desc)-1] != 2 {
+		t.Errorf("降序結果 %v，最強的省 1 應該在最前", desc)
+	}
+
+	// 邊界：0 個與 1 個元素不能 panic。
+	SortProvincesByStrength(nil, true, get)
+	one := []ProvinceID{5}
+	SortProvincesByStrength(one, true, get)
+	if len(one) != 1 || one[0] != 5 {
+		t.Errorf("單元素被動到了：%v", one)
+	}
+}
+
+// 相等時不交換（原版 `jbe`／`jnb` 都跳過）。
+func TestSortProvincesByStrengthTieKeepsOrder(t *testing.T) {
+	get := func(ProvinceID) int { return 42 } // 全部一樣
+	for _, asc := range []bool{true, false} {
+		list := []ProvinceID{3, 1, 2}
+		SortProvincesByStrength(list, asc, get)
+		if list[0] != 3 || list[1] != 1 || list[2] != 2 {
+			t.Errorf("ascending=%v 全部並列時順序被改成 %v，應該保持 [3 1 2]",
+				asc, list)
+		}
+	}
+}
+
+// 步驟 5 挑的是戰力最小的候選。
+func TestWeakestNeighbourTarget(t *testing.T) {
+	w := realWorld(t)
+	w.Units = nil
+	w.Strengths = nil
+	// 省 5 放一個部隊，省 3、省 4 都空 → 省 5 戰力最高。
+	// `ProvinceStrength` 要求 `General != 0`（空槽不算），不能省。
+	w.Units = append(w.Units, CombatUnit{General: 1, Province: 5, Active: true})
+	w.Strengths = append(w.Strengths, StrengthInput{
+		Ability: 80, Force: 20000, F19: 10, F20: 10, F29: 100, F30: 80, Branch: 1,
+	})
+	if got := w.WeakestNeighbourTarget([]ProvinceID{5, 3, 4}); got == 5 {
+		t.Errorf("挑了戰力最高的省 5，應該挑空的省 3 或 4")
+	}
+	if got := w.WeakestNeighbourTarget(nil); got != 0 {
+		t.Errorf("沒有候選時應該回 0，實際回 %d", got)
+	}
+	// 不可以改動呼叫端的切片。
+	cands := []ProvinceID{5, 3, 4}
+	w.WeakestNeighbourTarget(cands)
+	if cands[0] != 5 {
+		t.Errorf("呼叫端的候選切片被就地改動了：%v", cands)
+	}
+}
