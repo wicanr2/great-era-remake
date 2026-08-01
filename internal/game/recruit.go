@@ -247,3 +247,53 @@ func (w *AIWorld) RestoreLoyalty(p ProvinceID) error {
 	prov.Loyalty = uint8(v)
 	return nil
 }
+
+// ---------------------------------------------------------------------------
+// 開發（政略指令 7）的「建兵工廠」，出自 `sub_248A8`（`docs/re/20`）。
+// ---------------------------------------------------------------------------
+
+const (
+	// ArsenalCost 是蓋一座兵工廠的黃金（`mov cx, 1388h`）。
+	ArsenalCost = 5000
+	// ArsenalMax 是一個省的兵工廠上限（`cmp byte ptr [di-6223h], 5`）。
+	ArsenalMax = 5
+)
+
+// ArsenalAffordable 是這個省現在最多能蓋幾座，語意照 `sub_248A8`：
+// 黃金不足 5,000 就一座都蓋不了，而且不能超過上限 5。
+func (w *AIWorld) ArsenalAffordable(p ProvinceID) int {
+	prov, err := w.Table.At(p)
+	if err != nil {
+		return 0
+	}
+	n := int(prov.Gold) / ArsenalCost
+	if room := ArsenalMax - int(prov.Arsenals); n > room {
+		n = room
+	}
+	if n < 0 {
+		n = 0
+	}
+	return n
+}
+
+// BuildArsenal 蓋 n 座兵工廠，回傳實際蓋成幾座。
+//
+// 蓋好之後每座每月把煤鐵轉成彈藥——那條是實機量的
+// （`docs/playtest/06` §3，湖北 3 座 → 煤 −6,000、鐵 −6,000、彈藥 +6,000），
+// **公式還沒從反組譯確認**，所以不在這裡實作。
+func (w *AIWorld) BuildArsenal(p ProvinceID, n int) (int, error) {
+	prov, err := w.Table.At(p)
+	if err != nil {
+		return 0, err
+	}
+	if n <= 0 {
+		return 0, nil
+	}
+	if max := w.ArsenalAffordable(p); n > max {
+		return 0, fmt.Errorf("game: 省 %d 最多蓋 %d 座（黃金 %d、已有 %d 座），要求 %d",
+			p, max, prov.Gold, prov.Arsenals, n)
+	}
+	prov.Gold -= uint16(n * ArsenalCost)
+	prov.Arsenals += uint8(n)
+	return n, nil
+}
