@@ -99,18 +99,19 @@ func TestTileKindRanges(t *testing.T) {
 	if rail != 885 {
 		t.Errorf("鐵路格數應為 885，實得 %d", rail)
 	}
-	// 鐵路只鋪在這五種地形上：平原、丘陵、水（鐵橋）、沙漠、岩地。
+	// 鐵路只鋪在這五種地形上：平原、丘陵、河海（鐵橋）、沙漠、高原。
+	// 地形名稱出自原版詞表 2.15 的 195–205（docs/spec/04 §2）。
 	// 這是拆出來的結果，不是預先設定的過濾條件——公式錯就會冒出別的地形。
 	for k := range under {
 		switch k {
 		case assets.TilePlain, assets.TileHill, assets.TileWater,
-			assets.TileDesert, assets.TileRock:
+			assets.TileDesert, assets.TilePlateau:
 		default:
 			t.Errorf("鐵路底下出現非預期的地形 %d（%d 格）", k, under[k])
 		}
 	}
 	if under[assets.TileWater] != 77 {
-		t.Errorf("跨水的鐵橋應有 77 格，實得 %d", under[assets.TileWater])
+		t.Errorf("跨河海的鐵橋應有 77 格，實得 %d", under[assets.TileWater])
 	}
 }
 

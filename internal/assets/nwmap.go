@@ -22,20 +22,58 @@ const (
 // TileKind 是地物編號，1..22，減 1 就是 NEWTERR.TPC 的圖塊索引。
 type TileKind uint16
 
-// 已定名的地物編號。1–5 有直接證據，其餘是圖塊視覺判讀。
+// 地物編號 1–11 的名稱**出自原版自己的詞表**，不是視覺判讀：
+// `2.15` 的詞條 195–205 依序是「平原 丘陵 河海 森林 城市 高山 沙漠
+// 橋樑 橋樑 高原 關口」，前面第 194 條正是「地形」。
+//
+// 順序與編號 1–11 一一對應，連**橋樑重複兩次**（縱、橫兩種）都對上——
+// 這是 confirmed，不是推測。
+//
+// 12–22 沒有對應的詞條，視覺上是長城的各段（橫、縱、彎角、斜坡）；
+// `2.15` 詞條 120 有「長城」，但沒有逐段的名稱。
 const (
 	TilePlain    TileKind = 1  // 平原
 	TileHill     TileKind = 2  // 丘陵
-	TileWater    TileKind = 3  // 水（湖北的長江與漢水全部是 3）
+	TileWater    TileKind = 3  // 河海（湖北的長江與漢水全部是 3）
 	TileForest   TileKind = 4  // 森林
 	TileCity     TileKind = 5  // 城市（39/39 對上 TOWN 的城市數）
 	TileMountain TileKind = 6  // 高山
-	TileDesert   TileKind = 7  // 沙漠／黃土
-	TileBridgeV  TileKind = 8  // 橋（縱）
-	TileBridgeH  TileKind = 9  // 橋（橫）
-	TileRock     TileKind = 10 // 岩地／荒地
-	TileGate     TileKind = 11 // 關隘城門
+	TileDesert   TileKind = 7  // 沙漠
+	TileBridgeA  TileKind = 8  // 橋樑（縱）
+	TileBridgeB  TileKind = 9  // 橋樑（橫）
+	TilePlateau  TileKind = 10 // 高原
+	TilePass     TileKind = 11 // 關口
 )
+
+// TileName 回傳地物的原版名稱。12–22（長城各段）與鐵路沒有詞條名稱。
+func (k TileKind) TileName() string {
+	switch k {
+	case TilePlain:
+		return "平原"
+	case TileHill:
+		return "丘陵"
+	case TileWater:
+		return "河海"
+	case TileForest:
+		return "森林"
+	case TileCity:
+		return "城市"
+	case TileMountain:
+		return "高山"
+	case TileDesert:
+		return "沙漠"
+	case TileBridgeA, TileBridgeB:
+		return "橋樑"
+	case TilePlateau:
+		return "高原"
+	case TilePass:
+		return "關口"
+	}
+	if k >= 12 && k <= TileKindMax {
+		return "長城"
+	}
+	return ""
+}
 
 // TileKindMax 是地物編號的上限，也是 NEWTERR.TPC 的圖塊數。
 const TileKindMax TileKind = 22
@@ -56,8 +94,8 @@ func (k TileKind) TileIndex() int {
 // railStride 是 25，不是 22——編碼留了幾個空號。實測全 39 省 7,644 格
 // 用這個公式拆出來，地形與鐵路索引**全部落在合法範圍，零例外**。
 //
-// 拆出來的底層地形只有 {1, 2, 3, 7, 10}（平原、丘陵、水、沙漠、岩地），
-// 正是鐵路會經過的地形；水的那 77 格就是鐵橋。
+// 拆出來的底層地形只有 {1, 2, 3, 7, 10}（平原、丘陵、河海、沙漠、高原），
+// 正是鐵路會經過的地形；河海的那 77 格就是鐵橋。
 const (
 	railBase   = 31
 	railStride = 25

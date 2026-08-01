@@ -79,7 +79,8 @@
 | `docs/re/05-mem-war-record.md` | **戰鬥狀態 469 B 的欄位切法**（讀寫兩邊對稱驗證）+ 未初始化殘料的記帳 | ✅ |
 | `docs/spec/04-battlefield-tiles.md` | **戰場圖塊規格**：`NWMAP.DAT` 每省 196 格、地形 1–22、鐵路編碼（READY）| ✅ |
 | **`docs/mechanics/`** | **遊戲機制，按屬性分類**（`CLAUDE.md` §6.5）。`00-index.md` 是索引與狀態總表 | 🔶 骨架完成 |
-| **`docs/mechanics/70-ai.md`** | **電腦 AI 的判斷邏輯**——優先度最高。勢力輪替與戰鬥 gate 已解，決策邏輯全未解 | 🔶 |
+| **`docs/mechanics/70-ai.md`** | **電腦 AI 的判斷邏輯**——優先度最高。勢力輪替、戰鬥 gate、53 個 `Random` 的分佈、覆滅清空資源 | 🔶 |
+| **`docs/mechanics/01-vocabulary.md`** | **從 339 條原版 UI 詞彙反推的機制地圖**。地形名稱因此升級為 confirmed | ✅ |
 | `docs/re/06-main-loop-battle-gate.md` | **主迴圈與進入戰鬥的三個條件**；`sub_5C7FE` = 司令是否為十大勢力之一 | ✅ |
 | `docs/playtest/02-load-save-strategy-phase.md` | **政略畫面實測**：13 個省份欄位、15 個指令、命令數上限、密碼可過 | ✅ |
 | `docs/spec/01-map-and-terrain.md` | **地圖規格**：39 省鄰接表、14×14 戰場格子、**地名索引**（全 READY）| ✅ |
@@ -183,6 +184,18 @@
 - **受影響**：**後續每一份反組譯筆記**——呼叫慣例是 Pascal（參數由左至右壓棧、
   被呼叫者清棧），字串是長度前綴而非 NUL 結尾。用 C 的直覺讀參數順序會全部反過來。
   `CLAUDE.md` §3.1、§4.1 已更正。
+
+### 5.7 「地物編號 10 是岩地／荒地」→ 是高原
+
+- **原結論**（`docs/spec/04` 舊版）：從 `NEWTERR.TPC` 的圖塊顏色判讀，
+  灰褐色的地塊看起來像岩地或荒地。
+- **新證據**：`2.15` 的詞條 194 是「地形」，195–205 依序是
+  平原、丘陵、河海、森林、城市、高山、沙漠、橋樑、橋樑、高原、關口
+  ——與地物編號 1–11 一一對應，**連橋樑重複兩次都對上**。編號 10 是**高原**。
+- **為什麼會錯**：視覺判讀有極限。灰褐色地塊看起來像岩地，但遊戲裡它是高原。
+- **受影響**：`docs/spec/04` §2 的地物表升級為 confirmed（不再是視覺判讀），
+  `assets.TileRock` 改名 `TilePlateau`，`TileGate` 改 `TilePass`（關口）。
+  詞表整理見 `docs/mechanics/01-vocabulary.md`。
 
 ### 5.6 「`TERNAME.DAT` 的格值是地形編號 0–22」→ 是地名索引
 
