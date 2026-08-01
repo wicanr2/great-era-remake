@@ -80,3 +80,36 @@ func TestUndecidedStepsAreTracked(t *testing.T) {
 			len(UndecidedBattleSteps))
 	}
 }
+
+func TestDecideBattleARatioGates(t *testing.T) {
+	// §42：sub_3A885 與 sub_3A8C8 共用同一組比率門檻，只差看幾方。
+	base := BattleAIInput{SideStrength: 100, FoeStrength: 90} // 不觸發必勝門檻
+
+	// 兩方都成立 → 12（推倒重來）
+	in := base
+	in.RatioGateSelf, in.RatioGateFoe = true, true
+	if got := DecideBattleA(in); got.Action != ActAReset {
+		t.Errorf("兩方都成立該走推倒重來，實際 %s", BattleActionName(got.Action))
+	}
+
+	// 只有我方成立 → 19（全面接戰）
+	in = base
+	in.RatioGateSelf = true
+	if got := DecideBattleA(in); got.Action != ActAEngageAll {
+		t.Errorf("只有我方成立該走全面接戰，實際 %s", BattleActionName(got.Action))
+	}
+
+	// 只有對方成立 → 不是這兩步的事，落到後面
+	in = base
+	in.RatioGateFoe = true
+	if got := DecideBattleA(in); got.Action == ActAReset || got.Action == ActAEngageAll {
+		t.Errorf("只有對方成立不該走這兩步，實際 %s", BattleActionName(got.Action))
+	}
+
+	// ⚠️ 順序要對：必勝門檻排在比率門檻前面，成立時先攔下。
+	in = BattleAIInput{SideStrength: 20, FoeStrength: 100,
+		RatioGateSelf: true, RatioGateFoe: true}
+	if got := DecideBattleA(in); got.Action != ActADecisive {
+		t.Errorf("必勝門檻該先攔下，實際 %s", BattleActionName(got.Action))
+	}
+}

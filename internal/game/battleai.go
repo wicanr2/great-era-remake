@@ -88,6 +88,17 @@ type BattleAIInput struct {
 	FoeStrength int
 	// FirstUnitStrength 是首位單位的攻擊力（`sub_58D4A` 用）。
 	FirstUnitStrength int
+	// RatioGateSelf / RatioGateFoe 是 §42 那組比率門檻的結果
+	// （原版 `sub_3A63C` 與 `sub_3A730` 的 and，各對一方求值）。
+	//
+	//	門檻 = ( 比率 + byte_64900 ) < 15
+	//
+	// ⚠️ **比率的來源未解**——`word_64932/34/36/38` 是分子、`sub_3A4CE` 是分母，
+	// 形狀像按比例衰減的累積量但沒有證據。所以這兩個布林由呼叫端傳，
+	// 決策鏈本身不算。來源解出來之後只要改呼叫端，這裡的邏輯不動。
+	RatioGateSelf bool
+	RatioGateFoe  bool
+
 	// EnableLastSteps 是 `byte_6FFCA & 4`：**啟用後面幾步**。
 	//
 	// 與政略決策鏈的「啟用最後三步」是同一個位元、同一個手法
@@ -145,8 +156,22 @@ func DecideBattleA(in BattleAIInput) BattleDecision {
 		return BattleDecision{Action: ActADecisive, Step: "sub_3A817 必勝門檻"}
 	}
 
-	// 第二步 `sub_3A885` → 值 12。**未讀**。
-	// 第三步 `sub_3A8C8` → 值 19。**未讀**。
+	// 第二步 `sub_3A885` → 值 12；第三步 `sub_3A8C8` → 值 19。
+	//
+	// 兩者**共用同一組比率門檻**（§42），只差看幾方：
+	//
+	//	兩方都成立 → 12（推倒重來）
+	//	只有第二方 → 19（全面接戰）
+	//
+	// ⚠️ 比率的**來源**還沒解（`word_64932/34/36/38` 與 `sub_3A4CE`），
+	// 所以這裡收 `RatioGateSelf`／`RatioGateFoe` 兩個布林讓呼叫端傳，
+	// 而不是在這裡算——來源解出來之後只要改呼叫端。
+	if in.RatioGateSelf && in.RatioGateFoe {
+		return BattleDecision{Action: ActAReset, Step: "sub_3A885 兩方比率門檻"}
+	}
+	if in.RatioGateSelf {
+		return BattleDecision{Action: ActAEngageAll, Step: "sub_3A8C8 我方比率門檻"}
+	}
 
 	// 第四步 `sub_3A8F7`：要 `byte_6FFCA & 4`。
 	// 條件是**不成立**才往下走（§16 的表）——也就是「敵方 < 我方的 2/3」。
@@ -169,14 +194,13 @@ func DecideBattleA(in BattleAIInput) BattleDecision {
 //
 // 補完一支就從這裡移除一筆，並在 `docs/re/31` 補一節。
 var UndecidedBattleSteps = []string{
-	"sub_3A885 → 值 12（分支 A 第二步）",
-	"sub_3A8C8 → 值 19（分支 A 第三步）",
 	"sub_3A94E → 值 16／17（分支 A 第五步）",
 	"sub_3A817 在 11／12／16／17 之間怎麼選",
 	"sub_3A8F7 在 14／15／18 之間怎麼選",
 	"sub_3A9F4 → 值 2（分支 B 第一步，何時佈防）",
-	"sub_3AABA → 值 4（分支 B 第三步）",
 	"sub_3AA51 在 1／3 之間怎麼選",
+	"比率門檻的來源：word_64932/34/36/38 與 sub_3A4CE（§42 挖到第五層停手）",
+	"sub_56D49（值 4 與值 19 的共用前置，81 行）",
 }
 
 // BattleActionName 回傳行動的中文名稱，給紀錄與測試訊息用。
