@@ -119,3 +119,28 @@ func AIRecruitQualityCost(branch, skill, f20 uint8) (uint8, uint8) {
 	skill -= skill / AIRecruitSkillDiv
 	return skill, f20
 }
+
+// AIRecruitSplitMax 是第三支分配策略（`sub_191A6`）的部隊數上限：**5**。
+//
+// 那一支先數有幾個沒滿員的部隊（數到 5 就不再數），再把預算**平分**。
+// 硬編碼在 `cmp [bp+var_6], 5 / jge`。
+const AIRecruitSplitMax = 5
+
+// AIRecruitSplitShare 回傳「平分給 n 個部隊時每份多少」（`sub_191A6` 第二階段）。
+//
+// `n` 會先夾到 `AIRecruitSplitMax`。n == 0 回 0（原版直接 return）。
+//
+// 原版用 `Round(Real(預算) / Real(n))`，所以是四捨五入不是截斷。
+func AIRecruitSplitShare(budget, n int) int {
+	if n <= 0 {
+		return 0
+	}
+	if n > AIRecruitSplitMax {
+		n = AIRecruitSplitMax
+	}
+	q, r := budget/n, budget%n
+	if r*2 >= n {
+		q++
+	}
+	return q
+}

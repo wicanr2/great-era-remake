@@ -13,8 +13,9 @@ import (
 // 迴圈直到命令數用完。這裡做的是**決策鏈 A 那一段**，因為它是唯一會
 // 出兵的地方，也是玩家最有感的部分。
 //
-// ⚠️ **還沒接的**：內政（依 `byte_6FE7E` 分支）、`sub_19B89`、
-// 收尾 `sub_1AC01`。照實標記，不假裝跑了完整的回合。
+// ⚠️ **還沒接的**：`sub_19B89`、收尾 `sub_1AC01`，以及內政裡「只看到扣錢
+// 不知道換到什麼」的那幾條（1／8／12 月的黃金支出）。
+// 照實標記，不假裝跑了完整的回合。
 
 // computerTurnReport 是一次電腦回合的結果，用來組訊息。
 type computerTurnReport struct {
@@ -22,6 +23,7 @@ type computerTurnReport struct {
 	transfers   int
 	attacks     []string
 	relocations []string
+	recruits    []string
 }
 
 // runComputerTurn 讓所有非玩家勢力行動一輪。
@@ -68,11 +70,23 @@ func (a *app) runOneComputerAction(p game.ProvinceID, rep *computerTurnReport) b
 		// 這裡用同一支 `ProvinceForceTotal`，**不是代入值**。
 		TotalForce: a.world.ProvinceForceTotal(p, a.generals),
 	}
-	// 遷都排在兩條決策鏈**之前**（`docs/re/13` §6），而且會消耗一個命令數。
+	// 原版的順序是 `sub_19B89` → 遷都 → 內政 → 兩條決策鏈（`docs/re/13` §6）。
+	//
+	// 遷都會消耗一個命令數。
 	if r := a.world.Relocate(p, prov.Commander, a.generals); r.Moved {
 		rep.relocations = append(rep.relocations,
 			fmt.Sprintf("%s → %s 遷都", a.provinceName(r.From), a.provinceName(r.To)))
 		return true
+	}
+
+	// 季節性內政（`docs/re/32`）：徵兵在 1／3／8／11 月，忠誠度在 6 月。
+	//
+	// ⚠️ **內政不消耗命令數**——原版那一段在主迴圈裡、在命令數檢查之前，
+	// 沒有 `dec 狀態[-232h]`。所以它每一輪都會跑，這裡照抄。
+	if in := a.world.RunInterior(p, a.month, a.generals, 0); in.Recruited > 0 {
+		rep.recruits = append(rep.recruits,
+			fmt.Sprintf("%s 徵兵 %d（%d 金）",
+				a.provinceName(p), in.Recruited, in.GoldSpent))
 	}
 
 	res := a.world.ChainA(p, a.generals, opt)

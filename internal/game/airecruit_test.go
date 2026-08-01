@@ -125,3 +125,24 @@ func TestAIRecruitQualityCost(t *testing.T) {
 		}
 	})
 }
+
+// 平分策略：上限 5 個部隊，Round 不是截斷。
+func TestAIRecruitSplitShare(t *testing.T) {
+	if got := AIRecruitSplitShare(1000, 4); got != 250 {
+		t.Errorf("1000 分 4 份 = %d，預期 250", got)
+	}
+	// 上限 5：分給 8 個也只當成 5 個。
+	if got := AIRecruitSplitShare(1000, 8); got != AIRecruitSplitShare(1000, 5) {
+		t.Errorf("分給 8 個應該夾到 %d 個，兩者要相同", AIRecruitSplitMax)
+	}
+	// Round：1000 / 3 = 333.33 → 333；1000 / 6（夾成 5）= 200。
+	if got := AIRecruitSplitShare(1000, 3); got != 333 {
+		t.Errorf("1000 分 3 份 = %d，預期 333", got)
+	}
+	if got := AIRecruitSplitShare(10, 4); got != 3 {
+		t.Errorf("10 分 4 份 = %d，預期 3（2.5 進位）", got)
+	}
+	if got := AIRecruitSplitShare(1000, 0); got != 0 {
+		t.Errorf("0 個部隊回 %d，原版直接 return", got)
+	}
+}

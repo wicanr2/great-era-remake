@@ -200,6 +200,7 @@ func joinTurn(when, ai string) string {
 func describeComputerTurn(rep computerTurnReport) string {
 	var parts []string
 	parts = append(parts, rep.relocations...)
+	parts = append(parts, rep.recruits...)
 	if rep.comforts > 0 {
 		parts = append(parts, fmt.Sprintf("慰勞 %d", rep.comforts))
 	}
