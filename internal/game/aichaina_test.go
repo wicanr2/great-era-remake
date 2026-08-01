@@ -228,3 +228,45 @@ func TestChainAOnRealSave(t *testing.T) {
 		}
 	})
 }
+
+// 兩條決策鏈接力：A 沒決定時 B 要接得上（`docs/re/13` §6 的順序）。
+//
+// 這驗的是**覆蓋率**——單獨跑 A 有 7 省什麼都不做，
+// 那些省是不是真的無事可做，還是只是 A 管不到？
+func TestChainAThenChainB(t *testing.T) {
+	w := realWorld(t)
+	gens, err := ParseGenerals(readGame(t, "MAN(1).DAT"), 274)
+	if err != nil {
+		t.Fatal(err)
+	}
+	opt := ChainAOpts{Hard: true, EnableStep5: true, EnableLastThree: true}
+
+	var byA, byB, idle, total int
+	for p := ProvinceID(1); p <= ProvinceCount; p++ {
+		prov, err := w.Table.At(p)
+		if err != nil || prov.Commander == 0 {
+			continue
+		}
+		total++
+		opt.TotalForce = w.ProvinceForceTotal(p, gens)
+		switch {
+		case w.ChainA(p, gens, opt).Action.Kind != AINone:
+			byA++
+		case w.Decide(p).Kind != AINone:
+			byB++
+		default:
+			idle++
+		}
+	}
+	t.Logf("有主省 %d：決策鏈 A %d、決策鏈 B 接手 %d、都沒決定 %d",
+		total, byA, byB, idle)
+
+	if byA == 0 {
+		t.Error("決策鏈 A 一個省都沒決定")
+	}
+	// B 接手 0 個不必然是錯（A 可能真的涵蓋了全部），但**要看得到**，
+	// 因為「B 沒接上」與「B 接上了但沒事做」在總數上長得一樣。
+	if byA+byB == 0 {
+		t.Error("兩條鏈加起來一個決定都沒有")
+	}
+}

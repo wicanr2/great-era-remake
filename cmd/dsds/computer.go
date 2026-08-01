@@ -13,7 +13,8 @@ import (
 // 迴圈直到命令數用完。這裡做的是**決策鏈 A 那一段**，因為它是唯一會
 // 出兵的地方，也是玩家最有感的部分。
 //
-// ⚠️ **還沒接的**：內政、遷都、決策鏈 B（`sub_15F3C`，六步全是調動）。
+// ⚠️ **還沒接的**：內政（依 `byte_6FE7E` 分支）、`sub_19B89`、遷都
+// （`sub_1398D`，`docs/re/13` §4 已解）、收尾 `sub_1AC01`。
 // 照實標記，不假裝跑了完整的回合。
 
 // computerTurnReport 是一次電腦回合的結果，用來組訊息。
@@ -68,6 +69,17 @@ func (a *app) runOneComputerAction(p game.ProvinceID, rep *computerTurnReport) b
 		TotalForce: a.world.ProvinceForceTotal(p, a.generals),
 	}
 	res := a.world.ChainA(p, a.generals, opt)
+	if res.Action.Kind == game.AINone {
+		// 決策鏈 A 沒做出決定 → 換決策鏈 B（`sub_15F3C`，六步全是調動）。
+		// 原版的順序就是 A 在前、B 在後（`docs/re/13` §6）。
+		//
+		// ⚠️ 原版兩條鏈都還有一道 `狀態[-6] == 0` 的 gate
+		// （`sub_5C7FE`，疑似「是不是十大勢力」）。**沒有實作**——
+		// `docs/re/13` §6 自己標了「這讀起來很怪（主要軍閥反而不做決策？），
+		// `sub_5C7FE` 的語意可能需要重新驗」。照抄一個可疑的 gate
+		// 會讓大部分省不動，那比漏掉它更難發現。
+		res = game.ChainAResult{Action: a.world.Decide(p)}
+	}
 
 	switch res.Action.Kind {
 	case game.AIComfort:
