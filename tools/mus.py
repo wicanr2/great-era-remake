@@ -116,9 +116,9 @@ def cmd_tim() -> None:
 
 HDR_LEN = 0x46
 
-# status 高 nibble → data byte 數。
-# 8x/9x = NoteOff/NoteOn（2）；Ax = 本格式自訂的「聲部音量」（1，非標準 MIDI 的 2）；
-# Bx/Cx = 1；Ex = 2。實測見 `docs/formats/06-mus-tim-audio.md`。
+# status 高 nibble → data byte 數（AdLib MUS 規格）。
+# 8x/9x = NoteOff/NoteOn（2）；Ax = 音量變更（1，不是標準 MIDI 的 poly aftertouch）；
+# Bx = 控制器（1）；Cx = 音色切換（1）；Dx = 通道壓力（1）；Ex = 弯音（2）。
 DATA_LEN = {0x8: 2, 0x9: 2, 0xA: 1, 0xB: 1, 0xC: 1, 0xD: 1, 0xE: 2}
 
 NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]

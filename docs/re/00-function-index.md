@@ -297,7 +297,7 @@
 | `sub_4E239` | `cl`（`or al, 4`）\| `sub_41513`、`sub_4166E`、`sub_4E239` \| **只在戰鬥中** \| | `docs/re/21-develop-and-general-state.md`（另 2 份） | 3 |
 | `sub_4E413` | sub_4E055 sub_4E239 sub_4E413 sub_4E579 sub_4E627 sub_4E65C | `docs/re/04-battle-module.md` | 1 |
 | `sub_4E579` | sub_4E055 sub_4E239 sub_4E413 sub_4E579 sub_4E627 sub_4E65C | `docs/re/04-battle-module.md` | 1 |
-| `sub_4E627` | sub_4E055 sub_4E239 sub_4E413 sub_4E579 sub_4E627 sub_4E65C | `docs/re/04-battle-module.md` | 1 |
+| `sub_4E627` | sub_4E055 sub_4E239 sub_4E413 sub_4E579 sub_4E627 sub_4E65C | `docs/re/04-battle-module.md`（另 1 份） | 2 |
 | `sub_4E65C` | 位移表由 `sub_4E65C` 填、邊界規則在 `sub_510E0`（`docs/re/07` §6）： | `docs/mechanics/30-combat.md`（另 3 份） | 5 |
 | `sub_4E7D0` | sub_4E7D0 sub_4EA34 sub_4EB20 sub_4EC99* sub_4ED9B sub_4EECE | `docs/re/04-battle-module.md` | 1 |
 | `sub_4EA34` | sub_4E7D0 sub_4EA34 sub_4EB20 sub_4EC99* sub_4ED9B sub_4EECE | `docs/re/04-battle-module.md` | 1 |
@@ -333,7 +333,7 @@
 | `sub_506B0` | `sub_506B0` 算出每格的基準成本（`docs/re/07` §7）： | `docs/mechanics/30-combat.md`（另 3 份） | 7 |
 | `sub_50783` | `sub_50783` 每格呼叫 `sub_506B0` 算出基準成本填進 `byte_91E`， | `docs/re/07-battlefield-geometry.md` | 1 |
 | `sub_507C7` | `sub_507C7`（兩支戰損函式都會在特定條件下呼叫它） | `docs/re/08-combat-damage.md` | 1 |
-| `sub_50FF5` | +5 \| **戰場格編號 0..195**，`0xFF` = 不在場上 \| `sub_50FF5`、`sub_41513`（`docs/re/07` §2）\| | `docs/mechanics/30-combat.md`（另 2 份） | 9 |
+| `sub_50FF5` | 戰場六角格排列：`x = col×32`、`y = row×24 + (奇數欄 +12)`，整場 448×348 \| `docs/re/07` §3，出自 `sub_50FF5` \| **保存**（幾何是規則，見 … | `docs/design/10-visual-modernization.md`（另 3 份） | 12 |
 | `sub_510E0` | 位移表由 `sub_4E65C` 填、邊界規則在 `sub_510E0`（`docs/re/07` §6）： | `docs/mechanics/30-combat.md`（另 2 份） | 13 |
 | `sub_51399` | sub_51399(0, A.格, B.格) | `docs/re/08-combat-damage.md` | 1 |
 | `sub_517BE` | sub_517BE(A, B) | `docs/re/08-combat-damage.md` | 1 |
@@ -353,7 +353,7 @@
 | `sub_52EEA` | sub_52EEA(結果, A, B) | `docs/re/08-combat-damage.md` | 1 |
 | `sub_5301B` | ⚠️ **加成有開關。** `arg_A` 為 0 時整段跳過，而 `sub_5301B` 那條呼叫路徑 | `docs/re/08-combat-damage.md`（另 2 份） | 5 |
 | `sub_530B4` | `sub_530B4` 算完之後對 A 與 B 的 `+17`（兵力）**各做一次減法** | `docs/mechanics/30-combat.md`（另 3 份） | 9 |
-| `sub_534FF` | +14 \| **效忠的勢力領袖**（將領 ID，u16）。與省份記錄 `+20` 司令直接比較 \| `sub_534FF`、`sub_5A881`（`docs/re/07` §9）\| | `docs/mechanics/30-combat.md`（另 2 份） | 5 |
+| `sub_534FF` | +14 \| **效忠的勢力領袖**（將領 ID，u16）。與省份記錄 `+20` 司令直接比較 \| `sub_534FF`、`sub_5A881`（`docs/re/07` §9）\| | `docs/mechanics/30-combat.md`（另 3 份） | 6 |
 | `sub_53619` | 那是**發動結算**不是脫離戰鬥。`sub_53619` 只是成立後的另一道確認。 | `docs/re/31-battle-ai-chain.md` | 1 |
 | `sub_5375E` | **1** \| `sub_12AAD`、`sub_13484`、`sub_5375E`、`sub_53B1E` \| 政略 + 戰鬥 \| | `docs/re/21-develop-and-general-state.md` | 1 |
 | `sub_53B1E` | **1** \| `sub_12AAD`、`sub_13484`、`sub_5375E`、`sub_53B1E` \| 政略 + 戰鬥 \| | `docs/re/21-develop-and-general-state.md`（另 1 份） | 2 |
@@ -368,7 +368,7 @@
 | `sub_54826` | `sub_54826` 裡有一段完整的算式： | `docs/mechanics/30-combat.md`（另 4 份） | 12 |
 | `sub_54CFD` | 3i. 誰是攻方：`sub_54391` 與 `sub_54CFD` — **confirmed** | `docs/mechanics/30-combat.md`（另 1 份） | 5 |
 | `sub_54DAC` | 3f. 佔領：`sub_54DAC` — **confirmed** | `docs/mechanics/30-combat.md`（另 2 份） | 9 |
-| `sub_54E3B` | if arg_0 != 0: sub_54E3B(word_64942, word_64944) | `docs/re/31-battle-ai-chain.md`（另 1 份） | 8 |
+| `sub_54E3B` | if arg_0 != 0: sub_54E3B(word_64942, word_64944) | `docs/re/31-battle-ai-chain.md`（另 1 份） | 9 |
 | `sub_55632` | sub_55632(&清單, 1, 主將格) ; 收集 **37 格** | `docs/re/31-battle-ai-chain.md` | 13 |
 | `sub_55AB7` | sub_55BCC(a, b) = sub_510E0(a, b) 或 sub_55AB7(a, b) | `docs/re/31-battle-ai-chain.md` | 3 |
 | `sub_55BCC` | `sub_55BCC(a, b)` 是兩個判斷的 or： | `docs/re/31-battle-ai-chain.md` | 5 |
