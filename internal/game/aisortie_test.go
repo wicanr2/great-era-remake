@@ -125,15 +125,20 @@ func TestPlanSortieEmpty(t *testing.T) {
 	}
 }
 
-// 出兵閘門的六條分支。
+// 出兵閘門的分支。
+//
+// ⛔ 這個測試原本有兩個子測試在驗 `Field234` 的三向分支（< 3 否決、
+// > 3 放行、== 3 才看 `Field236`）。那三向分支是**把一個 32-bit 比較
+// 讀成兩個獨立欄位**造成的（`docs/re/13` §3），訂正後只剩一條
+// 「兵力總和 ≥ 260,000」。舊的子測試連同那個誤解一起刪掉。
 func TestSortieGate(t *testing.T) {
 	base := SortieGateInput{
 		Approved: true, Count: 3,
 		PlanStrength: 100, TargetStrength: 100, // 100 < 200 → 第一關不過
-		Field234: 3, Field236: 0, // 兩個追加條件都不過
+		TotalForce: 0,                          // 家底也不夠
 	}
 	if SortieGate(base) {
-		t.Error("四條放行條件都不成立，不該出兵")
+		t.Error("三條放行條件都不成立，不該出兵")
 	}
 
 	t.Run("旗標沒放行就不出兵", func(t *testing.T) {
@@ -166,30 +171,28 @@ func TestSortieGate(t *testing.T) {
 			t.Error("目標缺糧又被包圍，即使沒湊到兩倍也該打")
 		}
 	})
-	t.Run("Field234 大於 3 就出兵", func(t *testing.T) {
+	t.Run("家底夠厚就出兵", func(t *testing.T) {
 		in := base
-		in.Field234 = 4
+		in.TotalForce = AISortieForceThreshold
 		if !SortieGate(in) {
-			t.Error("[-234h] > 3 應該放行")
+			t.Errorf("兵力總和 %d 達門檻應該放行", in.TotalForce)
 		}
-	})
-	t.Run("Field234 小於 3 一律不出兵", func(t *testing.T) {
-		in := base
-		in.Field234 = 2
-		in.Field236 = AISortieField236Threshold // 這時 236 不該有機會生效
+		in.TotalForce = AISortieForceThreshold - 1
 		if SortieGate(in) {
-			t.Error("[-234h] < 3 應該直接否決，不看 [-236h]")
+			t.Error("差一就不該放行")
 		}
 	})
-	t.Run("Field234 等於 3 時才看 Field236", func(t *testing.T) {
-		in := base
-		in.Field236 = AISortieField236Threshold
-		if !SortieGate(in) {
-			t.Error("[-234h] == 3 且 [-236h] 達門檻應該放行")
-		}
-		in.Field236 = AISortieField236Threshold - 1
-		if SortieGate(in) {
-			t.Error("[-236h] 差一就不該放行")
-		}
-	})
+}
+
+// 門檻是 32-bit 比較拆成兩半：(3 << 16) | 0xF7A0。
+func TestSortieForceThresholdIsSplit32Bit(t *testing.T) {
+	if want := (3 << 16) | 0xF7A0; AISortieForceThreshold != want {
+		t.Errorf("門檻 %d，原版兩個 cmp 合起來是 %d（0x%X）",
+			AISortieForceThreshold, want, want)
+	}
+	// 260,000 剛好是 13 個滿員步兵師——這是它像個刻意選的值的理由。
+	if AISortieForceThreshold%20000 != 0 {
+		t.Errorf("門檻 %d 不是滿員步兵師（20000）的整數倍，"+
+			"與「13 個師」的讀法對不上", AISortieForceThreshold)
+	}
 }

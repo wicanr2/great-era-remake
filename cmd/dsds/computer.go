@@ -62,13 +62,10 @@ func (a *app) runOneComputerAction(p game.ProvinceID, rep *computerTurnReport) b
 		EnableStep5:     true,
 		EnableLastThree: true,
 		FirstStage:      false,
-		// TotalForce 對應 `[-236h]`。那一格的語意是**假說**（疑似兵力總和），
-		// 這裡用該省效忠其司令的兵力總和代入——形狀相符，但**不是同一個東西**。
+		// TotalForce 就是該省的兵力總和——`sub_13D23` 呼叫 `sub_306CF`
+		// 存進 `[-236h]:[-234h]`（`docs/re/13` §3，confirmed）。
+		// 這裡用同一支 `ProvinceForceTotal`，**不是代入值**。
 		TotalForce: a.world.ProvinceForceTotal(p, a.generals),
-		// Field234 對應 `[-234h]`，語意完全未解。傳 0 會讓步驟 5
-		// （需要 > 3）與出兵閘門的那一條分支都不成立。
-		// **這是已知的行為缺口**，不是調出來的值。
-		Field234: 0,
 	}
 	res := a.world.ChainA(p, a.generals, opt)
 

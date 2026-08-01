@@ -184,26 +184,41 @@ type SortieGateInput struct {
 	// TargetDesperate 是 `sub_17019(目標省)`：目標是不是軟柿子
 	// （缺糧又被包圍，`aidesperate.go`）。
 	TargetDesperate bool
-	// Field234 / Field236 是外層狀態的 `[-234h]` 與 `[-236h]`。
+	// TotalForce 是該省的**兵力總和**（`sub_306CF`）。
 	//
-	// ⚠️ 兩格的語意都是**假說**：`[-236h]` 疑似兵力總和
-	// （`aisupply.go` 的 `totalForce` 同一格），`[-234h]` 未解。
-	// 步驟 5 的前置也用同一組門檻（3 與 63,392）。
-	Field234, Field236 int
+	// ⛔ 這裡原本是 `Field234` 與 `Field236` 兩個「語意未解」的欄位。
+	// 那是誤讀：`sub_13D23` 做的是
+	//
+	//	call    sub_306CF               ; 32-bit 回傳
+	//	mov     ss:[di-236h], ax        ; ← 低位字
+	//	mov     ss:[di-234h], dx        ; ← 高位字
+	//
+	// **兩格是同一個 32-bit 值**（`docs/re/13` §3，早就 confirmed），
+	// 而那三條 `cmp`／`jg`／`jge` 是標準的 32-bit 比較拆成兩半。
+	TotalForce int
 }
 
-// AISortieField236Threshold 是 `[-236h]` 的門檻，決策鏈 A 步驟 5
-// 與這道閘門用的是同一個數字。
-const AISortieField236Threshold = 0xF7A0 // 63,392
+// AISortieForceThreshold 是「家底夠不夠厚」的門檻：**兵力總和 ≥ 260,000**。
+//
+//	cmp     word ptr ss:[di-234h], 3        ; 高位
+//	jg      放行
+//	jge     再看低位
+//	jmp     否決
+//	cmp     word ptr ss:[di-236h], 0F7A0h   ; 低位
+//
+//	(3 << 16) | 0xF7A0 = 0x3F7A0 = 260,000
+//
+// 剛好是 **13 個滿員步兵師**（20,000）。決策鏈 A 步驟 5 的前置用的是
+// 同一個門檻——`docs/re/28` §2 原本把它記成「`[-234h] > 3` 且
+// `[-236h] ≥ F7A0h`」兩個條件，其實是一個。
+const AISortieForceThreshold = 260000
 
 // SortieGate 決定湊好的兵到底出不出（`sub_174C9` `loc_17568`）。
 //
 //	if !Approved 或 Count < 3:            不出兵
 //	if 名單戰力 ≥ 目標戰力 × 2:            出兵    ← sub_17437
 //	if 目標是軟柿子:                       出兵    ← sub_17019
-//	if [-234h] < 3:                       不出兵
-//	if [-234h] > 3:                       出兵
-//	if [-236h] ≥ 63,392:                  出兵
+//	if 兵力總和 ≥ 260,000:                 出兵
 //	否則                                   不出兵
 //
 // 讀作：**湊夠了就打；沒湊夠但對方快垮了也打；兩者都不成立就看家底夠不夠厚。**
@@ -221,11 +236,5 @@ func SortieGate(in SortieGateInput) bool {
 	if in.TargetDesperate {
 		return true
 	}
-	switch {
-	case in.Field234 < 3:
-		return false
-	case in.Field234 > 3:
-		return true
-	}
-	return in.Field236 >= AISortieField236Threshold
+	return in.TotalForce >= AISortieForceThreshold
 }

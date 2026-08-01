@@ -21,12 +21,14 @@ type ChainAOpts struct {
 	FirstStage bool
 	// Spectating 是觀戰模式，步驟 2 會跳過。
 	Spectating bool
-	// TotalForce 是 `[-236h]`，AISupplyOK 與步驟 5 都用它。
+	// TotalForce 是該省的**兵力總和**（`sub_306CF` → `sub_13D23` 存進
+	// `[-236h]:[-234h]`，`docs/re/13` §3 已 confirmed）。
 	//
-	// ⚠️ 語意是**假說**（疑似兵力總和），由呼叫端傳入。
+	// `AISupplyOK`、步驟 5、出兵閘門三處都用它。
+	//
+	// ⛔ 這裡原本另有一個 `Field234`「語意未解」欄位。那是誤讀——
+	// `[-234h]` 是這個 32-bit 值的**高位字**，不是獨立欄位。
 	TotalForce int
-	// Field234 是 `[-234h]`，步驟 5 與出兵閘門用。語意未解。
-	Field234 int
 }
 
 // ChainAResult 是決策鏈 A 的結果。
@@ -119,7 +121,11 @@ func (w *AIWorld) ChainA(p ProvinceID, gens []General, opt ChainAOpts) ChainARes
 	}
 
 	// ── 步驟 5：兵多將廣時挑最弱的鄰省擴張 ─────────────────────────
-	if opt.EnableStep5 && opt.Field234 > 3 && opt.TotalForce >= AISortieField236Threshold &&
+	//
+	// ⛔ 前置原本寫成「`[-234h] > 3` 且 `[-236h] ≥ 63,392`」兩個條件，
+	// 是把一個 32-bit 比較讀成了兩個獨立欄位。正確是
+	// **兵力總和 ≥ 260,000**（= 13 個滿員步兵師，`AISortieForceThreshold`）。
+	if opt.EnableStep5 && opt.TotalForce >= AISortieForceThreshold &&
 		w.Hostile(p) != 0 && supplyOK {
 		// 候選：有效鄰省，跳過交戰中的。⚠️ 與步驟 3 的五道篩選不同，
 		// 這裡**不排除自己人與無主省**（`docs/re/28` §2）。
