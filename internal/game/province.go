@@ -218,3 +218,51 @@ func (t *ProvinceTable) Factions() map[GeneralID][]ProvinceID {
 	}
 	return out
 }
+
+// AttackableFrom 回傳從 from 出發可攻打的鄰省，順序照記錄裡的鄰省表。
+//
+// 規則是從 WAR.EXE 的 sub_5B7DC 讀出來的（docs/mechanics/20-military.md）：
+//
+//	for j = 1 to 8:
+//	    n = 記錄[省].鄰省[j]
+//	    if n == 0 or n == 0xFF:            continue   ; 填充／海洋
+//	    if 記錄[n].司令 == 0:               continue   ; 無主的省
+//	    if 記錄[n].司令 == 記錄[省].司令:    continue   ; 同一勢力
+//	    → 可攻打
+//
+// [雷] 判準是**司令不同且非無主**，不是「不在我控制的清單裡」。
+// 無主的省（司令 == 0）不能攻打——這一條 SPEC-01 §2 原本沒有，
+// 是實機樣本剛好都沒碰到（湖北與河南的鄰省全部有主）。
+//
+// [雷] 用的是**省份記錄裡的鄰省表**（+22），不是 WARPOS 的幾何鄰接。
+// 兩者有 3 筆差異（隔海的那組，docs/spec/03 §4），程式走的是記錄。
+func (t *ProvinceTable) AttackableFrom(from ProvinceID) ([]ProvinceID, error) {
+	src, err := t.At(from)
+	if err != nil {
+		return nil, err
+	}
+	var out []ProvinceID
+	for _, n := range src.Neighbours {
+		tgt, err := t.At(n)
+		if err != nil {
+			continue // 鄰省表裡的值超出範圍，跳過
+		}
+		if !tgt.Commander.Valid() || tgt.Commander == src.Commander {
+			continue
+		}
+		out = append(out, n)
+	}
+	return out, nil
+}
+
+// FirstAttackable 回傳第一個可攻打的鄰省，沒有就回 0。
+//
+// 這正是 sub_5B7DC 的回傳值。`sub_15F3C` 用它分流：
+// 非 0 走「有敵鄰省」的流程，0 走另一條（docs/mechanics/70-ai.md）。
+func (t *ProvinceTable) FirstAttackable(from ProvinceID) ProvinceID {
+	ns, err := t.AttackableFrom(from)
+	if err != nil || len(ns) == 0 {
+		return 0
+	}
+	return ns[0]
+}

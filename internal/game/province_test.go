@@ -233,3 +233,84 @@ func TestProvinceRoundTrip(t *testing.T) {
 		}
 	}
 }
+
+// TestAttackableMatchesScreen 攻打候選要對上實機的攻打子選單。
+//
+// 實機在湖北(26) 時顯示 (18,22,25,27,29)，在河南(19) 時顯示
+// (11,16,18,20,21,22)——都是鄰省扣掉同勢力的那一個。
+func TestAttackableMatchesScreen(t *testing.T) {
+	tbl, err := ParseSaveProvinces(readGame(t, "SAVE(1).DT1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []struct {
+		from ProvinceID
+		want []ProvinceID
+		name string
+	}{
+		{26, []ProvinceID{18, 22, 25, 27, 29}, "湖北"},
+		{19, []ProvinceID{11, 16, 18, 20, 21, 22}, "河南"},
+	} {
+		got, err := tbl.AttackableFrom(c.from)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(got) != len(c.want) {
+			t.Errorf("%s 的攻打候選：實機 %v，解出 %v", c.name, c.want, got)
+			continue
+		}
+		for i := range c.want {
+			if got[i] != c.want[i] {
+				t.Errorf("%s 的攻打候選：實機 %v，解出 %v", c.name, c.want, got)
+				break
+			}
+		}
+	}
+}
+
+// TestAttackableSkipsUnowned 無主的省不能攻打。
+//
+// 這一條是從 sub_5B7DC 讀到的，**實機沒有驗過**——湖北與河南的鄰省
+// 剛好全部有主。四川(29) 鄰接甘肅(17) 與青海(30)，兩者在第一期都無主。
+func TestAttackableSkipsUnowned(t *testing.T) {
+	tbl, err := ParseTownFile(readGame(t, "TOWN(1).DAT"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	sichuan, err := tbl.At(29)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := tbl.AttackableFrom(29)
+	if err != nil {
+		t.Fatal(err)
+	}
+	inList := func(p ProvinceID) bool {
+		for _, v := range got {
+			if v == p {
+				return true
+			}
+		}
+		return false
+	}
+	// 甘肅與青海在四川的鄰省表裡，但第一期無主
+	for _, p := range []ProvinceID{17, 30} {
+		neighbour := false
+		for _, n := range sichuan.Neighbours {
+			if n == p {
+				neighbour = true
+			}
+		}
+		if !neighbour {
+			t.Fatalf("省 %d 不在四川的鄰省表裡，測試前提不成立", p)
+		}
+		q, _ := tbl.At(p)
+		if q.Commander.Valid() {
+			t.Fatalf("省 %d 在第一期有主（司令 %d），測試前提不成立", p, q.Commander)
+		}
+		if inList(p) {
+			t.Errorf("無主的省 %d 不該出現在攻打候選裡：%v", p, got)
+		}
+	}
+	t.Logf("四川的攻打候選：%v（鄰省表 %v）", got, sichuan.Neighbours)
+}
