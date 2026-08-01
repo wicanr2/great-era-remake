@@ -115,6 +115,11 @@ type CombatUnit struct {
 
 	// NextCell 對應 `+12`：**朝目標走的下一格**。`NoCell`（0xFF）表示沒有。
 	//
+	// ⚠️ **Go 的零值是 0，而 0 是合法的格編號**（左上角那一格）。
+	// 原版用 0xFF 當哨兵，直接用零值會讓「還沒指派」被讀成「要走到格 0」。
+	// `NewBattleSim` 會把入場單位正規化成 `NoCell`；**自己造 `CombatUnit`
+	// 時要記得設**（2026-08-01 被 `TestExecDeployFillsRing` 抓到）。
+	//
 	// `sub_47EAA` 設命令 1 時一併寫它（值來自 `sub_47B6D`）；
 	// `sub_3DED9` 發現命令 3 卻沒有它就把命令降回 2；
 	// `sub_3B492` 拿它比對城市格來剔除「已經有人去了」的城市。

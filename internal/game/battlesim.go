@@ -44,6 +44,15 @@ type BattleSim struct {
 // 守方本來就在場上（`docs/re/07` §5）。所以守方的落點由呼叫端給定，
 // 這裡只檢查它們合法。
 func NewBattleSim(m *Map, at, from ProvinceID, attacker, defender []*Combatant, opt StrengthOpts) (*BattleSim, error) {
+	// ⚠️ `+12`／`+10` 的 Go 零值不等於原版的「沒有」——`NextCell` 的 0
+	// 是合法格編號（原版哨兵是 0xFF）。在唯一入口正規化，
+	// 免得呼叫端漏設就變成「所有單位都要走到格 0」。
+	for _, u := range append(append([]*Combatant(nil), attacker...), defender...) {
+		if u != nil && u.NextCell == 0 && u.TargetUnit == 0 {
+			u.NextCell = NoCell
+		}
+	}
+
 	bf, err := m.Battlefield(at)
 	if err != nil {
 		return nil, err

@@ -6,7 +6,7 @@ import "testing"
 func mkUnit(id GeneralID, faction GeneralID, branch uint8, force uint16) *Combatant {
 	return &Combatant{
 		CombatUnit: CombatUnit{
-			General: id, Faction: faction, Cell: NoCell,
+			General: id, Faction: faction, Cell: NoCell, NextCell: NoCell,
 			Max: 12, Current: 12, Active: true, Decaying: 80,
 		},
 		Strength: StrengthInput{
