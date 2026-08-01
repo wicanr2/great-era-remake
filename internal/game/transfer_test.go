@@ -289,3 +289,97 @@ func TestStepNeverReportsEmptyTransfer(t *testing.T) {
 	}
 	t.Logf("驗過 %d 次實際成立的調動", acted)
 }
+
+// 省份層尋路：路徑必須連續（每一步都相鄰）且不重複。
+//
+// 原版用 `sub_5B76E`（鄰接檢查）驗同樣的事（`docs/re/11` §5），
+// 這裡拿真實鄰省表把全國兩兩配對都跑一遍。
+func TestProvincePathIsContiguous(t *testing.T) {
+	w := realWorld(t)
+	found, checked := 0, 0
+	for a := ProvinceID(1); a <= ProvinceCount; a++ {
+		pa, err := w.Table.At(a)
+		if err != nil || pa.Commander == 0 {
+			continue
+		}
+		for b := ProvinceID(1); b <= ProvinceCount; b++ {
+			if a == b {
+				continue
+			}
+			checked++
+			path := w.ProvincePath(a, b, pa.Commander)
+			if path == nil {
+				continue
+			}
+			found++
+			if path[0] != a || path[len(path)-1] != b {
+				t.Fatalf("路徑 %v 的頭尾不是 %d → %d", path, a, b)
+			}
+			seen := map[ProvinceID]bool{}
+			for i, p := range path {
+				if seen[p] {
+					t.Fatalf("路徑 %v 重複經過省 %d", path, p)
+				}
+				seen[p] = true
+				if i > 0 && !w.adjacentProvinces(path[i-1], p) {
+					t.Errorf("路徑 %v 裡省 %d 與 %d 不相鄰", path, path[i-1], p)
+				}
+			}
+		}
+	}
+	if found == 0 {
+		t.Fatal("一條路徑都找不到，尋路沒有真的在跑")
+	}
+	t.Logf("%d 組配對裡找到 %d 條路徑", checked, found)
+}
+
+// NextHop 回傳的必須是**與出發省相鄰**的那一格，不是目的地本身。
+func TestNextHopIsAdjacent(t *testing.T) {
+	w := realWorld(t)
+	n := 0
+	for a := ProvinceID(1); a <= ProvinceCount; a++ {
+		pa, err := w.Table.At(a)
+		if err != nil || pa.Commander == 0 {
+			continue
+		}
+		for _, target := range w.RescueTargets(pa.Commander) {
+			hop := w.NextHop(a, target, pa.Commander)
+			if hop == 0 {
+				continue
+			}
+			n++
+			if !w.adjacentProvinces(hop, a) {
+				t.Errorf("省 %d 往 %d 的第一步是 %d，但它與 %d 不相鄰", a, target, hop, a)
+			}
+		}
+	}
+	t.Logf("驗過 %d 個第一步", n)
+}
+
+// 救援候選的四道篩選都要成立（`sub_149C8`）。
+func TestRescueTargetsMatchFilters(t *testing.T) {
+	w := realWorld(t)
+	total := 0
+	for f := range w.Table.Factions() {
+		for _, p := range w.RescueTargets(f) {
+			total++
+			prov, err := w.Table.At(p)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if prov.Commander != f {
+				t.Errorf("省 %d 的司令是 %d，不是 %d", p, prov.Commander, f)
+			}
+			if w.Hostile(p) == 0 {
+				t.Errorf("省 %d 不是前線，不該進救援候選", p)
+			}
+			if pw := w.ProvincePower(p); pw >= RescueThreshold {
+				t.Errorf("省 %d 的戰力 %d 沒有低於門檻 %d", p, pw, RescueThreshold)
+			}
+			if prov.Flags&ProvinceFlagInBattle != 0 {
+				t.Errorf("省 %d 正在交戰，不該進救援候選", p)
+			}
+		}
+	}
+	t.Logf("SAVE(1) 的救援候選共 %d 個", total)
+}

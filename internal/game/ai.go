@@ -190,6 +190,7 @@ func (w *AIWorld) chain(p ProvinceID) []func(ProvinceID) AIAction {
 		}
 	} else {
 		steps = []func(ProvinceID) AIAction{
+			w.rescueFront,
 			w.spreadOut,
 			func(q ProvinceID) AIAction { return w.generalTransfer(q, 1) },
 			w.reinforceFront,
@@ -253,6 +254,37 @@ func (w *AIWorld) Step(p ProvinceID) (AIAction, TransferReport) {
 		// 一個人都沒搬動 → 旗標沒立 → 試下一步。
 	}
 	return AIAction{From: p}, TransferReport{}
+}
+
+// rescueFront 是 `sub_15018`（`docs/re/11` §1）：**後方省的第一優先**。
+//
+// 把滿員的部隊送去「我方的、前線的、戰力掉到 2,000 以下、沒在交戰」的省。
+// 與其他五支調動最大的差別是**它掃全部 39 省**，不是只看鄰省——
+// 所以目標可能很遠，要靠 `NextHop` 一步一步接力過去。
+//
+// 調動模式在原版是 1／5／7 三選一，由 `byte_6FFCA` bit 0 與一張
+// 24 格表決定（§6）。那張表還沒解，所以這裡固定用 1，並標明差異。
+func (w *AIWorld) rescueFront(p ProvinceID) AIAction {
+	// sub_14761 bit 0：省內要有滿員的部隊。
+	if w.ManpowerFlags(p)&1 == 0 {
+		return AIAction{}
+	}
+	prov, err := w.Table.At(p)
+	if err != nil || prov.Commander == 0 {
+		return AIAction{}
+	}
+	for _, target := range w.RescueTargets(prov.Commander) {
+		if target == p {
+			continue // 自己不救自己
+		}
+		hop := w.NextHop(p, target, prov.Commander)
+		if hop == 0 {
+			continue
+		}
+		return AIAction{Kind: AITransfer, From: p, To: hop,
+			TransferKind: int(TransferFullOnly), Step: "sub_15018 救援前線"}
+	}
+	return AIAction{}
 }
 
 // pullBack 是 `sub_1541E`（§6h）：前線省把缺員的部隊撤到後方。
