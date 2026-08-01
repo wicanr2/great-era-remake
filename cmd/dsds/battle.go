@@ -51,6 +51,8 @@ type battleState struct {
 	aiAction, aiMoves, aiFights int
 	// leader 是這個省的司令，`sub_56D49`（§44）要問它在不在守方隊伍裡。
 	leader game.GeneralID
+	// tbl 是省份表，`sub_534FF`（§47）要掃鄰省找支援。
+	tbl *game.ProvinceTable
 }
 
 // startBattle 從當前省對某個鄰省開戰。
@@ -104,7 +106,7 @@ func (a *app) startBattle(at, from game.ProvinceID) error {
 	if p, err := a.tbl.At(at); err == nil {
 		leader = p.Commander
 	}
-	a.battle = &battleState{sim: sim, turn: 1, leader: leader}
+	a.battle = &battleState{sim: sim, turn: 1, leader: leader, tbl: a.tbl}
 	a.screen, a.dirty = screenBattle, true
 	return nil
 }
@@ -246,7 +248,15 @@ func (a *app) updateBattle() error {
 // ——比率門檻、佈防閘門、後援判斷。後果是守方偏向走「預設分流」，
 // 補齊之前這是**已知落差**，不是最終行為。
 func (b *battleState) runDefenderAI() {
-	gates := game.BattleChainGates{}
+	// ⭐ `sub_53619`（§47）接上了：問「守方在這個省有沒有可用的鄰省支援」。
+	// 原版回的是**反相**（有支援回 0），所以這裡取反。
+	//
+	// 這個判斷控制兩處必勝結算與值 16／17 的分流：
+	// **戰力差五倍而且有後援，才敢直接判勝負。**
+	gates := game.BattleChainGates{
+		Sub53619: !game.HasBattleSupport(b.tbl, b.sim.At, b.leader),
+	}
+	// ⚠️ 其餘兩個 gate（比率門檻、佈防閘門）的來源仍未解（§42），維持 false。
 	d := b.sim.DecideTurn(b.turn, gates, b.leader, 0)
 
 	route := func(to, from game.CellIndex) game.CellIndex {

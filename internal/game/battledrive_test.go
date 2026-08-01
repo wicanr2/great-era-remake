@@ -82,7 +82,7 @@ func TestDecideTurnOnLopsidedBattle(t *testing.T) {
 			BattleActionName(d.A.Action), d.A.Step)
 	}
 	// ⚠️ §45：sub_53619 為真時就不准直接判勝負，改走別條。
-	d2 := sim.DecideTurn(1, BattleChainGates{Loyalty: true}, 201, 58)
+	d2 := sim.DecideTurn(1, BattleChainGates{Sub53619: true}, 201, 58)
 	if d2.A.Action == ActADecisive {
 		t.Error("sub_53619 為真時不該必勝結算——那是 §45 的第二道門檻")
 	}

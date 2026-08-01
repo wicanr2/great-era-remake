@@ -31,9 +31,11 @@ type BattleChainGates struct {
 	RatioSelf, RatioFoe bool
 	// Deploy 對應 §43 的 `word_6493A == 0`，分支 B 值 2 獨有的閘門。**未解**。
 	Deploy bool
-	// Loyalty 對應 §45 的 `sub_53619`——**兩處「必勝結算」都要它為 false**。
-	// 來源是 `sub_534FF` 的第二個輸出，**未解**。
-	Loyalty bool
+	// Sub53619 對應 §45／§47 的 `sub_53619`——**兩處「必勝結算」都要它為 false**。
+	//
+	// ⭐ 語意已解：它是「**沒有**可用的我方鄰省支援」的反相判斷。
+	// 用 `!HasBattleSupport(tbl, at, leader)` 算（`battlesupport.go`）。
+	Sub53619 bool
 	// EnableLastSteps 是 `byte_6FFCA & 4`，這個**有解**（難度／階段旗標）。
 	EnableLastSteps bool
 }
@@ -91,7 +93,7 @@ func (s *BattleSim) DecideTurn(turn int, g BattleChainGates,
 		RatioGateSelf:    g.RatioSelf,
 		RatioGateFoe:     g.RatioFoe,
 		FoeLeaderOnField: LeaderOnField(s.Defender, defenderLeader),
-		Sub53619:         g.Loyalty,
+		Sub53619:         g.Sub53619,
 		EnableLastSteps:  g.EnableLastSteps,
 	}
 	// 分支 B（第一方 ≈ 攻方）：「我方」是攻方。
@@ -102,7 +104,7 @@ func (s *BattleSim) DecideTurn(turn int, g BattleChainGates,
 		RatioGateFoe:     g.RatioFoe,
 		DeployGateOpen:   g.Deploy,
 		FoeLeaderOnField: LeaderOnField(s.Defender, defenderLeader),
-		Sub53619:         g.Loyalty,
+		Sub53619:         g.Sub53619,
 		EnableLastSteps:  g.EnableLastSteps,
 	}
 	_ = attackerLeader // 分支 B 的領袖判斷要等 sub_534FF 解出來才用得上
