@@ -26,15 +26,17 @@ func main() {
 	verbose := flag.Bool("v", false, "逐省印出決策")
 	fight := flag.Bool("fight", false,
 		"每回合讓前線省對敵省各打一場（**不是原版 AI 行為**，見下）")
+	until := flag.Bool("until-unified", false,
+		"跑到只剩一個勢力為止（配 -fight 才有意義）")
 	flag.Parse()
 
-	if err := run(*dir, *turns, *verbose, *fight); err != nil {
+	if err := run(*dir, *turns, *verbose, *fight, *until); err != nil {
 		fmt.Fprintln(os.Stderr, "錯誤:", err)
 		os.Exit(1)
 	}
 }
 
-func run(dir string, turns int, verbose, fight bool) error {
+func run(dir string, turns int, verbose, fight, until bool) error {
 	read := func(name string) ([]byte, error) {
 		return os.ReadFile(filepath.Join(dir, name))
 	}
@@ -111,7 +113,13 @@ func run(dir string, turns int, verbose, fight bool) error {
 			captured += c
 		}
 		if t%5 == 0 || t == turns {
-			fmt.Printf("第 %2d 回合後：%s\n", t, summary(w))
+			fmt.Printf("第 %3d 回合後：%s\n", t, summary(w))
+		}
+		// 統一 = 只剩一個勢力還有省。這是我們定的結束條件，
+		// **不是原版的勝負判定**（那個還沒解，見 CLAUDE.md §8 M3）。
+		if until && len(w.Table.Factions()) <= 1 {
+			fmt.Printf("\n第 %d 回合天下統一：%s\n", t, summary(w))
+			break
 		}
 	}
 
