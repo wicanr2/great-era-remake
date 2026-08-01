@@ -98,3 +98,52 @@ func TestBattleSlotsUseEmptyMarker(t *testing.T) {
 		t.Errorf("非 0xFF 槽的最大值應為 190，實得 %d", maxV)
 	}
 }
+
+// TestRosterIsAttackerDefender 驗證 +28/+48 是攻守雙方的參戰單位。
+//
+// 河南那筆分得乾乾淨淨：攻方全是張作霖系的東北／河北將領，
+// 守方全是河南本地。用將領記錄的所屬省欄位（docs/spec/02 附錄）交叉比對。
+func TestRosterIsAttackerDefender(t *testing.T) {
+	sts, err := ParseBattleStates(readGame(t, "MEM_WAR.DAT"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	data := readGame(t, "MAN(1).DAT")
+	gs, err := ParseGenerals(data, 274)
+	if err != nil {
+		t.Fatal(err)
+	}
+	provinceOf := func(id GeneralID) ProvinceID {
+		if id == 0 || int(id) > len(gs) {
+			return 0
+		}
+		return gs[id-1].Province
+	}
+
+	henan := sts[18] // 省 19
+	att, def := henan.Attackers(), henan.Defenders()
+	if len(att) != 6 || len(def) != 7 {
+		t.Fatalf("河南的攻守單位數應為 6 / 7，實得 %d / %d", len(att), len(def))
+	}
+	// 守方全部來自河南本省
+	for _, id := range def {
+		if p := provinceOf(id); p != 19 {
+			t.Errorf("守方將領 %d 的所屬省是 %d，預期 19（河南）", id, p)
+		}
+	}
+	// 攻方全部不是河南的
+	for _, id := range att {
+		if p := provinceOf(id); p == 19 {
+			t.Errorf("攻方將領 %d 的所屬省是河南，不該出現在攻方", id)
+		}
+	}
+	// 攻方應該同屬一個勢力（張作霖系：東北九省 + 河北）
+	zhang := map[ProvinceID]bool{1: true, 2: true, 3: true, 4: true, 5: true,
+		6: true, 7: true, 8: true, 9: true, 11: true, 20: true}
+	for _, id := range att {
+		if p := provinceOf(id); !zhang[p] {
+			t.Errorf("攻方將領 %d 來自省 %d，不在張作霖的轄區內", id, p)
+		}
+	}
+	t.Logf("河南：攻方 %v，守方 %v", att, def)
+}

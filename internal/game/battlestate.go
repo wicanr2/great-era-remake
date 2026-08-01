@@ -22,10 +22,10 @@ const (
 	bsOffHeader   = 0   // 4 × u16
 	bsOffSlotsA   = 8   // 10 B，空槽填 0xFF
 	bsOffSlotsB   = 18  // 10 B
-	bsOffValuesA  = 28  // 10 × u16
-	bsOffValuesB  = 48  // 10 × u16
-	bsOffUnitsA   = 68  // 200 B
-	bsOffUnitsB   = 268 // 200 B
+	bsOffRosterA  = 28  // 10 × u16，攻方的參戰單位（將領 ID）
+	bsOffRosterB  = 48  // 10 × u16，守方
+	bsOffDetailA  = 68  // 200 B，攻方每單位 20 B
+	bsOffDetailB  = 268 // 200 B，守方
 	bsOffTrailing = 468 // 1 B
 
 	// BattleSlots 是每方的槽數。10 B 與 10 × u16 兩組都是這個數。
@@ -42,13 +42,23 @@ type BattleState struct {
 	Header [4]uint16
 	// SlotsA / SlotsB 各 10 個 byte，0xFF 表示空槽。
 	SlotsA, SlotsB [BattleSlots]byte
-	// ValuesA / ValuesB 各 10 個 u16，0 表示空。
-	ValuesA, ValuesB [BattleSlots]uint16
-	// UnitsA / UnitsB 是兩方各 200 B 的單位資料區。
+	// RosterA 是**攻方**的參戰單位（將領 ID，0 表示空槽），
+	// RosterB 是**守方**。每方最多 10 個。
+	//
+	// 證據：河南那筆的 RosterA 全是張作霖系的東北／河北將領
+	// （所屬省 1/2/5/7/11），RosterB 全是河南本地（所屬省 19）
+	// ——攻守分得乾乾淨淨。
+	//
+	// `sub_54CFD` 依 `byte_64901` 選用其中一組，也印證了這是成對的兩方。
+	//
+	// ⚠️ 這**不是**該省的將領名冊。湖北的兩組加起來只有 8 個，
+	// 而該省有 15 位將領（docs/spec/02）——參戰的是其中一部分。
+	RosterA, RosterB [BattleSlots]uint16
+	// DetailA / DetailB 是兩方各 200 B 的單位詳細資料。
 	//
 	// 初始狀態下全是 0。**欄位切法未知**——若每方 10 個單位就是 20 B/單位，
-	// 但那是從槽數推的，沒有直接證據。原樣保留。
-	UnitsA, UnitsB [BattleUnitArea]byte
+	// 與 Roster 的槽數一致，但沒有直接證據。原樣保留。
+	DetailA, DetailB [BattleUnitArea]byte
 	// Trailing 是最後一個 byte。語意未解。
 	Trailing byte
 
@@ -76,12 +86,12 @@ func countOccupied(s [BattleSlots]byte) int {
 //
 // 判準是兩個 200 B 區不全為 0——初始檔（MEM_WAR.DAT）全部 39 省都是 0。
 func (b *BattleState) Engaged() bool {
-	for _, v := range b.UnitsA {
+	for _, v := range b.DetailA {
 		if v != 0 {
 			return true
 		}
 	}
-	for _, v := range b.UnitsB {
+	for _, v := range b.DetailB {
 		if v != 0 {
 			return true
 		}
@@ -103,11 +113,11 @@ func ParseBattleState(rec []byte) (BattleState, error) {
 	copy(b.SlotsA[:], rec[bsOffSlotsA:])
 	copy(b.SlotsB[:], rec[bsOffSlotsB:])
 	for i := 0; i < BattleSlots; i++ {
-		b.ValuesA[i] = binary.LittleEndian.Uint16(rec[bsOffValuesA+i*2:])
-		b.ValuesB[i] = binary.LittleEndian.Uint16(rec[bsOffValuesB+i*2:])
+		b.RosterA[i] = binary.LittleEndian.Uint16(rec[bsOffRosterA+i*2:])
+		b.RosterB[i] = binary.LittleEndian.Uint16(rec[bsOffRosterB+i*2:])
 	}
-	copy(b.UnitsA[:], rec[bsOffUnitsA:])
-	copy(b.UnitsB[:], rec[bsOffUnitsB:])
+	copy(b.DetailA[:], rec[bsOffDetailA:])
+	copy(b.DetailB[:], rec[bsOffDetailB:])
 	b.Trailing = rec[bsOffTrailing]
 	return b, nil
 }
@@ -123,11 +133,11 @@ func (b *BattleState) Bytes() [BattleStateSize]byte {
 	copy(out[bsOffSlotsA:], b.SlotsA[:])
 	copy(out[bsOffSlotsB:], b.SlotsB[:])
 	for i := 0; i < BattleSlots; i++ {
-		binary.LittleEndian.PutUint16(out[bsOffValuesA+i*2:], b.ValuesA[i])
-		binary.LittleEndian.PutUint16(out[bsOffValuesB+i*2:], b.ValuesB[i])
+		binary.LittleEndian.PutUint16(out[bsOffRosterA+i*2:], b.RosterA[i])
+		binary.LittleEndian.PutUint16(out[bsOffRosterB+i*2:], b.RosterB[i])
 	}
-	copy(out[bsOffUnitsA:], b.UnitsA[:])
-	copy(out[bsOffUnitsB:], b.UnitsB[:])
+	copy(out[bsOffDetailA:], b.DetailA[:])
+	copy(out[bsOffDetailB:], b.DetailB[:])
 	out[bsOffTrailing] = b.Trailing
 	return out
 }
@@ -147,4 +157,20 @@ func ParseBattleStates(data []byte) ([ProvinceCount]BattleState, error) {
 		out[i] = b
 	}
 	return out, nil
+}
+
+// Attackers 回傳攻方的參戰單位（將領 ID），已濾掉空槽。
+func (b *BattleState) Attackers() []GeneralID { return roster(b.RosterA) }
+
+// Defenders 回傳守方的參戰單位（將領 ID），已濾掉空槽。
+func (b *BattleState) Defenders() []GeneralID { return roster(b.RosterB) }
+
+func roster(r [BattleSlots]uint16) []GeneralID {
+	var out []GeneralID
+	for _, v := range r {
+		if v != 0 {
+			out = append(out, GeneralID(v))
+		}
+	}
+	return out
 }

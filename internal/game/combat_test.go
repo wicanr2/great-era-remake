@@ -152,11 +152,11 @@ func TestBattleTurnCycle(t *testing.T) {
 func TestCombatDecay(t *testing.T) {
 	for _, c := range []struct{ in, want uint8 }{
 		{0, 0},
-		{5, 4},    // Round(0.5)=1（half-away-from-zero）
-		{10, 9},   // Round(1.0)=1
-		{15, 13},  // Round(1.5)=2
-		{40, 36},  // 無門檻，40 也會扣
-		{100, 90}, // Round(10.0)=10
+		{5, 4},     // Round(0.5)=1（half-away-from-zero）
+		{10, 9},    // Round(1.0)=1
+		{15, 13},   // Round(1.5)=2
+		{40, 36},   // 無門檻，40 也會扣
+		{100, 90},  // Round(10.0)=10
 		{255, 229}, // Round(25.5)=26
 	} {
 		if got := CombatDecay(c.in); got != c.want {
