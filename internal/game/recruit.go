@@ -344,6 +344,45 @@ func (w *AIWorld) ReclaimLand(p ProvinceID, politics, stamina uint8) (int, uint8
 	return actual, stamina - ReclaimStaminaCost, nil
 }
 
+const (
+	// MineStaminaCost 是挖金礦消耗的體力（`sub byte ptr [di+7A9Ah], 5`）。
+	// **門檻是 20 但只扣 5**，兩個數字不同，不要混用。
+	MineStaminaCost = 5
+	// MineYieldScale / MineYieldBase 是挖金礦的產出係數：
+	//
+	//	黃金 += Random(礦藏 + 政治手腕÷10) × 50 + 200
+	//
+	// `Random(n)` 回 `[0, n)`，所以產出範圍是 `[200, 200 + 50×(n−1)]`——
+	// **保底 200**，運氣差也不會空手而回。
+	MineYieldScale = 50
+	MineYieldBase  = 200
+)
+
+// MineGold 是挖金礦（開發指令的第二項，`sub_24535`）。
+//
+// `deposit` 是那張以省編號為索引的 byte 表的值（`ds:11h` 起，stride 1）。
+// ⚠️ **那張表的語意未解**——位置與形狀對得上「各省礦藏量」，但沒有直接證據，
+// 所以參數名只是暫用，不要當成已確認的欄位。
+//
+// `politics` 是將領 `+2`（政治手腕），`stamina` 是 `+29`（體力）。
+// 回傳實際入帳的黃金與扣完的體力。
+func (w *AIWorld) MineGold(p ProvinceID, deposit, politics, stamina uint8, rng *Rand) (int, uint8, error) {
+	prov, err := w.Table.At(p)
+	if err != nil {
+		return 0, stamina, err
+	}
+	if stamina < MineStaminaNeed {
+		return 0, stamina, fmt.Errorf("game: 體力 %d 不足 %d，不能挖礦",
+			stamina, MineStaminaNeed)
+	}
+	n := int(deposit) + int(politics)/DevelopPoliticsDivisor
+	yield := int(rng.Int(n))*MineYieldScale + MineYieldBase
+
+	before := prov.Gold
+	prov.Gold = AddResource(prov.Gold, uint16(yield))
+	return int(prov.Gold - before), stamina - MineStaminaCost, nil
+}
+
 // ---------------------------------------------------------------------------
 // 慰勞軍民（政略指令 14），出自 `sub_3412B`（`docs/re/22`）。
 // ---------------------------------------------------------------------------
