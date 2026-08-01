@@ -1,0 +1,553 @@
+{
+  "$comment": "batch-01（partial 類 10 人）的事實骨架。schema 定義見 docs/design/21-biography-authoring-spec.md §2。這是研究素材，不是執行期資料。成文見 bios-batch01.md。",
+  "schema_version": "1",
+  "generated": "2026-08-01",
+  "batch": "batch-01",
+  "sources": {
+    "S-GPOST": {
+      "tier": "A",
+      "title": "中華民國政府官職資料庫（國立政治大學圖書館）",
+      "url": "https://gpost.lib.nccu.edu.tw/",
+      "note": "取自《政府公報》《國民政府公報》的任免令，逐筆帶日期。查法 view_career.php?name=<姓名>&pagenumber=100。年份為民國紀年，本檔一律換算為西元後記錄。⚠ 以姓名為鍵，同名不同人的紀錄會混在同一頁（本批 #179 許琨即為實例）。",
+      "fetched": "2026-08-01"
+    },
+    "S-WPZH": {
+      "tier": "B",
+      "title": "中文維基百科（有引註條目）",
+      "url": "https://zh.wikipedia.org/",
+      "note": "本批用到的條目多引《中國現代軍事史主要戰役表》（國防大學編）與郭廷以《中華民國史事日誌》。依 §3.1 第 1 條，維基各條目合併計為一個 Tier B 來源。",
+      "fetched": "2026-08-01"
+    },
+    "S-DAIYUE-KZ": {
+      "tier": "C",
+      "title": "〈抗戰時期的戴岳將軍〉（新湖南／湖南日報，抗日戰爭紀念網轉載）",
+      "url": "https://www.krzzjn.com/show-1458-78753.html",
+      "note": "同一篇文章在 hunantoday.cn 與 krzzjn.com 兩站刊出，依 §3.1 第 1 條合併計為一個來源。",
+      "fetched": "2026-08-01"
+    },
+    "S-DAIYUE-GG": {
+      "tier": "C",
+      "title": "〈民主西街戴岳公館〉（華聲在線／湖南日報，2025-02）",
+      "url": "https://m.voc.com.cn/xhn/news/202502/27440537.html",
+      "note": "地方文史整理稿，無逐條引註。與 S-DAIYUE-KZ 為不同文章，但同屬 Tier C，不計入獨立來源數。",
+      "fetched": "2026-08-01"
+    },
+    "S-SUMMARY": {
+      "tier": "C",
+      "title": "搜尋引擎摘要（未取得原文的片段）",
+      "url": "",
+      "note": "依 §3.1 第 3 條，只看到摘要、未核對全文者一律標此來源並降一級，且不寫入正文。本批涉及：曹萬順的號與籍貫、葉開鑫的字。",
+      "fetched": "2026-08-01"
+    }
+  },
+  "people": [
+    {
+      "id": 26,
+      "name_ingame": "戴岳",
+      "name_common": "戴岳",
+      "identity": {
+        "courtesy": "希鵬",
+        "aliases": ["戴哲人（原名）"],
+        "disambiguation": "另有現代同名者（陸軍專科學校相關人物），年代不合，已排除。1930 年第十八師第五十二旅旅長戴岳與本條為同一人，依據是 S-DAIYUE-GG 明載其「1929 年任五十二旅中將旅長」，並非本輪推定。"
+      },
+      "life": {
+        "birth": { "year": 1888, "month": null, "day": null, "src": ["S-DAIYUE-KZ", "S-DAIYUE-GG"], "conf": "low" },
+        "death": { "year": 1971, "month": null, "day": null, "src": ["S-DAIYUE-KZ", "S-DAIYUE-GG"], "conf": "low" },
+        "birthplace": { "value": "湖南省邵陽縣東鄉", "src": ["S-DAIYUE-KZ", "S-DAIYUE-GG"], "conf": "low", "note": null }
+      },
+      "education": [
+        { "year": 1906, "end_year": null, "institution": "湖南陸軍小學堂", "program": null, "src": ["S-DAIYUE-KZ", "S-DAIYUE-GG"], "conf": "low", "note": null },
+        { "year": 1912, "end_year": null, "institution": "保定陸軍軍官學校", "program": null, "src": ["S-DAIYUE-KZ", "S-DAIYUE-GG"], "conf": "low", "note": "期別與科別三說不合，見 conflicts[0]。正文只寫校名。" },
+        { "year": 1937, "end_year": 1938, "institution": "陸軍大學特別班", "program": "第三期", "src": ["S-DAIYUE-KZ", "S-DAIYUE-GG"], "conf": "low", "note": null }
+      ],
+      "posts": [
+        { "from": "1924-04-05", "to": null, "title": "湘軍第二軍第二師師長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1926", "to": null, "title": "國民革命軍第二軍第六師師長", "org": null, "station": null, "src": ["S-WPZH", "S-DAIYUE-GG"], "conf": "high", "note": "S-WPZH〈1927年中国〉1927-05-18 條載「第二軍第六師戴岳部亦抵武昌」。" },
+        { "from": "1928", "to": null, "title": "長沙警備司令（兼）", "org": null, "station": "長沙", "src": ["S-DAIYUE-GG"], "conf": "low", "note": "Tier C 單一來源，未寫入正文。" },
+        { "from": "1929", "to": null, "title": "陸軍第十八師第五十二旅旅長", "org": null, "station": null, "src": ["S-WPZH", "S-DAIYUE-GG"], "conf": "high", "note": "S-WPZH〈龍岡戰鬥〉載 1930-12 該旅旅長為戴岳；S-DAIYUE-GG 載 1929 年任五十二旅旅長。" },
+        { "from": "1935-04-10", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘任，非職務。" },
+        { "from": "1938", "to": null, "title": "國民政府軍事委員會中將參議", "org": null, "station": null, "src": ["S-DAIYUE-KZ", "S-DAIYUE-GG"], "conf": "low", "note": "兩 Tier C 來源分記 1937 年與 1938 年，且 S-DAIYUE-GG 誤植為 1928 年。正文不寫。" },
+        { "from": "1939-07-12", "to": "1940-04-30", "title": "湖南省第四區行政督察專員", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1940-01-20", "to": "1940-04-30", "title": "湖南省第四區保安司令（兼）", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1940-04-30", "to": "1943-03-18", "title": "湖南省第九區行政督察專員兼保安司令", "org": null, "station": null, "src": ["S-GPOST", "S-DAIYUE-KZ"], "conf": "high", "note": "S-DAIYUE-KZ 記為「第九戰區行政督察專員」，機關名有出入，見 conflicts[1]。" },
+        { "from": "1943-03-01", "to": "1945-07-10", "title": "湖南省政府委員", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "S-DAIYUE-KZ 記為 1942 年，見 conflicts[1]。" },
+        { "from": "1944-09", "to": null, "title": "洪江行署主任", "org": null, "station": "湖南洪江", "src": ["S-DAIYUE-KZ", "S-DAIYUE-GG"], "conf": "low", "note": "S-DAIYUE-GG 記為 1943 年「湘西行署主任」。兩 Tier C 不合，未寫入正文。" },
+        { "from": "1954", "to": null, "title": "湖南省人民政府參事室參事", "org": null, "station": null, "src": ["S-DAIYUE-KZ", "S-DAIYUE-GG"], "conf": "low", "note": null }
+      ],
+      "events": [
+        { "when": "1930-12-30", "where": "江西龍岡", "name": "龍岡戰鬥", "role": "陸軍第十八師第五十二旅旅長", "outcome": "第十八師師部與兩旅為中國工農紅軍圍殲，師長張輝瓚被俘；戴岳自龍岡脫出", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1945-04", "where": "湖南雪峰山", "name": "湘西會戰", "role": "未載明職務", "outcome": "參與", "src": ["S-DAIYUE-KZ"], "conf": "low", "note": "Tier C 單一來源且未載職務，未寫入正文。" }
+      ],
+      "ending": { "when": "1971", "where": null, "how": "逝世", "src": ["S-DAIYUE-KZ", "S-DAIYUE-GG"], "conf": "low" },
+      "verified_by": ["S-GPOST", "S-WPZH", "S-DAIYUE-KZ", "S-DAIYUE-GG"],
+      "confidence": "medium",
+      "conflicts": [
+        {
+          "field": "education",
+          "statements": [
+            { "src": "S-DAIYUE-KZ", "says": "1912 年 8 月考入保定陸軍軍官學校步兵科" },
+            { "src": "S-DAIYUE-GG", "says": "1912 年 8 月考入保定陸軍軍官學校步兵科，1914 年 3 月再次錄取習炮科" },
+            { "src": "S-SUMMARY", "says": "保定軍校第二期炮科" }
+          ],
+          "resolved": false,
+          "note": "期別與科別三說皆不合。依 §4.4 末列，正文只寫「保定陸軍軍官學校畢業」，期別與科別都不寫。"
+        },
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-GPOST", "says": "1939-07-12 派湖南省第四區行政督察專員；1940-04-30 改派第九區；1943-03-01 任命湖南省政府委員" },
+            { "src": "S-DAIYUE-KZ", "says": "1939 年任第九戰區行政督察專員兼保安司令（駐沅陵）；1942 年任湖南省政府委員" }
+          ],
+          "resolved": false,
+          "note": "機關名（省第九區／第九戰區）與年份（1943／1942）皆不合。⚠ 這是 Tier A 對 Tier B 以外的組合：A 對 C。依 §4.4 採 A，分歧記帳。"
+        }
+      ],
+      "gaps": [
+        "生卒年、字、籍貫、學歷全部只有 Tier C（兩篇湖南地方媒體整理稿）。",
+        "1930-12 龍岡戰鬥之後到 1937 年之間的經歷，只有 Tier C 的零星記載（第三十六旅旅長、第四十六師師長），無獨立佐證，未寫入正文。",
+        "下一步：查《民國職官年表》與《邵陽市志·人物志》，可望補上生卒年與 1931–1936 年的職務。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆只有維基〈龍岡戰鬥〉一線索，內容侷限於 1930 年一役。本輪新增 S-GPOST 十筆帶公報日期的任免令（涵蓋 1924–1945），並確認 1926 年第二軍第六師師長一職。"
+    },
+    {
+      "id": 61,
+      "name_ingame": "劉佐龍",
+      "name_common": "劉佐龍",
+      "identity": { "courtesy": null, "aliases": [], "disambiguation": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1912-11-01", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1913-01-28", "to": null, "title": "湖北步隊第八旅旅長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1914-02-22", "to": null, "title": "湖北陸軍第一師步兵第二旅旅長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1918-05-25", "to": null, "title": "湖北陸軍第四混成旅旅長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "1923-01-26 再任同職。" },
+        { "from": "1918-10-31", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1923-12-15", "to": null, "title": "將軍府將軍", "org": null, "station": null, "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": null },
+        { "from": "1924-08-25", "to": null, "title": "將軍府冠字將軍", "org": null, "station": null, "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "冠字兩說不合，見 conflicts[0]。正文不寫冠字。" },
+        { "from": "1926-02-21", "to": null, "title": "湖北省長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "S-WPZH 記為 1926 年 8 月接任，見 conflicts[1]。" },
+        { "from": null, "to": "1926-09", "title": "湖北陸軍暫編第二師師長", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "S-WPZH 另載其同時兼漢陽防守司令。" },
+        { "from": "1926-09", "to": "1927-05", "title": "國民革命軍第十五軍軍長", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "所部由湖北陸軍暫編第二師改編，鄧演達允以一軍三師的額度。" },
+        { "from": "1926-09-23", "to": null, "title": "湖北政務委員會委員", "org": null, "station": "漢口", "src": ["S-WPZH"], "conf": "medium", "note": "該會由鄧演達兼主任委員，1926-09-23 在漢口成立，為當時湖北全省最高行政機關。" }
+      ],
+      "events": [
+        { "when": "1926-09-03", "where": "湖北武漢", "name": "所部易幟", "role": "湖北陸軍暫編第二師師長", "outcome": "經與國民革命軍政治工作部主任鄧演達交涉後，召集營級以上幹部宣布易幟，所部改編為國民革命軍第十五軍", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1926-09-05", "where": "漢陽龜山", "name": "鄂南作戰", "role": "國民革命軍第十五軍軍長", "outcome": "所部掩護何鍵指揮的國民革命軍第八軍第二師攻擊龜山禹王宮指揮所", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1927-05", "where": "武漢", "name": "第十五軍副軍長耿丹遭撤職扣押", "role": "國民革命軍第十五軍軍長", "outcome": "以連帶責任解除軍長職務，同年 8 月第十五軍解散，所部分別併入第十八軍、第十九軍等單位", "src": ["S-WPZH"], "conf": "medium" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-GPOST", "says": "1924-08-25 特任建威將軍" },
+            { "src": "S-WPZH〈北洋政府將軍府將軍列表〉（引《政府公報》第二一一冊）", "says": "1924 年 8 月 25 日升健威將軍" }
+          ],
+          "resolved": false,
+          "note": "⚠ 日期一致、冠字不合（建／健），兩者都自稱引《政府公報》。§4.4 沒有 Tier A 對 Tier B 的處理列。本輪比照 §4.4 末列處理：正文只寫「將軍府冠字將軍」，冠字不寫。"
+        },
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-GPOST", "says": "1926-02-21 特任湖北省長" },
+            { "src": "S-WPZH〈杜錫鈞〉", "says": "1926 年 2 月 14 日蕭耀南病逝後由杜錫鈞升任湖北省省長，同年 8 月省長職務由湖北陸軍第二師師長劉佐龍接任" }
+          ],
+          "resolved": false,
+          "note": "⚠ 同屬 1926 年但月份不合（2 月／8 月），且與杜錫鈞的任期互斥。同為 Tier A 對 Tier B，規格未定處理方式。本輪比照 §4.4 末列：正文只寫年份「1926 年任湖北省長」，月份不寫。"
+        }
+      ],
+      "gaps": [
+        "生卒年、字號、籍貫、學歷、結局全部查無，S-GPOST 與 S-WPZH 都只記職務。",
+        "1927 年 5 月解除軍長職務之後的行止未查得任何記載。",
+        "下一步：查《湖北省志·人物志》與《民國職官年表》的湖北省長條目。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆只有維基三個條目的零星記載（1926 年易幟前後）。本輪新增 S-GPOST 九筆帶公報日期的任免令，把任職序列往前推到 1912 年，並補上 1923-12 將軍府將軍與 1926-02 特任湖北省長兩項。"
+    },
+    {
+      "id": 144,
+      "name_ingame": "葉開鑫",
+      "name_common": "葉開鑫",
+      "identity": { "courtesy": null, "aliases": [], "disambiguation": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1914-11-20", "to": null, "title": "陸軍步兵少校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。1917-05-26 加銜陸軍步兵中校。" },
+        { "from": "1917-08-12", "to": null, "title": "暫編湖南第一師步兵第二團第二營營長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": null, "to": null, "title": "湖南陸軍第三師師長兼湘西善後督辦", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "S-WPZH〈洪江戰鬥〉載 1923-12 時任此職，未載起訖。實力後盾為湖南省省長兼督軍趙恆惕。" },
+        { "from": "1926-04", "to": null, "title": "討賊聯軍湘軍總司令", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "由吳佩孚任命。" },
+        { "from": "1927-03", "to": "1927-06", "title": "國民革命軍陸軍新編第五軍軍長", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "所部第三師改編而成；1927-06 該軍改編為國民革命軍第四十四軍。" },
+        { "from": "1927-07-06", "to": null, "title": "國民政府軍事委員會委員", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "1927-10-19 再次特任。" },
+        { "from": "1929-04-22", "to": "1933-01-23", "title": "湖南省政府委員", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "1933-01-23 呈請辭職。" },
+        { "from": "1931-06-27", "to": null, "title": "軍事參議院參議", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "1932-06-25 改為特任。" },
+        { "from": "1936-01-23", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘任。" }
+      ],
+      "events": [
+        { "when": "1923-09-01", "where": "湖南東部", "name": "長沙戰鬥", "role": "湘軍指揮官", "outcome": "與討賊軍張輝瓚部交戰至 11 月 2 日，討賊軍奪回長沙，所部退至寧鄉", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1923-12-07", "where": "湖南西部", "name": "洪江戰鬥", "role": "湖南陸軍第三師師長兼湘西善後督辦", "outcome": "擊潰沅陵鎮守使蔡鉅猷部，該鎮守使一職廢除，蔡部 12 月 31 日退入貴州", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1924-08-06", "where": "湖南西部", "name": "芷江戰鬥", "role": "湘軍指揮官", "outcome": "蔡鉅猷聯合川軍仍未能取勝", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1926-06", "where": "湖南淥田、金蘭寺", "name": "國民革命軍北伐", "role": "討賊聯軍湘軍總司令", "outcome": "所部一部為葉挺獨立團與第七軍第八旅擊潰，雙方對峙於淥水、漣水一線", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1926-07-11", "where": "湖南長沙", "name": "國民革命軍進佔長沙", "role": "討賊聯軍湘軍總司令", "outcome": "所部退守汨羅江北岸", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1926-08-01", "where": "湘東北", "name": "第三次汨羅江渡河戰鬥", "role": "討賊聯軍湘軍總司令", "outcome": "至 8 月 19 日與國民革命軍交戰", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1926-08", "where": "湖北汀泗橋", "name": "汀泗橋作戰", "role": "討賊聯軍湘軍總司令", "outcome": "所部萬餘人退據粵漢鐵路要隘汀泗橋，8 月 27 日汀泗橋失守", "src": ["S-WPZH"], "conf": "medium" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "conflicts": [],
+      "gaps": [
+        "生卒年、籍貫、學歷全部查無。原 people.json 寫「畢業於江南武備學堂」，本輪在 S-GPOST 與 S-WPZH 都查不到，已從骨架剔除。",
+        "字「競秋」只見於搜尋摘要，未取得原文（S-SUMMARY），未寫入正文。",
+        "1927 年 6 月新編第五軍改編為第四十四軍之後，本人是否續任軍長未查得；1933 年辭湖南省政府委員之後行止不詳。",
+        "下一步：《湖南省志·人物志》與《民國職官年表》的湘軍將領條目。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆的 1927 年寧漢戰爭段落（葉部突襲第六軍）本輪未能在任何來源核實，已剔除。新增 S-GPOST 十筆任免令與 S-WPZH 四場戰鬥條目的逐日記載。"
+    },
+    {
+      "id": 179,
+      "name_ingame": "許琨",
+      "name_common": "許琨",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "⚠ S-GPOST 以姓名為鍵，「許琨」名下 21 筆橫跨 1913–1994 年，其中 1974–1994 年的監察院科員／編審／秘書／專門委員共 12 筆，年代相隔逾一甲子，顯非同一人，已排除。本條只採 1913–1927 年的 9 筆。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1927-02-28", "to": null, "title": "援江蘇軍隊前敵總指揮", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "張宗昌、孫傳芳南京軍事會議決定，畢庶澄副之。" },
+        { "from": null, "to": null, "title": "直魯聯軍第七軍軍長", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "S-WPZH〈1927年中国〉1927-03-01 條起多次以此職稱之，未載起訖。" },
+        { "from": "1927-03-05", "to": null, "title": "安徽總司令（代理）", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "鄭俊彥兼署未到任前代理。" },
+        { "from": "1927-03", "to": null, "title": "前敵副司令兼第二路副指揮", "org": null, "station": "蚌埠", "src": ["S-WPZH"], "conf": "medium", "note": null },
+        { "from": "1927-06-28", "to": null, "title": "前敵總司令", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "張宗昌、孫傳芳濟南軍事會議決定，王棟為副司令。" },
+        { "from": "1913-12-21", "to": null, "title": "陸軍步兵上尉", "org": null, "station": null, "src": ["S-GPOST"], "conf": "low", "note": "見 conflicts[0]：與上列是否同一人待考。其後 1915-02-27 加銜少校、1917-05-26 授少校、1917-10-19 加銜中校、1918-09-16 授中校、1920-11-27 加銜上校。" },
+        { "from": "1926-10-09", "to": null, "title": "拱威將軍", "org": "將軍府", "station": null, "src": ["S-GPOST", "S-WPZH"], "conf": "low", "note": "同日並晉授陸軍中將。S-WPZH〈北洋政府將軍府將軍列表〉引《政府公報》載同一筆，且同日受冠字將軍者尚有程國瑞、徐源泉、畢庶澄等直魯聯軍將領。" },
+        { "from": "1927-04-23", "to": null, "title": "陸軍上將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "low", "note": "加銜。" }
+      ],
+      "events": [
+        { "when": "1927-03-01", "where": "安徽蚌埠", "name": "繳械陳調元部", "role": "直魯聯軍第七軍軍長", "outcome": "奉孫傳芳、張宗昌命令，將陳調元駐蚌埠部隊繳械", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1927-05-17", "where": "安徽全椒", "name": "全椒作戰", "role": "直魯聯軍第七軍軍長", "outcome": "所部與杜鳳舉部為國民革命軍第二路軍楊杰部擊潰，退向滁州", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1927-06-27", "where": "山東臨城", "name": "臨城作戰", "role": "直魯聯軍第七軍軍長", "outcome": "所部退往兗州", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1927-07-24", "where": "江蘇徐州", "name": "徐州戰鬥", "role": "直魯聯軍指揮官", "outcome": "占領徐州，國民革命軍王天培部退往安徽宿縣；7 月 29 日蔣中正親自指揮分三路反攻，直魯聯軍以誘敵深入之計反撲，國民革命軍撤退，王天培其後遭軍法處決", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1927-09-02", "where": "安徽蚌埠", "name": "與孫傳芳協商軍事", "role": "魯軍前敵總司令", "outcome": "由濟南赴蚌埠", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1927-11-30", "where": "江蘇宿遷", "name": "宿遷作戰", "role": "直魯聯軍第七軍軍長", "outcome": "所部再占宿遷", "src": ["S-WPZH"], "conf": "medium" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "low",
+      "conflicts": [
+        {
+          "field": "identity",
+          "statements": [
+            { "src": "S-WPZH", "says": "許琨為直魯聯軍第七軍軍長，1927 年間歷任援江蘇軍隊前敵總指揮、代理安徽總司令、前敵總司令" },
+            { "src": "S-GPOST", "says": "一名許琨自 1913 年起歷敘陸軍步兵上尉至上校，1926-10-09 特任拱威將軍並晉授陸軍中將，1927-04-23 加銜陸軍上將" }
+          ],
+          "resolved": false,
+          "note": "⚠ 沒有任何來源把這兩批記載直接連起來。旁證是 S-WPZH〈北洋政府將軍府將軍列表〉：1926-10-09 同一批受冠字將軍者為程國瑞、徐源泉、畢庶澄等直魯聯軍將領，與第七軍軍長許琨屬同一集團。但「同批授銜」仍是本輪查證者的推理，不是來源的陳述。依 §5.3 第 3 條降為 low，正文用待考句（S5b）呈現。"
+        }
+      ],
+      "gaps": [
+        "生卒年、字號、籍貫、學歷、1927 年之後的行止全部查無。",
+        "S-GPOST 的同名混入問題（1974–1994 年監察院職員 12 筆）已排除，但也說明該庫查詢結果必須逐筆看年代，不能整批照收。",
+        "下一步：《民國職官年表》與《北洋軍閥史料》的直魯聯軍將領名錄，確認拱威將軍許琨與第七軍軍長許琨是否同一人。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆只有維基〈徐州戰鬥 (北伐)〉與〈方面軍〉兩條，內容侷限於 1927 年 7 月一役。本輪由 S-WPZH〈1927年中国〉（引郭廷以《中華民國史事日誌》）取得 1927 年全年逐日的職務與作戰記載，並新增 S-GPOST 九筆敘任令（另有待考問題，見 conflicts）。"
+    },
+    {
+      "id": 263,
+      "name_ingame": "曹萬順",
+      "name_common": "曹萬順",
+      "identity": { "courtesy": null, "aliases": [], "disambiguation": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": ["S-SUMMARY"], "conf": "unknown", "note": "搜尋摘要稱「河南藁城人，號際昌」。⚠ 兩個問題：一、未取得原文，依 §3.1 第 3 條不採用；二、藁城在河北不在河南，摘要本身自相矛盾。另「藁」字為 DESIGN-20 §2.4 的 12 個不可畫字之一，即使查實也需要處理。未寫入正文。" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1914-03-11", "to": null, "title": "陸軍步兵少尉", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。1923-10-21 授陸軍步兵上校，1924-10-04 加銜陸軍少將。" },
+        { "from": null, "to": "1926-10", "title": "福建陸軍旅長", "org": "李鳳翔部", "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "所屬師的番號兩說不合，見 conflicts[0]。正文只寫「福建陸軍旅長」。" },
+        { "from": "1926-10-08", "to": "1928", "title": "國民革命軍第十七軍軍長（代）兼第一師師長", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "該軍軍長為何應欽，曹萬順代理；第一師師長後改余仲麟。" },
+        { "from": "1927-07-06", "to": null, "title": "國民政府軍事委員會委員", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "1927-10-19 再次特任，1928-02-17 特派。" },
+        { "from": "1928-07-25", "to": "1929", "title": "國民革命軍陸軍第十一師師長", "org": null, "station": null, "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "成軍時間兩說不合，見 conflicts[1]。第十一師由第十七軍與國民革命軍總司令部警衛第一、第二、第三團及第三師第九團合編而成，是日後第十八軍的前身。" },
+        { "from": "1929", "to": null, "title": "新編第一師師長", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "第十一師師長由副師長陳誠接任。" },
+        { "from": "1931-06-27", "to": null, "title": "軍事參議院參議", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1936-01-24", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘任。" }
+      ],
+      "events": [
+        { "when": "1926-10-08", "where": "廣東蕉嶺", "name": "所部易幟", "role": "福建陸軍旅長", "outcome": "與杜起雲聯名通電投向廣東國民政府，所部與陳炯明、林虎部投降官兵合編為國民革命軍第十七軍，福建方面周蔭人的西路攻勢因此癱瘓", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1926-10-10", "where": "廣東東部松口", "name": "松口戰鬥", "role": "國民革命軍第十七軍代軍長", "outcome": "至 10 月 13 日，國民革命軍獲勝", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1926-10-28", "where": "閩西汀州長汀", "name": "汀州長汀戰鬥", "role": "國民革命軍第十七軍代軍長", "outcome": "至 10 月 29 日，北洋政府所轄部隊退至永安", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1927-06-24", "where": "魯南日照", "name": "日照戰鬥", "role": "國民革命軍第十七軍第一師指揮官", "outcome": "至 6 月 28 日，北洋政府所轄部隊撤退", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1927-08-01", "where": "蘇北寶應", "name": "寶應戰鬥", "role": "國民革命軍第十七軍代軍長", "outcome": "至 8 月 17 日，孫傳芳部反撲，國民革命軍撤離蘇北", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1928-04-13", "where": "魯南臨沂", "name": "臨沂戰鬥", "role": "國民革命軍第十七軍代軍長", "outcome": "與直魯聯軍方永昌部激戰於薛家店、沂河、大河溝，5 月 11 日國民革命軍佔領臨沂，對方退往萊蕪", "src": ["S-WPZH"], "conf": "medium" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-WPZH〈松口戰鬥〉", "says": "李鳳翔領軍的福建陸軍第二師，下屬第五旅旅長曹萬順、第六旅旅長杜起雲" },
+            { "src": "S-WPZH〈國民革命軍第十七軍〉", "says": "原屬福建省都督陸軍第三師李鳳翔部（閩軍）的旅長曹萬順、杜起雲" }
+          ],
+          "resolved": false,
+          "note": "⚠ 這是同一個來源（維基）內部兩個條目自相矛盾，不是兩個來源的分歧。§4.4 的六列都不涵蓋這種形狀。本輪比照末列處理：正文只寫「福建陸軍旅長」，師的番號與旅的番號都不寫。"
+        },
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-GPOST", "says": "1928-07-25 任命曹萬順國民革命軍陸軍第十一師師長；1928-10-08 任命陸軍第十一師師長" },
+            { "src": "S-WPZH〈國民革命軍第十八軍〉", "says": "1928 年 12 月以第十七軍與總司令部警衛三團等合編為第十一師，師長曹萬順" }
+          ],
+          "resolved": false,
+          "note": "任命日期不合（1928-07／1928-12）。同為 Tier A 對 Tier B，規格未定處理方式。本輪採 S-GPOST 的日期（有公報日期可追），並在正文只寫到年份。"
+        }
+      ],
+      "gaps": [
+        "生卒年、字號、籍貫、學歷、1936 年之後的行止全部查無。",
+        "原 people.json 稱「1928 年 3 月部隊擴編為國民革命軍第三十四軍，曹萬順升任軍長」。本輪查 S-WPZH〈國民革命軍陸軍第三十四軍〉全文與 S-GPOST 全部十筆，都沒有這一項，已從骨架剔除；people.json 的 highest_post 欄位（第三十四軍軍長）連帶失去依據。",
+        "下一步：《民國職官年表》第十一師與第三十四軍條目，以及《福建省志·人物志》的閩軍將領。"
+      ],
+      "editorial_notes": [
+        "S-WPZH〈陳誠〉載其 1929 年「因處事失當」調任新編第一師師長。這是評價性敘述，骨架只保留「調任新編第一師師長、第十一師師長由陳誠接任」這個事實，理由不寫入正文（§4.3）。"
+      ],
+      "supersedes": "原 people.json 此筆只有維基〈國民革命軍第十七軍〉一條。本輪新增 S-GPOST 十筆任免令與 S-WPZH 五場戰鬥條目，並剔除無法核實的「第三十四軍軍長」一項。"
+    },
+    {
+      "id": 327,
+      "name_ingame": "谷良民",
+      "name_common": "谷良民",
+      "identity": { "courtesy": null, "aliases": [], "disambiguation": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1923-12-05", "to": null, "title": "陸軍步兵少校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1930-03", "to": "1938-06-30", "title": "陸軍第二十二師師長", "org": null, "station": null, "src": ["S-WPZH", "S-GPOST"], "conf": "high", "note": "S-WPZH 載 1930-03 韓復榘以該師為基礎擴編第十二軍時，谷良民已任師長；S-GPOST 載 1932-08-01 任命，1938-06-30 因另有任用免職。兩個日期並列於正文。" },
+        { "from": "1936-01-25", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘任。" },
+        { "from": "1937-12", "to": "1938-06", "title": "國民革命軍第五十六軍軍長", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "自兼第二十二師師長。1938 年編入第五戰區第三集團軍。" },
+        { "from": "1938-06-30", "to": null, "title": "軍事參議院參議", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null }
+      ],
+      "events": [
+        { "when": "1930-05", "where": "津浦鐵路沿線", "name": "中原大戰", "role": "陸軍第二十二師師長", "outcome": "第十二軍編入國民政府討逆軍第一軍團投入津浦線作戰；同年 11 月第十二軍裁撤，第二十二師回歸第三路軍指揮", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1937-11", "where": "山東津浦線濟南至德州段", "name": "津浦路北段沿線作戰", "role": "陸軍第二十二師師長", "outcome": "第二十二師全部部署於該段左翼", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1937-12-22", "where": "山東濟南", "name": "日軍強渡黃河", "role": "第五十六軍軍長兼第二十二師師長", "outcome": "所部先行撤退，第三集團軍隨之全線後撤", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1937-12-24", "where": "山東周村", "name": "周村撤守", "role": "陸軍第二十二師師長", "outcome": "率部南撤，12 月 26 日日軍攻占周村", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1938-06", "where": "—", "name": "第五十六軍撤銷", "role": "第五十六軍軍長", "outcome": "第二十二師轉隸第十二軍，師長由時同然接任", "src": ["S-WPZH"], "conf": "medium" }
+      ],
+      "ending": { "when": null, "where": "天津成都道", "how": "晚年寓居天津成都道", "src": ["S-WPZH"], "conf": "medium" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-WPZH〈国民革命军第十二军〉", "says": "1930 年 3 月韓復榘以第二十二師為基礎擴編第十二軍，該軍下屬部隊僅第二十二師（師長谷良民）" },
+            { "src": "S-GPOST", "says": "1932-08-01 任命谷良民陸軍第二十二師師長" }
+          ],
+          "resolved": false,
+          "note": "兩者不必然互斥——可能是軍系內部先派、中央後補正式任命。正文把兩個日期都寫出來並各自標明性質（任職／任命），不裁決。"
+        }
+      ],
+      "gaps": [
+        "生卒年、字號、籍貫、學歷全部查無；卒年與晚年細節只知「寓居天津成都道」。",
+        "1938 年 6 月改任軍事參議院參議之後的軍職未查得。",
+        "下一步：《山東省志·人物志》與韓復榘第三路軍的編制表；《民國職官年表》第二十二師條目。"
+      ],
+      "editorial_notes": [
+        "S-WPZH〈周村区〉原文用「率部南逃」。這是評價性動詞，骨架改記中性的「率部南撤」（§4.3）。",
+        "⚠ 正文寫「韓復渠」而非通行的「韓復榘」。理由：「榘」是 DESIGN-20 §2.4 十二個不可畫字之一，§6 檢查 2 明令新文字不得引入；而該人是本名冊 #49，遊戲寫法就是「韓復渠」，依 02-status.md §2「繁中母本保留原版寫法」，採遊戲寫法同時解掉可畫性與一致性。⚠ 這個解法只在「該人也在名冊裡」時成立，規格對名冊外的人名含不可畫字沒有規定。"
+      ],
+      "supersedes": "原 people.json 此筆的職務序列與本輪大致相符，但無任何帶日期的一手依據。本輪新增 S-GPOST 五筆帶公報日期的任免令，補上 1923 年加銜與 1938-06-30 卸師長改任軍事參議院參議兩項。"
+    },
+    {
+      "id": 362,
+      "name_ingame": "張際鵬",
+      "name_common": "張際鵬",
+      "identity": { "courtesy": null, "aliases": [], "disambiguation": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": 1970, "month": null, "day": null, "src": ["S-WPZH"], "conf": "medium" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [
+        { "year": null, "end_year": null, "institution": "中央陸軍軍官學校（黃埔）", "program": "第一期", "src": ["S-WPZH"], "conf": "medium", "note": "S-WPZH〈黄埔一期〉把他列入「陸軍步兵中校 29 人」名單，與 S-GPOST 1935-05-18 任命陸軍步兵中校一筆吻合。" }
+      ],
+      "posts": [
+        { "from": "1934-05-25", "to": null, "title": "陸軍第八十三師步兵第二百四十七旅副旅長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1935-05-18", "to": null, "title": "陸軍步兵中校", "org": null, "station": null, "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "敘任。" },
+        { "from": "1941-07", "to": "1943-03", "title": "陸軍第八十五師師長", "org": "國民革命軍第十四軍", "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "接谷熹。" },
+        { "from": "1943-03", "to": "1945-02", "title": "國民革命軍第十四軍軍長", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "接陳鐵；1945-02 調離，由余錦源接任。" },
+        { "from": "1949-01", "to": null, "title": "國民革命軍第十四軍軍長（重建）", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "該軍 1948-12 於淮海戰役中被殲後以殘部重建，S-WPZH 列軍長為張際鵬、谷炳奎、傅正模三人相繼。" },
+        { "from": "1949", "to": null, "title": "第一兵團中將副司令官", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "S-WPZH〈李默庵〉載由李默庵推薦。" }
+      ],
+      "events": [
+        { "when": "1944-05", "where": "河南龍門、洛陽、延秋、磁澗", "name": "豫中會戰", "role": "國民革命軍第十四軍軍長", "outcome": "率部阻擊日軍並參加反攻陝州戰鬥，戰後以龍門、延秋兩役獲頒三等雲麾勳章", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1947-03-19", "where": "南京中山陵", "name": "中山陵哭陵事件", "role": "陪祭", "outcome": "四百餘名國軍軍官參加，丁德隆主祭、張際鵬陪祭，訴求政府救濟貧困軍官", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1955-06", "where": "臺灣", "name": "遷臺", "role": "—", "outcome": "S-WPZH〈李默庵〉載其經同學袁守謙之助赴臺灣", "src": ["S-WPZH"], "conf": "low" }
+      ],
+      "ending": { "when": "1970", "where": "臺灣", "how": "逝世", "src": ["S-WPZH"], "conf": "medium" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-WPZH〈国民革命军第十四军〉", "says": "1949 年 1 月以該軍殘部重建第十四軍，軍長張際鵬、谷炳奎、傅正模" },
+            { "src": "S-WPZH〈李默庵〉", "says": "1949 年李默庵推薦張際鵬任第一兵團中將副司令官" }
+          ],
+          "resolved": false,
+          "note": "兩項都在 1949 年，先後不明，也可能並存。正文並列而不排先後。S-WPZH〈李默庵〉另以問號標記其是否列名長沙方面的通電，該來源自身存疑，未寫入正文。"
+        }
+      ],
+      "gaps": [
+        "生年、字號、籍貫查無。卒年 1970 只見於 S-WPZH〈李默庵〉的括號附註，非該條目主軸，證據強度有限。",
+        "1935–1941 年之間的職務全空（S-GPOST 只有 1934、1935 兩筆）。",
+        "下一步：黃埔軍校第一期同學錄與《國民革命軍第十四軍軍史》，可望補上籍貫與 1936–1940 年的職務。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆的年份有誤（稱 1941 年 7 月升「第85師師長」後「其後升任第十四軍軍長」，未給年份）。本輪確認為 1943 年 3 月，並新增 S-GPOST 兩筆任免令與黃埔第一期出身一項。"
+    },
+    {
+      "id": 385,
+      "name_ingame": "蘇祖馨",
+      "name_common": "蘇祖馨",
+      "identity": { "courtesy": null, "aliases": [], "disambiguation": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": "廣西省容縣", "src": ["S-WPZH"], "conf": "medium", "note": "S-WPZH〈容县〉把他列入該縣民國時期將領名單。" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1936-03-10", "to": null, "title": "陸軍步兵上校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘任。" },
+        { "from": "1937-11-13", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "晉任。" },
+        { "from": "1939-12", "to": null, "title": "陸軍第一三五師師長", "org": "國民革命軍第三十一軍", "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "該軍軍長韋雲淞，同軍另有第一三一師（賀維珍）、第一八八師（魏鎮）。" }
+      ],
+      "events": [
+        { "when": "1939-12", "where": "廣西昆崙關", "name": "昆崙關戰役", "role": "陸軍第一三五師師長", "outcome": "所部隸國民革命軍第三十一軍參戰", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1940", "where": "廣西", "name": "桂南會戰檢討", "role": "陸軍第一三五師師長", "outcome": "受撤職留任處分；同案受處分者尚有第三十七集團軍總司令葉肇、第三十八集團軍總司令徐庭瑤等", "src": ["S-WPZH"], "conf": "medium" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "conflicts": [],
+      "gaps": [
+        "生卒年、字號、學歷、結局全部查無。籍貫只有一筆名單式的 Tier B 記載。",
+        "1940 年之後的職務未查得。原 people.json 稱其為「中華民國陸軍中將」，本輪在 S-GPOST 只查到 1937 年晉少將，未見晉中將令。",
+        "下一步：《容縣志·人物志》與新桂系第三十一軍、第四十八軍的編制沿革。"
+      ],
+      "editorial_notes": [
+        "「撤職留任」是當時公文的處分名稱，屬事實而非評價，依 §4.2 原樣保留。"
+      ],
+      "supersedes": "原 people.json 此筆只有維基〈新桂系〉的名單式提及。本輪新增 S-GPOST 兩筆敘任令、S-WPZH〈昆仑关战役〉的戰鬥序列與〈桂南会战〉的處分名單，並補上籍貫。"
+    },
+    {
+      "id": 395,
+      "name_ingame": "黃維綱",
+      "name_common": "黃維綱",
+      "identity": { "courtesy": null, "aliases": [], "disambiguation": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown", "note": "S-WPZH 載 1943 年病故時「享年 46 歲」。由此回推生年屬本輪的推算，不是來源的陳述，故不填。" },
+        "death": { "year": 1943, "month": 8, "day": 3, "src": ["S-WPZH"], "conf": "medium" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown", "note": "S-WPZH 只載「歸葬河南項城」。歸葬地通常為原籍，但來源並未這樣寫，屬推定，不填籍貫。" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1926-03-11", "to": null, "title": "陸軍步兵少校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1935-04-18", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘任。同年因長城作戰獲頒青天白日勳章。" },
+        { "from": "1937-08", "to": "1940-05-22", "title": "陸軍第三十八師師長", "org": "國民革命軍第五十九軍", "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "第五十九軍 1937-08 由第二十九軍體系的第三十八師與特務旅合編而成。" },
+        { "from": "1940-05-22", "to": "1943-08-03", "title": "國民革命軍第五十九軍軍長", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "接張自忠；由第三十三集團軍總司令馮治安報請。1943-08-17 由劉振三接任。" },
+        { "from": "1943-10-21", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "追贈。S-GPOST 記令下日期 1943-10-21，S-WPZH 記國民政府明令褒獎並追贈陸軍中將。" }
+      ],
+      "events": [
+        { "when": "1935", "where": "長城一線", "name": "長城作戰", "role": "未載明職務", "outcome": "獲頒青天白日勳章", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1940-05", "where": "湖北南瓜店、方家集", "name": "棗宜會戰", "role": "陸軍第三十八師師長", "outcome": "第三十三集團軍總司令張自忠陣亡後，組織部隊取回其遺體，5 月 18 日送回集團軍司令部", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1941-03-06", "where": "河南南陽", "name": "豫南會戰", "role": "國民革命軍第五十九軍軍長", "outcome": "率部反擊收復南陽", "src": ["S-WPZH"], "conf": "medium" }
+      ],
+      "ending": { "when": "1943-08-03", "where": "湖北南漳", "how": "病故，終年 46 歲；歸葬河南項城", "src": ["S-WPZH"], "conf": "medium" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "conflicts": [],
+      "gaps": [
+        "生年、字號、籍貫、學歷全部查無。",
+        "1926 年授少校到 1935 年敘少將之間的九年職務全空；1937 年之前在第二十九軍（西北軍）體系內的經歷未查得。",
+        "下一步：《項城市志·人物志》與第二十九軍、第三十八師的編制沿革；青天白日勳章授勳檔案可望給出當時的職務與籍貫。"
+      ],
+      "editorial_notes": [
+        "S-WPZH 敘述張自忠之死用「壯烈殉國」，敘述奪回遺體用「敢死隊」。兩者皆帶評價色彩，骨架改記中性的「陣亡」「組織部隊取回遺體」（§4.3）。"
+      ],
+      "supersedes": "原 people.json 此筆只有維基三個條目的零星提及，且把 1940 年隨棗會戰與棗宜會戰混為一談。本輪確認 1940-05 為棗宜會戰，並新增 S-GPOST 三筆任免令（含 1943-10-21 追贈陸軍中將，可與卒年互相印證）與青天白日勳章一項。"
+    },
+    {
+      "id": 413,
+      "name_ingame": "邵百昌",
+      "name_common": "邵百昌",
+      "identity": { "courtesy": null, "aliases": [], "disambiguation": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [
+        { "year": 1917, "end_year": 1919, "institution": "保定陸軍軍官學校", "program": "第六期炮兵科", "src": ["S-WPZH"], "conf": "medium", "note": "S-WPZH〈保定陸軍軍官學校〉把他列在「1917 年初入學、1919 年春畢業」該期的炮兵科名單。" }
+      ],
+      "posts": [
+        { "from": "1933-09-04", "to": "1934-09-11", "title": "陸軍砲兵學校教育長", "org": null, "station": "南京", "src": ["S-GPOST"], "conf": "medium", "note": "S-WPZH 把他列為該校教育處少將處長，職稱不合，見 conflicts[0]。" },
+        { "from": "1934-09-11", "to": null, "title": "防空學校教育長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1935-05-11", "to": null, "title": "陸軍砲兵上校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘任。S-GPOST 原文作「陸軍礮兵上校」，礮為砲的異體。1936-10-22 晉升陸軍少將，1937-12-16 晉任陸軍中將。" },
+        { "from": "1936-12-29", "to": "1937-12", "title": "江寧要塞司令", "org": null, "station": "南京", "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "S-GPOST 原文作「江甯區要塞司令」，甯為寧的異體。" },
+        { "from": null, "to": null, "title": "中國遠征軍砲兵指揮部指揮官", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "S-WPZH 未載起訖年月。轄砲兵第七團（鄭琦）、第十團（楊宗藩，1944-06 前由胡克先接任）、第二十一團（楊友梅）、重迫擊砲第二團（廖治民）、砲兵第四十九團第二連。軍事委員會 1944 年 1 月令各戰區砲兵指揮部一律撤銷。" },
+        { "from": "1946-06", "to": "1948-05", "title": "吳淞要塞司令", "org": null, "station": "上海吳淞", "src": ["S-WPZH"], "conf": "medium", "note": "1948-05 由胡克先接任。" }
+      ],
+      "events": [
+        { "when": "1937-12", "where": "南京", "name": "南京保衛戰", "role": "江寧要塞司令", "outcome": "所部含砲兵第八團一營、砲兵第十團一營（戰車防禦砲八門）、防空司令部所屬高射砲隊、城防通信營；12 月 12 日守軍開始突圍後撤離", "src": ["S-WPZH"], "conf": "medium" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-GPOST", "says": "1933-09-04 任命邵百昌陸軍砲兵學校教育長；1934-09-11 另有任用免本職" },
+            { "src": "S-WPZH〈中華民國陸軍砲兵訓練指揮部〉〈国民革命军炮兵〉", "says": "陸軍砲兵學校教育長歷任為張亮清、周斌、鄒作華、史文桂、金鎮；邵百昌列於該校教育處少將處長一欄" }
+          ],
+          "resolved": false,
+          "note": "⚠ 同一時期、同一學校，一方記教育長、一方記教育處處長。Tier A 對 Tier B，規格未定處理方式。本輪採 S-GPOST（有公報日期），分歧記帳，正文不並列。"
+        }
+      ],
+      "gaps": [
+        "生卒年、字號、籍貫全部查無。",
+        "中國遠征軍砲兵指揮部指揮官的起訖年月未查得，只能由「軍事委員會 1944 年 1 月令各戰區砲兵指揮部撤銷」推得一個上界，但這是推算不是記載，正文不寫年份。",
+        "1919 年畢業到 1933 年任砲校教育長之間的十四年職務全空。",
+        "下一步：保定軍校第六期同學錄；《陸軍砲兵學校校史》與遠征軍砲兵指揮部的編成命令。"
+      ],
+      "editorial_notes": [
+        "S-GPOST 原文的「礮」「甯」兩個異體字，正文一律改用通行的「砲」「寧」。這是字形正規化，不是改事實；原寫法記在 posts[].note。⚠ 「礮」字經 tools/eten.py 檢查 Big5 編得出且倚天有字模，改字不是為了可畫性，是為了與專案其他文件的用字一致。"
+      ],
+      "supersedes": "原 people.json 此筆只有維基〈中国远征军〉的一行編制表。本輪新增 S-GPOST 七筆帶公報日期的任免令（1933–1937）、保定第六期炮兵科出身、南京保衛戰江寧要塞司令與戰後吳淞要塞司令三項。"
+    }
+  ]
+}
