@@ -264,5 +264,42 @@ func (a *app) drawBattle(c *render.Canvas) error {
 			c.DrawCellCursor(fieldX, fieldY, t.Cell, cursorTarget)
 		}
 	}
-	return nil
+	return c.DrawBattlePanel(a.battlePanelData(), a.fonts)
+}
+
+// battlePanelData 把戰鬥狀態整理成右側面板要顯示的內容。
+//
+// 版面與欄位出自實機截圖（`docs/playtest/14`）。四種資源目前**從省份記錄取**
+// ——原版是從參戰部隊表（`ds:A358h`）取，那張表的完整語意還沒解完
+// （`docs/re/29` §4），所以這裡先用省份的值。**這是已知的差異。**
+func (a *app) battlePanelData() render.BattlePanelData {
+	b := a.battle
+	d := render.BattlePanelData{
+		Province: b.sim.At,
+		Month:    a.month,
+		Day:      1,
+	}
+	count := func(us []*game.Combatant) (units, soldiers uint32) {
+		for _, u := range us {
+			if u.Alive() {
+				units++
+				soldiers += uint32(u.Strength.Force)
+			}
+		}
+		return
+	}
+	d.Attacker.Units, d.Attacker.Soldiers = count(b.sim.Attacker)
+	d.Defender.Units, d.Defender.Soldiers = count(b.sim.Defender)
+
+	if p, err := a.tbl.At(b.sim.From); err == nil {
+		d.Attacker.Leader = p.Commander
+		d.Attacker.Gold, d.Attacker.Food = uint32(p.Gold), uint32(p.Food)
+		d.Attacker.Ammo, d.Attacker.Fuel = uint32(p.Ammo), uint32(p.Fuel)
+	}
+	if p, err := a.tbl.At(b.sim.At); err == nil {
+		d.Defender.Leader = p.Commander
+		d.Defender.Gold, d.Defender.Food = uint32(p.Gold), uint32(p.Food)
+		d.Defender.Ammo, d.Defender.Fuel = uint32(p.Ammo), uint32(p.Fuel)
+	}
+	return d
 }
