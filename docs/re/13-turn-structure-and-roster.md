@@ -183,6 +183,8 @@ if !sub_5C7FE(司令):  sub_13DDC()
 
 loc_1AD5D:                           ; ← 主迴圈
     ...內政（依 byte_6FE7E 分支：1／3／6／7／8／0Bh／0Ch）...
+                                     ; ← **byte_6FE7E 是月份**，整段是
+                                     ;   季節性內政，見 docs/re/32
     sub_19B89()
     sub_1398D()                      ; 遷都
     if 司令 == 0 或 命令數 == 0:  sub_13786(); return
