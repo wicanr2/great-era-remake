@@ -223,3 +223,108 @@ func TestStrengthFactionBonus(t *testing.T) {
 		t.Errorf("第二期不該套用那條加成，得到 %d（基準 %d）", got, plain)
 	}
 }
+
+// 一面倒用的兵種權重是**另一張表**：兵種 6 是 2，不是攻擊力那張的 4。
+func TestRoutWeightDiffersFromStrengthWeight(t *testing.T) {
+	same := []uint8{1, 4, 5}
+	for _, b := range same {
+		if BranchWeight(b) != RoutWeight(b) {
+			t.Errorf("兵種 %d 兩張表應該相同：%d vs %d", b, BranchWeight(b), RoutWeight(b))
+		}
+	}
+	if BranchWeight(6) != 4 || RoutWeight(6) != 2 {
+		t.Errorf("兵種 6 應該是 4（攻擊力）與 2（一面倒），得到 %d 與 %d",
+			BranchWeight(6), RoutWeight(6))
+	}
+}
+
+// 勢均力敵：雙方損失比例合計恆為 1/4，戰力相等時各 1/8。
+func TestCasualtiesEvenSplitsAQuarter(t *testing.T) {
+	const f = 20000
+	// 戰力相等 → pct = 100 → 各損失 1/8 = 2500
+	lossE, lossF := CasualtiesEven(1000, 1000, f, f, 1, 1)
+	if lossE != f/8 || lossF != f/8 {
+		t.Errorf("戰力相等時應各損失 %d，得到 %d / %d", f/8, lossE, lossF)
+	}
+
+	// E 是 F 的 3 倍強 → pct = 300 → F 損 3/4×1/4、E 損 1/4×1/4
+	lossE, lossF = CasualtiesEven(3000, 1000, f, f, 1, 1)
+	if wantF := f * 3 / 16; lossF != wantF {
+		t.Errorf("F 的損失 = %d，應為 %d", lossF, wantF)
+	}
+	if wantE := f / 16; lossE != wantE {
+		t.Errorf("E 的損失 = %d，應為 %d", lossE, wantE)
+	}
+	// 強的一方損失比較少——這是這條公式的核心性質。
+	if lossE >= lossF {
+		t.Errorf("E 比較強卻損失比較多：E=%d F=%d", lossE, lossF)
+	}
+
+	// 損失永遠不超過兵力。
+	lossE, lossF = CasualtiesEven(1000000, 1, 100, 100, 1, 1)
+	if lossE > 100 || lossF > 100 {
+		t.Errorf("損失超過兵力：E=%d F=%d", lossE, lossF)
+	}
+}
+
+// 兵種 4 兩條特例：pct 減半、而且任一方是 4 時 F 完全不受損失。
+func TestCasualtiesEvenBranchFourExceptions(t *testing.T) {
+	const f = 20000
+	// E 是兵種 4 → F 不受損失
+	lossE, lossF := CasualtiesEven(1000, 1000, f, f, 4, 1)
+	if lossF != 0 {
+		t.Errorf("E 是兵種 4 時 F 不該有損失，得到 %d", lossF)
+	}
+	if lossE == 0 {
+		t.Error("E 自己還是要受損失")
+	}
+	// F 是兵種 4 → 一樣，F 不受損失
+	_, lossF = CasualtiesEven(1000, 1000, f, f, 1, 4)
+	if lossF != 0 {
+		t.Errorf("F 是兵種 4 時也不該有損失，得到 %d", lossF)
+	}
+	// E 是兵種 4 時 pct 減半 → E 自己的損失變大（100/(pct+100) 變大）
+	normalE, _ := CasualtiesEven(1000, 1000, f, f, 1, 1)
+	halvedE, _ := CasualtiesEven(1000, 1000, f, f, 4, 1)
+	if halvedE <= normalE {
+		t.Errorf("兵種 4 的 pct 減半應讓自己損失變大：%d vs %d", halvedE, normalE)
+	}
+}
+
+// 一面倒：門檻與全滅是自洽的，損失不會超過兵力。
+func TestCasualtiesRoutAnnihilationThreshold(t *testing.T) {
+	const force = 10000
+	// 兵種 1（權重 1）：人力值 = 10000。攻擊 1000 × 10 = 10000 >= 10000 → 全滅
+	lossE, _ := CasualtiesRout(1000, 0, force, force, 1, 1)
+	if lossE != force {
+		t.Errorf("剛好達門檻應全滅，得到 %d", lossE)
+	}
+	// 差一點就不全滅
+	lossE, _ = CasualtiesRout(999, 0, force, force, 1, 1)
+	if lossE >= force {
+		t.Errorf("沒到門檻不該全滅，得到 %d", lossE)
+	}
+	if lossE != 9990 {
+		t.Errorf("損失 = %d，應為 attack×10/權重 = 9990", lossE)
+	}
+
+	// 兵種 5（權重 100）撐得住得多：人力值 = 1,000,000
+	lossE, _ = CasualtiesRout(1000, 0, force, force, 5, 1)
+	if lossE != 100 {
+		t.Errorf("兵種 5 的損失 = %d，應為 1000×10/100 = 100", lossE)
+	}
+
+	// 全部兵種掃一遍：損失永遠落在 [0, 兵力]
+	for _, b := range []uint8{1, 4, 5, 6} {
+		for _, atk := range []int{0, 1, 100, 10000, 1000000} {
+			l := routSide(atk, force, b)
+			if l < 0 || l > force {
+				t.Errorf("兵種 %d 攻擊 %d 的損失 %d 超出 [0, %d]", b, atk, l, force)
+			}
+		}
+	}
+	// 未知兵種回 0。
+	if got := routSide(99999, force, 3); got != 0 {
+		t.Errorf("未知兵種的損失 = %d，應為 0", got)
+	}
+}

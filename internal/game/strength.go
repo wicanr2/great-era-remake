@@ -170,3 +170,94 @@ func round(x float64) int {
 // sqrt 是 math.Sqrt 的別名，獨立出來只是為了讓上面的公式讀起來
 // 貼近原版的 `Sqrt(Real)`。
 func sqrt(x float64) float64 { return math.Sqrt(x) }
+
+// ---------------------------------------------------------------------------
+// 戰損。`sub_51D68` 依「雙方戰力差是否超過 4 倍」分兩條路，
+// 兩支的算法完全不同（`docs/re/08` §5）。
+// ---------------------------------------------------------------------------
+
+// routWeight 是**第二張**兵種權重表（`sub_5190E`）。
+//
+// ⚠️ **與 `branchWeight` 不完全相同**：兵種 6 在這裡是 2，在攻擊力公式裡是 4。
+// 其餘三個一樣。這不是抄錯——原版就是兩張獨立的表，用途不同。
+var routWeight = map[uint8]int{
+	1: 1,
+	4: 10,
+	5: 100,
+	6: 2, // ← 攻擊力那張表是 4
+}
+
+// RoutWeight 回傳一面倒結算用的兵種權重（`sub_5190E`）。
+func RoutWeight(branch uint8) int { return routWeight[branch] }
+
+// CasualtiesEven 算勢均力敵時雙方的兵力損失（`sub_51B94`）。
+//
+//	pct = Round(powE / powF × 100)      ← E 是兵種 4 時再除以 2
+//	損失F = Round( 兵力F / 4 / (pct+100) × pct )
+//	損失E = Round( 兵力E / 4 / (pct+100) × 100 )
+//
+// 兩個係數 `pct/(pct+100)` 與 `100/(pct+100)` 相加恆為 1，
+// 所以**雙方的損失比例合計恆為各自兵力的 1/4**。戰力相等時（pct = 100）
+// 各損失自己兵力的 1/8。
+//
+// ⚠️ **任一方是兵種 4 時，F 完全不受損失**——原版在寫回 F 的損失之前
+// 檢查兩邊的 `+21`，只要有一邊是 4 就跳過那次寫入。
+//
+// powE／powF 是 `sub_51D68` 算出的兩個戰力值（`Strength` 的產物再經
+// 修正係數）。E 是 `sub_51D68` 的 `arg_E`，F 是 `arg_10`。
+func CasualtiesEven(powE, powF int, forceE, forceF uint16, branchE, branchF uint8) (lossE, lossF int) {
+	if powF <= 0 {
+		return 0, 0
+	}
+	pct := round(float64(powE) / float64(powF) * 100)
+	if branchE == 4 {
+		pct = round(float64(powE) / float64(powF) * 100 / 2)
+	}
+	denom := float64(pct + 100)
+	lossF = round(float64(forceF) / 4 / denom * float64(pct))
+	lossE = round(float64(forceE) / 4 / denom * 100)
+
+	// 任一方是兵種 4 → F 不受損失。
+	if branchE == 4 || branchF == 4 {
+		lossF = 0
+	}
+	return clampLoss(lossE, forceE), clampLoss(lossF, forceF)
+}
+
+// CasualtiesRout 算一面倒時的損失（`sub_51972`）。
+//
+//	人力值(u) = 兵種權重(sub_5190E) × 兵力
+//	if 對方攻擊值 × 10 >= 人力值(u):  u 全滅
+//	else:                            損失 = Round(對方攻擊值 × 10 / 兵種權重(u))
+//
+// 兩條分支是自洽的：`攻擊×10/W < 兵力` 恰好等價於 `攻擊×10 < W×兵力`，
+// 所以損失永遠不會超過兵力——**全滅是門檻，不是溢位的補救**。
+//
+// `atkOnE` 是 `sub_51D68` 的 var_4（用 F 的強度算出來的、施加於 E 的值），
+// `atkOnF` 是 var_8。
+func CasualtiesRout(atkOnE, atkOnF int, forceE, forceF uint16, branchE, branchF uint8) (lossE, lossF int) {
+	lossE = routSide(atkOnE, forceE, branchE)
+	lossF = routSide(atkOnF, forceF, branchF)
+	return lossE, lossF
+}
+
+func routSide(atk int, force uint16, branch uint8) int {
+	w := RoutWeight(branch)
+	if w == 0 {
+		return 0
+	}
+	if atk*10 >= w*int(force) {
+		return int(force) // 全滅
+	}
+	return clampLoss(round(float64(atk*10)/float64(w)), force)
+}
+
+func clampLoss(loss int, force uint16) int {
+	if loss < 0 {
+		return 0
+	}
+	if loss > int(force) {
+		return int(force)
+	}
+	return loss
+}
