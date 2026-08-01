@@ -163,6 +163,19 @@ func (u *CombatUnit) ClearAssignment() {
 	u.Flags13 &^= UnitAssignedBit
 }
 
+// ResetToStandby 是 `sub_3B15E`（`docs/re/31` §33）：把單位打回待命。
+//
+//	+9  = 2（待命）    +12 = 0xFF（沒有下一跳）    +10 = 0（沒有目標）
+//
+// ⭐ 與 `ClearAssignment` 是一對：兩者都清 `+10`／`+12`，但
+// `ClearAssignment`（`sub_3E81F`）清 `+13` bit 7 而**不動命令**，
+// 這一支改設命令為待命而**不動 `+13`**。原版就是這樣分工的，別合併。
+func (u *CombatUnit) ResetToStandby() {
+	u.Command = BattleCmdStandby
+	u.NextCell = NoCell
+	u.TargetUnit = 0
+}
+
 // BeginTurn 套用回合開始的重置，順序照 sub_5446D。
 //
 //	+16 = 1        啟用

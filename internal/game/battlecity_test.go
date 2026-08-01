@@ -288,3 +288,28 @@ func TestClearAssignmentKeepsOtherBits(t *testing.T) {
 		t.Errorf("ClearAssignment 只該清 bit 7：要 0x4C，實際 %#02x", u.Flags13)
 	}
 }
+
+func TestResetToStandbyVsClearAssignment(t *testing.T) {
+	// 兩支原版函式分工不同，不能合併：
+	//   sub_3B15E  設命令 = 待命，不動 +13
+	//   sub_3E81F  清 +13 bit 7，不動命令
+	u := &CombatUnit{General: 1, Command: BattleCmdSeekTarget,
+		TargetUnit: 5, NextCell: 30, Flags13: UnitAssignedBit}
+	u.ResetToStandby()
+	if u.Command != BattleCmdStandby || u.TargetUnit != 0 || u.NextCell != NoCell {
+		t.Errorf("ResetToStandby 要設待命並清目標，實際 %+v", u)
+	}
+	if !u.Assigned() {
+		t.Error("ResetToStandby **不該**動 +13 bit 7——那是 sub_3E81F 的事")
+	}
+
+	v := &CombatUnit{General: 2, Command: BattleCmdSeekTarget,
+		TargetUnit: 5, NextCell: 30, Flags13: UnitAssignedBit}
+	v.ClearAssignment()
+	if v.Command != BattleCmdSeekTarget {
+		t.Error("ClearAssignment **不該**動命令——那是 sub_3B15E 的事")
+	}
+	if v.Assigned() {
+		t.Error("ClearAssignment 要清掉 +13 bit 7")
+	}
+}
