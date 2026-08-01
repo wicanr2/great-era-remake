@@ -5,7 +5,7 @@
 **動手讀任何 `sub_` 之前先在這裡 grep 它。**
 `CLAUDE.md` §7.1「動手挖之前先查手上已有的」——這份索引就是為了讓那一條真的做得到。
 
-目前 **393** 個函式在文件裡有紀錄。
+目前 **404** 個函式在文件裡有紀錄。
 
 | 函式 | 目前的結論（摘自文件）| 出處 | 提及次數 |
 |---|---|---|---:|
@@ -208,7 +208,7 @@
 | `sub_38444` | `sub_30003` 由 `sub_38444+97` 呼叫——**回合／月份的自動更新**。 | `docs/re/23-rescan-with-fixed-pattern.md`（另 1 份） | 2 |
 | `sub_38DFE` | `WAR.EXE` 裡**只有一支函式**比較 `'6'`：`sub_38DFE`（`0x38DFE`， | `docs/mechanics/30-combat.md`（另 1 份） | 3 |
 | `sub_3964E` | **傳入的是司令 ID 已經是 confirmed**——§5 從另一條路（`sub_3964E` 用同一個 | `docs/mechanics/70-ai.md`（另 8 份） | 15 |
-| `sub_39B6E` | 戰鬥主迴圈 `sub_39B6E` 逐一處理戰場單位： | `docs/mechanics/30-combat.md`（另 9 份） | 25 |
+| `sub_39B6E` | 戰鬥主迴圈 `sub_39B6E` 逐一處理戰場單位： | `docs/mechanics/30-combat.md`（另 9 份） | 26 |
 | `sub_3A320` | **戰鬥中的 AI** \| ✅ **骨架已解**（`docs/re/31`）：`sub_3F698` 主入口 → `sub_3AB99` 決策鏈（與政略同構：兩分支、優先序、已決定旗標）→ 分派到 **13 種行動… | `docs/mechanics/70-ai.md`（另 1 份） | 10 |
 | `sub_3A766` | 這解釋了整條鏈的形狀：`sub_3A766`（§6）檢查那些城市格有沒有被攻方站住 | `docs/re/31-battle-ai-chain.md` | 2 |
 | `sub_3A817` | `sub_3A817` \| 0 \| **5.0** \| 第二方被壓到第一方的 1/5 以下 \| 成立才繼續 \| | `docs/re/31-battle-ai-chain.md`（另 1 份） | 9 |
@@ -244,16 +244,17 @@
 | `sub_3C777` | 26. `sub_3C777`（143 行）：收尾補救，而且**保存-呼叫-還原** | `docs/re/31-battle-ai-chain.md` | 4 |
 | `sub_3C89A` | 3 \| `sub_3C89A` \| **打城市**（預設行動）\| | `docs/mechanics/30-combat.md`（另 1 份） | 11 |
 | `sub_3CA09` | 4 \| `sub_3CA09` \| **打敵方主力周邊** \| | `docs/mechanics/30-combat.md`（另 1 份） | 11 |
-| `sub_3CBD9` | +0 \| byte \| `sub_3CBD9`／`sub_3D57B`／`sub_3DD05`／`sub_3DED9` \| **2** \| | `docs/re/31-battle-ai-chain.md` | 5 |
+| `sub_3CBD9` | +0 \| byte \| `sub_3CBD9`／`sub_3D57B`／`sub_3DD05`／`sub_3DED9` \| **2** \| | `docs/re/31-battle-ai-chain.md` | 6 |
 | `sub_3D0AC` | ⚠️ `CONTEXT.md` 把 `+9` 記成「所屬省」。這裡 `sub_3D0AC` 在**戰鬥中**寫它， | `docs/re/31-battle-ai-chain.md` | 17 |
-| `sub_3D261` | `sub_3D261`（191 行）\| `+10`(word)、`+13`(byte) \| | `docs/re/31-battle-ai-chain.md` | 3 |
-| `sub_3D57B` | 13 \| `sub_3D57B` \| **預設**（五步都沒決定時）\| | `docs/re/31-battle-ai-chain.md` | 5 |
+| `sub_3D261` | **1. 設它的是分支 A 的行動函式**——`sub_3CBD9`(值 12)、`sub_3D261`、 | `docs/re/31-battle-ai-chain.md` | 4 |
+| `sub_3D57B` | 13 \| `sub_3D57B` \| **預設**（五步都沒決定時）\| | `docs/re/31-battle-ai-chain.md` | 6 |
 | `sub_3D823` | +0 \| byte \| `sub_3D823`／`sub_3E24F` \| **3** \| | `docs/re/31-battle-ai-chain.md` | 5 |
 | `sub_3DAEF` | if 將領[u].+12 == 0FFh: sub_3DAEF(...) | `docs/re/31-battle-ai-chain.md` | 4 |
-| `sub_3DD05` | +0 \| byte \| `sub_3CBD9`／`sub_3D57B`／`sub_3DD05`／`sub_3DED9` \| **2** \| | `docs/re/31-battle-ai-chain.md` | 6 |
-| `sub_3DED9` | +0 \| byte \| `sub_3CBD9`／`sub_3D57B`／`sub_3DD05`／`sub_3DED9` \| **2** \| | `docs/re/31-battle-ai-chain.md` | 13 |
+| `sub_3DD05` | +0 \| byte \| `sub_3CBD9`／`sub_3D57B`／`sub_3DD05`／`sub_3DED9` \| **2** \| | `docs/re/31-battle-ai-chain.md` | 7 |
+| `sub_3DED9` | +0 \| byte \| `sub_3CBD9`／`sub_3D57B`／`sub_3DD05`／`sub_3DED9` \| **2** \| | `docs/re/31-battle-ai-chain.md` | 14 |
 | `sub_3E24F` | `sub_3E24F`／`sub_3E691` 未讀。**這是下一步最有價值的目標。** | `docs/re/31-battle-ai-chain.md` | 3 |
 | `sub_3E691` | `sub_3E24F`／`sub_3E691` 未讀。**這是下一步最有價值的目標。** | `docs/re/31-battle-ai-chain.md` | 7 |
+| `sub_3E81F` | +13 \| 每回合歸零；**bit 7 = 本回合已指派目標**（`docs/re/31` §31）\| `sub_5446D`／`sub_3E81F` \| | `docs/mechanics/30-combat.md`（另 1 份） | 5 |
 | `sub_3E93A` | 2 \| `sub_3DED9`、`sub_3E93A`、`sub_48A95` \| 11 支 \| | `docs/re/31-battle-ai-chain.md` | 1 |
 | `sub_3ED4F` | 變數 \| `sub_3C777`(cl)、`sub_3D0AC`(cx)、`sub_3ED4F`(cx) \| — \| | `docs/re/31-battle-ai-chain.md` | 1 |
 | `sub_3EF98` | if byte_6FFCA & 4: sub_3EF98 | `docs/re/31-battle-ai-chain.md` | 2 |
@@ -264,8 +265,18 @@
 | `sub_4166E` | `cl`（`or al, 4`）\| `sub_41513`、`sub_4166E`、`sub_4E239` \| **只在戰鬥中** \| | `docs/re/21-develop-and-general-state.md`（另 1 份） | 2 |
 | `sub_42B56` | sub_42B56(arg_4) ; 顯示訊息後結束 | `docs/re/09-ranged-attack.md` | 3 |
 | `sub_42BC3` | `sub_42BC3(target, unit)` = 目標在不在攻擊範圍內 — **confirmed** | `docs/re/09-ranged-attack.md`（另 1 份） | 5 |
-| `sub_42C8F` | `sub_42C8F` 開頭是一段遠程攻擊的守門： | `docs/mechanics/30-combat.md`（另 3 份） | 8 |
-| `sub_4798B` | 1 \| `sub_4798B`、`sub_47EAA` \| 8 支（含 `sub_3D0AC`、`sub_3D823`、`sub_3DED9`）\| | `docs/re/31-battle-ai-chain.md` | 2 |
+| `sub_42C8F` | `sub_42C8F` 開頭是一段遠程攻擊的守門： | `docs/mechanics/30-combat.md`（另 4 份） | 10 |
+| `sub_44B10` | 3（08h）\| `sub_45A92` \| `sub_44B10`／`sub_475EB` \| `sub_44B10`／`sub_46331`／`sub_4798B` \| | `docs/re/31-battle-ai-chain.md` | 1 |
+| `sub_457F9` | 2（04h）\| `sub_457F9` \| `sub_45C79` \| — \| | `docs/re/31-battle-ai-chain.md` | 1 |
+| `sub_45A92` | 3（08h）\| `sub_45A92` \| `sub_44B10`／`sub_475EB` \| `sub_44B10`／`sub_46331`／`sub_4798B` \| | `docs/re/31-battle-ai-chain.md` | 1 |
+| `sub_45C79` | 2（04h）\| `sub_457F9` \| `sub_45C79` \| — \| | `docs/re/31-battle-ai-chain.md` | 1 |
+| `sub_46331` | 3（08h）\| `sub_45A92` \| `sub_44B10`／`sub_475EB` \| `sub_44B10`／`sub_46331`／`sub_4798B` \| | `docs/re/31-battle-ai-chain.md` | 1 |
+| `sub_46A33` | **7（80h）**\| **六支 AI 行動** ＋ `sub_46A33`／`sub_46E19`／`sub_4732C` \| `sub_3E81F` \| `sub_4732C` \| | `docs/re/31-battle-ai-chain.md` | 1 |
+| `sub_46E19` | **7（80h）**\| **六支 AI 行動** ＋ `sub_46A33`／`sub_46E19`／`sub_4732C` \| `sub_3E81F` \| `sub_4732C` \| | `docs/re/31-battle-ai-chain.md` | 1 |
+| `sub_47075` | else: sub_47075(...) | `docs/re/31-battle-ai-chain.md` | 1 |
+| `sub_4732C` | **7（80h）**\| **六支 AI 行動** ＋ `sub_46A33`／`sub_46E19`／`sub_4732C` \| `sub_3E81F` \| `sub_4732C` \| | `docs/re/31-battle-ai-chain.md` | 2 |
+| `sub_475EB` | 3（08h）\| `sub_45A92` \| `sub_44B10`／`sub_475EB` \| `sub_44B10`／`sub_46331`／`sub_4798B` \| | `docs/re/31-battle-ai-chain.md` | 1 |
+| `sub_4798B` | 1 \| `sub_4798B`、`sub_47EAA` \| 8 支（含 `sub_3D0AC`、`sub_3D823`、`sub_3DED9`）\| | `docs/re/31-battle-ai-chain.md` | 3 |
 | `sub_47B6D` | 將領[u].+12 = sub_47B6D(狀態) ; 目標格 | `docs/re/31-battle-ai-chain.md` | 2 |
 | `sub_47EAA` | ⚠️ 幾支函式**寫不只一個值**（`sub_47EAA` 寫 1 與 3、`sub_3C26A` 寫 3 與 4）， | `docs/re/31-battle-ai-chain.md` | 11 |
 | `sub_483A5` | 傳的正是 **0**。另一個呼叫端 `sub_483A5+1BC` 還沒讀。 | `docs/re/08-combat-damage.md` | 2 |
@@ -342,7 +353,7 @@
 | `sub_540B2` | sub_540B2 sub_54391 sub_546D1 sub_543C2 sub_54CFD | `docs/mechanics/30-combat.md` | 3 |
 | `sub_54391` | 3i. 誰是攻方：`sub_54391` 與 `sub_54CFD` — **confirmed** | `docs/mechanics/30-combat.md`（另 1 份） | 6 |
 | `sub_543C2` | `sub_543C2` 對**兩張都**做回合初始化（`+16=1`、`+7=+6`、`+13=0`）， | `docs/mechanics/30-combat.md`（另 1 份） | 5 |
-| `sub_5446D` | 3d. 回合初始化：`sub_5446D` 與 `sub_545B0` — **confirmed** | `docs/mechanics/30-combat.md`（另 1 份） | 14 |
+| `sub_5446D` | 3d. 回合初始化：`sub_5446D` 與 `sub_545B0` — **confirmed** | `docs/mechanics/30-combat.md`（另 2 份） | 15 |
 | `sub_545B0` | 3d. 回合初始化：`sub_5446D` 與 `sub_545B0` — **confirmed** | `docs/mechanics/30-combat.md`（另 1 份） | 8 |
 | `sub_546D1` | `sub_546D1`（九步結算的第三步）： | `docs/mechanics/40-economy.md`（另 3 份） | 5 |
 | `sub_54826` | `sub_54826` 裡有一段完整的算式： | `docs/mechanics/30-combat.md`（另 4 份） | 12 |

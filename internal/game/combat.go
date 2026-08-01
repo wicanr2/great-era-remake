@@ -124,6 +124,43 @@ type CombatUnit struct {
 	// ——`sub_47EAA` 設命令 1（前往城市）時就明確寫 0，因為那時
 	// 目標是「格」不是「單位」。
 	TargetUnit GeneralID
+
+	// Flags13 是 `+13` 的完整 byte。**存整個 byte 而不是拆成具名 bool**，
+	// 因為只有 bit 7 解出語意，其餘位元要原封不動帶回存檔
+	// （`CLAUDE.md` §9：只蓋已解欄位，未解區域一個 byte 都不動）。
+	//
+	// 位元地圖見 `docs/re/31` §31。bit 2／3／6 由玩家互動層操作，語意未解。
+	Flags13 uint8
+}
+
+// UnitAssignedBit 是 `+13` 的 bit 7：**這個單位這一輪已經被指派了目標**。
+//
+// 三條獨立證據（`docs/re/31` §31）：分支 A 的五支行動函式決定完就設它；
+// `sub_3E81F` 把它和 `+10`／`+12` **一起清**（同一組狀態）；
+// `sub_4732C` 讀它並「已設就跳過」。
+//
+// 與省份記錄 `+32` bit 2「本回合已處理過」（`docs/re/14`）是同一個手法，
+// 只是一個管省份層一個管單位層。
+const UnitAssignedBit uint8 = 0x80
+
+// Assigned 回報這個單位這一輪是否已經被指派了目標。
+func (u *CombatUnit) Assigned() bool { return u.Flags13&UnitAssignedBit != 0 }
+
+// AssignTo 把目標與下一跳寫進去並立起「已指派」——三個欄位一起動，
+// 對應分支 A 行動函式的收尾。
+func (u *CombatUnit) AssignTo(target GeneralID, next CellIndex) {
+	u.TargetUnit = target
+	u.NextCell = next
+	u.Flags13 |= UnitAssignedBit
+}
+
+// ClearAssignment 是 `sub_3E81F`：把 `+10`／`+12`／`+13` bit 7 一起清掉。
+//
+// ⚠️ 只清 bit 7，其餘位元不動——那些是別層在用的。
+func (u *CombatUnit) ClearAssignment() {
+	u.TargetUnit = 0
+	u.NextCell = NoCell
+	u.Flags13 &^= UnitAssignedBit
 }
 
 // BeginTurn 套用回合開始的重置，順序照 sub_5446D。

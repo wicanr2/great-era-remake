@@ -258,3 +258,33 @@ func TestSortCandidatesKeepsOrderOnTie(t *testing.T) {
 		t.Errorf("距離相等時要保持原順序（7 在 8 前），實際 %v", list)
 	}
 }
+
+func TestUnitAssignmentLifecycle(t *testing.T) {
+	// 三個欄位一起設、一起清（sub_3E81F 就是這樣寫的）。
+	u := &CombatUnit{General: 1, NextCell: NoCell}
+	if u.Assigned() {
+		t.Error("初始不該是已指派")
+	}
+	u.AssignTo(7, 42)
+	if !u.Assigned() || u.TargetUnit != 7 || u.NextCell != 42 {
+		t.Errorf("AssignTo 之後三個欄位都要有值，實際 %+v", u)
+	}
+	u.ClearAssignment()
+	if u.Assigned() || u.TargetUnit != 0 || u.NextCell != NoCell {
+		t.Errorf("ClearAssignment 要三個一起清，實際 %+v", u)
+	}
+}
+
+func TestClearAssignmentKeepsOtherBits(t *testing.T) {
+	// ⚠️ +13 的 bit 2/3/6 是別層在用的，只准動 bit 7
+	//（CLAUDE.md §9：未解區域一個 byte 都不動）。
+	u := &CombatUnit{General: 1, Flags13: 0x4C} // bit 2 + 3 + 6
+	u.AssignTo(3, 9)
+	if u.Flags13 != 0xCC {
+		t.Errorf("AssignTo 只該加上 bit 7：要 0xCC，實際 %#02x", u.Flags13)
+	}
+	u.ClearAssignment()
+	if u.Flags13 != 0x4C {
+		t.Errorf("ClearAssignment 只該清 bit 7：要 0x4C，實際 %#02x", u.Flags13)
+	}
+}
