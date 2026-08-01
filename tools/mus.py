@@ -129,15 +129,28 @@ def note_name(n: int) -> str:
 
 
 def parse_mus(data: bytes) -> dict:
+    """欄位名稱依 AdLib MUS 格式規格（VGMPF）。"""
     hdr = {
-        "version": struct.unpack_from("<H", data, 0)[0],
-        "w24": struct.unpack_from("<H", data, 0x24)[0],
-        "w26": struct.unpack_from("<H", data, 0x26)[0],
-        "w2A": struct.unpack_from("<H", data, 0x2A)[0],
-        "w2E": struct.unpack_from("<H", data, 0x2E)[0],
-        "b3A": data[0x3A], "b3B": data[0x3B], "b3C": data[0x3C],
-        "raw": data[:HDR_LEN].hex(),
+        "major": data[0], "minor": data[1],
+        "tuneId": struct.unpack_from("<i", data, 2)[0],
+        "tuneName": data[6:0x24].split(b"\0")[0].decode("ascii", "replace"),
+        "tickBeat": data[0x24],          # 每拍 tick 數
+        "beatMeasure": data[0x25],       # 每小節拍數
+        "totalTick": struct.unpack_from("<i", data, 0x26)[0],
+        "dataSize": struct.unpack_from("<i", data, 0x2A)[0],
+        "nrCommand": struct.unpack_from("<i", data, 0x2E)[0],
+        "soundMode": data[0x3A],         # 0=melodic(9 聲部) 1=percussive(6+5)
+        "pitchBRange": data[0x3B],       # 弯音範圍（半音）
+        "basicTempo": struct.unpack_from("<H", data, 0x3C)[0],
     }
+    # tick 速率 = (tempo / 60) * tickBeat（Hz），秒數 = totalTick / 該速率
+    rate = hdr["basicTempo"] / 60.0 * hdr["tickBeat"]
+    hdr["tickRate"] = rate
+    hdr["seconds"] = hdr["totalTick"] / rate if rate else 0.0
+    # 相容舊欄位名
+    hdr.update({"w26": hdr["totalTick"], "w2A": hdr["dataSize"],
+                "w2E": hdr["nrCommand"], "b3A": hdr["soundMode"],
+                "b3B": hdr["pitchBRange"], "b3C": hdr["basicTempo"]})
     events = []          # (abs_tick, status, data bytes)
     pos = HDR_LEN
     tick = 0
@@ -192,17 +205,21 @@ def parse_mus(data: bytes) -> dict:
 
 
 def cmd_header() -> None:
-    print(f"{'曲名':<10}{'ver':>4}{'@0x24':>7}{'@0x26':>7}{'@0x2A':>7}{'@0x2E':>7}"
-          f"{'@3A':>5}{'@3B':>5}{'@3C':>5}   檔頭前 0x46 是否其餘全零")
+    print(f"{'曲名':<10}{'ver':>5}{'tick/拍':>8}{'拍/小節':>8}{'totalTick':>10}"
+          f"{'dataSize':>9}{'nrCmd':>7}{'模式':>5}{'弯音':>5}{'tempo':>6}"
+          f"{'tick/s':>8}{'秒':>7}  其餘位元組")
     for song in SONGS:
         data = (AUDIO / f"{song}.MUS").read_bytes()
         m = parse_mus(data)["hdr"]
         head = bytearray(data[:HDR_LEN])
-        for o in (0, 1, 0x24, 0x25, 0x26, 0x27, 0x2A, 0x2B, 0x2E, 0x2F, 0x3A, 0x3B, 0x3C):
+        for o in list(range(0, 2)) + list(range(0x24, 0x32)) + [0x3A, 0x3B, 0x3C, 0x3D]:
             head[o] = 0
         rest = "全零" if not any(head) else "有殘值:" + head.hex()
-        print(f"{song:<10}{m['version']:>4}{m['w24']:>7}{m['w26']:>7}{m['w2A']:>7}"
-              f"{m['w2E']:>7}{m['b3A']:>5}{m['b3B']:>5}{m['b3C']:>5}   {rest}")
+        ok = "OK" if m["dataSize"] == len(data) - HDR_LEN else "!!"
+        print(f"{song:<10}{m['major']}.{m['minor']:<3}{m['tickBeat']:>8}"
+              f"{m['beatMeasure']:>8}{m['totalTick']:>10}{m['dataSize']:>9}({ok})"
+              f"{m['nrCommand']:>7}{m['soundMode']:>5}{m['pitchBRange']:>5}"
+              f"{m['basicTempo']:>6}{m['tickRate']:>8.0f}{m['seconds']:>7.1f}  {rest}")
 
 
 def cmd_events() -> None:
@@ -234,7 +251,9 @@ def cmd_events() -> None:
         print(f"  Ax 事件 {len(axx)}，值域 "
               f"{min((e[2][0] for e in axx), default=-1)}–{max((e[2][0] for e in axx), default=-1)}")
         syx = [e for e in ev if e[1] == 0xF0]
-        print(f"  SysEx {len(syx)}：{[e[2].hex() for e in syx][:4]}")
+        # F0 7F 00 <整數> <分數/128> F7 = 速度倍率（0x01,0x00 = 1.00 = 原速）
+        spd = [(t, p[2] + p[3] / 128.0) for t, _, p in syx if len(p) == 4]
+        print(f"  速度控制 SysEx {len(syx)} 次，倍率 {sorted({round(v, 3) for _, v in spd})}")
 
 
 def _vlq(n: int) -> bytes:
