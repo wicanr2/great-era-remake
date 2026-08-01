@@ -1,0 +1,925 @@
+{
+  "$comment": "batch-U3（`unknown` 池 24 個槽位：孫傳芳 13、袁祖銘 4、劉湘 1、唐繼堯 1、無領袖 5）的事實骨架。schema 見 docs/design/21-biography-authoring-spec.md §2；§9～§16 的裁決優先於 §2–§8，本檔特別依循 §9.3／§10.2／§11.3（同名分群）、§10.1（low 只罰主敘述）、§10.3（列表頁不計 tier）、§12.1（零命中一律重跑）、§12.3＋§14.7（異寫各自查、各自分群）、§14.4（不得為維持評等放寬查證）、§14.5（Tier B 判準＝能否追到已出版來源）、§15.1（欄位不重疊＝互補不互證）、§15.3（不計 tier 的來源仍要登錄）、§15.5（沒有計數表＝抓取失敗）。⚠ #274『無省長』依 §5.3 第 2 條為佔位值不是人物，不列入本檔。這是研究素材，不是執行期資料。成文見 bios-batchU3.md。",
+  "schema_version": "1",
+  "generated": "2026-08-02",
+  "batch": "batch-U3",
+  "sources": {
+    "S-GPOST": {
+      "tier": "A",
+      "title": "中華民國政府官職資料庫（國立政治大學圖書館）",
+      "url": "https://gpost.lib.nccu.edu.tw/",
+      "note": "取自《政府公報》的任免令，逐筆帶日期。查法 view_career.php?name=<姓名>&pagenumber=200，年份為民國紀年，本檔一律換算西元。⚠ 解析器只信『共有N筆』字串，抓不到就重試最多四次（§15.5）；本輪 23 個姓名無一次抓取失敗。⚠ 零筆一律重跑（§12.1）：本批 6 個零筆（何麓昆、牟守先、陳旅安、朱羔政、郝柏春、王健宣）各重跑一次，結果相同。⚠ 以姓名為鍵不是以人為鍵（§9.3）：本批排除 8 筆同名他人，理由逐一記於各人 identity.disambiguation。⚠ 異寫要各查（§12.3）：張鳳歧→張鳳岐 21 筆、何璧輝→何壁輝 0 筆、何麓昆→何麓崑 0 筆、楊賡和→楊庚和 0 筆、顏景宗→顏景琮 0 筆。⚠ 該站自帶版權聲明，本檔只取事實（誰在哪一天任什麼職），未複製其敘述文字（G-N10）。",
+      "fetched": "2026-08-02"
+    },
+    "S-WPZH": {
+      "tier": "B",
+      "title": "中文維基百科（可追到已出版來源的條目）",
+      "url": "https://zh.wikipedia.org/",
+      "note": "依 §3.1 第 1 條，維基各條目合併計為一個 Tier B 來源（〈1927年中国〉除外，見 S-WPNJ）。取用方式為 MediaWiki API action=parse&prop=wikitext 全文，非搜尋摘要。依 §14.5 逐條目確認可追到已出版來源：戰鬥條目（〈蛟橋戰鬥〉〈德安戰鬥 (北洋政府時期)〉〈德安馬迴嶺戰鬥〉〈當塗戰鬥〉〈九江瑞昌戰鬥〉〈贛南戰鬥〉〈虔南龍南戰鬥〉〈市汊街戰鬥〉〈萍鄉戰鬥〉〈宜春戰鬥〉〈新喻戰鬥〉〈第五次南昌戰鬥 (北洋政府時期)〉）書目為國防大學編《中國現代軍事史主要戰役表》；〈近畿陸軍第一師〉逐句引《政府公報》《申報》《大公報》《晨報》《中華民國史檔案資料匯編》；〈王普 (安徽省长)〉引天津政協文史資料與《亳州晚報》2012-08-24；〈福建陆军〉引《北洋軍閥 1912–1928》第 5 卷；〈但懋辛〉〈高世讀〉〈国民革命军第七军〉〈孫傳芳〉〈五省聯軍〉〈中国国民党江西省党部〉有內文引註；〈张占彪〉引《大理白族自治州志》卷六卷九、《怒江文史資料選輯》第三輯。",
+      "fetched": "2026-08-02"
+    },
+    "S-WPNJ": {
+      "tier": "B",
+      "title": "中文維基百科〈1927年中国〉",
+      "url": "https://zh.wikipedia.org/wiki/1927%E5%B9%B4%E4%B8%AD%E5%9B%BD",
+      "note": "依 §13.4（G-06-3），逐條引第三方著作並標頁碼的年表視為『對該第三方著作的轉引』，與其他維基頁面**分別計為獨立來源**。本條目逐日引郭廷以系統的《中華民國史事日誌》／李新總主編《中華民國史大事記》並標 rp 頁碼。⭐ §12.9：它與 S-GPOST 同源於《政府公報》一系的材料，經常同一天對上。本批用到 4 月 9 日（rp 2678-2679）、6 月 5 日與 6 月 28 日（rp 2728-2729、2749-2750）、9 月 9 日（rp 2813-2814）、1 月 11 日（rp 2604）五條。",
+      "fetched": "2026-08-02"
+    },
+    "S-WPFM": {
+      "tier": "C",
+      "title": "中文維基百科〈方面军〉的「浙闽苏皖赣五省联军总司令孙传芳的各方面军」編制表",
+      "url": "https://zh.wikipedia.org/wiki/%E6%96%B9%E9%9D%A2%E5%86%9B",
+      "note": "⚠ 依 §14.5 判為 Tier C：條目掛 {{no footnotes}} 與 {{refimprove}} 模板，全文零內文引註，參考書目只有秦郁彥《日本陸海軍總合事典》與外山操等《帝國陸軍編制總覽》兩本日文書——**內容完全不對應**五省聯軍的編制。⭐ 但它是本批命中率最高的單一材料：1926 年 9 月六個方面軍的編制表裡出現本批 5 人（第一方面軍中央第九混成旅旅長张凤岐＝#125、第二方面軍江蘇第一混成旅旅長杨庚和＝#100 疑、福建第一混成旅旅長彭德铨＝#101、第三方面軍浙江第七混成旅旅長杨振东＝#102 疑、第五方面軍安徽第四混成旅旅長刘凤图＝#118、第六方面軍總司令兼浙江第八混成旅旅長颜景琮＝#103 疑）。依 §3.1 **只當線索與 identity 佐證，不作史實陳述**；其中 #103 的『第八混成旅』與 S-GPOST 1925-09-21 的任免令番號相合，是本批最硬的一組異寫接合證據。",
+      "fetched": "2026-08-02"
+    },
+    "S-WPJP": {
+      "tier": "C",
+      "title": "中文維基百科〈陆军士官学校 (日本)〉的中國留學生名單",
+      "url": "https://zh.wikipedia.org/wiki/%E9%99%B8%E8%BB%8D%E5%A3%AB%E5%AE%98%E5%AD%A6%E6%A0%A1_(%E6%97%A5%E6%9C%AC)",
+      "note": "⚠ batch06 的 G-06-1 已裁定該名單為 Tier C（引註品質不足），本輪沿用。另依 §14.5 覆核：條目書目為兩本日文 IJA 著作，涵蓋期別與畢業年，但**不涵蓋中國學生的後續職務註記**（本批用到的『五省聯軍第六方面軍總司令』即屬此類）。本批只用它給 #103 顏景宗的第七期炮科、直隸河間籍貫；『第六方面軍總司令』一項另有 S-WPZH〈德安馬迴嶺戰鬥〉的旁證，但寫法作顏景琮，只進待考句。",
+      "fetched": "2026-08-02"
+    },
+    "S-WPBD": {
+      "tier": "C",
+      "title": "中文維基百科〈保定陸軍軍官學校〉的北洋陸軍速成武備學堂校友列舉",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BF%9D%E5%AE%9A%E9%99%B8%E8%BB%8D%E8%BB%8D%E5%AE%98%E5%AD%B8%E6%A0%A1",
+      "note": "⚠ 依 §14.5 判為 Tier C：該段列舉零內文引註，條目的參考書籍《保定陸軍軍官學校同學錄》**不涵蓋北洋陸軍速成武備學堂**（兩校不同）。名單同時列有孫傳芳（一期）、周蔭人、陳嘉謨、王都慶與 #118 劉鳳圖，是很好的線索但不是來源。依 §3.1 不進正文。",
+      "fetched": "2026-08-02"
+    },
+    "S-WPLIST": {
+      "tier": "none",
+      "title": "中文維基百科的列表頁（〈北洋政府将军府将军列表〉〈中华民国北京政府时期福建省职官列表〉〈制憲國民大會代表〉〈第一屆國民大會塞外及塞北四省代表〉〈国民参政会参政员〉）",
+      "url": "https://zh.wikipedia.org/",
+      "note": "⚠ 依 §10.3（G-04-3）列表頁不計 tier；依 §15.3（G-08-2）查到的東西仍要登錄，否則下一輪重查一次白工。本批登錄三筆：(1) #129 李生春『純威將軍 1924年6月10日』並引《政府公報》第二〇九冊第 2953 號；(2) #129 李生春『福寧鎮守使 1923年6月6日』；⭐ 這兩筆與 S-GPOST 逐日相合，但**同源於《政府公報》，依 §3.1 第 1 條不計為第二個獨立來源**——這是本批唯一一次『看似互證其實同源』。(3) #132 蘇珽為第一屆國民大會綏遠省涼城縣代表、國民參政會綏遠省參政員、制憲國民大會代表，1963 年歸化美國而被撤銷公職——用於**排除**，見 #132 的 disambiguation。",
+      "fetched": "2026-08-02"
+    },
+    "S-ROSTER": {
+      "tier": "A",
+      "title": "專案內一手資料：`MAN(1).DAT` 的 +4 所屬省／+14 效忠領袖，與 `MAN115` 字模反查",
+      "url": null,
+      "note": "⚠ 依 §11.6 裁決：**僅限 identity 佐證與查證起點，不作史實陳述，不進正文**。本批兩處用到——(1) 字模反查（§15.6 手法）：本批 24 個槽位共 72 個字模，逐個查倚天反查表，**每一個都只有唯一候選**（#132 中間槽為兩字名的全形空白填充），排除了『我們讀錯字』這一層；因此 6 個全查無的姓名不是反查誤差造成的。(2) 所屬省欄位是 1-based（#273 唐繼麟＝34→雲南省、吳佩孚系＝19→河南省，兩處都指向 1-based；`docs/reference/people/03-ingame-affiliation.md` 的表列的是原始值）。換算後本批孫傳芳系 13 人分佈於江蘇 1、安徽 6、福建 5、江西 1，**完全落在〈五省聯軍〉條目所述的江蘇、安徽、江西、浙江、福建五省之內**；袁祖銘系 4 人在貴州、劉湘系 1 人在四川、唐繼堯系 1 人在雲南，三者都與該領袖的實際地盤相符。這使遊戲名冊的軍系歸屬可以當成查證起點，但**仍然不是史料**。"
+    }
+  },
+  "people": [
+    {
+      "id": 100,
+      "name_ingame": "楊賡和",
+      "name_common": "楊賡和",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["楊庚和（S-WPFM 寫法，待考）", "楊廣和（S-WPZH〈第五次南昌戰鬥〉寫法，未採）"],
+        "disambiguation": "S-GPOST「楊賡和」名下僅 1 筆（1923-04-30 授陸軍步兵少校），無同名混入疑慮，但也無從分群。異寫「楊庚和」在 S-GPOST 為 0 筆（已重跑）。⚠ 三處記載的番號互不相同：S-WPZH〈蛟橋戰鬥〉作皖軍第五混成旅、〈国民革命军第七军〉作獨立第一旅、S-WPFM 作江蘇第一混成旅（原楊化昭部）。前兩者同為 S-WPZH（簡繁寫法相同，不構成接合），第三者是異寫加 Tier C，只進待考句。〈第五次南昌戰鬥〉result 欄提到的「楊廣和」為第三種寫法，該欄無引註且與其他兩役不能對應，**不採用**。"
+      },
+      "highest_post": { "value": null, "src": [], "conf": "unknown", "note": "三處番號互斥且都只到旅級，依 §4.4 末列不擇一。" },
+      "faction": { "value": null, "src": [], "conf": "unknown", "note": "S-ROSTER 給的是遊戲編排，依 §11.6 不得作為 faction 的來源。" },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1923-04-30", "to": null, "title": "陸軍步兵少校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階，非職務（§4.2）。⭐ 與 #134 吳大洪的 1923-04-30 授陸軍工兵上校同日成批敘任（§11.3），但兩人分屬不同軍系，同日不構成關聯。" },
+        { "from": "1926-10", "to": null, "title": "皖軍第五混成旅指揮官", "org": null, "station": "江西贛江西岸", "src": ["S-WPZH"], "conf": "low", "note": "〈蛟橋戰鬥〉infobox commander2。番號與下一筆互斥，見 conflicts[0]。" },
+        { "from": "1926", "to": null, "title": "獨立第一旅旅長", "org": null, "station": "江西", "src": ["S-WPZH"], "conf": "low", "note": "〈国民革命军第七军〉正文『在九仙嶺戰役中，俘虜獨立第一旅旅長楊賡和、陸軍第四旅旅長崔景貴』。〈九仙嶺戰役〉本身無獨立條目。" },
+        { "from": "1926-09", "to": null, "title": "江蘇第一混成旅旅長", "org": "五省聯軍第二方面軍", "station": null, "src": ["S-WPFM"], "conf": "low", "note": "⚠ 寫法作楊庚和，且來源為 Tier C。註明『原楊化昭部』。只進待考句。" }
+      ],
+      "events": [
+        { "when": "1926-10-08/1926-10-13", "where": "江西贛江西岸蛟橋、楊村（南昌西北）", "name": "蛟橋戰鬥", "role": "皖軍第五混成旅指揮官", "outcome": "與國民革命軍第三軍、第七師、第八師激戰，雙方傷亡慘重，國民革命軍第八師傷亡逾半", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1926-10", "where": "江西九仙嶺", "name": "九仙嶺戰役", "role": "獨立第一旅旅長", "outcome": "為國民革命軍第七軍所俘", "src": ["S-WPZH"], "conf": "medium", "note": "〈国民革命军第七军〉把此役繫於王家舖戰役之後，時序在 1926 年 10 月中。正文只寫『同年』。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "low",
+      "open_join": true,
+      "conflicts": [
+        { "field": "posts",
+          "statements": [
+            { "src": "S-WPZH", "says": "〈蛟橋戰鬥〉1926年10月8－13日，皖軍第五混旅指揮官楊賡和" },
+            { "src": "S-WPZH", "says": "〈国民革命军第七军〉九仙嶺戰役俘虜獨立第一旅旅長楊賡和" },
+            { "src": "S-WPFM", "says": "五省聯軍第二方面軍江蘇第一混成旅旅長楊庚和（原楊化昭部）" }
+          ],
+          "resolved": false,
+          "note": "三說番號全不同，且分屬同一個月的江西戰場。前兩說同為 S-WPZH（§3.1 第 1 條同源），依 §9.4 第 2 列本應退到共同粒度，但兩役是**不同的事件**而非同一事件的兩種說法，故各自照原文寫番號，並在正文的待考句點明三處番號不一致。第三說是異寫＋Tier C，只進待考句。" }
+      ],
+      "gaps": ["生卒年、字、籍貫查無：S-GPOST 只給一筆敘階，維基無專條（insource 繁簡各查一次，繁 1 筆簡 1 筆，皆為戰鬥／部隊條目的提及）", "『楊賡和／楊庚和／楊廣和』三種寫法是否同一人未解，是本篇 low 的主因", "下一步：《申報》《大公報》1926 年 10 月的江西戰事報導；江西省志軍事志的北伐戰役條"]
+    },
+    {
+      "id": 101,
+      "name_ingame": "彭德銓",
+      "name_common": "彭德銓",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "S-GPOST「彭德銓」名下 8 筆全部落在 1913–1926 年，官階序列少校→中校→上校兼少將→少將兼中將→中將**單調遞增，無倒序**（§10.2），兵種前後一致為礮兵，未見同名他人混入。異寫「彭德詮」在 S-GPOST 為 0 筆。⭐ 正向佐證（§11.3 成批敘任）：1925-09-21 與 #103 顏景宗同日分任暫編陸軍第六、第八混成旅旅長；1926-11-18 與 #102 楊鎮東、#103 顏景宗同日敘中將。三人在 S-GPOST 都出身陸軍第二師，而 S-WPZH〈孫傳芳〉記孫傳芳 1921-08-29 兼陸軍第二師師長——這解釋了遊戲把三人一併歸給孫傳芳的理由，但**該推論只用於分群，不進正文**。"
+      },
+      "highest_post": { "value": "五省聯軍前敵司令", "src": ["S-WPNJ"], "conf": "medium", "note": "1927-06-28 濟南軍事會議所派。同年 4 月的『聯軍副司令』是兼職，見 posts。" },
+      "faction": { "value": "陸軍第二師／五省聯軍／安國軍", "src": ["S-GPOST", "S-WPNJ", "S-WPZH"], "conf": "medium", "note": "只填機構名，不填概括語（DESIGN-20 §6.1 原則 4）。" },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1913-03-12", "to": null, "title": "陸軍礮兵少校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階。" },
+        { "from": "1917-11-19", "to": null, "title": "陸軍第二師礮兵第二團團長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1920-06-07", "to": null, "title": "陸軍礮兵中校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階。" },
+        { "from": "1922-05-07", "to": null, "title": "陸軍第二師礮兵第二團團長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "任免令事由欄作『開復本職』，即復任原職。中間的去職令未見於資料庫。" },
+        { "from": "1923-10-21", "to": null, "title": "陸軍礮兵上校兼少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1924-10-04", "to": null, "title": "陸軍少將兼中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。⭐ 與 #134 吳大洪同日加銜陸軍少將（§11.3），兩人不同軍系。" },
+        { "from": "1925-09-21", "to": null, "title": "暫編陸軍第六混成旅旅長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "⭐ 與 #103 顏景宗同日受令（第八混成旅）。" },
+        { "from": "1926-11-18", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "晉授。⭐ 與 #102 楊鎮東、#103 顏景宗同日。" },
+        { "from": "1926-09", "to": null, "title": "福建第一混成旅旅長", "org": "五省聯軍第二方面軍", "station": null, "src": ["S-WPFM"], "conf": "low", "note": "⚠ Tier C，且與 S-GPOST 1925-09-21 的暫編陸軍第六混成旅番號不同。依 §3.1 只當線索，不進正文。" },
+        { "from": "1927-04-09", "to": null, "title": "第四師師長兼五省聯軍副司令", "org": null, "station": "江蘇淮陰", "src": ["S-WPNJ"], "conf": "medium", "note": "孫傳芳委任，是日就職。" },
+        { "from": "1927-06-28", "to": null, "title": "五省聯軍前敵司令", "org": null, "station": null, "src": ["S-WPNJ"], "conf": "medium", "note": "張宗昌、孫傳芳等在濟南舉行軍事會議所定，同批另定許琨為前敵總司令、王棟為副司令、徐源泉為第二路總司令、杜鳳舉為西路總司令、鄭俊彥為膠濟鐵路方面總司令。" }
+      ],
+      "events": [
+        { "when": "1927-06-05", "where": "江蘇漣水", "name": "北伐第一路軍攻漣水", "role": "所部第三團", "outcome": "所部第三團向國民革命軍第十七軍杜起雲部繳械", "src": ["S-WPNJ"], "conf": "medium" },
+        { "when": "1927-08-05/1927-08-13", "where": "安徽北部固鎮、襄遠一帶", "name": "淮河附近戰鬥", "role": "安國軍指揮官之一（與孫傳芳、李寶章並列）", "outcome": "國民革命軍第四十軍第一師向南撤退", "src": ["S-WPZH"], "conf": "high", "note": "與下一筆同為國防大學《中國現代軍事史主要戰役表》系統，且 S-WPNJ 6 月 28 日條獨立記他任前敵司令——兩個獨立來源對『1927 年他是孫傳芳方面的前線指揮官』這同一個事實都有記載（§15.1）。" },
+        { "when": "1927-08-12/1927-08-17", "where": "安徽東部滁縣", "name": "第二次滁縣戰鬥", "role": "安國軍指揮官之一（與孫傳芳、李寶章並列）", "outcome": "8月12日蔣中正引退後兩軍對峙暫時中止", "src": ["S-WPZH"], "conf": "high" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPNJ", "S-WPZH"],
+      "confidence": "high",
+      "open_join": false,
+      "conflicts": [
+        { "field": "posts",
+          "statements": [
+            { "src": "S-GPOST", "says": "1925-09-21 任命彭德銓暫編陸軍第六混成旅旅長" },
+            { "src": "S-WPFM", "says": "1926年9月五省聯軍第二方面軍序列，福建第一混成旅旅長彭德铨" }
+          ],
+          "resolved": false,
+          "note": "Tier A 對 Tier C，依 §4.4 第 3 列**採 A，不並列**。分歧可能只是一年之內的改編（暫編陸軍第六混成旅→福建第一混成旅），但沒有來源這樣說，不寫。" }
+      ],
+      "gaps": ["生卒年、字、籍貫查無：S-GPOST 只給任免令，維基無專條", "1927 年 8 月之後的行止查無；孫傳芳部 1928 年在山東南部潰敗後的去向未見記載", "下一步：《申報》1927 年 8–12 月安國軍人事；徐友春《民國人物大辭典》"]
+    },
+    {
+      "id": 102,
+      "name_ingame": "楊鎮東",
+      "name_common": "楊鎮東",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["楊振東（S-WPFM 寫法，待考）"],
+        "disambiguation": "S-GPOST「楊鎮東」名下 8 筆全部落在 1915–1926 年，官階少校→中校→上校兼少將→少將→中將**單調遞增**（§10.2），兵種一致為步兵，未見同名他人混入。⭐ 正向佐證（§11.3）：1926-11-18 與 #101 彭德銓、#103 顏景宗同日敘中將，三人在 S-GPOST 都出身陸軍第二師。維基 insource 繁體 2 筆，其中〈楊大功〉是清順治四年進士的曾祖父（明代指揮僉事），**時代差三百年，排除**。簡體「杨镇东」0 筆（已重跑）。異寫「楊振東」只出現在 S-WPFM（Tier C），只進待考句。"
+      },
+      "highest_post": { "value": "陸軍第二師步兵第七團團長", "src": ["S-GPOST"], "conf": "medium", "note": "S-WPZH〈德安戰鬥〉把他與鄧如琢、盧香亭並列為指揮官但未給職務；S-WPFM 的『浙江第七混成旅旅長』是異寫＋Tier C，不採。" },
+      "faction": { "value": "陸軍第二師／五省聯軍", "src": ["S-GPOST", "S-WPZH"], "conf": "medium", "note": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1915-07-16", "to": null, "title": "陸軍步兵少校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "任免令事由欄作『加』。" },
+        { "from": "1916-07-13", "to": null, "title": "陸軍步兵少校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。與上一筆是加銜與實授的關係，依 §11.7 的 G-05-4 正文只寫年。" },
+        { "from": "1918-03-15", "to": null, "title": "陸軍第二師步兵第八團第二營營長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1918-04-26", "to": null, "title": "陸軍步兵中校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1921-11-12", "to": null, "title": "陸軍第二師步兵第七團團長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1922-08-27", "to": null, "title": "陸軍步兵上校兼少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1923-10-21", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。⭐ 與 #101 彭德銓同日加銜（礮兵上校兼少將）。" },
+        { "from": "1926-11-18", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1926-09", "to": null, "title": "浙江第七混成旅旅長", "org": "五省聯軍第三方面軍（總指揮盧香亭）", "station": null, "src": ["S-WPFM"], "conf": "low", "note": "⚠ 寫法作楊振東，Tier C。只進待考句。同表列盧香亭兼中央陸軍第二師師長，與 S-GPOST 的第二師任職相合，是接合的動機所在。" }
+      ],
+      "events": [
+        { "when": "1926-10-01/1926-10-07", "where": "江西北部德安", "name": "德安戰鬥", "role": "指揮官之一（與鄧如琢、盧香亭並列）", "outcome": "10月3日國民革命軍第七軍受蘇十師四個旅包圍，雙方各傷亡千餘人；國軍一度占德安，因蘇十師增援而撤退，兩地數度易手", "src": ["S-WPZH"], "conf": "medium", "note": "〈德安戰鬥 (北洋政府時期)〉infobox。combatant2 作『蘇十師』，與 S-GPOST 的陸軍第二師不同——但 infobox 沒有把該番號繫到他個人，故不構成 conflict（§4.4 第 4 列：覆蓋範圍差）。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "open_join": true,
+      "conflicts": [
+        { "field": "identity",
+          "statements": [
+            { "src": "S-GPOST", "says": "楊鎮東 1921-11-12 任陸軍第二師步兵第七團團長，1926-11-18 加銜陸軍中將" },
+            { "src": "S-WPFM", "says": "1926年9月五省聯軍第三方面軍（盧香亭，中央陸軍第二師師長）序列，浙江第七混成旅旅長楊振東" }
+          ],
+          "resolved": false,
+          "note": "『鎮／振』異寫。相合的點是同屬陸軍第二師系統、同為第七的番號、同一年。但 S-WPFM 是 Tier C，且沒有任何來源說兩者是同一人，依 §4.5 只寫待考句；主敘述不依賴這個接合，故依 §10.1 `confidence` 依主敘述評、另標 open_join。" }
+      ],
+      "gaps": ["生卒年、字、籍貫查無", "1926 年 11 月之後行止查無", "『楊鎮東／楊振東』是否同一人未解", "下一步：浙江省志軍事志；《申報》1926 年江西戰事的浙軍序列"]
+    },
+    {
+      "id": 103,
+      "name_ingame": "顏景宗",
+      "name_common": "顏景宗",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["顏景琮（S-WPZH／S-WPFM 寫法，待考）"],
+        "disambiguation": "S-GPOST「顏景宗」名下 8 筆。前 7 筆落在 1913–1926 年，兵種以礮兵為主，官階中校→上校→少將→中將**單調遞增**；⚠ 第 8 筆 1936-10-16『任顏景宗陸軍礟兵上校』相對於 1926-11-18 的中將是**官階倒序**，且無編遣或縮編記載可解釋（§15.2 的但書不成立），依 §10.2 判為同名他人，**排除**。異寫「顏景琮」在 S-GPOST 為 0 筆。⭐ 接合證據：S-WPFM 記五省聯軍第六方面軍總司令兼浙江第八混成旅旅長作顏景琮，而 S-GPOST 1925-09-21 有『任命顏景宗暫編陸軍第八混成旅旅長』——**旅的番號逐字相合**，這是本批最硬的一組異寫線索；S-WPZH〈德安馬迴嶺戰鬥〉另把顏景琮與陳調元並列為六方面軍、五方面軍指揮官。但沒有任何來源說兩種寫法是同一人，依 §4.5 只進待考句。"
+      },
+      "highest_post": { "value": "暫編陸軍第八混成旅旅長", "src": ["S-GPOST"], "conf": "medium", "note": "⚠ S-WPJP 註記『五省聯軍第六方面軍總司令』、S-WPFM 同，但寫法作顏景琮且兩者一為 Tier C 一為 Tier C，不採為 highest_post。" },
+      "faction": { "value": "陸軍第二師／五省聯軍", "src": ["S-GPOST"], "conf": "medium", "note": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": "直隸河間（今河北省河間市）", "src": ["S-WPJP"], "conf": "low", "note": "⚠ 只有 Tier C。同期同科另列張文通（直隸河間）、第六期炮科列周宗祥（直隸河間），該名單的籍貫欄格式一致。旁證是兵種：S-GPOST 的敘階與職務幾乎全是礮兵，與『炮科』相合。" }
+      },
+      "education": [
+        { "year": 1908, "end_year": 1910, "institution": "日本陸軍士官學校", "program": "第七期炮兵科", "src": ["S-WPJP"], "conf": "low", "note": "⚠ Tier C。該條目記第七期 55 人，1908年11月入學、1910年5月畢業。" }
+      ],
+      "posts": [
+        { "from": "1913-07-09", "to": null, "title": "陸軍礮兵中校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1916-04-04", "to": null, "title": "陸軍第二師礮兵第二團第三營營長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "與 #101 彭德銓同屬該師礮兵第二團。" },
+        { "from": "1924-01-09", "to": null, "title": "陸軍礮兵上校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。⭐ 與 #115 倪朝榮同日（倪為加銜陸軍中將），兩人分屬不同軍系。" },
+        { "from": "1924-03-01", "to": null, "title": "陸軍第二師步兵第五團團長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "由礮兵改領步兵團。" },
+        { "from": "1924-09-18", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "晉授。" },
+        { "from": "1925-09-21", "to": null, "title": "暫編陸軍第八混成旅旅長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "⭐ 與 #101 彭德銓同日受令（第六混成旅）。" },
+        { "from": "1926-11-18", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1926-09", "to": null, "title": "五省聯軍第六方面軍總司令兼浙江第八混成旅旅長", "org": null, "station": null, "src": ["S-WPFM", "S-WPJP"], "conf": "low", "note": "⚠ 寫法作顏景琮（S-WPFM）／顏景宗（S-WPJP），兩者都是 Tier C。只進待考句。" }
+      ],
+      "events": [
+        { "when": "1926-10-30/1926-11-05", "where": "江西德安、馬迴嶺", "name": "德安馬迴嶺戰鬥", "role": "六方面軍指揮官（與陳調元並列）", "outcome": "與國民革命軍第七軍及北伐第一、第二路軍作戰", "src": ["S-WPZH"], "conf": "low", "note": "⚠ infobox 寫法作顏景琮。此役是唯一一筆 Tier B 提到六方面軍與該人名，只進待考句。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH", "S-WPJP", "S-WPFM"],
+      "confidence": "medium",
+      "open_join": true,
+      "conflicts": [
+        { "field": "identity",
+          "statements": [
+            { "src": "S-GPOST", "says": "1925-09-21 任命顏景宗暫編陸軍第八混成旅旅長；1926-11-18 加銜陸軍中將" },
+            { "src": "S-WPFM", "says": "1926年9月五省聯軍第六方面軍總司令顏景琮，兼浙江第八混成旅旅長" },
+            { "src": "S-WPZH", "says": "〈德安馬迴嶺戰鬥〉1926年10月30日－11月5日，六方面軍、五方面軍指揮官顏景琮、陳調元" }
+          ],
+          "resolved": false,
+          "note": "『宗／琮』異寫。相合的點是第八混成旅這個番號（Tier A 與 Tier C 逐字相同）與 1925–1926 的時間帶。⚠ 但 Tier A 那邊只到旅長，Tier C 那邊直接是方面軍總司令，職級落差一大級以上；沒有來源做這個接合，依 §4.5 只寫待考句，主敘述不依賴它（§10.1）。" }
+      ],
+      "gaps": ["生卒年查無；籍貫只有一個 Tier C 來源（日本陸軍士官學校名單的括號註記）", "『第六方面軍總司令』一項無 Tier A/B 佐證，未進正文", "『顏景宗／顏景琮』是否同一人未解", "下一步：《河間縣志》人物志；日本《陸軍士官學校卒業生名簿》第七期原件"]
+    },
+    {
+      "id": 104,
+      "name_ingame": "張中立",
+      "name_common": "張中立",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "S-GPOST「張中立」名下 7 筆。⚠ 第 7 筆 1977-03-14『任命張中立台灣省嘉義縣立竹崎國民中學人事室主任』與前六筆相隔 47 年、性質完全不同，依 §9.3 判為同名他人，**排除**。前六筆分兩段：1914–1925 的江蘇陸軍軍職（少校→中校→中校兼上校，官階遞增）與 1929–1930 的江蘇省政府民政廳科長。兩段同在江蘇、時間相接、官階無倒序，且中間隔著 1928–1929 年的編遣（§15.2），視為同一人。⚠ S-WPNJ 記 1927 年 9 月第三十一軍第九十二師師長張中立屬南京方面（國民革命軍），與前段的江蘇陸軍（孫傳芳方面）分屬敵對陣營，**沒有來源記載這次改隸**，依 §4.5 只進待考句。維基 insource 繁體 9 筆、簡體 2 筆，除〈1927年中国〉外全部是當代藝人、唐朝人物或清末咨議局議員，**全數排除**。"
+      },
+      "highest_post": { "value": "江蘇陸軍第二師步兵第六團第二營營長", "src": ["S-GPOST"], "conf": "medium", "note": "⚠ 若 S-WPNJ 那筆是同一人則應為第九十二師師長，但接合未解，不採。" },
+      "faction": { "value": "江蘇陸軍第二師", "src": ["S-GPOST"], "conf": "medium", "note": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1914-07-31", "to": null, "title": "陸軍步兵少校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1921-01-14", "to": null, "title": "江蘇陸軍第二師步兵第六團第二營營長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "⭐ 與 #118 劉鳳圖同日受令（江蘇陸軍第二混成旅礟兵營營長），§11.3 成批敘任。" },
+        { "from": "1924-10-09", "to": null, "title": "陸軍步兵中校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1925-03-13", "to": null, "title": "陸軍步兵中校兼上校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1927-09", "to": null, "title": "國民革命軍第三十一軍第九十二師師長", "org": null, "station": null, "src": ["S-WPNJ"], "conf": "low", "note": "⚠ 陣營與前後兩段不接，只進待考句。" },
+        { "from": "1929-05-04", "to": "1930-12-13", "title": "江蘇省政府民政廳第三科科長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "去職事由欄作『呈懇辭職』，去職令的職稱作『江蘇省政府民政廳科長』。" }
+      ],
+      "events": [
+        { "when": "1927-09-09/1927-09-14", "where": "江蘇江陰南星鎮、南通、如皋、海安、鹽城、阜寧", "name": "北伐寧方右翼軍渡江北進", "role": "第三十一軍第九十二師師長", "outcome": "9月9日自江陰南星鎮渡江，循水道經南通、如皋，11日晚抵海安，13日拂曉抵鹽城，14日克阜寧", "src": ["S-WPNJ"], "conf": "low", "note": "⚠ 依賴未解的接合，只進待考句。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPNJ"],
+      "confidence": "medium",
+      "open_join": true,
+      "conflicts": [
+        { "field": "identity",
+          "statements": [
+            { "src": "S-GPOST", "says": "張中立 1921 年任江蘇陸軍第二師步兵第六團第二營營長，1925 年加銜陸軍步兵中校兼上校，1929 年任江蘇省政府民政廳第三科科長" },
+            { "src": "S-WPNJ", "says": "1927年9月9日，寧方右翼軍右縱隊（第三十一軍之張中立第九十二師）於江陰南星鎮一帶渡江" }
+          ],
+          "resolved": false,
+          "note": "相合的點：同姓名、同在江蘇、時間相接（1925 上校 → 1927 師長 → 1929 文職，1928–1929 適逢編遣，§15.2）。不合的點：1921–1925 屬江蘇陸軍（後歸孫傳芳五省聯軍），1927 年 9 月屬南京方面的國民革命軍，中間的改隸沒有任何來源記載。依 §4.5 寫待考句，主敘述不依賴它（§10.1）。" }
+      ],
+      "gaps": ["生卒年、字、籍貫查無", "1921–1925 與 1927 年那筆是否同一人未解——這是本篇最值得追的一條", "下一步：〈國民革命軍第三十一軍〉沿革；《江蘇省志·軍事志》；《申報》1927 年 9 月蘇北戰事"]
+    },
+    {
+      "id": 115,
+      "name_ingame": "倪朝榮",
+      "name_common": "倪朝榮",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "S-GPOST「倪朝榮」名下 8 筆全部落在 1914–1924 年，官階少校→中校→上校→中將**單調遞增**（§10.2），職務全在安徽陸軍第一混成旅系統，未見同名他人混入。維基 insource 繁體 0 筆、簡體 1 筆（〈王普 (安徽省长)〉），⚠ **繁體零命中已重跑一次**（§12.1），確為零。⚠ 同一條〈王普〉另記 1924 年 10 月『新任第一混成旅旅長倪朝芝』——與本人同旅、同年、名字只差一字，見 conflicts[0]；沒有來源說兩者是同一人，也沒有來源說是兩個人。"
+      },
+      "highest_post": { "value": "安徽陸軍第一混成旅旅長", "src": ["S-GPOST"], "conf": "medium", "note": null },
+      "faction": { "value": "安徽陸軍第一混成旅（皖軍）", "src": ["S-GPOST", "S-WPZH"], "conf": "medium", "note": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1914-03-04", "to": null, "title": "陸軍步兵少校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1917-10-19", "to": null, "title": "陸軍步兵中校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。⭐ 與 #125 張鳳歧、#129 李生春同日敘中校（§11.3），三人分屬不同軍系，是一次大批敘任。" },
+        { "from": "1920-10-30", "to": null, "title": "安徽陸軍第一混成旅步兵第一團團長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1922-06-20", "to": null, "title": "陸軍步兵上校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1923-01-26", "to": null, "title": "陸軍步兵上校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。與上一筆是加銜與實授的關係，正文只寫年（§11.7 G-05-4）。" },
+        { "from": "1924-01-09", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1924-04-02", "to": null, "title": "安徽陸軍第一混成旅旅長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1924-07-28", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "晉授。" }
+      ],
+      "events": [
+        { "when": "1925-10", "where": "安徽臨淮關、壽縣、潁上至蚌埠", "name": "皖軍響應孫傳芳通電討奉", "role": "皖軍將領（與王普、高世讀、華疏庵並列）", "outcome": "率部進軍蚌埠，解除駐蚌埠奉軍姜登選部的武裝", "src": ["S-WPZH"], "conf": "medium", "note": "〈王普 (安徽省长)〉，引天津政協文史資料。同段記 10 月 7 日皖贛蘇閩浙五省代表在杭州會議推孫傳芳為總司令、10 月 18 日皖軍響應。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "open_join": false,
+      "conflicts": [
+        { "field": "posts",
+          "statements": [
+            { "src": "S-GPOST", "says": "1924-04-02 任命倪朝榮安徽陸軍第一混成旅旅長" },
+            { "src": "S-WPZH", "says": "〈王普 (安徽省长)〉：1924年10月第二次直奉戰爭後，王普與倪嗣冲舊部的第二混成旅旅長李培基、第四混成旅旅長高世讀、新任第一混成旅旅長倪朝芝等人共同制造輿論反對馬聯甲督皖" }
+          ],
+          "resolved": false,
+          "note": "Tier A 對 Tier B，同一個旅、同一年、名字差一字。可能是（a）同一人的異寫，（b）四月倪朝榮、十月倪朝芝的先後任，（c）維基筆誤。三種都沒有來源支持，依 §9.4 第 1 列**退到雙方一致的粒度**：正文只寫 S-GPOST 的『1924年任安徽陸軍第一混成旅旅長』，不寫 1924 年 10 月那段人事風潮。⚠ 倪嗣冲部將多以『倪朝』為排行用字，不能據此推斷。" }
+      ],
+      "gaps": ["生卒年、字、籍貫查無", "1925 年 10 月之後行止查無", "『倪朝榮／倪朝芝』的關係未解", "下一步：《安徽省志·軍事志》；天津政協《文史資料選輯》倪嗣冲與安武軍專題；《申報》1924 年安徽人事"]
+    },
+    {
+      "id": 118,
+      "name_ingame": "劉鳳圖",
+      "name_common": "劉鳳圖",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "S-GPOST「劉鳳圖」名下 8 筆。⚠ 第 8 筆 1936-02-07『任劉鳳圖陸軍少將』相對於 1925-09-08 的中將是**官階倒序**，無編遣記載可解（§15.2 不成立），依 §10.2 判為同名他人，**排除**。⚠ 其餘 7 筆內部另有一處落差：1916-04-23 授陸軍少將、1917-08-30 任陸軍第六師一等參謀官，之後 1921-01-14 卻任江蘇陸軍第二混成旅**營長**——職務由師級參謀退到營級。官階序列本身（少校→中校→少將→中將）**沒有倒退**，且 1920 年直皖戰爭後陸軍第六師的編制有變動，故不判為兩人，但列為未解的疑點。維基 insource 繁體 2 筆、簡體 3 筆，其中〈保定陸軍軍官學校〉的北洋陸軍速成武備學堂校友列舉同時列有孫傳芳、周蔭人、陳嘉謨——是很好的線索但零引註（S-WPBD，Tier C），不進正文。"
+      },
+      "highest_post": { "value": "五省聯軍第五方面軍第二軍軍長", "src": ["S-WPZH"], "conf": "medium", "note": "〈九江瑞昌戰鬥〉result 欄。S-WPFM 的『安徽第四混成旅旅長』是 Tier C，不採。" },
+      "faction": { "value": "江蘇陸軍第二混成旅／五省聯軍第五方面軍", "src": ["S-GPOST", "S-WPZH"], "conf": "medium", "note": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [
+        { "year": null, "end_year": null, "institution": "北洋陸軍速成武備學堂", "program": null, "src": ["S-WPBD"], "conf": "low", "note": "⚠ Tier C（零引註，且條目的參考書籍是保定軍校同學錄，不涵蓋速成武備學堂）。不進正文。該校 1903–1907 共三期 1,426 人，同列名單有孫傳芳（一期）。" }
+      ],
+      "posts": [
+        { "from": "1913-05-24", "to": null, "title": "陸軍步兵少校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1913-08-25", "to": null, "title": "陸軍步兵中校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1916-04-23", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1917-08-30", "to": null, "title": "陸軍第六師一等參謀官", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1921-01-14", "to": null, "title": "江蘇陸軍第二混成旅步兵第二團礟兵營營長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "⭐ 與 #104 張中立同日受令（江蘇陸軍第二師步兵第六團第二營營長），§11.3。⚠ 與前一筆的職級落差見 disambiguation。" },
+        { "from": "1922-02-04", "to": null, "title": "江蘇陸軍第二混成旅步兵第二團團長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1925-09-08", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1926-11", "to": null, "title": "五省聯軍第五方面軍第二軍軍長", "org": null, "station": "江西九江、瑞昌", "src": ["S-WPZH"], "conf": "medium", "note": "〈九江瑞昌戰鬥〉。第五方面軍總指揮為陳調元。" },
+        { "from": "1926-09", "to": null, "title": "安徽第四混成旅旅長", "org": "五省聯軍第五方面軍（總指揮陳調元）", "station": null, "src": ["S-WPFM"], "conf": "low", "note": "⚠ Tier C。與 S-GPOST 的江蘇陸軍第二混成旅團長不同番號，也與兩個月後的第二軍軍長不同級。不進正文。" }
+      ],
+      "events": [
+        { "when": "1925-10", "where": "安徽亳州", "name": "皖軍合圍亳州", "role": "所部一個旅", "outcome": "陳調元與孫傳芳協商後借調其所部一個旅參加合圍，與高世讀第四旅、華毓庵旅共同圍孫殿英部於亳州城", "src": ["S-WPZH"], "conf": "medium", "note": "〈高世讀〉，引安徽文化網與《亳州晚報》2012-08-24。原文作『江蘇劉鳳圖的一個旅』——與 S-GPOST 的江蘇陸軍第二混成旅相合，是本篇 A、B 兩來源少數重疊的一點。" },
+        { "when": "1926-11-04", "where": "江西九江、瑞昌", "name": "九江瑞昌戰鬥", "role": "五省聯軍第五方面軍第二軍軍長", "outcome": "國民革命軍獨立第二師攻佔九江，五方面軍被俘數千；攻入瑞昌後隻身撤離", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1927-03-11/1927-03-17", "where": "安徽當塗", "name": "當塗戰鬥", "role": "國民革命軍第六軍第十七師、第三十七軍指揮官之一（與文鴻恩並列）", "outcome": "攻擊時遭直魯聯軍第四軍抵抗，至17日對方撤退", "src": ["S-WPZH"], "conf": "medium", "note": "⚠ 此役他在**國民革命軍一方**，與四個月前的五省聯軍相反。〈国民革命军第三十七军〉是陳調元部改編的番號，但條目未提他個人；**改隸的經過沒有來源記載**，正文只寫他在該役指揮哪些部隊，不寫『改隸』二字。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "open_join": false,
+      "conflicts": [
+        { "field": "posts",
+          "statements": [
+            { "src": "S-GPOST", "says": "1916-04-23 授劉鳳圖陸軍少將；1917-08-30 任命陸軍第六師一等參謀官；1921-01-14 任命江蘇陸軍第二混成旅步兵第二團礟兵營營長" },
+            { "src": "S-GPOST", "says": "同一序列內，1921 年的營級職務低於 1917 年的師級參謀職務" }
+          ],
+          "resolved": false,
+          "note": "同一來源內部的職級落差（§9.4 第 2 列）。官階本身無倒退，且 1920 年直皖戰爭後第六師編制有變動，故不套 §10.2 判為兩人。正文照序列原樣寫，不加解釋。" },
+        { "field": "posts",
+          "statements": [
+            { "src": "S-WPZH", "says": "〈九江瑞昌戰鬥〉1926年11月4日，五方面軍二軍軍長劉鳳圖" },
+            { "src": "S-WPFM", "says": "1926年9月五省聯軍第五方面軍安徽第四混成旅旅長刘凤图" }
+          ],
+          "resolved": false,
+          "note": "Tier B 對 Tier C，依 §4.4 第 3 列採高階者，正文寫第二軍軍長。兩者相差兩個月，也可能是連續升遷，但沒有來源這樣說。" }
+      ],
+      "gaps": ["生卒年、字、籍貫查無", "1926 年 11 月與 1927 年 3 月之間的改隸經過查無——這是本篇最大的缺口", "1927 年 3 月之後行止查無", "下一步：〈國民革命軍第三十七軍〉的沿革專著；張明金、劉立勤《國民黨歷史上的158個軍》；《申報》1927 年 1–3 月陳調元部易幟報導"]
+    },
+    {
+      "id": 125,
+      "name_ingame": "張鳳歧",
+      "name_common": "張鳳歧",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["張鳳岐（S-GPOST 與部分 S-WPZH 條目的寫法）"],
+        "disambiguation": "⚠ 本篇的分群工作量最大。S-GPOST「張鳳歧」名下只有 3 筆（1913 上尉兼少校、1917 中校、1924-01-19 派蒙藏院一等繕寫）；末筆為文職低階，相對 1917 中校是**官階倒序**（§10.2），且與江西贛軍無涉，**全數不採**。異寫「張鳳岐」名下 21 筆，內部至少三群：(a) 1920-08-14～1926-04-04 的江西群（第九混成旅步兵第一團第三營營長→江西陸軍憲兵營營長→江西陸軍步兵第一團團長→陸軍第九混成旅旅長→陸軍步兵上校兼少將→陸軍少將），官階遞增；(b) 1925-11-17『任陸軍第一師步兵第三團團長』——在 1925-02-14 已任旅長之後又任團長，**官階倒序**，排除；(c) 1913 年諸筆與 1945–1948 年雲南省政府會計處／財政廳科長、1948 陸軍步兵上尉，時代與性質不合，排除。**只採 (a) 群。** ⭐ 兩種寫法的接合不是本輪的推測：維基自己用兩種寫法記同一批事——〈市汊街戰鬥〉（1926-10，皖軍九混旅）作張鳳歧、〈新喻戰鬥〉（1926-09，贛九混旅）作張鳳岐，兩役相隔一個月、同一番號、同一同僚鄧如琢；〈中国国民党江西省党部〉記江西人民裁判逆犯委員會審判贛軍將領張鳳歧，〈1927年中国〉記張鳳岐等五省聯軍軍官在南昌貢院執行死刑，是同一次審判與行刑。但**沒有任何來源明說兩種寫法是同一人**，依 §5.3 第 3 條這仍是推定，且推定支撐主敘述，故 confidence 降 low 並用待考句（§10.1 的例外不適用）。"
+      },
+      "highest_post": { "value": "陸軍第九混成旅旅長", "src": ["S-GPOST", "S-WPZH"], "conf": "low", "note": "S-WPFM 作『第一方面軍中央第九混成旅旅長』（Tier C）；S-WPZH〈第五次南昌戰鬥〉正文把他與唐福山、岳思寅並稱為被俘的『師長』，與旅長不合，見 conflicts[1]。" },
+      "faction": { "value": "江西陸軍／五省聯軍第一方面軍", "src": ["S-GPOST", "S-WPZH"], "conf": "low", "note": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": 1927, "month": 1, "day": 11, "src": ["S-WPNJ"], "conf": "low", "note": "⚠ 卒日寫法作張鳳岐，依賴未解的異寫接合，故 conf low 而非 medium。依 §12.5，生卒括號只放沒有未解 conflict 的值——本篇因此不用括號。" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1920-08-14", "to": null, "title": "陸軍第九混成旅步兵第一團第三營營長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "low", "note": "以下 S-GPOST 各筆皆繫於『張鳳岐』寫法。" },
+        { "from": "1922-12-28", "to": null, "title": "江西陸軍憲兵營營長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "low", "note": null },
+        { "from": "1923-02-04", "to": null, "title": "江西陸軍步兵第一團團長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "low", "note": null },
+        { "from": "1925-02-14", "to": null, "title": "陸軍第九混成旅旅長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "low", "note": "⚠ 與 S-WPZH〈贛南戰鬥〉〈虔南龍南戰鬥〉把他繫為 1922 年的旅級指揮官互斥，見 conflicts[0]。" },
+        { "from": "1925-06-16", "to": null, "title": "陸軍步兵上校兼少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "low", "note": "加銜。" },
+        { "from": "1926-04-04", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "low", "note": "授階。" },
+        { "from": "1926-09", "to": null, "title": "中央第九混成旅旅長", "org": "五省聯軍第一方面軍（總指揮鄧如琢）", "station": null, "src": ["S-WPFM"], "conf": "low", "note": "⚠ Tier C。同表列唐福山為江西陸軍第一師師長、岳思寅為江西第一混成旅旅長——與被俘、受審、行刑三處的同案人名一致。不進正文。" }
+      ],
+      "events": [
+        { "when": "1922-05-15/1922-05-17", "where": "江西虔南、龍南", "name": "虔南龍南戰鬥", "role": "贛軍第四混成旅指揮官", "outcome": "贛軍落敗", "src": ["S-WPZH"], "conf": "low", "note": "寫法作張鳳歧。⚠ 番號作第四混成旅，與同月次役的第九混成旅不同，見 conflicts[0]。" },
+        { "when": "1922-06-09/1922-06-13", "where": "江西贛南", "name": "贛南戰鬥", "role": "贛軍第九混成旅指揮官", "outcome": "贛軍敗，江西總督陳光遠辭職", "src": ["S-WPZH"], "conf": "low", "note": "寫法作張鳳歧。" },
+        { "when": "1925-09-02/1925-09-07", "where": "江西萍鄉", "name": "萍鄉戰鬥", "role": "贛軍第九混成旅指揮官（與唐福山並列）", "outcome": "未及抵抗即向東退", "src": ["S-WPZH"], "conf": "low", "note": "寫法作張鳳岐。" },
+        { "when": "1925-09-09/1925-09-10", "where": "江西宜春", "name": "宜春戰鬥", "role": "贛軍第九混成旅指揮官（與唐福山並列）", "outcome": "國民革命軍第二軍佔宜春，贛軍敗退", "src": ["S-WPZH"], "conf": "low", "note": "寫法作張鳳岐。" },
+        { "when": "1926-09-14/1926-09-16", "where": "江西新喻", "name": "新喻戰鬥", "role": "贛軍第九混成旅指揮官（與鄧如琢、唐福山並列）", "outcome": "激戰三晝夜後中央第一師退向清江樟樹", "src": ["S-WPZH"], "conf": "low", "note": "寫法作張鳳岐。" },
+        { "when": "1926-10-07/1926-10-13", "where": "江西市汊街、萬舍街（南昌南方）", "name": "市汊街戰鬥", "role": "皖軍第九混成旅指揮官（與鄧如琢並列）", "outcome": "9日向南昌退，國民革命軍準備進攻南昌", "src": ["S-WPZH"], "conf": "low", "note": "寫法作張鳳歧。⭐ 與前一筆相隔一個月、同一番號、同一同僚，卻用另一種寫法——這是兩種寫法指同一人的最直接旁證。" },
+        { "when": "1926-11-03/1926-11-08", "where": "江西南昌", "name": "第五次南昌戰鬥", "role": "被俘者之一（與唐福山、岳思寅並列）", "outcome": "為國民革命軍右翼軍所俘", "src": ["S-WPZH"], "conf": "low", "note": "寫法作張鳳岐。⚠ 該段稱三人為『師長』，與旅長不合，見 conflicts[1]。" },
+        { "when": "1926-11/1927-01", "where": "江西南昌", "name": "江西人民裁判逆犯委員會審判", "role": "受審的贛軍將領之一", "outcome": "由中國國民黨江西省黨部組織的委員會審判", "src": ["S-WPZH"], "conf": "low", "note": "〈中国国民党江西省党部〉，寫法作張鳳歧。" }
+      ],
+      "ending": { "when": "1927-01-11", "where": "江西南昌貢院", "how": "與岳思寅、唐福山、白家駿、侯全本等五省聯軍軍官同日處決", "src": ["S-WPNJ"], "conf": "low", "note": "⚠ 寫法作張鳳岐（rp 2604）。這是本批唯一一筆明確的結局。" },
+      "verified_by": ["S-GPOST", "S-WPZH", "S-WPNJ"],
+      "confidence": "low",
+      "open_join": false,
+      "conflicts": [
+        { "field": "posts",
+          "statements": [
+            { "src": "S-GPOST", "says": "1920-08-14 任第九混成旅步兵第一團第三營營長；1925-02-14 才任陸軍第九混成旅旅長" },
+            { "src": "S-WPZH", "says": "〈贛南戰鬥〉1922年6月，贛軍第九混成旅指揮官張鳳歧；〈虔南龍南戰鬥〉1922年5月，贛軍第四混成旅指揮官張鳳歧" }
+          ],
+          "resolved": false,
+          "note": "Tier A 與 Tier B 對 1922 年的職級互斥（營長／團長 vs 旅級指揮官），且 Tier B 自己的兩役番號也不一致（第四／第九）。依 §9.4 第 1 列**退到雙方一致的粒度**：正文只寫他 1922 年在江西贛軍所部參加這兩役，不寫他當時的番號與職務。" },
+        { "field": "posts",
+          "statements": [
+            { "src": "S-WPZH", "says": "〈第五次南昌戰鬥〉正文：俘虜師長唐福山、岳思寅、張鳳岐" },
+            { "src": "S-GPOST", "says": "1925-02-14 任陸軍第九混成旅旅長，1926-04-04 授陸軍少將" }
+          ],
+          "resolved": false,
+          "note": "『師長』與『旅長』互斥。Tier A 對 Tier B 且無一致粒度可退，依 §10.4（G-04-4）**採 Tier A**，正文寫旅長。⚠ 該句是三人並稱的概括語，唐福山確為師長（S-WPFM 同），很可能是行文就高不就低。" },
+        { "field": "identity",
+          "statements": [
+            { "src": "S-GPOST", "says": "任免令與部分事件繫於『張鳳岐』" },
+            { "src": "S-WPZH", "says": "〈贛南戰鬥〉〈虔南龍南戰鬥〉〈市汊街戰鬥〉〈中国国民党江西省党部〉繫於『張鳳歧』；〈萍鄉戰鬥〉〈宜春戰鬥〉〈新喻戰鬥〉〈第五次南昌戰鬥〉與〈1927年中国〉繫於『張鳳岐』" }
+          ],
+          "resolved": false,
+          "note": "『歧／岐』異寫。相合的點極多（同一番號第九混成旅、同一同僚鄧如琢與唐福山、同一戰場江西、被俘與受審與行刑是同一串事件），但沒有來源明說兩者是同一人。依 §5.3 第 3 條，推定接合且支撐主敘述 → confidence 降 low + 待考句（§4.5）。⚠ 遊戲寫法是『歧』，與維基多數江西戰鬥條目一致；S-GPOST 的任免令則全在『岐』名下。" }
+      ],
+      "gaps": ["生卒年、字、籍貫查無", "1922 年那兩役的番號（第四／第九混成旅）與職級未解", "『張鳳歧／張鳳岐』是否同一人未解——這是本篇 low 的唯一原因", "下一步：《江西省志·軍事志》北伐條；《申報》1926 年 11 月至 1927 年 1 月南昌審判與行刑報導；江西省檔案館的軍法審判卷"]
+    },
+    {
+      "id": 129,
+      "name_ingame": "李生春",
+      "name_common": "李生春",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "S-GPOST「李生春」名下 13 筆。⚠ 末兩筆 1972-08-04、1975-06-13 為台灣省高雄市／高雄縣稅捐稽徵處職員，與前 11 筆相隔近半世紀，依 §9.3 判為同名他人，**排除**。前 11 筆落在 1914–1924 年，兵種一致（騎兵出身，1920 年後領步兵團旅），官階少校→中校→上校→少將→中將→將軍府將軍**單調遞增**（§10.2），未見混入。⭐ 1917-10-19 與 #115 倪朝榮、#125 張鳳歧同日敘中校（§11.3 成批敘任），三人分屬不同軍系，屬一次大批敘任。"
+      },
+      "highest_post": { "value": "福寧鎮守使", "src": ["S-GPOST"], "conf": "medium", "note": "1924 年的『純威將軍』是將軍府的榮銜不是實職（§4.2 敘任與任職之別）。" },
+      "faction": { "value": "陸軍第十二師", "src": ["S-GPOST"], "conf": "medium", "note": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1914-03-28", "to": null, "title": "陸軍騎兵少校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "同日另有加銜陸軍騎兵中校一筆，正文合寫（§11.7 G-05-4）。" },
+        { "from": "1917-10-19", "to": null, "title": "陸軍騎兵中校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1920-05-19", "to": null, "title": "陸軍騎兵上校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1920-09-04", "to": null, "title": "陸軍第十二師步兵第四十五團團長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1921-07-14", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1922-10-31", "to": null, "title": "陸軍第十二師步兵第二十三旅旅長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1922-12-26", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。⭐ 與 #137 張慶昶同日授陸軍少將（§11.3），兩人分屬不同軍系。" },
+        { "from": "1923-06-06", "to": null, "title": "福寧鎮守使", "org": null, "station": "福建福寧", "src": ["S-GPOST", "S-WPLIST"], "conf": "medium", "note": "⚠ S-WPLIST〈中华民国北京政府时期福建省职官列表〉記同一日期，但依 §10.3 不計 tier，且與 S-GPOST 同源於《政府公報》，**不構成第二個獨立來源**（§3.1 第 1 條）。" },
+        { "from": "1923-08-28", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。" },
+        { "from": "1924-06-10", "to": null, "title": "純威將軍", "org": "將軍府", "station": null, "src": ["S-GPOST", "S-WPLIST"], "conf": "medium", "note": "特任。⚠ S-WPLIST〈北洋政府将军府将军列表〉記同一日期並引《政府公報》第二〇九冊 1924年6月11日第2953號——**與 S-GPOST 同源**，不計為第二來源。" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST"],
+      "confidence": "medium",
+      "open_join": false,
+      "conflicts": [
+        { "field": "verified_by",
+          "statements": [
+            { "src": "S-WPLIST", "says": "〈北洋政府将军府将军列表〉與〈中华民国北京政府时期福建省职官列表〉兩處分別記純威將軍 1924-06-10、福寧鎮守使 1923-06-06，與 S-GPOST 逐日相合" },
+            { "src": "S-GPOST", "says": "同兩筆任免令" }
+          ],
+          "resolved": false,
+          "note": "⚠ 這不是事實衝突，是**來源計數的衝突**，記在這裡是因為它決定了 confidence。兩者看起來互證，實際同源於《政府公報》（列表頁的 ref 直接寫出公報期號），依 §3.1 第 1 條合併為一個來源；再加上 §10.3 列表頁不計 tier，本篇實際只有一個 Tier A 來源，故判 medium 而非 high。⭐ 本批唯一一次『看似互證其實同源』，值得記進規格（見 G-U3-2）。" }
+      ],
+      "gaps": ["生卒年、字、籍貫查無", "沒有任何一筆事件記載——13 筆全是任免令，無戰役、無地方志記述", "1924 年 6 月之後行止查無", "下一步：《福建省志·軍事志》福寧鎮守使沿革；《霞浦縣志》（福寧府治）；陸軍第十二師的沿革專著"]
+    },
+    {
+      "id": 132,
+      "name_ingame": "蘇珽",
+      "name_common": "蘇珽",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "⚠ **全數排除**（§12.8 / §11.7 的 G-03-2）。S-GPOST「蘇珽」名下 2 筆：1946-12-10 任綏遠省政府委員、1961-06-05 派考試院專員；S-WPLIST 三處：第一屆國民大會綏遠省涼城縣代表（1963 年歸化美國而被撤銷公職，總統府公報第2024、2043號）、國民參政會綏遠省參政員（1947-01-08 增補）、制憲國民大會代表。五筆全部指向同一位綏遠省文職政治人物，**與遊戲名冊把他放在北伐時期、福建省、孫傳芳麾下完全不符**，且全部晚於北伐二十年。簡體「苏珽」1 筆，同一人。⚠ 字模反查確認遊戲寫的是『蘇珽』兩字（中間槽為全形空白填充），不是讀錯。"
+      },
+      "highest_post": { "value": null, "src": [], "conf": "unknown" },
+      "faction": { "value": null, "src": [], "conf": "unknown" },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": [],
+      "confidence": "unknown",
+      "open_join": false,
+      "conflicts": [],
+      "gaps": ["⚠ 依 §15.3 登錄『查到了但不算數』的內容：綏遠省的蘇珽（1946 省府委員、1947 國民參政員、制憲國大代表、第一屆國大涼城縣代表、1961 考試院專員、1963 歸化美國）資料完整，但**不是遊戲裡的這個人**", "遊戲裡的這個蘇珽是誰尚未解決", "下一步：《福建省志·軍事志》1926 年周蔭人部序列；《申報》福建戰事的旅級將領名單；蘇姓在閩系將領中的分佈"]
+    },
+    {
+      "id": 134,
+      "name_ingame": "吳大洪",
+      "name_common": "吳大洪",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "S-GPOST「吳大洪」名下 2 筆（1923-04-30 授陸軍工兵上校、1924-10-04 加銜陸軍少將），官階遞增，時間相鄰，未見同名他人。維基 insource 繁體 0 筆（**已重跑**，§12.1）、簡體 1 筆（〈福建陆军〉）。⭐ 交叉印證：S-GPOST 的兵種是**工兵**，S-WPZH 記他所領的福建陸軍第五旅原為王永泉部的**工兵教導團**改編——兵種相合，是本篇接受同一人的主要依據。"
+      },
+      "highest_post": { "value": "福建陸軍第五旅旅長", "src": ["S-WPZH"], "conf": "medium", "note": null },
+      "faction": { "value": "福建陸軍（周蔭人部）", "src": ["S-WPZH"], "conf": "medium", "note": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1923-04-30", "to": null, "title": "陸軍工兵上校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。⭐ 與 #100 楊賡和同日敘任（§11.3），兩人不同軍系。" },
+        { "from": "1924-05", "to": null, "title": "福建陸軍第五旅旅長", "org": null, "station": "福建涵江", "src": ["S-WPZH"], "conf": "medium", "note": "〈福建陆军〉：1924年5月周蔭人接任福建督理後收編王永泉部的工兵教導團，編為福建陸軍第五旅，約三千餘人。" },
+        { "from": "1924-10-04", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。⭐ 與 #101 彭德銓同日加銜陸軍少將兼中將。" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "open_join": false,
+      "conflicts": [
+        { "field": "verified_by",
+          "statements": [
+            { "src": "S-GPOST", "says": "1923-04-30 授吳大洪陸軍工兵上校；1924-10-04 加銜陸軍少將（皆為敘階，無職務）" },
+            { "src": "S-WPZH", "says": "1924年5月起任福建陸軍第五旅旅長（職務，無敘階）" }
+          ],
+          "resolved": false,
+          "note": "⚠ 兩個來源涵蓋的欄位**完全不重疊**——A 只給敘階、B 只給職務。依 §15.1（G-08-3）這是**互補不是互證**，只能支撐 medium。兵種相合（工兵上校／工兵教導團改編的旅）是接合的依據，但那是本輪的推理不是來源的陳述。" }
+      ],
+      "gaps": ["生卒年、字、籍貫查無", "1924 年 10 月之後行止查無；1926 年北伐軍入閩、周蔭人退浙時的去向未見記載", "下一步：《福建省志·軍事志》；《莆田縣志》（涵江）；《北洋軍閥 1912–1928》第 5 卷福建部分原書"]
+    },
+    {
+      "id": 137,
+      "name_ingame": "張慶昶",
+      "name_common": "張慶昶",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "S-GPOST「張慶昶」名下 10 筆，分兩群：(a) 1916–1918 黑龍江群（黑龍江陸軍第一師步兵第二旅少校副官→陸軍步兵上校→黑龍江督軍公署上校參謀→1918-01-19 因病辭職）；(b) 1921–1925 陸軍第一師群（步兵第一團第一營營長→步兵第二團團長→陸軍少將→加銜中將→授中將）。⚠ (a) 末筆是上校參謀、(b) 首筆是營長，職務由督軍公署參謀退到營級，形式上符合 §10.2 的倒序判準，且中間隔著 1918 年的辭職與三年空窗——**兩群是否同一人未解**。本篇只採 (b) 群為主敘述（該群與遊戲期別相符，且有 Tier B 逐字佐證），(a) 群只進待考句，依 §10.1 不因此降級。維基 insource 繁體 1 筆、簡體 0 筆。⭐ (b) 群的關鍵佐證：S-GPOST 1922-06-16『任命張慶昶陸軍第一師步兵第二團團長』與 S-WPZH〈近畿陸軍第一師〉1922 年 9 月的序列表『步兵第二團 團長張慶昶』**逐字相合**——兩個獨立來源記載同一個事實（§15.1 的正例）。"
+      },
+      "highest_post": { "value": "近畿陸軍第一師步兵第二團團長", "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "1923 年後的中將是敘階不是職務（§4.2）。" },
+      "faction": { "value": "近畿陸軍第一師（蔡成勳部）", "src": ["S-WPZH"], "conf": "medium", "note": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1916-03-31", "to": null, "title": "黑龍江陸軍第一師步兵第二旅少校副官", "org": null, "station": null, "src": ["S-GPOST"], "conf": "low", "note": "⚠ 屬 (a) 群，只進待考句。任免令事由欄作『充任』。" },
+        { "from": "1917-03-16", "to": null, "title": "陸軍步兵上校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "low", "note": "⚠ (a) 群。授階。" },
+        { "from": "1917-04-09", "to": "1918-01-19", "title": "黑龍江督軍公署上校參謀", "org": null, "station": null, "src": ["S-GPOST"], "conf": "low", "note": "⚠ (a) 群。去職事由欄作『因病辭職』。" },
+        { "from": "1921-10-24", "to": null, "title": "陸軍第一師步兵第一團第一營營長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "(b) 群起點。當時第一師大部駐綏遠，少數部隊開往懷來（S-WPZH）。" },
+        { "from": "1922-06-16", "to": null, "title": "陸軍第一師步兵第二團團長", "org": null, "station": null, "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "⭐ Tier A 任免令與 Tier B 序列表逐字相合。S-WPZH 的 1922 年 9 月序列把該團繫在步兵第一旅（旅長楊以來）之下。" },
+        { "from": "1922-12-26", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。⭐ 與 #129 李生春同日。" },
+        { "from": "1923-04-04", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1925-12", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。⚠ 1925-12-12 與 1925-12-27 兩筆內容相同，依 §11.7 的 G-05-4 正文只寫到年。" }
+      ],
+      "events": [
+        { "when": "1922-09", "where": "江西", "name": "近畿陸軍第一師隨蔡成勳入贛", "role": "步兵第二團團長", "outcome": "蔡成勳任督理江西軍務善後事宜，第一師分駐江西各地", "src": ["S-WPZH"], "conf": "medium", "note": "同條目記該師 1922 年 6 月因援贛南下，7 月未實際戰鬥即收回贛南地區。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "high",
+      "open_join": true,
+      "conflicts": [
+        { "field": "identity",
+          "statements": [
+            { "src": "S-GPOST", "says": "1917-04-09 任命張慶昶黑龍江督軍公署上校參謀，1918-01-19 因病辭職" },
+            { "src": "S-GPOST", "says": "1921-10-24 任命張慶昶陸軍第一師步兵第一團第一營營長" }
+          ],
+          "resolved": false,
+          "note": "同一來源內的兩群。督軍公署上校參謀（1917）到營長（1921）是職務倒退，符合 §10.2 的形式判準，但沒有貶謫或縮編記載，也沒有反證。依 §9.3 第 4 步分群，只採與遊戲期別相符的 (b) 群為主敘述；(a) 群進待考句。主敘述不依賴這個接合，故依 §10.1 confidence 依主敘述評、另標 open_join。" }
+      ],
+      "gaps": ["生卒年、字、籍貫查無", "1916–1918 的黑龍江群與 1921 年之後是否同一人未解", "1925 年 12 月之後行止查無；近畿陸軍第一師 1924 年 12 月潰散後他的去向未見記載", "下一步：《黑龍江省志·軍事志》；〈近畿陸軍第一師〉所引《中華民國史檔案資料匯編·軍事（一）》615–618 頁原件"]
+    },
+    {
+      "id": 140,
+      "name_ingame": "何麓昆",
+      "name_common": "何麓昆",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "查無任何記載，無同名風險可評。⚠ 字模反查確認遊戲寫的是『何麓昆』三字，每個字模在倚天字庫都只有唯一候選，不是讀錯（§15.6 手法）。"
+      },
+      "highest_post": { "value": null, "src": [], "conf": "unknown" },
+      "faction": { "value": null, "src": [], "conf": "unknown" },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": [],
+      "confidence": "unknown",
+      "open_join": false,
+      "conflicts": [],
+      "gaps": ["S-GPOST：何麓昆 0 筆（重跑一次，結果相同）、何麓崑 0 筆、何鹿昆 0 筆", "維基 insource：何麓昆繁簡各 0 筆（重跑三次）、何麓崑 0 筆、何鹿昆 0 筆", "下一步：《福建省志·軍事志》1926 年周蔭人部序列；《申報》1926 年閩浙戰事人事報導；何姓在閩系將領中的分佈"]
+    },
+    {
+      "id": 150,
+      "name_ingame": "何璧輝",
+      "name_common": "何璧輝",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "S-GPOST「何璧輝」名下 3 筆全部落在 1924–1926 年，官階少將兼中將→中將**遞增**，接著 1926 年任旅長，序列連貫，未見同名他人。異寫「何壁輝」在 S-GPOST 與維基 insource 皆為 0 筆。維基 insource「何璧輝」繁簡各 0 筆（**重跑三次**，§12.1）。⭐ 正向佐證（§11.3 成批敘任）：1924-10-17 與同批 #151 吳傳心同日加銜陸軍少將兼中將——兩人在遊戲裡同屬袁祖銘麾下，是本批唯一一組同日受令的同軍系人物。"
+      },
+      "highest_post": { "value": "暫編陸軍第九混成旅旅長", "src": ["S-GPOST"], "conf": "medium", "note": null },
+      "faction": { "value": null, "src": [], "conf": "unknown", "note": "任免令未記所屬。S-ROSTER 給的是遊戲編排，依 §11.6 不得作為來源。" },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1924-04-04", "to": null, "title": "陸軍少將兼中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。" },
+        { "from": "1924-10-17", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "授階。⭐ 與 #151 吳傳心同日（吳為加銜少將兼中將）。" },
+        { "from": "1926-01-20", "to": null, "title": "暫編陸軍第九混成旅旅長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "⚠ 番號與 #125 張鳳歧的『陸軍第九混成旅』相近但不同（暫編／非暫編），兩者無關。" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST"],
+      "confidence": "medium",
+      "open_join": false,
+      "conflicts": [],
+      "gaps": ["生卒年、字、籍貫查無", "所屬部隊系統查無——三筆任免令都不記機關", "沒有任何一筆事件記載", "下一步：《貴州省志·軍事志》黔軍序列；《申報》1926 年黔軍入川報導；貴陽市志人物卷"]
+    },
+    {
+      "id": 151,
+      "name_ingame": "吳傳心",
+      "name_common": "吳傳心",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "S-GPOST「吳傳心」名下 3 筆。⚠ 末筆 1936-09-24『任吳傳心陸軍少將』相對於 1924-10-17 的中將是**官階倒序**，無編遣或縮編記載可解（§15.2 不成立），依 §10.2 判為同名他人，**排除**。前兩筆 1917、1924 相隔七年但無倒序，且 1917 那筆的機關是暫編貴州第一師——與遊戲把他放在黔軍系統相符，採為同一人。維基 insource 繁體 1 筆（〈章哲銘〉，是當代電視節目的來賓名單，**排除**）、簡體 0 筆（已重跑）。⭐ 正向佐證：1924-10-17 與 #150 何璧輝同日受令（§11.3）。"
+      },
+      "highest_post": { "value": "暫編貴州第一師步兵第三團第一營營長", "src": ["S-GPOST"], "conf": "medium", "note": "1924 年的中將是敘階不是職務（§4.2）。" },
+      "faction": { "value": "暫編貴州第一師", "src": ["S-GPOST"], "conf": "medium", "note": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1917-10-03", "to": null, "title": "暫編貴州第一師步兵第三團第一營營長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1924-10-17", "to": null, "title": "陸軍少將兼中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "加銜。⭐ 與 #150 何璧輝同日。" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST"],
+      "confidence": "medium",
+      "open_join": false,
+      "conflicts": [],
+      "gaps": ["生卒年、字、籍貫查無", "1917 至 1924 年之間七年無任何記載", "沒有任何一筆事件記載", "下一步：《貴州省志·軍事志》暫編貴州第一師沿革；黔軍將領名錄；《申報》1924 年黔軍人事"]
+    },
+    {
+      "id": 153,
+      "name_ingame": "牟守先",
+      "name_common": "牟守先",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "查無任何記載，無同名風險可評。⚠ 字模反查確認遊戲寫的是『牟守先』三字，每個字模在倚天字庫都只有唯一候選。"
+      },
+      "highest_post": { "value": null, "src": [], "conf": "unknown" },
+      "faction": { "value": null, "src": [], "conf": "unknown" },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": [],
+      "confidence": "unknown",
+      "open_join": false,
+      "conflicts": [],
+      "gaps": ["S-GPOST：牟守先 0 筆（重跑一次）、牟受先 0 筆", "維基 insource：牟守先 0 筆（重跑三次）、牟受先 0 筆", "下一步：《貴州省志·軍事志》；牟姓在黔軍中的分佈（黔東北思南、印江一帶牟姓聚居）；《申報》1926 年黔軍人事"]
+    },
+    {
+      "id": 154,
+      "name_ingame": "劉國貞",
+      "name_common": "劉國貞",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "⚠ **全數排除**（§12.8 / §11.7 的 G-03-2）。S-GPOST「劉國貞」名下 2 筆：1936-03-13 任陸軍輜重兵上校、2014-06-12 任命薦任公務人員——後者相隔 78 年，顯然是另一人；前者晚於北伐十年，且無任何線索把它繫到北伐時期的黔軍。維基 insource 繁體 4 筆（《南明史》與三屆縣市議員選舉名單）、簡體 1 筆（電視劇〈青山不墨〉），**全部排除**。"
+      },
+      "highest_post": { "value": null, "src": [], "conf": "unknown" },
+      "faction": { "value": null, "src": [], "conf": "unknown" },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": [],
+      "confidence": "unknown",
+      "open_join": false,
+      "conflicts": [],
+      "gaps": ["⚠ 依 §15.3 登錄『查到了但不算數』：1936-03-13 有一名劉國貞任陸軍輜重兵上校，時間與性質都無法繫到北伐期的黔軍，未採", "遊戲裡的這個劉國貞是誰尚未解決", "下一步：《貴州省志·軍事志》；1936 年那筆輜重兵上校的其他佐證（若能證明他是黔軍出身，本篇可救回）"]
+    },
+    {
+      "id": 164,
+      "name_ingame": "何光烈",
+      "name_common": "何光烈",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "S-GPOST「何光烈」名下 2 筆。⚠ 末筆 1936-09-08『任命何光烈陸軍步兵中校』相對於 1924 年的師長是**官階與職務雙重倒序**，且兵種由四川地方部隊變為中央步兵，依 §10.2 判為同名他人，**排除**。維基 insource 3 筆：〈但懋辛〉（採用）、〈二十一条〉（⚠ 記 1915 年保定軍官學校學生何光烈因二十一條簽訂而自殺——**死於 1915 年的人不可能在 1920、1924 年領第五師**，這是用一筆記載直接否證另一批的例子，排除）、〈刘伯承元帅〉（電視劇演員角色表，不計 tier，排除）。⭐ 兩個採用的來源對『四川陸軍第五師師長』這同一個事實都有記載（§15.1 的正例）。"
+      },
+      "highest_post": { "value": "四川陸軍第五師師長", "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": null },
+      "faction": { "value": "靖國軍第一軍（但懋辛部）／四川陸軍第五師", "src": ["S-WPZH", "S-GPOST"], "conf": "medium", "note": "只填機構名（DESIGN-20 §6.1 原則 4）。" },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1920", "to": null, "title": "第五師師長", "org": "靖國軍第一軍（軍長但懋辛，總司令劉存厚）", "station": "四川", "src": ["S-WPZH"], "conf": "medium", "note": "〈但懋辛〉：1920 年熊克武、但懋辛退往閬中整編，與退處陝南的劉存厚結盟組靖國軍，下轄三軍一師；但懋辛任第一軍軍長，轄喻培棣第一師、張沖第二混成旅、何光烈第五師、余際唐全川江防總隊。" },
+        { "from": "1924-07-18", "to": null, "title": "四川陸軍第五師師長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "high", "note": "⭐ 與上一筆同指第五師師長，兩個獨立來源記載同一事實。" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "open_join": false,
+      "conflicts": [],
+      "gaps": ["生卒年、字、籍貫查無", "1920 與 1924 之間、以及 1924 年之後的經歷查無——只有兩個時間點，串不成序列，這是本篇不判 high 的原因", "1920 年 8 月熊克武發動驅滇黔之戰時第五師的動向未見記載", "下一步：《四川省志·軍事志》；《四川軍閥史料》；周開慶《民國川事紀要》"]
+    },
+    {
+      "id": 238,
+      "name_ingame": "陳旅安",
+      "name_common": "陳旅安",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "查無任何記載，無同名風險可評。⚠ 字模反查確認遊戲寫的是『陳旅安』三字，每個字模在倚天字庫都只有唯一候選——『旅』作人名用字罕見，但不是讀錯。⚠ 本人在遊戲裡不屬於任何勢力（`MAN(1).DAT` 的 +14 為 0），所屬省也是 0，因此 S-ROSTER 連查證起點都給不了。"
+      },
+      "highest_post": { "value": null, "src": [], "conf": "unknown" },
+      "faction": { "value": null, "src": [], "conf": "unknown" },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": [],
+      "confidence": "unknown",
+      "open_join": false,
+      "conflicts": [],
+      "gaps": ["S-GPOST：陳旅安 0 筆（重跑一次）", "維基 insource：陳旅安 0 筆（重跑三次）；簡體『陈旅安』1 筆為〈石抹氏〉（元代人物條目的斷詞誤命中），排除", "遊戲裡無效忠領袖、無所屬省，沒有可用的查證起點", "下一步：只能靠名冊全表反查——〈保定陸軍軍官學校〉〈雲南陸軍講武堂〉〈北洋政府將軍府將軍列表〉本輪都已抓下全文並比對，零命中"]
+    },
+    {
+      "id": 239,
+      "name_ingame": "朱羔政",
+      "name_common": "朱羔政",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "查無任何記載，無同名風險可評。⚠ 字模反查確認遊戲寫的是『朱羔政』三字，每個字模在倚天字庫都只有唯一候選——『羔』作人名用字極罕見，但反查沒有第二候選，不是讀錯。⚠ 遊戲裡不屬於任何勢力，S-ROSTER 給不了查證起點。"
+      },
+      "highest_post": { "value": null, "src": [], "conf": "unknown" },
+      "faction": { "value": null, "src": [], "conf": "unknown" },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": [],
+      "confidence": "unknown",
+      "open_join": false,
+      "conflicts": [],
+      "gaps": ["S-GPOST：朱羔政 0 筆（重跑一次）", "維基 insource：朱羔政繁簡各 0 筆（重跑四次）", "⚠ 『羔』極可能是原版的形近誤植（如羊、姜、美等字旁），但字模反查只能排除『我們讀錯』，不能排除『1992 年打錯字』——與 §11.1 的 #183、§15.6 的 #297 是同一種結論邊界", "下一步：以『朱?政』為模式在《北洋政府將軍府將軍列表》等名冊做部分比對"]
+    },
+    {
+      "id": 240,
+      "name_ingame": "郝柏春",
+      "name_common": "郝柏春",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "查無任何記載，無同名風險可評。⚠ 字模反查確認遊戲寫的是『郝柏春』三字，每個字模在倚天字庫都只有唯一候選。⚠ 維基 insource『郝伯春』（柏→伯）4 筆全部是郝柏村、當代藝人與電視劇條目的斷詞誤命中，排除。⚠ 遊戲裡不屬於任何勢力。"
+      },
+      "highest_post": { "value": null, "src": [], "conf": "unknown" },
+      "faction": { "value": null, "src": [], "conf": "unknown" },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": [],
+      "confidence": "unknown",
+      "open_join": false,
+      "conflicts": [],
+      "gaps": ["S-GPOST：郝柏春 0 筆（重跑一次）", "維基 insource：郝柏春繁簡各 0 筆（重跑四次）、郝伯春 4 筆皆誤命中", "遊戲裡無效忠領袖、無所屬省", "下一步：山西、河北的郝姓將領名錄；《北洋軍閥史》人名索引"]
+    },
+    {
+      "id": 241,
+      "name_ingame": "王健宣",
+      "name_common": "王健宣",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "查無任何記載，無同名風險可評。⚠ 字模反查確認遊戲寫的是『王健宣』三字，每個字模在倚天字庫都只有唯一候選。⚠ 異寫『王建宣』在維基 insource 為 0 筆。⚠ 遊戲裡不屬於任何勢力。"
+      },
+      "highest_post": { "value": null, "src": [], "conf": "unknown" },
+      "faction": { "value": null, "src": [], "conf": "unknown" },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": [],
+      "confidence": "unknown",
+      "open_join": false,
+      "conflicts": [],
+      "gaps": ["S-GPOST：王健宣 0 筆（重跑一次）", "維基 insource：王健宣繁簡各 0 筆（重跑四次）、王建宣 0 筆", "遊戲裡無效忠領袖、無所屬省", "下一步：名冊全表反查已做（保定、講武堂、將軍府、集團軍序列），零命中；剩下只有省志與《申報》人事欄的逐年翻查"]
+    },
+    {
+      "id": 273,
+      "name_ingame": "唐繼麟",
+      "name_common": "唐繼麟",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "S-GPOST「唐繼麟」名下僅 1 筆（1929-11-21 任命雲南省政府委員），無同名混入疑慮。維基 insource 繁體 0 筆、簡體 1 筆（〈张占彪〉）。⭐ 兩筆都指向雲南，且時間相鄰（1926–1927 領兵、1929 任省府委員），採為同一人。⚠ **不得與唐繼虞混同**：唐繼虞是唐繼堯之弟（S-WPZH〈唐繼堯〉），與唐繼麟名字相近，但沒有任何來源說兩者有關係或是同一人。⚠ `people.json` 此筆的 `name_common` 原為空白，本輪填為與 `name_ingame` 相同。"
+      },
+      "highest_post": { "value": "雲南省政府委員", "src": ["S-GPOST"], "conf": "medium", "note": null },
+      "faction": { "value": "雲南陸軍", "src": ["S-WPZH"], "conf": "medium", "note": null },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1926", "to": "1927", "title": "步兵第三團帶兵官", "org": "雲南省", "station": "雲南大理、洱源一帶", "src": ["S-WPZH"], "conf": "medium", "note": "〈张占彪〉：1926 年至 1927 年，雲南省先後派步兵三團唐繼麟、王炳章和步兵五團歐陽好謙前往。原文未給他的正式職稱，正文只寫『領步兵第三團』。" },
+        { "from": "1929-11-21", "to": null, "title": "雲南省政府委員", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null }
+      ],
+      "events": [
+        { "when": "1926/1927", "where": "雲南大理、洱源、賓川一帶", "name": "雲南省對張占彪部用兵", "role": "步兵第三團帶兵官", "outcome": "1927 年二六政變唐繼堯被推翻後，張占彪接受招安", "src": ["S-WPZH"], "conf": "medium", "note": "〈张占彪〉引《大理白族自治州志》卷六、卷九與《怒江文史資料選輯》第三輯。⚠ 原文用『圍剿』『土匪頭子』等評價性字眼，正文依 DESIGN-20 §6.1 原則 2 改為中性敘述。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "open_join": false,
+      "conflicts": [
+        { "field": "verified_by",
+          "statements": [
+            { "src": "S-WPZH", "says": "1926–1927 年領雲南省步兵第三團（職務，無敘階，無日期）" },
+            { "src": "S-GPOST", "says": "1929-11-21 任雲南省政府委員（另一個職務，另一個時間）" }
+          ],
+          "resolved": false,
+          "note": "⚠ 兩來源的欄位不重疊，依 §15.1 是**互補不是互證**，只能支撐 medium。接合的依據是同姓名、同省、時間相鄰，屬本輪的推理；但接合只影響『這兩筆是不是同一個人』，兩筆各自都成立，故不另立待考句。" }
+      ],
+      "gaps": ["生卒年、字、籍貫查無", "1927 至 1929 年之間、以及 1929 年之後的經歷查無", "與唐繼虞（唐繼堯之弟）的關係查無——名字相近但無任何來源提及", "下一步：《雲南省志·軍事志》滇軍序列；雲南陸軍講武堂同學錄；《大理白族自治州志》原件"]
+    }
+  ]
+}
