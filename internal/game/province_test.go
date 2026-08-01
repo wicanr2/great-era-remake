@@ -314,3 +314,56 @@ func TestAttackableSkipsUnowned(t *testing.T) {
 	}
 	t.Logf("四川的攻打候選：%v（鄰省表 %v）", got, sichuan.Neighbours)
 }
+
+// TestProvinceFlags 記錄 +32 旗標的實測分佈。
+//
+// 初始檔全 0；SAVE(1) 有 25 個省設了 bit 2、SAVE(2) 只有 4 個，
+// 而且**無主的省一律沒設**。這是「已徵過稅」假說的依據
+// （docs/spec/03 §2）。數字是釘住現況用的回歸檢查。
+func TestProvinceFlags(t *testing.T) {
+	for _, name := range []string{"TOWN(1).DAT", "TOWN(2).DAT", "TOWN(3).DAT"} {
+		tbl, err := ParseTownFile(readGame(t, name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for i := range tbl.Province {
+			if f := tbl.Province[i].Flags; f != 0 {
+				t.Errorf("%s 第 %d 省的旗標是 %#x，初始檔應全為 0", name, i+1, f)
+			}
+		}
+	}
+
+	for _, c := range []struct {
+		file  string
+		taxed int
+	}{
+		{"SAVE(1).DT1", 25},
+		{"SAVE(2).DT1", 4},
+	} {
+		tbl, err := ParseSaveProvinces(readGame(t, c.file))
+		if err != nil {
+			t.Fatal(err)
+		}
+		n := 0
+		for i := range tbl.Province {
+			p := &tbl.Province[i]
+			if !p.Taxed() {
+				continue
+			}
+			n++
+			if !p.Commander.Valid() {
+				t.Errorf("%s 第 %d 省無主卻設了已徵稅旗標", c.file, i+1)
+			}
+		}
+		if n != c.taxed {
+			t.Errorf("%s 設了 bit 2 的省應為 %d 個，實得 %d", c.file, c.taxed, n)
+		}
+		// bit 6 在兩份存檔裡都沒出現過
+		for i := range tbl.Province {
+			if tbl.Province[i].Flags&ProvinceFlagExcluded != 0 {
+				t.Errorf("%s 第 %d 省出現了 bit 6，先前的觀察是兩份存檔都沒有",
+					c.file, i+1)
+			}
+		}
+	}
+}

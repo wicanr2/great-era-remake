@@ -37,7 +37,29 @@ const (
 	provOffCommander = 20 // u16，將領 ID（1-based），0 = 無主
 	provOffNeighbour = 22 // 8 × u8
 	provOffGovernor  = 30 // u16，將領 ID
+	provOffFlags     = 32 // u8，位元旗標
 	provNeighbourLen = 8
+)
+
+// 省份記錄 +32 的位元旗標。
+//
+// 初始檔（TOWN(N).DAT）全 39 省都是 0，存檔裡才會設。
+const (
+	// ProvinceFlagTaxed 是 bit 2。**假說**：本月已徵過稅。
+	//
+	// 依據：`4.15` 詞條 42 是「已徵過稅」，而徵稅每月限一次正好需要一個旗標。
+	// SAVE(1) 有 25 個省設了它、SAVE(2) 只有 4 個，符合「回合中後段 vs 初期」；
+	// **無主的省一律沒設**（不會徵稅）。
+	//
+	// ⚠️ 沒有實機驗證。要確認就實機徵稅一次、存檔、比對這個 bit。
+	ProvinceFlagTaxed = 0x04
+
+	// ProvinceFlagExcluded 是 bit 6。**語意未解**。
+	//
+	// `sub_15925` 收集候選鄰省時會檢查它，設了就把該省排除
+	// （docs/mechanics/70-ai.md）。兩份存檔裡都沒有出現過，
+	// 所以是遊戲進行中才會設的狀態。
+	ProvinceFlagExcluded = 0x40
 )
 
 // SeaBorder 是鄰省表裡表示「海洋或境外」的哨兵值。
@@ -79,6 +101,10 @@ type Province struct {
 	// Coastal 表示鄰省表裡帶 SeaBorder，也就是這個省臨海或臨國境。
 	Coastal bool
 
+	// Flags 是 +32 的位元旗標。已知 bit 2（疑似已徵稅）與 bit 6（程式會檢查，
+	// 語意未解）；其餘位元沒觀察到。
+	Flags uint8
+
 	// Raw 是完整的 37 bytes，寫回時以它為基底只蓋已解欄位。
 	Raw [ProvinceRecordSize]byte
 }
@@ -109,6 +135,7 @@ func ParseProvince(rec []byte) (Province, error) {
 	p.Loyalty = rec[provOffLoyalty]
 	p.Commander = GeneralID(u16(provOffCommander))
 	p.Governor = GeneralID(u16(provOffGovernor))
+	p.Flags = rec[provOffFlags]
 
 	for _, b := range rec[provOffNeighbour : provOffNeighbour+provNeighbourLen] {
 		switch {
@@ -143,6 +170,7 @@ func (p *Province) Bytes() [ProvinceRecordSize]byte {
 	out[provOffLoyalty] = p.Loyalty
 	put(provOffCommander, uint16(p.Commander))
 	put(provOffGovernor, uint16(p.Governor))
+	out[provOffFlags] = p.Flags
 	return out
 }
 
@@ -266,3 +294,6 @@ func (t *ProvinceTable) FirstAttackable(from ProvinceID) ProvinceID {
 	}
 	return ns[0]
 }
+
+// Taxed 回報這個省本月是否已徵過稅（假說，見 ProvinceFlagTaxed）。
+func (p *Province) Taxed() bool { return p.Flags&ProvinceFlagTaxed != 0 }
