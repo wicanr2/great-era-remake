@@ -18,8 +18,17 @@ import (
 //
 // 效忠對象推導自「所屬省的司令」——原版的將領 `+14` 是執行期才填的欄位，
 // 檔案裡沒有（`internal/game/ai_test.go` 的 realWorld 用同一套推導）。
-func buildWorld(tbl *game.ProvinceTable, gens []game.General) *game.AIWorld {
-	w := &game.AIWorld{Table: tbl, Opts: game.StrengthOpts{Stage: 1}, EnableExtra: true}
+//
+// `factions` 是存檔裡的勢力表（`docs/formats/07` §4）。傳 nil 表示沒有——
+// ⚠️ **那不是無害的**：`MajorPower` 為 nil 時十大勢力的戰力加成不會生效
+// （`internal/game/strength.go`），勝負判定也會保守地一律回「還沒結束」。
+// 在解出勢力表之前這個欄位只能是 nil，現在有資料源了。
+func buildWorld(tbl *game.ProvinceTable, gens []game.General, factions *game.FactionTable) *game.AIWorld {
+	opts := game.StrengthOpts{Stage: 1}
+	if factions != nil {
+		opts.MajorPower = factions.MajorPower
+	}
+	w := &game.AIWorld{Table: tbl, Opts: opts, EnableExtra: true}
 	for i := range gens {
 		g := &gens[i]
 		var faction game.GeneralID
@@ -178,7 +187,8 @@ func (a *app) endTurn() string {
 
 	a.month = 1
 	a.cmdBudget.Reset()
-	st := &game.GameState{Stage: 1, Year: uint8(a.year), Month: a.month}
+	st := &game.GameState{Stage: 1, Year: uint8(a.year), Month: a.month,
+		MajorPower: a.world.Opts.MajorPower}
 	rep := a.world.AdvanceYear(st, a.generals, 0, nil)
 	a.year = uint16(st.Year)
 	return joinTurn(fmt.Sprintf("民國 %d 年 1 月：%d 省人口成長共 %d 人",

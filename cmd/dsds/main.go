@@ -420,7 +420,17 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 		// 固定種子：`CLAUDE.md` §9 要求截圖驗收可重現。
 		rng: game.NewRand(seed),
 	}
-	a.world = buildWorld(tbl, generals)
+	// 勢力表只存在於存檔裡；用初始檔 TOWN(1).DAT 開的話沒有這一塊。
+	var factions *game.FactionTable
+	if origSave != nil {
+		if ft, err := game.ParseFactionTable(origSave); err == nil {
+			factions = &ft
+		} else {
+			// **不要靜默**：沒有勢力表會讓戰力加成與勝負判定安靜地失效。
+			fmt.Fprintf(os.Stderr, "[dsds] 勢力表讀不出來：%v\n", err)
+		}
+	}
+	a.world = buildWorld(tbl, generals, factions)
 	a.cmdBudget = game.NewCommandBudget(a.world)
 	// 語系表載不到不是致命錯誤——省名會退回「省 N」，其餘照跑。
 	// **不要靜默**：印到 stderr，否則「沒有語系表」與「語系表是壞的」
