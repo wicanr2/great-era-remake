@@ -121,9 +121,10 @@ func (m *Map) Battlefield(p ProvinceID) (*Battlefield, error) {
 //
 // 規則：鄰省扣掉 owned 裡已控制的省。
 //
-// **這是假說**（docs/spec/01 §2）：只用單一樣本驗證過——實機顯示河南(19) 可攻打
-// 11,16,18,20,21,22，而鄰接表是這六個再加湖北(26)，26 正是當時玩家控制的省。
-// 要換一個控制不同省份的存檔再驗。
+// 兩個獨立樣本驗證過（docs/spec/01 §2）：玩家同時控制河南(19) 與湖北(26)，
+// 從這兩省出發時，實機的攻打候選都正好等於鄰接表扣掉另一個己方省。
+//
+// 未涵蓋：跨海（臺灣、海南島）能不能攻打、盟省算不算 owned。
 func (m *Map) AttackTargets(from ProvinceID, owned map[ProvinceID]bool) ([]ProvinceID, error) {
 	ns, err := m.Neighbours(from)
 	if err != nil {

@@ -47,24 +47,36 @@ func TestAdjacencySymmetry(t *testing.T) {
 	}
 }
 
-// TestAttackTargets 用 DOSBox 實機畫面對照。
+// TestAttackTargets 用 DOSBox 實機畫面對照，兩個獨立樣本。
 //
-// 實機：玩家控制湖北(26)，在河南(19) 的攻打選單顯示 11,16,18,20,21,22。
-// 鄰接表是這六個再加 26，扣掉自己控制的 26 之後應該完全吻合。
+// 存檔 SAVE(1) 裡玩家（吳佩孚）同時控制湖北(26) 與河南(19)——兩省的司令
+// 都是吳佩孚。實機的攻打子選單在這兩個省分別顯示：
+//
+//	河南(19)：11,16,18,20,21,22      鄰接表多一個 26
+//	湖北(26)：18,22,25,27,29         鄰接表多一個 19
+//
+// 兩次少掉的都正好是玩家控制的另一個省，所以「鄰省扣掉已控制」成立。
 func TestAttackTargets(t *testing.T) {
 	m := loadTestMap(t)
-	owned := map[ProvinceID]bool{26: true} // 湖北
-	got, err := m.AttackTargets(19, owned)
-	if err != nil {
-		t.Fatal(err)
-	}
-	want := []ProvinceID{11, 16, 18, 20, 21, 22}
-	if len(got) != len(want) {
-		t.Fatalf("攻打候選 = %v，預期 %v", got, want)
-	}
-	for i := range got {
-		if got[i] != want[i] {
-			t.Fatalf("攻打候選 = %v，預期 %v", got, want)
+	owned := map[ProvinceID]bool{19: true, 26: true} // 河南、湖北
+	for _, tc := range []struct {
+		from ProvinceID
+		want []ProvinceID
+	}{
+		{19, []ProvinceID{11, 16, 18, 20, 21, 22}},
+		{26, []ProvinceID{18, 22, 25, 27, 29}},
+	} {
+		got, err := m.AttackTargets(tc.from, owned)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(got) != len(tc.want) {
+			t.Fatalf("從省 %d 的攻打候選 = %v，預期 %v", tc.from, got, tc.want)
+		}
+		for i := range got {
+			if got[i] != tc.want[i] {
+				t.Fatalf("從省 %d 的攻打候選 = %v，預期 %v", tc.from, got, tc.want)
+			}
 		}
 	}
 }
