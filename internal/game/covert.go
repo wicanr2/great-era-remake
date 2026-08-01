@@ -1,6 +1,9 @@
 package game
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 // 秘密行動（政略指令 11）的兩個子項，出自 `sub_1FC1C`（派遣游擊隊）與
 // `sub_20447`（鼓動學潮）。
@@ -42,6 +45,26 @@ const (
 	GuerrillaArsenalRollRange = 5
 )
 
+// StudentProtestFactor 是學潮成功後乘上去的係數：**0.8**。
+//
+// 原版存的是 Turbo Pascal 48-bit Real：
+//
+//	cx = 0CD80h   si = 0CCCCh   di = 4CCCh
+//
+// 拆成 bytes 是 `80 CD CC CC CC 4C`——exponent `0x80`、
+// mantissa 的 `CCCC…` 循環正是 0.8 的指紋（0.8 = 1.6 × 2⁻¹，
+// 而 1.6 的二進位是 `1.1001100110011…`）。
+// 已用同一支解碼器對照過 10／5／1.5 三個已知常數，全部吻合。
+//
+// ⚠️ 原版用的是 `Round` **不是** `Trunc`——四捨五入，不是無條件捨去。
+// 這與人口成長（`yearend.go` 用 Trunc）不同，別混。
+const StudentProtestFactor = 0.8
+
+// StudentProtestScale 套用學潮的衰減：`Round(v × 0.8)`。
+func StudentProtestScale(v uint8) uint8 {
+	return uint8(math.Round(float64(v) * StudentProtestFactor))
+}
+
 // CovertResult 記錄一次秘密行動的結果。
 type CovertResult struct {
 	// Success 是這次行動成不成功。
@@ -52,6 +75,8 @@ type CovertResult struct {
 	Cost int
 	// ArsenalDestroyed 只有游擊隊會用：有沒有炸掉一座兵工廠。
 	ArsenalDestroyed bool
+	// Demoralised 只有學潮會用：被影響的將領數（`Units` 索引）。
+	Demoralised []int
 }
 
 // decay 是原版的「剩 70%」寫法：**先除後乘**。
@@ -112,12 +137,25 @@ func (w *AIWorld) SendGuerrillas(from, target ProvinceID, cost int, rng *Rand) (
 //
 // 固定花 1,500 黃金，**成敗都扣**。`Random(10) ≤ 1` 才成功（2/10）。
 //
-// ⚠️ 成功之後原版呼叫 `sub_5C441(0, 目標省, 10)`，那支 329 行**還沒讀**——
-// 所以這裡只做到「判定成功」，**實際效果沒有實作**。
-// 回傳的 `Success` 是可信的，但目標省不會有任何改變。
-// 這是明確的缺口，不是「做完了」。
-func (w *AIWorld) IncitStudentProtest(from ProvinceID, rng *Rand) (CovertResult, error) {
+// 成功的效果是**三個欄位各 ×0.8**：
+//
+//	目標省的將領：士氣（+30）、忠誠度（+1）
+//	目標省本身：  人民忠誠度（+19）
+//
+// 打擊敵方的士氣與忠誠，不動任何資源——與游擊隊（砍資源）分工清楚。
+//
+// `gens` 與 `w.Units` 一一對應，用來改將領的忠誠度。
+//
+// ⚠️ 原版另外呼叫 `sub_5C441(10, 目標省, 0)` 顯示公告。那支被 **19 個**
+// 指令共用（練兵、休息、徵兵、外援、開發…），是通用的訊息函式，
+// **不改任何狀態**——用 `tools/field_writes.py` 驗過。
+func (w *AIWorld) IncitStudentProtest(from, target ProvinceID, gens []General,
+	rng *Rand) (CovertResult, error) {
 	src, err := w.Table.At(from)
+	if err != nil {
+		return CovertResult{}, err
+	}
+	dst, err := w.Table.At(target)
 	if err != nil {
 		return CovertResult{}, err
 	}
@@ -130,5 +168,18 @@ func (w *AIWorld) IncitStudentProtest(from ProvinceID, rng *Rand) (CovertResult,
 	res := CovertResult{Cost: StudentProtestCost}
 	res.Roll = rng.Int(StudentRollRange)
 	res.Success = res.Roll <= StudentSuccessMax
+	if !res.Success {
+		return res, nil
+	}
+
+	for i := range w.Units {
+		if w.Units[i].Province != target || i >= len(gens) {
+			continue
+		}
+		gens[i].F30 = StudentProtestScale(gens[i].F30)
+		gens[i].AbilityB = StudentProtestScale(gens[i].AbilityB)
+		res.Demoralised = append(res.Demoralised, i)
+	}
+	dst.Loyalty = StudentProtestScale(dst.Loyalty)
 	return res, nil
 }

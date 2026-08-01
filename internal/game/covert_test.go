@@ -138,7 +138,7 @@ func TestCovertInsufficientFunds(t *testing.T) {
 	if src.Gold != 100 {
 		t.Errorf("報錯後黃金變成 %d，不該扣", src.Gold)
 	}
-	if _, err := w.IncitStudentProtest(1, NewRand(1)); err == nil {
+	if _, err := w.IncitStudentProtest(1, 2, nil, NewRand(1)); err == nil {
 		t.Error("黃金 100 鼓動學潮（要 1500）應該報錯")
 	}
 }
@@ -149,7 +149,7 @@ func TestStudentProtestAlwaysCosts(t *testing.T) {
 		w := realWorld(t)
 		src, _ := w.Table.At(1)
 		src.Gold = 5000
-		res, err := w.IncitStudentProtest(1, NewRand(seed))
+		res, err := w.IncitStudentProtest(1, 2, nil, NewRand(seed))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -159,6 +159,67 @@ func TestStudentProtestAlwaysCosts(t *testing.T) {
 		}
 		if res.Cost != StudentProtestCost {
 			t.Errorf("回報的成本 %d，預期 %d", res.Cost, StudentProtestCost)
+		}
+	}
+}
+
+// 學潮成功：目標省的將領士氣／忠誠度與省的人民忠誠度各 ×0.8。
+func TestStudentProtestEffect(t *testing.T) {
+	for seed := uint32(1); seed < 60; seed++ {
+		w := realWorld(t)
+		gens, err := ParseGenerals(readGame(t, "MAN(1).DAT"), 274)
+		if err != nil {
+			t.Fatal(err)
+		}
+		src, _ := w.Table.At(1)
+		dst, _ := w.Table.At(2)
+		src.Gold = 5000
+		dst.Loyalty = 100
+
+		w.Units = []CombatUnit{{Province: 2}, {Province: 3}}
+		gens = gens[:2]
+		gens[0].F30, gens[0].AbilityB = 100, 50
+		gens[1].F30, gens[1].AbilityB = 100, 50
+
+		res, err := w.IncitStudentProtest(1, 2, gens, NewRand(seed))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !res.Success {
+			continue
+		}
+		if dst.Loyalty != 80 {
+			t.Errorf("人民忠誠度 %d，預期 80（100 × 0.8）", dst.Loyalty)
+		}
+		if gens[0].F30 != 80 || gens[0].AbilityB != 40 {
+			t.Errorf("目標省將領：士氣 %d、忠誠 %d，預期 80／40",
+				gens[0].F30, gens[0].AbilityB)
+		}
+		if gens[1].F30 != 100 || gens[1].AbilityB != 50 {
+			t.Error("別的省的將領不該被影響")
+		}
+		if len(res.Demoralised) != 1 {
+			t.Errorf("影響了 %d 個將領，預期 1", len(res.Demoralised))
+		}
+		return
+	}
+	t.Skip("60 顆種子都失敗，跳過")
+}
+
+// ×0.8 用的是 Round（四捨五入）不是 Trunc。
+func TestStudentProtestRounding(t *testing.T) {
+	cases := []struct{ in, want uint8 }{
+		{100, 80},
+		{50, 40},
+		{9, 7},  // 7.2 → 7
+		{7, 6},  // 5.6 → 6（Trunc 會是 5）
+		{3, 2},  // 2.4 → 2
+		{1, 1},  // 0.8 → 1（Trunc 會是 0）
+		{0, 0},
+	}
+	for _, c := range cases {
+		if got := StudentProtestScale(c.in); got != c.want {
+			t.Errorf("Round(%d × 0.8) = %d，預期 %d", c.in, got, c.want)
 		}
 	}
 }
