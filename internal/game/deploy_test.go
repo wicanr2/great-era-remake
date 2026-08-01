@@ -94,7 +94,7 @@ func TestDeployScanOrderMatchesOriginal(t *testing.T) {
 	}
 
 	var occ Occupancy
-	got, ok := occ.Deploy(zone, 58) // 吳佩孚
+	got, ok := occ.Deploy(zone, 58, nil) // 吳佩孚
 	if !ok || got != 186 {
 		t.Errorf("Deploy 落點 = %d (%v)，應為 186", got, ok)
 	}
@@ -103,9 +103,9 @@ func TestDeployScanOrderMatchesOriginal(t *testing.T) {
 	}
 	// 佔滿之後要回報放不下，不是靜靜覆蓋別人。
 	for i := 1; i < len(zone); i++ {
-		occ.Deploy(zone, GeneralID(100+i))
+		occ.Deploy(zone, GeneralID(100+i), nil)
 	}
-	if _, ok := occ.Deploy(zone, 999); ok {
+	if _, ok := occ.Deploy(zone, 999, nil); ok {
 		t.Error("進場區已滿卻還放得進去")
 	}
 }
@@ -137,5 +137,135 @@ func TestCellIndexBounds(t *testing.T) {
 	}
 	if _, err := CellAt(14, 0); err == nil {
 		t.Error("欄 14 應該越界")
+	}
+}
+
+// 六角鄰接：位移表出自 sub_4E65C，邊界規則出自 sub_510E0。
+func TestHexNeighbours(t *testing.T) {
+	// 正中央的格子：偶欄與奇欄各驗一個，都該有 6 個鄰居。
+	center, _ := CellAt(6, 6) // 偶數欄
+	if got := center.Neighbours(); len(got) != 6 {
+		t.Errorf("偶數欄中央格的鄰居數 = %d，應為 6：%v", len(got), got)
+	}
+	oddCenter, _ := CellAt(7, 6) // 奇數欄
+	if got := oddCenter.Neighbours(); len(got) != 6 {
+		t.Errorf("奇數欄中央格的鄰居數 = %d，應為 6：%v", len(got), got)
+	}
+
+	// 位移對不對，逐個方向驗。cell 90 = col 6, row 6。
+	want := map[HexDir]CellIndex{
+		DirLowerLeft: 89, DirDown: 104, DirLowerRight: 91,
+		DirUpperLeft: 75, DirUp: 76, DirUpperRight: 77,
+	}
+	for d, w := range want {
+		got, ok := center.Neighbour(d)
+		if !ok || got != w {
+			t.Errorf("cell 90 方向 %d 的鄰格 = %d (%v)，應為 %d", d, got, ok, w)
+		}
+	}
+}
+
+// 鄰接關係必須對稱。不對稱代表位移表或邊界規則抄錯了——
+// 這是最便宜也最狠的檢查，全 196 格跑一遍。
+func TestHexAdjacencyIsSymmetric(t *testing.T) {
+	for i := 0; i < CellCount; i++ {
+		c := CellIndex(i)
+		for _, n := range c.Neighbours() {
+			if !Adjacent(c, n) {
+				t.Fatalf("cell %d 說 %d 是鄰居，反過來卻不成立", c, n)
+			}
+		}
+	}
+}
+
+// 幾何自洽：鄰格的螢幕座標必須真的貼著本格。
+// 六角格的鄰居距離不是「同一列同一欄 ±1」，所以這條抓得到位移表寫反。
+func TestHexNeighboursAreGeometricallyClose(t *testing.T) {
+	for i := 0; i < CellCount; i++ {
+		c := CellIndex(i)
+		x, y := c.ScreenXY()
+		for _, n := range c.Neighbours() {
+			nx, ny := n.ScreenXY()
+			dx, dy := abs(nx-x), abs(ny-y)
+			if dx > HexCellW || dy > HexCellH {
+				t.Errorf("cell %d 的鄰格 %d 距離 (%d,%d) 太遠", c, n, dx, dy)
+			}
+		}
+	}
+}
+
+// 邊緣的鄰居數：原版只裁左右，上下靠 0..195 的範圍檢查擋掉。
+func TestHexEdgeNeighbourCounts(t *testing.T) {
+	cases := []struct {
+		col, row int
+		want     int
+		why      string
+	}{
+		{0, 0, 2, "左上角：偶欄左緣裁兩個，再被上邊界擋掉一個"},
+		{0, 6, 4, "左緣偶欄：左下、左上被裁，剩下、右下、上、右上"},
+		{13, 6, 4, "右緣奇欄：右下、右上被裁"},
+		{13, 13, 2, "右下角"},
+		{6, 0, 3, "上緣偶欄：左上、上、右上都出界"},
+		{6, 13, 5, "下緣偶欄：只有正下方出界"},
+	}
+	for _, c := range cases {
+		cell, err := CellAt(c.col, c.row)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := len(cell.Neighbours()); got != c.want {
+			t.Errorf("(%d,%d) 的鄰居數 = %d，應為 %d（%s）：%v",
+				c.col, c.row, got, c.want, c.why, cell.Neighbours())
+		}
+	}
+}
+
+func abs(v int) int {
+	if v < 0 {
+		return -v
+	}
+	return v
+}
+
+// 部署的第一輪要避開「旁邊已經有敵人」的格，掃不到才放寬。
+// 兩輪都實作了才不會把原版的讓步規則寫成硬性限制。
+func TestDeployAvoidsCellsNextToEnemies(t *testing.T) {
+	m := loadTestMap(t)
+	zone, err := m.DeployZone(19, 26) // 湖北打河南，10 格
+	if err != nil {
+		t.Fatal(err)
+	}
+	isEnemy := func(g GeneralID) bool { return g >= 900 }
+
+	// 把敵人擺在第一個部署格的鄰格上，那一格就該被跳過。
+	var occ Occupancy
+	nb := zone[0].Neighbours()
+	if len(nb) == 0 {
+		t.Fatal("第一個部署格沒有鄰格，測試前提不成立")
+	}
+	occ[nb[0]] = 999
+	got, ok := occ.Deploy(zone, 58, isEnemy)
+	if !ok {
+		t.Fatal("應該還有別的格可放")
+	}
+	if got == zone[0] {
+		t.Errorf("落點 %d 旁邊有敵人，第一輪不該選它", got)
+	}
+
+	// 每一格旁邊都有敵人時，第二輪必須硬塞——不能回報失敗。
+	var packed Occupancy
+	for _, c := range zone {
+		for _, n := range c.Neighbours() {
+			if packed[n] == 0 {
+				packed[n] = 999
+			}
+		}
+	}
+	// 清掉被擺到 zone 自己身上的敵人，留下空的落點。
+	for _, c := range zone {
+		packed[c] = 0
+	}
+	if _, ok := packed.Deploy(zone, 58, isEnemy); !ok {
+		t.Error("第一輪找不到安全格時，原版會硬塞，不該失敗")
 	}
 }
