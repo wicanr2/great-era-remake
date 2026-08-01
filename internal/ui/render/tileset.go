@@ -179,3 +179,33 @@ func (c *Canvas) DrawUnitIcon(icons []*assets.Image, idx int, pal assets.Palette
 	}
 	return nil
 }
+
+// DrawUnitAtCell 把兵種圖示疊到六角格 cell 上。
+//
+// 與 DrawUnitIcon 的差別是座標用 `game.CellIndex.ScreenXY()`
+// ——奇數欄下移半格（`docs/re/07` §3），不是方格排列。
+func (c *Canvas) DrawUnitAtCell(icons []*assets.Image, idx int, pal assets.Palette,
+	originX, originY int, cell game.CellIndex) error {
+	if idx < 0 || idx >= len(icons) {
+		return fmt.Errorf("render: 圖示編號 %d 超出 0..%d", idx, len(icons)-1)
+	}
+	dx, dy := cell.ScreenXY()
+	im := icons[idx]
+	px, py := originX+dx, originY+dy+(TileH-IconH)/2
+	for y := 0; y < im.H; y++ {
+		for x := 0; x < im.W; x++ {
+			v := im.Pix[y*im.W+x]
+			if v == 0 || int(v) >= len(pal) {
+				continue
+			}
+			c.setPixel(px+x, py+y, pal[v])
+		}
+	}
+	return nil
+}
+
+// DrawCellCursor 在六角格上畫一圈框，標示游標或選中的單位。
+func (c *Canvas) DrawCellCursor(originX, originY int, cell game.CellIndex, col assets.RGB) {
+	dx, dy := cell.ScreenXY()
+	c.strokeRect(originX+dx, originY+dy, TileW, TileH, col)
+}

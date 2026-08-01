@@ -26,15 +26,16 @@ func main() {
 	prov := flag.Int("province", 0, "只畫某一省（1-39），0 = 全部")
 	menu := flag.Bool("menu", false, "右側改畫政略指令選單")
 	units := flag.Bool("units", false, "在戰場上疊出參戰單位的圖示")
+	battle := flag.Bool("battle", false, "畫一場實際的戰鬥（跑 BattleSim）")
 	flag.Parse()
 
-	if err := run(*dir, *out, game.ProvinceID(*prov), *menu, *units); err != nil {
+	if err := run(*dir, *out, game.ProvinceID(*prov), *menu, *units, *battle); err != nil {
 		fmt.Fprintln(os.Stderr, "錯誤:", err)
 		os.Exit(1)
 	}
 }
 
-func run(dir, out string, only game.ProvinceID, menu, units bool) error {
+func run(dir, out string, only game.ProvinceID, menu, units, battle bool) error {
 	read := func(name string) ([]byte, error) {
 		return os.ReadFile(filepath.Join(dir, name))
 	}
@@ -99,7 +100,7 @@ func run(dir, out string, only game.ProvinceID, menu, units bool) error {
 		if err != nil {
 			return err
 		}
-		if err := c.DrawTiledBattlefield(bf, ts, 190, 14); err != nil {
+		if err := c.DrawTiledBattlefield(bf, ts, 190, 0); err != nil {
 			return err
 		}
 		p, err := tbl.At(id)
@@ -117,6 +118,13 @@ func run(dir, out string, only game.ProvinceID, menu, units bool) error {
 		if err := c.DrawStrategyPanel(d, fonts); err != nil {
 			return err
 		}
+		if battle {
+			// 跑一場真的戰鬥再畫——單位的位置由部署規則決定
+			// （`docs/re/07` §5），不是排版擺的。
+			if err := drawLiveBattle(c, m, tbl, generals, icons, id); err != nil {
+				return err
+			}
+		}
 		if units {
 			// 把參戰單位擺在戰場上。**位置是 remake 的排版選擇**——
 			// 原版每個單位在哪一格由戰鬥狀態決定，那部分還沒解出來
@@ -125,14 +133,14 @@ func run(dir, out string, only game.ProvinceID, menu, units bool) error {
 			for i, gid := range st.Attackers() {
 				_ = gid
 				if err := c.DrawUnitIcon(icons, 0, assets.EGADefaultPalette,
-					190, 14, i, 0); err != nil {
+					190, 0, i, 0); err != nil {
 					return err
 				}
 			}
 			for i, gid := range st.Defenders() {
 				_ = gid
 				if err := c.DrawUnitIcon(icons, 1, assets.EGADefaultPalette,
-					190, 14, i, 13); err != nil {
+					190, 0, i, 13); err != nil {
 					return err
 				}
 			}
@@ -142,7 +150,7 @@ func run(dir, out string, only game.ProvinceID, menu, units bool) error {
 			if err := c.DrawCommandPage(cmdFonts,
 				assets.RGB{R: 0xAE, G: 0x00, B: 0x00},
 				assets.RGB{R: 0xFF, G: 0xFF, B: 0xA2},
-				190, 14, render.ModeBGIW-190, render.ModeBGIH-14); err != nil {
+				190, 0, render.ModeBGIW-190, render.ModeBGIH-14); err != nil {
 				return err
 			}
 		}
@@ -162,6 +170,92 @@ func run(dir, out string, only game.ProvinceID, menu, units bool) error {
 		}
 		f.Close()
 		fmt.Println("寫出", path)
+	}
+	return nil
+}
+
+// drawLiveBattle 用 BattleSim 跑一場戰鬥，把佈署後的樣子畫出來。
+//
+// 與 `-units` 的差別是**單位位置由規則決定**：攻方走部署掃描落在
+// 進場區，守方在腹地。這是規則層與呈現層第一次串起來。
+func drawLiveBattle(c *render.Canvas, m *game.Map, tbl *game.ProvinceTable,
+	generals []game.General, icons []*assets.Image, at game.ProvinceID) error {
+	from := tbl.FirstAttackable(at)
+	if from == 0 {
+		// 沒有可攻打的鄰省就挑第一個鄰省，純粹為了畫得出東西。
+		ns, err := m.Neighbours(at)
+		if err != nil || len(ns) == 0 {
+			return nil
+		}
+		from = ns[0]
+	}
+	mk := func(gs []game.General, prov game.ProvinceID, base int) []*game.Combatant {
+		var out []*game.Combatant
+		for i := range gs {
+			if len(out) >= game.UnitsPerSide {
+				break
+			}
+			id := game.GeneralID(base + i + 1)
+			out = append(out, &game.Combatant{
+				CombatUnit: game.CombatUnit{
+					General: id, Faction: game.GeneralID(prov), Cell: game.NoCell,
+					Province: prov, Max: 12, Current: 12, Active: true, Decaying: 80,
+				},
+				Strength: game.StrengthInput{
+					Ability: gs[i].AbilityA, Force: gs[i].Force,
+					F19: 60, F20: 60, F29: 64, F30: 80,
+					Branch: game.Branch1, General: id, Faction: game.GeneralID(prov),
+				},
+			})
+		}
+		return out
+	}
+	atk := mk(game.GeneralsOf(generals, from), from, 0)
+	def := mk(game.GeneralsOf(generals, at), at, 500)
+	if len(atk) == 0 || len(def) == 0 {
+		return nil
+	}
+
+	bf, err := m.Battlefield(at)
+	if err != nil {
+		return err
+	}
+	placed := 0
+	for i := 0; i < game.CellCount && placed < len(def); i++ {
+		cc := game.CellIndex(i)
+		col, row := cc.ColRow()
+		if bf.Owner[row][col] != 0 || bf.Tiles[row][col].MoveCost() >= assets.MoveCostImpassable {
+			continue
+		}
+		def[placed].Cell = cc
+		placed++
+	}
+	def = def[:placed]
+	if placed == 0 {
+		return nil
+	}
+
+	sim, err := game.NewBattleSim(m, at, from, atk, def, game.StrengthOpts{Stage: 1})
+	if err != nil {
+		return err
+	}
+	// 印出佈署，讓落點能與 `docs/re/07` §5 的進場區對照。
+	fmt.Printf("  戰鬥：省 %d ← 省 %d　攻 %d／守 %d\n",
+		at, from, len(sim.Attacker), len(sim.Defender))
+	for _, u := range sim.Attacker {
+		col, row := u.Cell.ColRow()
+		fmt.Printf("    攻 %d 落在格 %d (欄%2d,列%2d)，該格的 WARPOS = %d\n",
+			u.General, u.Cell, col, row, bf.Owner[row][col])
+	}
+	for _, u := range sim.Defender {
+		if err := c.DrawUnitAtCell(icons, 1, assets.EGADefaultPalette, 190, 0, u.Cell); err != nil {
+			return err
+		}
+	}
+	for _, u := range sim.Attacker {
+		if err := c.DrawUnitAtCell(icons, 0, assets.EGADefaultPalette, 190, 0, u.Cell); err != nil {
+			return err
+		}
 	}
 	return nil
 }

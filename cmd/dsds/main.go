@@ -36,11 +36,14 @@ import (
 // 邏輯解析度仍是原版的 640×350。
 const scale = 2
 
-// 版面。原版政略畫面是左側面板（約 190 寬）+ 右側地圖，
-// 戰場畫面是 14×14 格 × 32×24 = 448×336。兩者都放得進 640×350。
-// **座標是 remake 的排版選擇，不是還原原版數值。**
+// 版面。原版政略畫面是左側面板（約 190 寬）+ 右側地圖。
+//
+// 戰場的實際尺寸是 **448×348**（14 欄 × 32、13 列 × 24 + 半格 + 24，
+// `docs/re/07` §3），高度只差 2 px 就頂到 BGI 640×350 的底部
+// ——所以 y 必須是 0，不能留上邊距，否則最下面那一列會被切掉。
+// x 是 remake 的排版選擇（原版戰場畫面從 x=0 起，面板在右側）。
 const (
-	fieldX, fieldY = 190, 14
+	fieldX, fieldY = 190, 0
 )
 
 // 配色取自實機截圖的實際像素值（面板的暗紅字與米黃底）。
@@ -55,6 +58,7 @@ type screen int
 const (
 	screenMap     screen = iota // 戰場 + 省份面板
 	screenCommand               // 政略指令選單
+	screenBattle                // 戰鬥（見 battle.go）
 	screenQuit                  // 離開確認
 )
 
@@ -66,6 +70,8 @@ type app struct {
 	tiles    *render.TileSet     // NEWTERR + RAIL 的圖塊
 	origSave []byte              // 原始存檔內容，寫回時當基底
 	cmdFonts render.CommandFonts
+	icons    []*assets.Image // NEWICON.TPC 的兵種圖示
+	battle   *battleState    // 非 nil 表示正在打仗
 	current  game.ProvinceID
 	screen   screen
 	savePath string // 離開時自動存檔的目標（不覆蓋原版）
@@ -98,10 +104,25 @@ func (a *app) Update() error {
 		}
 		return nil
 
+	case screenBattle:
+		return a.updateBattle()
+
 	case screenCommand:
 		// ESC 只退回上一層。
 		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 			a.screen, a.dirty = screenMap, true
+			return nil
+		}
+		// A：對第一個可攻打的鄰省開戰。攻打候選的規則見
+		// `docs/spec/01` §2（鄰省 − 自己控制的省）。
+		if inpututil.IsKeyJustPressed(ebiten.KeyA) {
+			target := a.tbl.FirstAttackable(a.current)
+			if target == 0 {
+				return nil
+			}
+			if err := a.startBattle(target, a.current); err != nil {
+				fmt.Fprintln(os.Stderr, "開戰失敗:", err)
+			}
 		}
 		return nil
 	}
@@ -148,13 +169,19 @@ func (a *app) autosave() error {
 func (a *app) compose() error {
 	c := render.NewBGICanvas()
 
-	bf, err := a.m.Battlefield(a.current)
-	if err != nil {
-		return err
-	}
-	// 用原版的 NEWTERR 圖塊畫戰場，有鐵路的格子疊 RAIL.TPC。
-	if err := c.DrawTiledBattlefield(bf, a.tiles, fieldX, fieldY); err != nil {
-		return err
+	if a.screen == screenBattle {
+		if err := a.drawBattle(c); err != nil {
+			return err
+		}
+	} else {
+		bf, err := a.m.Battlefield(a.current)
+		if err != nil {
+			return err
+		}
+		// 用原版的 NEWTERR 圖塊畫戰場，有鐵路的格子疊 RAIL.TPC。
+		if err := c.DrawTiledBattlefield(bf, a.tiles, fieldX, fieldY); err != nil {
+			return err
+		}
 	}
 
 	p, err := a.tbl.At(a.current)
@@ -304,12 +331,20 @@ func run(dir string, start game.ProvinceID, savePath string) error {
 	if err != nil {
 		return err
 	}
+	newicon, err := read("NEWICON.TPC")
+	if err != nil {
+		return err
+	}
+	icons, err := render.LoadIcons(newicon)
+	if err != nil {
+		return err
+	}
 
 	ebiten.SetWindowSize(render.ModeBGIW*scale, render.ModeBGIH*scale)
 	ebiten.SetWindowTitle("大時代的故事")
 	return ebiten.RunGame(&app{
 		m: m, tbl: tbl, generals: generals, fonts: fonts, cmdFonts: cmdFonts,
-		tiles: ts, origSave: origSave, savePath: savePath,
+		tiles: ts, icons: icons, origSave: origSave, savePath: savePath,
 		current: start, dirty: true,
 	})
 }
