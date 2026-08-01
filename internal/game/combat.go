@@ -86,6 +86,47 @@ func (u *CombatUnit) EndTurn() {
 
 // UnitsPerSide 是每方的單位上限。
 //
-// 兩處獨立對上：戰鬥狀態記錄 469 B 裡每方 10 個槽（docs/re/05），
-// 以及 sub_54826 的衰減迴圈跑 1..10。
+// **三處獨立對上**：
+//   - 戰鬥狀態記錄 469 B 裡每方 10 個槽（docs/re/05）
+//   - `sub_54826` 的衰減迴圈跑 1..10
+//   - 執行期的兩個單位清單 `0x750` 與 `0x764` 相差 0x14 = 20 bytes
+//     = 10 個 word，是相鄰的兩張表
 const UnitsPerSide = 10
+
+// Side 是戰鬥的一方。原版用兩張相鄰的單位清單（`0x750` 與 `0x764`），
+// 以及 `byte_64901`（取 1 或 2）決定誰先動。
+type Side int
+
+const (
+	// SideA 對應單位清單 0x750。
+	SideA Side = iota
+	// SideB 對應單位清單 0x764。
+	SideB
+)
+
+// Battle 是一場戰鬥的雙方單位。
+//
+// 哪一方是攻、哪一方是守由 `byte_64901` 決定（詞表有「攻方」「守方」，
+// `2.15` 166/167），**但原版哪個值對應哪一方還沒驗**，
+// 所以這裡用中性的 A／B 命名。
+type Battle struct {
+	Units [2][UnitsPerSide]CombatUnit
+}
+
+// BeginTurn 對雙方所有單位套用回合開始的重置（sub_543C2／sub_5446D）。
+func (b *Battle) BeginTurn() {
+	for s := range b.Units {
+		for i := range b.Units[s] {
+			b.Units[s][i].BeginTurn()
+		}
+	}
+}
+
+// EndTurn 對雙方所有單位套用回合結束的衰減（sub_54826）。
+func (b *Battle) EndTurn() {
+	for s := range b.Units {
+		for i := range b.Units[s] {
+			b.Units[s][i].EndTurn()
+		}
+	}
+}

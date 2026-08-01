@@ -95,3 +95,55 @@ func TestBeginTurnResets(t *testing.T) {
 		t.Errorf("空槽不該被重置或衰減：%+v", empty)
 	}
 }
+
+// TestCaptureFollowsOriginal 佔領結算：清除「正在打仗」旗標、司令改成勝方。
+//
+// 順序照 sub_54DAC：`+32 &= 0xBF` 然後 `+20 = 勝方`。
+func TestCaptureFollowsOriginal(t *testing.T) {
+	p := Province{Commander: 58, Flags: ProvinceFlagInBattle | ProvinceFlagTaxed}
+	if !p.InBattle() {
+		t.Fatal("前提不成立：應該在戰鬥中")
+	}
+	p.Capture(98) // 孫傳芳打下來
+	if p.InBattle() {
+		t.Error("戰後應該清除「正在打仗」旗標")
+	}
+	if p.Commander != 98 {
+		t.Errorf("司令應改成 98，實得 %d", p.Commander)
+	}
+	if !p.Taxed() {
+		t.Error("不該動到其他位元（已徵稅）")
+	}
+
+	// 勝方為 0 時只清旗標、不改司令
+	q := Province{Commander: 58, Flags: ProvinceFlagInBattle}
+	q.Capture(0)
+	if q.InBattle() || q.Commander != 58 {
+		t.Errorf("勝方為 0 時應只清旗標：flags=%#x commander=%d", q.Flags, q.Commander)
+	}
+}
+
+// TestBattleTurnCycle 雙方各 10 個單位，一輪 BeginTurn/EndTurn 都要生效。
+func TestBattleTurnCycle(t *testing.T) {
+	var b Battle
+	for s := range b.Units {
+		for i := range b.Units[s] {
+			b.Units[s][i] = CombatUnit{
+				General: GeneralID(s*100 + i + 1),
+				Max:     12, Current: 0, Decaying: 100,
+			}
+		}
+	}
+	b.BeginTurn()
+	b.EndTurn()
+	for s := range b.Units {
+		for i, u := range b.Units[s] {
+			if u.Current != 12 || !u.Active {
+				t.Fatalf("side %d unit %d 沒有重置：%+v", s, i, u)
+			}
+			if u.Decaying != 80 {
+				t.Fatalf("side %d unit %d 的衰減是 %d，預期 80", s, i, u.Decaying)
+			}
+		}
+	}
+}

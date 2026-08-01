@@ -358,10 +358,11 @@ func TestProvinceFlags(t *testing.T) {
 		if n != c.taxed {
 			t.Errorf("%s 設了 bit 2 的省應為 %d 個，實得 %d", c.file, c.taxed, n)
 		}
-		// bit 6 在兩份存檔裡都沒出現過
+		// bit 6 是「正在打仗」的暫時旗標，戰後由 sub_54DAC 清除，
+		// 所以存檔裡不該出現。
 		for i := range tbl.Province {
-			if tbl.Province[i].Flags&ProvinceFlagExcluded != 0 {
-				t.Errorf("%s 第 %d 省出現了 bit 6，先前的觀察是兩份存檔都沒有",
+			if tbl.Province[i].InBattle() {
+				t.Errorf("%s 第 %d 省帶著「正在打仗」旗標——存檔時不該在戰鬥中",
 					c.file, i+1)
 			}
 		}

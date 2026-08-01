@@ -54,12 +54,15 @@ const (
 	// ⚠️ 沒有實機驗證。要確認就實機徵稅一次、存檔、比對這個 bit。
 	ProvinceFlagTaxed = 0x04
 
-	// ProvinceFlagExcluded 是 bit 6。**語意未解**。
+	// ProvinceFlagInBattle 是 bit 6：**這個省正在打仗**。
 	//
-	// `sub_15925` 收集候選鄰省時會檢查它，設了就把該省排除
-	// （docs/mechanics/70-ai.md）。兩份存檔裡都沒有出現過，
-	// 所以是遊戲進行中才會設的狀態。
-	ProvinceFlagExcluded = 0x40
+	// 兩處證據合起來就清楚了：
+	//   - `sub_15925` 收集候選鄰省時跳過設了它的省（不能挑正在打的）
+	//   - `sub_54DAC`（戰後結算）用 `&= 0xBF` **清除**它
+	//
+	// 所以它是戰鬥期間的暫時旗標，戰鬥一結束就清掉——這也解釋了
+	// 為什麼兩份存檔裡都沒有出現過（存檔時不在戰鬥中）。
+	ProvinceFlagInBattle = 0x40
 )
 
 // SeaBorder 是鄰省表裡表示「海洋或境外」的哨兵值。
@@ -297,3 +300,20 @@ func (t *ProvinceTable) FirstAttackable(from ProvinceID) ProvinceID {
 
 // Taxed 回報這個省本月是否已徵過稅（假說，見 ProvinceFlagTaxed）。
 func (p *Province) Taxed() bool { return p.Flags&ProvinceFlagTaxed != 0 }
+
+// InBattle 回報這個省是不是正在打仗（bit 6）。
+func (p *Province) InBattle() bool { return p.Flags&ProvinceFlagInBattle != 0 }
+
+// Capture 套用戰後的佔領結算，順序照 sub_54DAC：
+//
+//	記錄[省].+32 &= 0xBF     ; 清除「正在打仗」
+//	記錄[省].+20 = 勝方       ; 司令改成勝方
+//
+// 勝方為 0 時只清旗標、不改司令——原版那一步有前置條件
+// （`[arg_0+8] == word_64942`），條件不成立時省份易主不會發生。
+func (p *Province) Capture(winner GeneralID) {
+	p.Flags &^= ProvinceFlagInBattle
+	if winner.Valid() {
+		p.Commander = winner
+	}
+}
