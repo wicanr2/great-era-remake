@@ -137,15 +137,29 @@ def gate(batch: str) -> int:
     bad += len(body_bad) + len(field_bad)
 
     # 3. JSON 與 id
+    #
+    # ⛔ 這一項原本寫「篇數 == id 數」，**與規格 §3.2「`unknown` 不寫小傳」
+    # 直接衝突**（`G-U2-3`）。前九批母體是 `partial`、10 人 10 篇，
+    # 所以從沒浮現；`unknown` 池是第一個必然撞到的母體。
+    # 承辦的 agent 正確地選擇回報而不是改我的工具，這裡補上。
     ids = [p["id"] for p in fj["people"]]
     missing = [i for i in ids if i not in ppl]
     mism = [(p["id"], p["name_ingame"], ppl[p["id"]]["name_ingame"])
             for p in fj["people"]
             if p["id"] in ppl and p["name_ingame"] != ppl[p["id"]]["name_ingame"]]
-    count_ok = len(bodies) == len(ids)
-    print(f"[{batch}] 3 id：{len(ids)} 筆，不存在 {missing or '✔無'}，"
-          f"name_ingame 不符 {mism or '✔無'}，篇數對得上 {'✔' if count_ok else '⛔'}")
-    bad += len(missing) + len(mism) + (0 if count_ok else 1)
+
+    unknown_ids = {p["id"] for p in fj["people"] if p.get("confidence") == "unknown"}
+    want_bodies = len(ids) - len(unknown_ids)
+    written = [i for i, _ in bodies if i not in unknown_ids]
+    count_ok = len(written) == want_bodies
+    # `unknown` 的 `bio_zh` 必須是空的——查不到就是查不到，不准補話。
+    fabricated = [p["id"] for p in fj["people"]
+                  if p.get("confidence") == "unknown" and (p.get("bio_zh") or "").strip()]
+    print(f"[{batch}] 3 id：{len(ids)} 筆（unknown {len(unknown_ids)} 筆不立傳），"
+          f"不存在 {missing or '✔無'}，name_ingame 不符 {mism or '✔無'}，"
+          f"立傳篇數 {len(written)}/{want_bodies} {'✔' if count_ok else '⛔'}"
+          + (f"，⛔ unknown 卻有 bio_zh：{fabricated}" if fabricated else ""))
+    bad += len(missing) + len(mism) + (0 if count_ok else 1) + len(fabricated)
 
     # 4. 禁用詞——分「該擋」與「該複審」兩級
     stop, review = [], []
