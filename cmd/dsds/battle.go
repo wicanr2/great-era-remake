@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -40,6 +41,16 @@ type battleState struct {
 	sel      int    // 目前選中第幾個攻方單位
 	log      string // 最近一次動作的結果，畫在面板上
 	finished bool
+
+	// turn 是回合序號，決策鏈要用（每回合重跑一次）。
+	turn int
+	// aiLog 是守方 AI 這一回合做了什麼。⚠️ 目前只印到 stderr——
+	// 畫面上畫不出自由組合的中文（原版字模是場景子集，見 `runDefenderAI`）。
+	aiLog string
+	// aiAction／aiMoves／aiFights 是同一件事的數字版，面板畫得出來。
+	aiAction, aiMoves, aiFights int
+	// leader 是這個省的司令，`sub_56D49`（§44）要問它在不在守方隊伍裡。
+	leader game.GeneralID
 }
 
 // startBattle 從當前省對某個鄰省開戰。
@@ -85,7 +96,15 @@ func (a *app) startBattle(at, from game.ProvinceID) error {
 		return err
 	}
 	sim.BeginTurn()
-	a.battle = &battleState{sim: sim}
+
+	// 守方司令＝被打的那個省的司令（省份記錄 `+20`）。
+	// `sub_56D49`（§44）問的就是「他本人在不在守方隊伍裡」，
+	// 那是電腦改變打法的觸發點。
+	var leader game.GeneralID
+	if p, err := a.tbl.At(at); err == nil {
+		leader = p.Commander
+	}
+	a.battle = &battleState{sim: sim, turn: 1, leader: leader}
 	a.screen, a.dirty = screenBattle, true
 	return nil
 }
@@ -192,14 +211,92 @@ func (a *app) updateBattle() error {
 		return nil
 	}
 
-	// 空白鍵：結束這一回合（衰減 + 機動力回滿）。
+	// 空白鍵：結束這一回合——**先讓守方 AI 動**，再換回合。
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		b.runDefenderAI()
+		b.sim.Sweep()
+		if over, won := b.sim.Over(); over {
+			b.finished = true
+			if won {
+				b.log = "攻方獲勝"
+			} else {
+				b.log = "守方獲勝"
+			}
+			a.dirty = true
+			return nil
+		}
 		b.sim.EndTurn()
 		b.sim.BeginTurn()
+		b.turn++
 		b.log = "換下一回合"
 		a.dirty = true
 	}
 	return nil
+}
+
+// runDefenderAI 讓守方由**決策鏈**指揮走一回合。
+//
+// 三層都在規則層（`internal/game`）：
+//
+//	DecideTurn      決策鏈選一個行動（13 種，`docs/re/31` §41）
+//	ExecuteAction   執行層寫命令／目標／下一跳
+//	依 +12 移動、相鄰就交戰
+//
+// ⚠️ 那三個還沒解出來源的判斷（`BattleChainGates`）目前**全部給 false**
+// ——比率門檻、佈防閘門、後援判斷。後果是守方偏向走「預設分流」，
+// 補齊之前這是**已知落差**，不是最終行為。
+func (b *battleState) runDefenderAI() {
+	gates := game.BattleChainGates{}
+	d := b.sim.DecideTurn(b.turn, gates, b.leader, 0)
+
+	route := func(to, from game.CellIndex) game.CellIndex {
+		if game.Adjacent(from, to) {
+			return to
+		}
+		best, bestD := game.NoCell, 1<<30
+		for _, n := range from.Neighbours() {
+			if b.sim.Occ[n] != 0 {
+				continue
+			}
+			if dist := game.CellManhattan(n, to); dist < bestD {
+				best, bestD = n, dist
+			}
+		}
+		return best
+	}
+
+	r := b.sim.ExecuteAction(d.A.Action, b.sim.Defender, b.sim.Attacker, route)
+	if r.Decisive {
+		b.finished = true
+		if r.DecisiveAttackerWon {
+			b.aiLog = "守方認輸：" + r.Note
+		} else {
+			b.aiLog = "攻方潰敗：" + r.Note
+		}
+		return
+	}
+
+	moves, fights := 0, 0
+	for _, u := range b.sim.Defender {
+		if b.sim.StepByOrder(u) {
+			moves++
+		}
+		if b.sim.EngageIfAdjacent(u) {
+			fights++
+		}
+	}
+	b.aiLog = fmt.Sprintf("守方：%s（動 %d 打 %d）",
+		game.BattleActionName(d.A.Action), moves, fights)
+	if !r.Implemented {
+		b.aiLog += " ⚠未實作"
+	}
+	b.aiAction, b.aiMoves, b.aiFights = int(d.A.Action), moves, fights
+
+	// ⚠️ **畫面上還畫不出這行字。** 原版的字模是每個場景一份子集
+	// （`CLAUDE.md` §3.5），畫不出自由組合的中文；完整字型是 M6 的事。
+	// 在那之前先印到 stderr，讓行為至少是可觀測的——
+	// 面板上用數字顯示（`aiAction`／`aiMoves`／`aiFights`）。
+	fmt.Fprintln(os.Stderr, "[battle]", b.aiLog)
 }
 
 // current 回傳目前選中的攻方單位，跳過已陣亡的。
@@ -288,6 +385,7 @@ func (a *app) battlePanelData() render.BattlePanelData {
 		}
 		return
 	}
+	d.AIAction, d.AIMoves, d.AIFights = b.aiAction, b.aiMoves, b.aiFights
 	d.Attacker.Units, d.Attacker.Soldiers = count(b.sim.Attacker)
 	d.Defender.Units, d.Defender.Soldiers = count(b.sim.Defender)
 

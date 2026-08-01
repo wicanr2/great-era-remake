@@ -137,7 +137,7 @@ func TestStepByOrderClearsNextCell(t *testing.T) {
 		t.Skip("周圍沒有可走的空格")
 	}
 	u.NextCell = free
-	if !sim.stepByOrder(u) {
+	if !sim.StepByOrder(u) {
 		t.Fatal("該走得動")
 	}
 	if u.Cell != free {
@@ -148,7 +148,7 @@ func TestStepByOrderClearsNextCell(t *testing.T) {
 		t.Errorf("走完該清掉下一跳，實際 %d", u.NextCell)
 	}
 	// 沒有下一跳就不動。
-	if sim.stepByOrder(u) {
+	if sim.StepByOrder(u) {
 		t.Error("沒有下一跳不該移動")
 	}
 }

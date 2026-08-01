@@ -55,7 +55,7 @@ func dirToward(from, to CellIndex) HexDir {
 //
 // 回傳是否真的動了。走到之後把 `+12` 清成 `NoCell`——
 // 下一跳是一次性的，要繼續走得重新算（原版每回合都會重算，§14）。
-func (s *BattleSim) stepByOrder(u *Combatant) bool {
+func (s *BattleSim) StepByOrder(u *Combatant) bool {
 	if u == nil || !u.Alive() || u.NextCell == NoCell || u.NextCell == u.Cell {
 		return false
 	}
@@ -74,7 +74,7 @@ func (s *BattleSim) stepByOrder(u *Combatant) bool {
 //
 // 原版的交戰是移動到相鄰之後才發生的，這裡照同樣的順序：
 // 先走（`stepByOrder`），走完檢查相不相鄰。
-func (s *BattleSim) engageIfAdjacent(u *Combatant) bool {
+func (s *BattleSim) EngageIfAdjacent(u *Combatant) bool {
 	if u == nil || !u.Alive() || u.TargetUnit == 0 {
 		return false
 	}
@@ -177,10 +177,10 @@ func (s *BattleSim) AutoResolveByChain(maxTurns int, gates BattleChainGates,
 		}
 
 		for _, u := range append(append([]*Combatant(nil), s.Attacker...), s.Defender...) {
-			if s.stepByOrder(u) {
+			if s.StepByOrder(u) {
 				st.Moves++
 			}
-			if s.engageIfAdjacent(u) {
+			if s.EngageIfAdjacent(u) {
 				st.Engagements++
 			}
 		}

@@ -98,6 +98,16 @@ type BattlePanelData struct {
 	Day      uint8
 	Attacker BattleSide
 	Defender BattleSide
+
+	// AIAction／AIMoves／AIFights 是守方 AI 上一回合的行動編號與動作次數。
+	//
+	// ⚠️ **這是 remake 新增的**，原版面板沒有這一區（`docs/re/31` 沒有
+	// 任何「把決策值畫出來」的痕跡）。加它的理由是玩家看不到 AI 在做什麼
+	// 就無從判斷戰鬥是否正常——而中文訊息要等 M6 的完整字型才畫得出來
+	// （原版字模是場景子集，畫不出自由組合的字）。
+	//
+	// `AIAction == 0` 表示還沒有 AI 行動，不畫。
+	AIAction, AIMoves, AIFights int
 }
 
 // DrawBattlePanel 把戰鬥畫面的右側面板畫到畫布上。
@@ -114,6 +124,15 @@ func (c *Canvas) DrawBattlePanel(d BattlePanelData, f PanelFonts) error {
 	}
 	c.DrawSmallNumber(uint32(d.Month), battlePanelInk, 596, battlePanelTitleY)
 	c.DrawSmallNumber(uint32(d.Day), battlePanelInk, 632, battlePanelTitleY)
+
+	// ⚠️ remake 新增：守方 AI 的行動編號與動作次數（見 BattlePanelData）。
+	// 畫在面板最下緣，避開所有對實機驗證過的欄位。
+	if d.AIAction != 0 {
+		const aiY = ModeBGIH - 14
+		c.DrawSmallNumber(uint32(d.AIAction), battlePanelInk, BattlePanelX+8, aiY)
+		c.DrawSmallNumber(uint32(d.AIMoves), battlePanelInk, BattlePanelX+40, aiY)
+		c.DrawSmallNumber(uint32(d.AIFights), battlePanelInk, BattlePanelX+72, aiY)
+	}
 
 	// 第二行：攻方 攻擊 守方。
 	if err := c.drawLeader(f, d.Attacker.Leader, battlePanelAtkX, battlePanelSideY); err != nil {
