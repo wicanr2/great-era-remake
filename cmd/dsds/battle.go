@@ -56,6 +56,8 @@ type battleState struct {
 	// supAtk／supDef 是雙方帶進這場戰鬥的資源與兵力總和，
 	// 比率門檻（§48）要用。攻方＝第一方、守方＝第二方。
 	supAtk, supDef game.BattleSupply
+	// units 是全期將領表，`sub_5A881`（數某省的可用將領）要掃它。
+	units []game.CombatUnit
 }
 
 // startBattle 從當前省對某個鄰省開戰。
@@ -115,7 +117,7 @@ func (a *app) startBattle(at, from game.ProvinceID) error {
 	// `MEM_WAR.DAT` 的 `+0..+7`（`docs/re/05` §2），但「出兵時帶多少」
 	// 是誰決定的還沒解。這裡直接取雙方所屬省的存量當近似，
 	// 並把它標成已知差異——不要拿它對原版做行為驗收。
-	b := &battleState{sim: sim, turn: 1, leader: leader, tbl: a.tbl}
+	b := &battleState{sim: sim, turn: 1, leader: leader, tbl: a.tbl, units: a.world.Units}
 	b.supAtk = supplyOf(a.tbl, from, atk)
 	b.supDef = supplyOf(a.tbl, at, def)
 	a.battle = b
@@ -304,7 +306,7 @@ func (b *battleState) runDefenderAI() {
 	// 它只是門檻的加項，給 0 等於用最寬鬆的那一端。
 	const phase = 0
 	gates := game.BattleChainGates{
-		Sub53619:  !game.HasBattleSupport(b.tbl, b.sim.At, b.leader),
+		Sub53619:  !game.HasBattleSupport(b.tbl, b.sim.At, b.leader, b.units),
 		RatioSelf: b.supDef.RatioGate(phase),
 		RatioFoe:  b.supAtk.RatioGate(phase),
 		// §43 的 `word_6493A == 0` = **第一方（攻方）的彈藥為 0**。

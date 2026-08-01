@@ -7,52 +7,34 @@ package game
 //
 //	戰力差五倍，**而且有我方鄰省可以支援**——才敢直接判勝負。
 //	沒有後援就不冒險速戰，改走打城市或推倒重來。
-
-// ProvinceFlagNoSupport 是省份記錄 `+32` 的 **bit 6**。
 //
-// `sub_534FF` 掃鄰省時，這一位立起來的省會被跳過（§47）。
-// ⚠️ **語意未解**——`docs/re/14` 只解出 bit 2（本回合已處理過）。
-// 這裡的命名是照它在本函式裡的作用取的，不是原版的欄位名。
-const ProvinceFlagNoSupport uint8 = 0x40
+// ⚠️ **`sub_534FF` 本身不在這裡實作。** 它是 `ProvinceTable.ReinforcementSources`
+// （`province.go`），從 `docs/re/07` §9 解出來的，比這裡早。
+// 本檔只做「戰鬥決策鏈怎麼問它」這一層。
+//
+// 這件事踩過一次：初版在這裡把 `sub_534FF` 重寫了一遍，而且抄漏兩道
+// ——無主省原版是**停止掃描**不是跳過，`+32` bit 6 的語意也已經解出來是
+// 「那個省正在打仗」。`CLAUDE.md` §7.4 講的就是這個：
+// **一條規則只留一份實作，重抄的那份一定會漂。**
 
-// SupportingNeighbours 是 `sub_534FF`：找出**當前交戰省的鄰省裡，
-// 屬於 `leader` 這個勢力而且可用的省**。
+// SupportingNeighbours 是決策鏈問的那一句：**當前交戰省的鄰省裡，
+// 有哪些屬於 `leader` 這個勢力而且能出兵**。
 //
 //	tbl     省份表
 //	at      當前交戰的省（原版 `byte_6FFC4`）
 //	leader  單位效忠的勢力領袖（`+14`）
+//	units   將領表，數「可用將領數」那道篩選要用
 //
-// 原版的五道篩選，這裡實作四道：
-//
-//	鄰省編號有效           ✅
-//	司令 != 0（非無主省）  ✅
-//	司令 == leader         ✅
-//	`+32` bit 6 沒立起來    ✅
-//	`sub_5A881(鄰) < 100`   ❌ **未實作**——那支未讀（§47）
-//
-// ⚠️ 少一道篩選的後果是**回報的支援省可能偏多**，也就是必勝結算比原版
-// 容易觸發。補上之前不要拿它對原版做行為驗收。
-func SupportingNeighbours(tbl *ProvinceTable, at ProvinceID, leader GeneralID) []ProvinceID {
+// 直接轉給 `ReinforcementSources`——原版就是同一支 `sub_534FF`，
+// 政略的增援與戰鬥的後援判斷共用它。
+func SupportingNeighbours(tbl *ProvinceTable, at ProvinceID, leader GeneralID,
+	units []CombatUnit) []ProvinceID {
 	if tbl == nil || leader == 0 {
 		return nil
 	}
-	p, err := tbl.At(at)
+	out, err := tbl.ReinforcementSources(at, leader, units)
 	if err != nil {
 		return nil
-	}
-	var out []ProvinceID
-	for _, n := range p.Neighbours {
-		np, err := tbl.At(n)
-		if err != nil {
-			continue
-		}
-		if np.Commander == 0 || np.Commander != leader {
-			continue
-		}
-		if np.Flags&ProvinceFlagNoSupport != 0 {
-			continue
-		}
-		out = append(out, n)
 	}
 	return out
 }
@@ -64,6 +46,7 @@ func SupportingNeighbours(tbl *ProvinceTable, at ProvinceID, leader GeneralID) [
 //
 // 刻意提供正相版本：`Sub53619` 那個名字保留原版的反相語意是為了對照
 // 組合語言，但呼叫端讀「有沒有支援」比讀「sub_53619 為不為零」清楚得多。
-func HasBattleSupport(tbl *ProvinceTable, at ProvinceID, leader GeneralID) bool {
-	return len(SupportingNeighbours(tbl, at, leader)) > 0
+func HasBattleSupport(tbl *ProvinceTable, at ProvinceID, leader GeneralID,
+	units []CombatUnit) bool {
+	return len(SupportingNeighbours(tbl, at, leader, units)) > 0
 }
