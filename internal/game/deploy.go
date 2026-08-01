@@ -235,19 +235,38 @@ func (o *Occupancy) enemyNeighbours(c CellIndex, enemy func(GeneralID) bool) int
 	return n
 }
 
+// OccupiedCost 是「這格有人站」在成本表裡的值。
+//
+// 原版不用獨立的旗標擋住已佔用的格——`sub_41513` 部署時把
+// `byte_91E[格]` 寫成 `50h`（80），移動的成本表直接讀那張表，
+// 而機動力不可能有 80，所以**佔用是用成本表達的**。單位離開時
+// 從底圖 `byte_9E2` 還原原始成本。
+const OccupiedCost = 0x50
+
+// MoveCostTo 回傳走進某格要花多少機動力，語意照原版的 `byte_91E`：
+// 有人站是 80，否則是該格的地形成本（`sub_506B0`）。
+func (o *Occupancy) MoveCostTo(bf *Battlefield, c CellIndex) int {
+	if !c.Valid() {
+		return int(assets.MoveCostImpassable)
+	}
+	if o[c] != 0 {
+		return OccupiedCost
+	}
+	col, row := c.ColRow()
+	return bf.Tiles[row][col].MoveCost()
+}
+
 // Move 把單位從現在的格移到相鄰的一格，語意照 `sub_4A1C0`
 // 與其呼叫端 `sub_4ABFD` 的三道 gate（`docs/re/07` §7）：
 //
 //  1. 目標格必須六角相鄰且在界內（`sub_510E0`）
 //  2. 目標格必須可進入（`sub_4A583`）：長城段（地物 12..21）擋路，
-//     除非單位能穿越；另外目標格不能已經有人站
-//  3. 剩餘機動力 `+7` 必須 >= 該步的成本
+//     除非單位能穿越
+//  3. 剩餘機動力 `+7` 必須 >= 該格的成本（`sub_4A470` 填的成本表）
 //
-// **成本怎麼算未解**，所以由呼叫端傳進來。原版的成本是一張以方向為索引的
-// 表，在移動前算好，推測與目標格的地形有關，但沒有追到填表處。
-//
-// `bf` 可以傳 nil，那就跳過地形檢查（純狀態轉移測試用）。
-func (o *Occupancy) Move(bf *Battlefield, u *CombatUnit, d HexDir, cost uint8) (CellIndex, error) {
+// 成本由 `MoveCostTo` 自己算——原版的成本表就是讀 `byte_91E`，
+// 那張表的內容是地形成本，被單位佔住的格則寫成 80。
+func (o *Occupancy) Move(bf *Battlefield, u *CombatUnit, d HexDir) (CellIndex, error) {
 	if u.General == 0 || !u.Cell.Valid() {
 		return NoCell, fmt.Errorf("game: 單位不在場上，無法移動")
 	}
@@ -255,21 +274,39 @@ func (o *Occupancy) Move(bf *Battlefield, u *CombatUnit, d HexDir, cost uint8) (
 	if !ok {
 		return NoCell, fmt.Errorf("game: 格 %d 的方向 %d 出界", u.Cell, d)
 	}
-	if o[dst] != 0 {
-		return NoCell, fmt.Errorf("game: 格 %d 已被單位 %d 佔住", dst, o[dst])
+	col, row := dst.ColRow()
+	if !u.CanCross && bf.Tiles[row][col].Kind.Blocks() {
+		return NoCell, fmt.Errorf("game: 格 %d 是長城，擋住了", dst)
 	}
-	if bf != nil && !u.CanCross {
-		col, row := dst.ColRow()
-		if bf.Tiles[row][col].Kind.Blocks() {
-			return NoCell, fmt.Errorf("game: 格 %d 是長城，擋住了", dst)
-		}
-	}
-	if u.Current < cost {
-		return NoCell, fmt.Errorf("game: 剩餘機動力 %d 不足 %d", u.Current, cost)
+	cost := o.MoveCostTo(bf, dst)
+	if int(u.Current) < cost {
+		return NoCell, fmt.Errorf("game: 走進格 %d 要 %d 機動力，只剩 %d",
+			dst, cost, u.Current)
 	}
 	o[u.Cell] = 0
 	u.Cell = dst
-	u.Current -= cost
+	u.Current -= uint8(cost)
 	o[dst] = u.General
 	return dst, nil
+}
+
+// Exhausted 回報單位這回合是不是哪裡都走不了。
+//
+// 原版 `sub_4A470` 算完六個方向的成本後，若剩餘機動力**每一個都不夠**，
+// 就直接把它歸零——這回合不用再問了。
+func (o *Occupancy) Exhausted(bf *Battlefield, u *CombatUnit) bool {
+	for d := DirLowerLeft; d <= DirUpperRight; d++ {
+		dst, ok := u.Cell.Neighbour(d)
+		if !ok {
+			continue
+		}
+		col, row := dst.ColRow()
+		if !u.CanCross && bf.Tiles[row][col].Kind.Blocks() {
+			continue
+		}
+		if int(u.Current) >= o.MoveCostTo(bf, dst) {
+			return false
+		}
+	}
+	return true
 }

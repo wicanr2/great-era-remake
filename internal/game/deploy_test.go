@@ -270,14 +270,28 @@ func TestDeployAvoidsCellsNextToEnemies(t *testing.T) {
 	}
 }
 
-// 移動：格子轉移、佔用表兩邊都要更新、機動力照扣。
+// plainField 造一張全平原的戰場，每格成本 3。
+// 用人工資料是為了讓成本可預期——真實省份混了各種地形，
+// 驗「扣了多少」會變成驗地形分佈。
+func plainField() *Battlefield {
+	bf := new(Battlefield)
+	for y := range bf.Tiles {
+		for x := range bf.Tiles[y] {
+			bf.Tiles[y][x] = assets.Tile{Kind: assets.TilePlain, Rail: assets.NoRail}
+		}
+	}
+	return bf
+}
+
+// 移動：格子轉移、佔用表兩邊都要更新、機動力照地形成本扣。
 func TestMoveConsumesMovementAllowance(t *testing.T) {
+	bf := plainField()
 	var occ Occupancy
 	start, _ := CellAt(6, 6)
 	u := &CombatUnit{General: 58, Cell: start, Max: 10, Current: 10}
 	occ[start] = u.General
 
-	dst, err := occ.Move(nil, u, DirDown, 3)
+	dst, err := occ.Move(bf, u, DirDown)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -287,7 +301,7 @@ func TestMoveConsumesMovementAllowance(t *testing.T) {
 	if u.Cell != dst {
 		t.Errorf("單位的格沒更新：%d", u.Cell)
 	}
-	if u.Current != 7 {
+	if u.Current != 7 { // 平原成本 3
 		t.Errorf("剩餘機動力 = %d，應為 7", u.Current)
 	}
 	if occ[start] != 0 {
@@ -297,28 +311,65 @@ func TestMoveConsumesMovementAllowance(t *testing.T) {
 		t.Errorf("新格沒指回單位：occ[%d] = %d", dst, occ[dst])
 	}
 
-	// 機動力不足要擋下，而且不能動到任何狀態。
+	// 目標格有人：原版是把成本表寫成 80 來擋，不是獨立的旗標。
+	nb, _ := u.Cell.Neighbour(DirUp)
+	occ[nb] = 999
+	if got := occ.MoveCostTo(bf, nb); got != OccupiedCost {
+		t.Errorf("有人站的格成本 = %d，應為 %d", got, OccupiedCost)
+	}
 	before := *u
-	if _, err := occ.Move(nil, u, DirDown, 99); err == nil {
-		t.Error("機動力不足卻走得動")
+	if _, err := occ.Move(bf, u, DirUp); err == nil {
+		t.Error("目標格有人卻走得進去")
 	}
 	if *u != before {
 		t.Error("移動失敗卻改了單位狀態")
 	}
 
-	// 目標格有人也要擋。
-	nb, _ := u.Cell.Neighbour(DirUp)
-	occ[nb] = 999
-	if _, err := occ.Move(nil, u, DirUp, 1); err == nil {
-		t.Error("目標格有人卻走得進去")
+	// 機動力見底就走不動。
+	u.Current = 2
+	if _, err := occ.Move(bf, u, DirDown); err == nil {
+		t.Error("機動力 2 < 平原成本 3，卻走得動")
+	}
+	if !occ.Exhausted(bf, u) {
+		t.Error("六個方向都走不了，應該回報用盡")
+	}
+	u.Current = 3
+	if occ.Exhausted(bf, u) {
+		t.Error("機動力剛好夠走一格，不該回報用盡")
 	}
 
 	// 出界要擋。
 	edge, _ := CellAt(0, 0)
 	e := &CombatUnit{General: 1, Cell: edge, Max: 9, Current: 9}
 	occ[edge] = 1
-	if _, err := occ.Move(nil, e, DirUp, 1); err == nil {
+	if _, err := occ.Move(bf, e, DirUp); err == nil {
 		t.Error("走出上邊界卻沒被擋")
+	}
+}
+
+// 高山不可通行、鐵路覆蓋地形——兩條都在移動這一層驗一次。
+func TestMoveTerrainCosts(t *testing.T) {
+	bf := plainField()
+	var occ Occupancy
+	start, _ := CellAt(6, 6)
+	down, _ := CellAt(6, 7)
+	dcol, drow := down.ColRow()
+
+	bf.Tiles[drow][dcol] = assets.Tile{Kind: assets.TileMountain, Rail: assets.NoRail}
+	u := &CombatUnit{General: 58, Cell: start, Max: 255, Current: 254}
+	occ[start] = u.General
+	if _, err := occ.Move(bf, u, DirDown); err == nil {
+		t.Error("高山成本 255，機動力 254 不該走得進去")
+	}
+
+	// 同一格加上鐵路就變成 2——原版是先問鐵路再看地形。
+	bf.Tiles[drow][dcol] = assets.Tile{Kind: assets.TileMountain, Rail: 3}
+	u.Current = 2
+	if _, err := occ.Move(bf, u, DirDown); err != nil {
+		t.Errorf("高山鋪了鐵路，成本應為 2：%v", err)
+	}
+	if u.Current != 0 {
+		t.Errorf("剩餘機動力 = %d，應為 0", u.Current)
 	}
 }
 
@@ -355,20 +406,26 @@ func TestMoveBlockedByGreatWall(t *testing.T) {
 	}
 
 	var occ Occupancy
-	u := &CombatUnit{General: 58, Cell: from, Max: 9, Current: 9}
+	u := &CombatUnit{General: 58, Cell: from, Max: 12, Current: 12} // 長城成本 10
 	occ[from] = u.General
-	if _, err := occ.Move(bf, u, dir, 1); err == nil {
+	if _, err := occ.Move(bf, u, dir); err == nil {
 		t.Errorf("從格 %d 走進長城格 %d 竟然通過", from, wall)
 	}
-	if u.Cell != from || u.Current != 9 {
+	if u.Cell != from || u.Current != 12 {
 		t.Error("被擋下卻改了單位狀態")
 	}
 
 	u.CanCross = true
-	if _, err := occ.Move(bf, u, dir, 1); err != nil {
+	if got := occ.MoveCostTo(bf, wall); got != 10 {
+		t.Errorf("長城的移動成本 = %d，應為 10", got)
+	}
+	if _, err := occ.Move(bf, u, dir); err != nil {
 		t.Errorf("能穿越的單位仍被擋：%v", err)
 	}
 	if u.Cell != wall {
 		t.Errorf("穿越後的位置 = %d，應為 %d", u.Cell, wall)
+	}
+	if u.Current != 2 {
+		t.Errorf("穿越長城後剩餘機動力 = %d，應為 2", u.Current)
 	}
 }

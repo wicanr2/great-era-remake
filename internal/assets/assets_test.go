@@ -429,3 +429,59 @@ func TestGreatWallBlocksOnlyInNorthernProvinces(t *testing.T) {
 		t.Error("關口(11) 不該阻隔")
 	}
 }
+
+// 移動成本：常數出自 sub_506B0，這裡驗分組與「鐵路覆蓋地形」。
+func TestTileMoveCost(t *testing.T) {
+	cases := []struct {
+		tile Tile
+		want int
+		why  string
+	}{
+		{Tile{Kind: TilePlain, Rail: NoRail}, 3, "平原"},
+		{Tile{Kind: TilePlateau, Rail: NoRail}, 3, "高原"},
+		{Tile{Kind: TileBridgeA, Rail: NoRail}, 3, "橋樑（縱）"},
+		{Tile{Kind: TileCity, Rail: NoRail}, 4, "城市"},
+		{Tile{Kind: TileDesert, Rail: NoRail}, 4, "沙漠"},
+		{Tile{Kind: TilePass, Rail: NoRail}, 4, "關口"},
+		{Tile{Kind: TileKindMax, Rail: NoRail}, 4, "地物 22"},
+		{Tile{Kind: TileHill, Rail: NoRail}, 5, "丘陵"},
+		{Tile{Kind: TileForest, Rail: NoRail}, 5, "森林"},
+		{Tile{Kind: TileGreatWallFirst, Rail: NoRail}, 10, "長城首段"},
+		{Tile{Kind: TileGreatWallLast, Rail: NoRail}, 10, "長城末段"},
+		{Tile{Kind: TileWater, Rail: NoRail}, 12, "河海"},
+		{Tile{Kind: TileMountain, Rail: NoRail}, MoveCostImpassable, "高山"},
+		// 鐵路覆蓋地形——連高山都變成 2。原版就是這樣寫的：
+		// sub_506B0 第一件事就是問有沒有鐵路，有就直接回，不看地形。
+		{Tile{Kind: TileMountain, Rail: 0}, MoveCostRail, "高山 + 鐵路"},
+		{Tile{Kind: TileWater, Rail: 5}, MoveCostRail, "河海 + 鐵路（鐵橋）"},
+	}
+	for _, c := range cases {
+		if got := c.tile.MoveCost(); got != c.want {
+			t.Errorf("%s 的移動成本 = %d，應為 %d", c.why, got, c.want)
+		}
+	}
+
+	// 全 39 省每一格都要算得出成本，且高山以外都走得動。
+	tiles, err := ParseNWMap(gameFile(t, "NWMAP.DAT"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	impassable := 0
+	for _, grid := range tiles {
+		for y := range grid {
+			for _, tl := range grid[y] {
+				c := tl.MoveCost()
+				if c < MoveCostRail || c > MoveCostImpassable {
+					t.Fatalf("地物 %d 算出離譜的成本 %d", tl.Kind, c)
+				}
+				if c == MoveCostImpassable {
+					impassable++
+					if tl.Kind != TileMountain || tl.HasRail() {
+						t.Errorf("不可通行的格竟不是無鐵路的高山：%+v", tl)
+					}
+				}
+			}
+		}
+	}
+	t.Logf("全 39 省不可通行（高山無鐵路）的格數 = %d", impassable)
+}

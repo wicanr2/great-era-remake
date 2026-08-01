@@ -140,6 +140,53 @@ type Tile struct {
 	Raw uint16
 }
 
+// 移動成本。整張表出自 `sub_506B0`（`docs/re/07` §7），
+// 一個常數都不是推的。
+const (
+	// MoveCostRail 是有鐵路的格。**鐵路覆蓋地形**——`sub_506B0` 第一件事
+	// 就是問有沒有鐵路，有就直接回 2，底下的地形分支根本不看。
+	MoveCostRail = 2
+	// MoveCostImpassable 是高山。機動力是 u8，要 >= 255 才走得動，
+	// 實質上就是不可通行。
+	MoveCostImpassable = 255
+)
+
+// MoveCost 回傳走進這一格要花多少機動力。
+//
+// 分組完全照 `sub_506B0` 的比較順序：
+//
+//	有鐵路                              → 2
+//	平原(1)、高原(10)、橋樑(8,9)         → 3
+//	城市(5)、沙漠(7)、關口(11)、22       → 4
+//	丘陵(2)、森林(4)                    → 5
+//	長城(12..21)                        → 10
+//	河海(3)                             → 12
+//	高山(6)                             → 255（不可通行）
+//
+// ⚠️ 這是**實際移動**的成本。AI 尋路用的是另一組權重
+// （`docs/mechanics/70-ai.md`），河海與沙漠在那邊貴得多。
+func (t Tile) MoveCost() int {
+	if t.HasRail() {
+		return MoveCostRail
+	}
+	switch k := t.Kind; {
+	case k == TilePlain, k == TilePlateau, k == TileBridgeA, k == TileBridgeB:
+		return 3
+	case k == TileCity, k == TileDesert, k == TilePass, k == TileKindMax:
+		return 4
+	case k == TileHill, k == TileForest:
+		return 5
+	case k.Blocks():
+		return 10
+	case k == TileWater:
+		return 12
+	case k == TileMountain:
+		return MoveCostImpassable
+	}
+	// 1..22 全部涵蓋在上面，走到這裡代表地物編號壞了。
+	return MoveCostImpassable
+}
+
 // HasRail 回報這一格有沒有鐵路。
 func (t Tile) HasRail() bool { return t.Rail != NoRail }
 
