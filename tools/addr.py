@@ -62,7 +62,8 @@ FIELDS = {
     "省份記錄": {
         20: ("司令（將領 ID，1-based；0 = 無主）", "docs/spec/03 §2", "confirmed"),
         22: ("鄰省表", "docs/spec/03", "confirmed"),
-        32: ("旗標；bit 2 = 本回合已處理過", "docs/re/14 §1", "confirmed"),
+        22: ("鄰省列表（8×u8）", "docs/spec/03 §2/§4", "confirmed"),
+        32: ("旗標；bit 2 = 本回合已處理過；bit 6 讓鄰省被跳過（語意未解）", "docs/re/14 §1 / re/31 §47", "confirmed"),
     },
 }
 
