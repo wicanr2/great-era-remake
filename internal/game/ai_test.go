@@ -112,10 +112,17 @@ func TestDecideProducesValidActions(t *testing.T) {
 		if !ok {
 			t.Errorf("省 %d 的決定指向 %d，但那不是它的鄰省（%v）", p, a.To, ns)
 		}
-		// 調動類型只有 0/1/4 三種。
-		if a.Kind == AITransfer && a.TransferKind != 0 &&
-			a.TransferKind != 1 && a.TransferKind != 4 {
-			t.Errorf("省 %d 的調動類型 %d 不在 {0,1,4}", p, a.TransferKind)
+		// 決策鏈實際會產生的調動類型：
+		//   0/1  一般調動（sub_150FC）
+		//   2    補窮省（sub_15925）
+		//   3    分兵（sub_15667）
+		//   4    撤回後方（sub_1541E）、增援前線、補給調動
+		switch a.TransferKind {
+		case 0, 1, 2, 3, 4:
+		default:
+			if a.Kind == AITransfer {
+				t.Errorf("省 %d 的調動類型 %d 不在 0..4", p, a.TransferKind)
+			}
 		}
 	}
 	for k, n := range kinds {
@@ -199,29 +206,42 @@ func TestManpowerFlags(t *testing.T) {
 	}
 }
 
-// 守門的作用就是「讓一般調動不要吃掉所有決策」。
+// 守門的作用是「讓一般調動不要吃掉所有決策」。
 //
-// 這條測試釘住那個效果——沒有守門時一般調動 18 次、攻打 0 次；
-// 有守門之後一般調動剩個位數、攻打回來了。改壞了會靜靜消音，
-// 所以要有測試盯著（`70-ai.md` §6l）。
-func TestGatesKeepAttackReachable(t *testing.T) {
+// ⛔ 這條測試原本盯的是「攻打次數 > 0」，前提錯了——
+// **政略決策鏈六步全是調動，沒有一步是攻打**（`docs/re/12`）。
+// 現在盯的是真正該盯的事：一般調動之後的步驟仍然有機會執行。
+//
+// 沒有守門時一般調動 18 次、把後面全吃掉；有守門之後它剩個位數。
+// 改壞了會靜靜消音，所以要有測試盯著。
+func TestGatesLeaveLaterStepsReachable(t *testing.T) {
 	w := realWorld(t)
-	counts := map[AIActionKind]int{}
+	steps := map[string]int{}
+	acted := 0
 	for p := ProvinceID(1); p <= ProvinceCount; p++ {
 		prov, err := w.Table.At(p)
 		if err != nil || prov.Commander == 0 {
 			continue
 		}
-		counts[w.Decide(p).Kind]++
+		a := w.Decide(p)
+		if a.Kind == AINone {
+			continue
+		}
+		acted++
+		steps[a.Step]++
 	}
-	if counts[AIAttack] == 0 {
-		t.Error("攻打 0 次——一般調動又吃掉所有決策了，檢查三道守門")
+	if acted == 0 {
+		t.Fatal("沒有任何省做出決定")
 	}
-	if counts[AITransfer] == 0 {
-		t.Error("調動 0 次——守門太嚴了")
+	if n := steps["sub_150FC 一般調動"]; n > acted/2 {
+		t.Errorf("一般調動佔了 %d/%d 個決定，守門可能失效了", n, acted)
 	}
-	t.Logf("攻打 %d 次、調動 %d 次、無動作 %d 次",
-		counts[AIAttack], counts[AITransfer], counts[AINone])
+	if len(steps) < 2 {
+		t.Errorf("只有 %d 種決策被觸發，鏈上其他步驟都不可達", len(steps))
+	}
+	for k, n := range steps {
+		t.Logf("  %-24s %d 次", k, n)
+	}
 }
 
 // 那個疑似原版 bug 要照抄：省編號當將領 ID 索引。

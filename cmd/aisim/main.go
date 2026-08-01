@@ -24,15 +24,17 @@ func main() {
 	dir := flag.String("game", "workplace/orig/game", "原版素材目錄（唯讀）")
 	turns := flag.Int("turns", 20, "跑幾個回合")
 	verbose := flag.Bool("v", false, "逐省印出決策")
+	fight := flag.Bool("fight", false,
+		"每回合讓前線省對敵省各打一場（**不是原版 AI 行為**，見下）")
 	flag.Parse()
 
-	if err := run(*dir, *turns, *verbose); err != nil {
+	if err := run(*dir, *turns, *verbose, *fight); err != nil {
 		fmt.Fprintln(os.Stderr, "錯誤:", err)
 		os.Exit(1)
 	}
 }
 
-func run(dir string, turns int, verbose bool) error {
+func run(dir string, turns int, verbose, fight bool) error {
 	read := func(name string) ([]byte, error) {
 		return os.ReadFile(filepath.Join(dir, name))
 	}
@@ -53,7 +55,12 @@ func run(dir string, turns int, verbose bool) error {
 		return err
 	}
 
-	w := &game.AIWorld{Table: tbl, Opts: game.StrengthOpts{Stage: 1}, EnableExtra: true}
+	m, err := game.LoadMap(mustRead(dir, "WARPOS.DAT"), mustRead(dir, "TERNAME.DAT"),
+		mustRead(dir, "NWMAP.DAT"))
+	if err != nil {
+		return err
+	}
+	w := &game.AIWorld{Table: tbl, Map: m, Opts: game.StrengthOpts{Stage: 1}, EnableExtra: true}
 	for i := range gs {
 		g := &gs[i]
 		id := game.GeneralID(i + 1)
@@ -75,7 +82,7 @@ func run(dir string, turns int, verbose bool) error {
 	fmt.Println("開局：", summary(w))
 
 	stats := map[string]int{}
-	moved := 0
+	moved, battles, captured := 0, 0, 0
 	for t := 1; t <= turns; t++ {
 		for p := game.ProvinceID(1); p <= game.ProvinceCount; p++ {
 			prov, err := tbl.At(p)
@@ -93,6 +100,11 @@ func run(dir string, turns int, verbose bool) error {
 					t, a.From, a.To, a.Step, a.TransferKind, len(rep.Moved), alertMark(rep))
 			}
 		}
+		if fight {
+			b, c := forceBattles(w, verbose, t)
+			battles += b
+			captured += c
+		}
 		if t%5 == 0 || t == turns {
 			fmt.Printf("第 %2d 回合後：%s\n", t, summary(w))
 		}
@@ -107,8 +119,64 @@ func run(dir string, turns int, verbose bool) error {
 	for _, k := range keys {
 		fmt.Printf("  %-28s %4d\n", k, stats[k])
 	}
-	fmt.Printf("\n累計搬動 %d 人次\n", moved)
+	fmt.Printf("\n累計搬動 %d 人次；打了 %d 場，攻方拿下 %d 省\n",
+		moved, battles, captured)
 	return nil
+}
+
+// forceBattles 讓每個前線省對第一個敵對鄰省打一場。
+//
+// ⚠️ **這不是原版行為。** 政略決策鏈六步全是調動，沒有一步是攻打
+// （`docs/re/12`）——電腦怎麼發動戰爭還沒找到。這個旗標的用途是
+// **壓力測試戰鬥層**、觀察局面在有戰爭時怎麼演變，不是模擬原版。
+func forceBattles(w *game.AIWorld, verbose bool, turn int) (battles, captured int) {
+	for p := game.ProvinceID(1); p <= game.ProvinceCount; p++ {
+		prov, err := w.Table.At(p)
+		if err != nil || prov.Commander == 0 {
+			continue
+		}
+		target := w.Hostile(p)
+		if target == 0 {
+			continue
+		}
+		out, err := w.ResolveAttack(p, target)
+		if err != nil {
+			if verbose {
+				fmt.Printf("  T%02d 省 %2d 攻 %2d 打不成：%v\n", turn, p, target, err)
+			}
+			continue
+		}
+		battles++
+		if out.Decided && out.AttackerWon {
+			captured++
+		}
+		if verbose {
+			fmt.Printf("  T%02d 省 %2d ⚔ %2d　%s　%d 回合　攻損 %d／守損 %d\n",
+				turn, p, target, verdict(out), out.Turns,
+				out.AttackerLoss, out.DefenderLoss)
+		}
+	}
+	return battles, captured
+}
+
+func verdict(o game.BattleOutcome) string {
+	switch {
+	case !o.Decided:
+		return "僵局"
+	case o.AttackerWon:
+		return "攻方勝"
+	default:
+		return "守方勝"
+	}
+}
+
+func mustRead(dir, name string) []byte {
+	b, err := os.ReadFile(filepath.Join(dir, name))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "讀不到", name, err)
+		os.Exit(1)
+	}
+	return b
 }
 
 func alertMark(r game.TransferReport) string {

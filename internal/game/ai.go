@@ -30,7 +30,11 @@ const (
 	AINone AIActionKind = iota
 	// AITransfer 是調動（`sub_14F9A`）。決策鏈六步裡有五步做這個。
 	AITransfer
-	// AIAttack 是攻打（`sub_15925`）。
+	// AIAttack 是攻打。
+	//
+	// ⚠️ **政略決策鏈裡沒有任何一步會產生它**——六步全是調動
+	// （`docs/re/12`）。留著這個值是因為攻打確實存在（`docs/re/06`
+	// 解過進入戰鬥的三個 gate），只是觸發它的地方還沒找到。
 	AIAttack
 )
 
@@ -60,6 +64,14 @@ const (
 	AISpreadMinGenerals = 3
 	// AISupplyMinGenerals 是往補給省調動的門檻（`sub_15A9A`，§6k）。
 	AISupplyMinGenerals = 4
+	// AIPoorestFrontGenerals / AIPoorestRearGenerals 是 `sub_15925` 的前置
+	// 門檻（`docs/re/12`）。**25 幾乎不可能達到**，所以前線省這一步等於關閉。
+	AIPoorestFrontGenerals = 25
+	AIPoorestRearGenerals  = 5
+	// AITransferableFrontCap / AITransferableRearCap 是 `sub_1588C` 收目標時
+	// 對「自己的省」的將領數上限。
+	AITransferableFrontCap = 15
+	AITransferableRearCap  = 2
 )
 
 // 補給門檻（`sub_15A9A`，§6k）。資源上限是 60,000，
@@ -186,7 +198,7 @@ func (w *AIWorld) chain(p ProvinceID) []func(ProvinceID) AIAction {
 		steps = []func(ProvinceID) AIAction{
 			w.pullBack,
 			func(q ProvinceID) AIAction { return w.generalTransfer(q, 2) },
-			w.attack,
+			func(q ProvinceID) AIAction { return w.poorestTransfer(q, true) },
 		}
 	} else {
 		steps = []func(ProvinceID) AIAction{
@@ -194,7 +206,7 @@ func (w *AIWorld) chain(p ProvinceID) []func(ProvinceID) AIAction {
 			w.spreadOut,
 			func(q ProvinceID) AIAction { return w.generalTransfer(q, 1) },
 			w.reinforceFront,
-			w.attack,
+			func(q ProvinceID) AIAction { return w.poorestTransfer(q, false) },
 		}
 	}
 	if w.EnableExtra {
@@ -481,14 +493,76 @@ func (w *AIWorld) supplyTransfer(p ProvinceID) AIAction {
 	return AIAction{}
 }
 
-// attack 是 `sub_15925`：挑一個可攻打的鄰省。
+// poorestTransfer 是 `sub_15925`（`docs/re/12`）。
 //
-// 規則見 `SPEC-01` §2：鄰省、司令不同、且非無主。
-func (w *AIWorld) attack(p ProvinceID) AIAction {
-	if t := w.Table.FirstAttackable(p); t != 0 {
-		return AIAction{Kind: AIAttack, From: p, To: t, Step: "sub_15925 攻打"}
+// ⛔ **這一支原本被當成「攻打」，是誤判。** 它最後呼叫的是
+// `sub_14F9A(狀態, 2, 目標)`——調動，而且目標篩選 `sub_1588C`
+// 只放行「無主省」與「自己的省」，一個敵省都不收。
+//
+// 一道很硬的前置門檻：
+//
+//	前線省（arg_2 = 1）：當前省將領數 >= 25（19h）
+//	後方省（arg_2 = 0）：當前省將領數 >= 5
+//
+// 25 這個數字幾乎不會達到（`sub_1527A` 的增援上限才 15），
+// 所以**前線省這一步實際上等於關閉**。
+//
+// 目標依省份記錄 `+0`（黃金）**升序**排，挑最窮的那個
+// ——把部隊送去自己最缺錢的省。
+func (w *AIWorld) poorestTransfer(p ProvinceID, frontline bool) AIAction {
+	need := AIPoorestRearGenerals
+	if frontline {
+		need = AIPoorestFrontGenerals
 	}
-	return AIAction{}
+	if w.GeneralCount(p) < need {
+		return AIAction{}
+	}
+	prov, err := w.Table.At(p)
+	if err != nil {
+		return AIAction{}
+	}
+	best, bestGold := ProvinceID(0), 0
+	for _, n := range w.neighbours(prov) {
+		np, err := w.Table.At(n)
+		if err != nil || !w.transferable(n, prov.Commander) {
+			continue
+		}
+		if np.Flags&ProvinceFlagInBattle != 0 {
+			continue
+		}
+		if best == 0 || int(np.Gold) < bestGold {
+			best, bestGold = n, int(np.Gold)
+		}
+	}
+	if best == 0 {
+		return AIAction{}
+	}
+	return AIAction{Kind: AITransfer, From: p, To: best,
+		TransferKind: int(TransferUnderHalfCapped), Step: "sub_15925 補窮省"}
+}
+
+// transferable 是 `sub_1588C`：這個鄰省可不可以當目標。
+//
+//	無主省                     → 可以
+//	別人的省                   → 不行（**一個敵省都不收**）
+//	自己的前線省，將領數 <= 15 → 可以
+//	自己的後方省，將領數 <= 2  → 可以
+func (w *AIWorld) transferable(n ProvinceID, faction GeneralID) bool {
+	np, err := w.Table.At(n)
+	if err != nil {
+		return false
+	}
+	if np.Commander == 0 {
+		return true
+	}
+	if np.Commander != faction {
+		return false
+	}
+	count := w.GeneralCount(n)
+	if w.Hostile(n) != 0 {
+		return count <= AITransferableFrontCap
+	}
+	return count <= AITransferableRearCap
 }
 
 // neighbours 回傳鄰省表的前 7 格（原版只掃 7 格），濾掉填充與海洋境外。
