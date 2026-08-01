@@ -6,8 +6,13 @@
 // （還是所有兵擠成一堆、還是誰都不動）只有跑才看得出來。
 // 對照 docs/playtest/04 在戰鬥層做的同一件事。
 //
-// ⚠️ 這不是與原版對照。DOSBox 的輸入問題（docs/playtest/03）沒解之前
-// 拿不到實機的逐回合狀態。
+// ⚠️ 這不是與原版對照——DOSBox oracle 已恢復可用（docs/playtest/06），
+// 但還沒拿它做逐回合對照。
+//
+// ⛔ `-fight` 的定位改了：它原本標記為「不是原版 AI 行為」，
+// 依據是 docs/re/12 的「電腦不會攻打」。**那個結論已作廢**
+// （docs/re/29：電腦會填參戰部隊表）。現在的理解是 `-fight`
+// **比關掉更接近原版**，但在實跑驗證之前不改預設值。
 package main
 
 import (
@@ -25,7 +30,7 @@ func main() {
 	turns := flag.Int("turns", 20, "跑幾個回合")
 	verbose := flag.Bool("v", false, "逐省印出決策")
 	fight := flag.Bool("fight", false,
-		"每回合讓前線省對敵省各打一場（**不是原版 AI 行為**，見下）")
+		"每回合讓前線省對敵省各打一場（見下：**比關掉更接近原版**，但未實跑驗證）")
 	until := flag.Bool("until-unified", false,
 		"跑到只剩一個勢力為止（配 -fight 才有意義）")
 	recruit := flag.Bool("recruit", false,
