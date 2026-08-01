@@ -191,7 +191,9 @@ DOSBox 設定 `machine=svga_s3`，但這是打包者選的，不代表原版需�
 - `.MUS`／`.TIM` 成對，共 **8 組**（原本這裡只列了 5 組，漏掉 `MAINTHEM`、
   `STRATEGY`、`WALL`）：`MAINTHEM`(31,227 B，最大，主題曲)、`BATTLE1`、`BATTLE2`、
   `SCENE`、`FINAL`、`BT02`、`WALL`、`STRATEGY`。檔名對得上場景：政略、戰鬥、過場、結局。
-  `BT02.TIM` 裡有 `bass2` 這種樂器名字串，看起來是樂器與時序表。
+  `BT02.TIM` 裡有 `bass2` 這種樂器名字串——**已 confirmed**：`.TIM` 就是
+  AdLib Timbre Bank（OPL 雙運算元 FM 參數），`.MUS` 是 AdLib MUS 事件流。
+  詳見 `docs/formats/06-mus-tim-audio.md`。
 - `GRT.GLB` 239 KB，熵 **7.96 bit/byte** → 壓縮或加密過的封裝，不是裸資料。
 - `PLACD.SAV` 1.2 MB，是所有檔案裡最大的一個，用途未知。
 - `SAVE(1)`／`SAVE(2)` 各有 `.DT1` 與 `.DT2` 兩份，可拿來做存檔 diff。
@@ -201,9 +203,15 @@ DOSBox 設定 `machine=svga_s3`，但這是打包者選的，不代表原版需�
 
 ### 3.7 未知（誠實標記，不要靜悄悄變成前提）
 
-`.GLB` 封裝格式、`PLACD.SAV` 用途、`.MUS` 音樂格式與音源（AdLib？MIDI？PC speaker？）、
-`.DAT` 十二個資料表的語意、`.GTB`（2 個，200–380 B）、`SR.EXE` 的來歷、
-`.TPC` 那 20 byte 的差額。
+`.GLB` 封裝格式、`PLACD.SAV` 用途、`.DAT` 十二個資料表的語意、
+`.GTB`（2 個，200–380 B）、`SR.EXE` 的來歷、`.TPC` 那 20 byte 的差額。
+
+✅ **`.MUS`／`.TIM` 已全解**（`docs/formats/06`，READY）：音源是
+**AdLib／OPL2（YM3812），埠 0x388–0x389**——三條獨立證據（`GRT.EXE`
+`sub_144C3` 是教科書等級的 AdLib 偵測程序、`.TIM` 是公開文件化的
+AdLib Timbre Bank、聲部 0–5 旋律 + 6–10 打擊吻合 OPL2 rhythm mode）。
+兩者都**不是自製格式**，是公開的 AdLib MUS + Timbre Bank，全部欄位對上。
+旋律可完整取出（`tools/mus.py midi`）。播放走 TSR 掛 **INT 66h**。
 
 五個執行檔的角色（2026-08-01 反組譯，見 `docs/re/02`、`docs/re/03`）：
 

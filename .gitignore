@@ -29,6 +29,16 @@ STDFONT.*
 SPCFONT.*
 ASCFONT.*
 
+# 音訊衍生物：從原版 .MUS/.TIM 轉出來的旋律，與原版資產同等看待
+# （docs/formats/06 已 confirmed 那是 AdLib MUS + Timbre Bank，
+#  轉成 MIDI 只是換一種表示法，旋律還是原版的）
+*.mid
+*.midi
+*.ogg
+*.wav
+*.snd
+*.bnk
+
 # IDA / 反組譯產物
 *.i64
 *.idb

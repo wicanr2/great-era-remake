@@ -12,6 +12,9 @@ cd "$ROOT"
 
 # 原版二進位資產：一個 byte 都不該進版控
 DENY_EXT='\.(TPC|RGB|MUS|TIM|GLB|GTB|DT1|DT2|SAV|CPS|BGI|EXE|exe)$|\.15$|^MAN[123]15$|(/|^)(TN15\.[0-9]+|[0-9]+\.15)$'
+# 音訊衍生物：.MUS/.TIM 轉出來的旋律與原版同等看待（docs/formats/06 已 confirmed
+# 那是 AdLib MUS + Timbre Bank，轉 MIDI 只是換表示法，旋律還是原版的）
+DENY_AUDIO='\.(mid|midi|ogg|wav|snd|bnk|MID|MIDI|OGG|WAV|SND|BNK)$'
 # 倚天字型：不得散布
 DENY_FONT='(STDFONT|SPCFONT|ASCFONT|SPCFSUPP)\.'
 # 整個原版素材區
@@ -25,7 +28,7 @@ else
   files=$(printf '%s\n%s\n' "$files" "$staged" | sort -u | sed '/^$/d')
 fi
 
-hits=$(printf '%s\n' "$files" | grep -E "$DENY_EXT|$DENY_FONT|$DENY_DIR" || true)
+hits=$(printf '%s\n' "$files" | grep -E "$DENY_EXT|$DENY_AUDIO|$DENY_FONT|$DENY_DIR" || true)
 
 # ── 展示截圖的白名單（CLAUDE.md §9 的唯一例外）─────────────────────
 #

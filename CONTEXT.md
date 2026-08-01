@@ -42,7 +42,7 @@
 | **`.GLB`／`.GTB` 圖庫** | ✅ **confirmed**：PKWARE DCL implode + 13 B 目錄，45 筆全解。**逐像素 round-trip 通過**。見 `docs/formats/02-glb-image-library.md` |
 | **執行檔反組譯（M2）** | 🔶 4/5 進 IDA（`SDFA` 解不開）。**戰鬥模組已定位**：`sub_39B6E` ← `PROGRAM+537`，主迴圈在 `+18F`–`+6F4`。見 `docs/re/04` |
 | **`PLACD.SAV`** | ✅ **是 ZIP**：整包遊戲的 1993 年備份，145/147 檔與 `game/` byte-identical。見 `docs/formats/03-placd-archive.md` |
-| `.MUS`／`.TIM` | ⬜ 未開始；音源未確認 |
+| `.MUS`／`.TIM` | ✅ **全解**（`docs/formats/06`，READY）。音源 **AdLib／OPL2（YM3812）埠 0x388–0x389**，三條獨立證據。兩者都是**公開文件化的 AdLib 格式**（MUS 事件流 + Timbre Bank），不是自製。旋律可完整取出轉 MIDI（`tools/mus.py`）。播放走 TSR 掛 INT 66h。⚠️ 主遊戲 `WAR`／`SR` **一個音效都沒有**，只有 `GRT`／`GRTE` 的 PC 喇叭掃頻音 |
 | **`.DAT` 資料表** | 🔶 **39 省是核心維度**：`TERNAME`／`WARPOS` 每省 196 B、`MEM_WAR` 每省 469 B、`TOWN(N)` 每省 37 B。`MAN(N).DAT` 33 B/人 |
 | **將領番號** | ✅ **`+25`/`+26`/`+27`/`+28` 全解**：前綴／編號／後綴／勢力名，三個索引都指向 `FAN(1).15` 的槽位（1-based）。11 個勢力名對上 1926 史實。見 `docs/spec/02` |
 | **將領能力值** | ✅ **三個全部定名**（實機「查閱將領」）：`+0` 帶兵能力、`+1` **忠誠度**、`+2` **政治手腕**。連同 `+17`／`+19`／`+20` 共六欄零誤差。見 `docs/playtest/08` |
