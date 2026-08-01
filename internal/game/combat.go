@@ -1,5 +1,7 @@
 package game
 
+import "github.com/wicanr2/great-era-remake/internal/assets"
+
 // 戰鬥規則。依據：docs/mechanics/30-combat.md
 //
 // **這一層只放已經從程式碼讀出來的規則**，沒解出來的不猜。
@@ -198,4 +200,53 @@ func (b *Battle) EndTurn() {
 // 要確認就實機打一場，記錄該欄位的變化序列。
 func CombatDecay(v uint8) uint8 {
 	return v - uint8((uint16(v)+CombatDecayDivisor/2)/CombatDecayDivisor)
+}
+
+// 地形對戰力的加成。倍率出自 `sub_51D68`（`docs/re/08` §3a），
+// **這是社群說法「地形影響防禦」的第一份程式碼證據**。
+//
+// 原版的寫法是自我相加：`v += v` 就是 ×2，城市那條先算 `v×2` 再加回去
+// 所以是 ×3。
+const (
+	// TerrainBonusRail 是有鐵路的格。鐵路先問，問到就不看地形。
+	TerrainBonusRail = 2
+	// TerrainBonusHillPass 是丘陵與關口。
+	TerrainBonusHillPass = 2
+	// TerrainBonusCity 是城市——全遊戲最高的加成。
+	TerrainBonusCity = 3
+)
+
+// TerrainBonus 回傳站在這一格的戰力倍率。
+//
+// 依 `sub_51D68` 的順序：先問鐵路，再看地形，其餘一律 1 倍。
+//
+// ⚠️ 這個加成有一個開關（`sub_51D68` 的 `arg_A`）。
+// `sub_5301B` 那條呼叫路徑傳 0，**不套用**；另一個呼叫端
+// （`sub_483A5`）還沒讀。所以「什麼時候算地形」尚未確定。
+func TerrainBonus(t assets.Tile) int {
+	if t.HasRail() {
+		return TerrainBonusRail
+	}
+	switch t.Kind {
+	case assets.TileHill, assets.TilePass:
+		return TerrainBonusHillPass
+	case assets.TileCity:
+		return TerrainBonusCity
+	}
+	return 1
+}
+
+// RoutThreshold 是「一面倒」的門檻倍率。
+//
+// `sub_51D68` 算完雙方戰力後分兩條路：任一方的戰力 ×4 還不到對方，
+// 就走 `sub_51972`；雙方都在 4 倍之內才走 `sub_51B94`。
+// 兩支的戰損算法不同，**都還沒讀**。
+//
+// 詞表的「崩潰」「敗逃」「打敗」（`2.15`）很可能對應一面倒那條，
+// 但沒有證據。
+const RoutThreshold = 4
+
+// Lopsided 回報兩個戰力值是不是差到「一面倒」的程度，語意照 `sub_51D68`。
+func Lopsided(a, b int) bool {
+	return a*RoutThreshold <= b || b*RoutThreshold <= a
 }

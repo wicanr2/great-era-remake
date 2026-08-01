@@ -1,6 +1,10 @@
 package game
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/wicanr2/great-era-remake/internal/assets"
+)
 
 // TestDecayMatchesOriginal 驗證整數版的衰減與原版的浮點算式等價。
 //
@@ -179,5 +183,49 @@ func TestTwoDecayRulesDiffer(t *testing.T) {
 	}
 	if CombatDecay(30) != 27 {
 		t.Errorf("CombatDecay(30) 應為 27（無門檻），實得 %d", CombatDecay(30))
+	}
+}
+
+// 地形加成：倍率出自 sub_51D68，鐵路優先於地形。
+func TestTerrainBonus(t *testing.T) {
+	cases := []struct {
+		tile assets.Tile
+		want int
+		why  string
+	}{
+		{assets.Tile{Kind: assets.TilePlain, Rail: assets.NoRail}, 1, "平原無加成"},
+		{assets.Tile{Kind: assets.TileHill, Rail: assets.NoRail}, 2, "丘陵"},
+		{assets.Tile{Kind: assets.TilePass, Rail: assets.NoRail}, 2, "關口"},
+		{assets.Tile{Kind: assets.TileCity, Rail: assets.NoRail}, 3, "城市，全遊戲最高"},
+		{assets.Tile{Kind: assets.TileMountain, Rail: assets.NoRail}, 1, "高山沒有加成"},
+		{assets.Tile{Kind: assets.TileWater, Rail: assets.NoRail}, 1, "河海沒有加成"},
+		// 鐵路先問，問到就不看地形——所以鐵路上的城市是 2 不是 3。
+		{assets.Tile{Kind: assets.TileCity, Rail: 4}, 2, "城市 + 鐵路"},
+		{assets.Tile{Kind: assets.TilePlain, Rail: 0}, 2, "平原 + 鐵路"},
+	}
+	for _, c := range cases {
+		if got := TerrainBonus(c.tile); got != c.want {
+			t.Errorf("%s 的戰力倍率 = %d，應為 %d", c.why, got, c.want)
+		}
+	}
+}
+
+// 一面倒的門檻：4 倍。邊界是 <=，不是 <。
+func TestLopsidedThreshold(t *testing.T) {
+	cases := []struct {
+		a, b int
+		want bool
+	}{
+		{10, 40, true},    // 剛好 4 倍 → 一面倒
+		{10, 39, false},   // 差一點
+		{40, 10, true},    // 反方向
+		{100, 100, false}, // 勢均力敵
+		{1, 4, true},
+		{3, 11, false},
+	}
+	for _, c := range cases {
+		if got := Lopsided(c.a, c.b); got != c.want {
+			t.Errorf("Lopsided(%d, %d) = %v，應為 %v", c.a, c.b, got, c.want)
+		}
 	}
 }
