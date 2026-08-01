@@ -194,3 +194,52 @@ func TestManpowerFlags(t *testing.T) {
 		t.Error("司令本人滿員不該設 bit 0")
 	}
 }
+
+// 守門的作用就是「讓一般調動不要吃掉所有決策」。
+//
+// 這條測試釘住那個效果——沒有守門時一般調動 18 次、攻打 0 次；
+// 有守門之後一般調動剩個位數、攻打回來了。改壞了會靜靜消音，
+// 所以要有測試盯著（`70-ai.md` §6l）。
+func TestGatesKeepAttackReachable(t *testing.T) {
+	w := realWorld(t)
+	counts := map[AIActionKind]int{}
+	for p := ProvinceID(1); p <= ProvinceCount; p++ {
+		prov, err := w.Table.At(p)
+		if err != nil || prov.Commander == 0 {
+			continue
+		}
+		counts[w.Decide(p).Kind]++
+	}
+	if counts[AIAttack] == 0 {
+		t.Error("攻打 0 次——一般調動又吃掉所有決策了，檢查三道守門")
+	}
+	if counts[AITransfer] == 0 {
+		t.Error("調動 0 次——守門太嚴了")
+	}
+	t.Logf("攻打 %d 次、調動 %d 次、無動作 %d 次",
+		counts[AIAttack], counts[AITransfer], counts[AINone])
+}
+
+// 那個疑似原版 bug 要照抄：省編號當將領 ID 索引。
+// 這條測試把行為釘住，免得有人「順手修好」而不自知改了遊戲規則。
+func TestPortsOriginalIndexingBug(t *testing.T) {
+	w := &AIWorld{
+		Units: []CombatUnit{
+			{General: 1, Faction: 100}, // 將領 1
+			{General: 2, Faction: 200}, // 將領 2
+			{General: 3, Faction: 300}, // 將領 3
+		},
+	}
+	// 傳「省 2」，原版讀的是**將領 2** 的效忠勢力（200），
+	// 而不是省 2 的司令。
+	if !w.generalsLoyalTo(2, 200) {
+		t.Error("應該讀到將領 2 的效忠勢力 200——原版就是這樣索引的")
+	}
+	if w.generalsLoyalTo(2, 100) {
+		t.Error("不該讀到將領 1")
+	}
+	// 超出將領表就回 false，不 panic。
+	if w.generalsLoyalTo(99, 100) {
+		t.Error("省編號超出將領表時應回 false")
+	}
+}

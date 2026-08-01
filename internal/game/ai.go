@@ -167,16 +167,8 @@ func (w *AIWorld) GeneralCount(p ProvinceID) int {
 // 順序照 `sub_15F3C`（§6d）：先看這個省是不是前線，再依鏈往下試，
 // **第一個做出決定的就是答案**。
 //
-// ⚠️ **已知與原版的差異。** 原版每一步還有幾道守門
-// （`sub_13F4E`／`sub_1401E`／`sub_36BC7`）尚未讀出，這裡沒有實作。
-// 後果很具體：`generalTransfer`（一般調動）的條件只剩「鄰省有主」，
-// 幾乎總是成立，於是**它會吃掉所有決策，排在它後面的攻打永遠輪不到**。
-//
-// 拿 `SAVE(1)` 的局面跑一遍就看得出來：29 個有主的省裡，
-// 18 個走一般調動、6 個撤回後方、5 個分兵，**攻打 0 次**。
-// 原版當然會攻打——差在那三道守門。
-//
-// 在守門解出來之前，**不要把這支當成原版行為的替代品**。
+// 三道守門（`sub_13F4E`／`sub_1401E`／`sub_36BC7`）已經實作，
+// 見各自的方法。**含一個疑似原版 bug，照抄並標記**（`generalsLoyalTo`）。
 func (w *AIWorld) Decide(p ProvinceID) AIAction {
 	if w.Hostile(p) != 0 {
 		return w.decideFrontline(p)
@@ -335,8 +327,22 @@ func (w *AIWorld) generalTransfer(p ProvinceID, mode int) AIAction {
 		if err != nil || np.Commander == 0 {
 			continue // 無主省不調
 		}
-		if mode == 2 && np.Flags&ProvinceFlagInBattle != 0 {
+		// sub_13F4E：鄰省裡要有效忠我方的（含那個疑似 bug 的索引）。
+		if !w.generalsLoyalTo(n, prov.Commander) {
 			continue
+		}
+		// sub_1401E：模式 1 時，目標省要比當前省窮。
+		if mode == 1 && !w.poorerThan(n, p) {
+			continue
+		}
+		// sub_36BC7：模式 2 還要過特殊省份的檢查。
+		if mode == 2 {
+			if !isSpecial(n) {
+				continue
+			}
+			if np.Flags&ProvinceFlagInBattle != 0 {
+				continue
+			}
 		}
 		kind := 0
 		switch {
@@ -396,4 +402,57 @@ func (w *AIWorld) neighbours(prov *Province) []ProvinceID {
 		out = append(out, ProvinceID(b))
 	}
 	return out
+}
+
+// SpecialProvinces 是 `sub_36BC7` 硬編碼在程式裡的五個省。
+//
+// ⚠️ **這五個省與 `WARPOS.DAT` 裡帶哨兵 40 的五個省完全相同**
+// （`70-ai.md` §6m）。一份是 1992 年的地圖資料、一份是程式常數，
+// 兩處毫不相干卻一模一樣——那五個省有共同的特殊性質，**語意未定**。
+var SpecialProvinces = [5]ProvinceID{7, 11, 20, 21, 36}
+
+// isSpecial 是 `sub_36BC7` 的簡化版：只實作「這個省本身在清單裡」那一條。
+//
+// ⚠️ 原版還有兩條分支（`sub_5B76E` 與 `sub_5BF74`，都**未讀**），
+// 所以這裡比原版嚴格——會擋掉一些原版放行的情況。
+func isSpecial(p ProvinceID) bool {
+	for _, s := range SpecialProvinces {
+		if s == p {
+			return true
+		}
+	}
+	return false
+}
+
+// poorerThan 是 `sub_1401E`（`70-ai.md` §6m）：
+// 目標省的**黃金與糧食都比當前省少**才回 true。
+func (w *AIWorld) poorerThan(target, here ProvinceID) bool {
+	t, err1 := w.Table.At(target)
+	h, err2 := w.Table.At(here)
+	if err1 != nil || err2 != nil {
+		return false
+	}
+	return t.Gold < h.Gold && t.Food < h.Food
+}
+
+// generalsLoyalTo 是 `sub_13F4E` 的核心判斷。
+//
+// # ⚠️ 這裡照抄了一個疑似原版 bug
+//
+// 原版拿**鄰省編號**去索引將領表（`mul 21h` = 33，將領記錄大小），
+// 讀第 (鄰省編號) 個將領的效忠勢力。正確的寫法應該是拿省編號索引
+// 省份表（`mul 25h` = 37）讀該省的司令——同樣做這件事的 `sub_5B7DC`
+// 就是那樣寫的。
+//
+// 兩個常數同時不同，而型別剛好相容（兩邊都是勢力領袖 ID 的 u16），
+// 所以不會崩，只是讀到不相干的將領。詳見 `70-ai.md` §6m。
+//
+// **照抄是刻意的**：`CLAUDE.md` §1 的定位是還原，「不得默默改動遊戲規則」
+// ——bug 也是 1992 年玩家玩到的行為。要修是 remake 差異，由使用者決定。
+func (w *AIWorld) generalsLoyalTo(neighbour ProvinceID, faction GeneralID) bool {
+	i := int(neighbour) - 1 // 將領 ID 是 1-based
+	if i < 0 || i >= len(w.Units) {
+		return false
+	}
+	return w.Units[i].Faction == faction
 }
