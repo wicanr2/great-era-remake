@@ -18,7 +18,7 @@ const PlaceNameSlotWidth = 5
 // 舊說「格值 = 地形編號 0..22」解釋不了為什麼各省的上限都不一樣，
 // 也解釋不了為什麼上限剛好落在該省的地名數上。
 func TestPlaceIndexMatchesNameTable(t *testing.T) {
-	m, err := LoadMap(readGame(t, "WARPOS.DAT"), readGame(t, "TERNAME.DAT"))
+	m, err := LoadMap(readGame(t, "WARPOS.DAT"), readGame(t, "TERNAME.DAT"), readGame(t, "NWMAP.DAT"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +50,7 @@ func TestPlaceIndexMatchesNameTable(t *testing.T) {
 // 河流與山脈綿延多格、城市各佔一格——這是「地名索引」說的旁證：
 // 如果格值是地形類型，就不會出現「某個值全省只有一格」這種分佈。
 func TestPlaceDistribution(t *testing.T) {
-	m, err := LoadMap(readGame(t, "WARPOS.DAT"), readGame(t, "TERNAME.DAT"))
+	m, err := LoadMap(readGame(t, "WARPOS.DAT"), readGame(t, "TERNAME.DAT"), readGame(t, "NWMAP.DAT"))
 	if err != nil {
 		t.Fatal(err)
 	}

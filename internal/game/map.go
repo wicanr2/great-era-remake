@@ -40,6 +40,9 @@ type Battlefield struct {
 	Owner [assets.GridH][assets.GridW]ProvinceID
 	// Place[y][x] 是地名索引，指向該省的 TN15 地名表。
 	Place [assets.GridH][assets.GridW]PlaceIndex
+	// Tiles 是每格的地物（NWMAP.DAT，SPEC-04）：平原、水、城市、城牆…
+	// 地名說「這一格叫什麼」，地物說「這一格該畫成什麼」。
+	Tiles assets.TileGrid
 }
 
 // MaxPlace 回傳這張戰場用到的最大地名索引，也就是該省的地名數。
@@ -61,11 +64,11 @@ type Map struct {
 	fields    []Battlefield
 }
 
-// LoadMap 從 WARPOS.DAT 與 TERNAME.DAT 建出地圖。
+// LoadMap 從 WARPOS.DAT、TERNAME.DAT 與 NWMAP.DAT 建出地圖。
 //
 // 鄰接表是**從檔案導出**的，不在程式碼裡重打一份——重抄的那份一定會漂
 // （CLAUDE.md §7 第 4 條）。
-func LoadMap(warpos, tername []byte) (*Map, error) {
+func LoadMap(warpos, tername, nwmap []byte) (*Map, error) {
 	pos, err := assets.ParseProvinceGrids(warpos)
 	if err != nil {
 		return nil, fmt.Errorf("game: WARPOS.DAT: %w", err)
@@ -73,6 +76,11 @@ func LoadMap(warpos, tername []byte) (*Map, error) {
 	ter, err := assets.ParseProvinceGrids(tername)
 	if err != nil {
 		return nil, fmt.Errorf("game: TERNAME.DAT: %w", err)
+	}
+
+	tiles, err := assets.ParseNWMap(nwmap)
+	if err != nil {
+		return nil, fmt.Errorf("game: NWMAP.DAT: %w", err)
 	}
 
 	if bad := pos.IsSymmetric(); len(bad) != 0 {
@@ -93,6 +101,7 @@ func LoadMap(warpos, tername []byte) (*Map, error) {
 			ids[i] = ProvinceID(v)
 		}
 		m.adjacency[k] = ids
+		m.fields[k].Tiles = tiles[k]
 
 		for y := 0; y < assets.GridH; y++ {
 			for x := 0; x < assets.GridW; x++ {

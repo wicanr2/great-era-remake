@@ -14,10 +14,11 @@ func loadTestMap(t *testing.T) *Map {
 	t.Helper()
 	warpos, err1 := os.ReadFile(filepath.Join(gameDir, "WARPOS.DAT"))
 	tername, err2 := os.ReadFile(filepath.Join(gameDir, "TERNAME.DAT"))
-	if err1 != nil || err2 != nil {
+	nwmap, err3 := os.ReadFile(filepath.Join(gameDir, "NWMAP.DAT"))
+	if err1 != nil || err2 != nil || err3 != nil {
 		t.Skip("沒有原版素材，跳過")
 	}
-	m, err := LoadMap(warpos, tername)
+	m, err := LoadMap(warpos, tername, nwmap)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -26,7 +27,7 @@ func loadTestMap(t *testing.T) *Map {
 
 // TestLoadMapRejectsBadSize 確認尺寸不對時會報錯而不是默默吃掉。
 func TestLoadMapRejectsBadSize(t *testing.T) {
-	if _, err := LoadMap(make([]byte, 100), make([]byte, 100)); err == nil {
+	if _, err := LoadMap(make([]byte, 100), make([]byte, 100), make([]byte, 100)); err == nil {
 		t.Fatal("尺寸不對應該報錯")
 	}
 }

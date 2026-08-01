@@ -13,10 +13,11 @@ func loadTestMap(t *testing.T) *game.Map {
 	t.Helper()
 	warpos, e1 := os.ReadFile(filepath.Join(gameDir, "WARPOS.DAT"))
 	tername, e2 := os.ReadFile(filepath.Join(gameDir, "TERNAME.DAT"))
-	if e1 != nil || e2 != nil {
+	nwmap, e3 := os.ReadFile(filepath.Join(gameDir, "NWMAP.DAT"))
+	if e1 != nil || e2 != nil || e3 != nil {
 		t.Skip("沒有原版素材，跳過")
 	}
-	m, err := game.LoadMap(warpos, tername)
+	m, err := game.LoadMap(warpos, tername, nwmap)
 	if err != nil {
 		t.Fatal(err)
 	}

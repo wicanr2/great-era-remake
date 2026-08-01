@@ -1,6 +1,7 @@
 // dsds 是《大時代的故事》remake 的執行檔。
 //
-// 目前做到的：載入原版資料，用 Ebiten 顯示各省的戰場格子與省名，可切換省份。
+// 目前做到的：載入原版資料，用**原版的地形圖塊**畫出各省的 14×14 戰場，
+// 側欄顯示省名，可切換省份。
 // 遊戲邏輯（戰鬥、政略指令、存檔）尚未實作——那些的規格還沒解出來。
 //
 //	tools/go.sh run ./cmd/dsds -game workplace/orig/game
@@ -30,16 +31,19 @@ import (
 // 邏輯解析度仍是原版的 640×350。
 const scale = 2
 
-// 省名畫在哪。位置是 remake 的排版選擇，不是還原原版座標。
+// 版面。戰場是 14×14 格 × 32×24 = 448×336，放進 640×350 之後
+// 右側剩 192 寬給側欄——這個比例與原版政略畫面（左側面板 + 右側地圖）一致，
+// 但**座標本身是 remake 的排版選擇，不是還原原版數值**。
 const (
-	nameX, nameY = 24, 16
-	fieldX       = 24
-	fieldY       = 48
+	fieldX, fieldY = 0, 14
+	sideX          = 452
+	nameY          = 16
 )
 
 type app struct {
 	m        *game.Map
 	provName *assets.GlyphFile // 3.15：前 39 個三字詞條是省名
+	tiles    *render.TileSet   // NEWTERR.TPC 的 22 張地形圖塊
 	current  game.ProvinceID
 	dirty    bool
 	frame    *ebiten.Image
@@ -69,17 +73,20 @@ func (a *app) Update() error {
 func (a *app) compose() error {
 	c := render.NewBGICanvas()
 
-	// 省名：3.15 的第 (current-1) 個三字詞條
-	if err := c.DrawEntry(a.provName, int(a.current)-1, 3,
-		assets.RGB{R: 0xFF, G: 0xFF, B: 0xA2}, nameX, nameY, true); err != nil {
-		return err
-	}
-
 	bf, err := a.m.Battlefield(a.current)
 	if err != nil {
 		return err
 	}
-	c.DrawBattlefield(bf, fieldX, fieldY)
+	// 用原版的 NEWTERR 圖塊畫戰場：NWMAP 的地物編號減 1 就是圖塊索引。
+	if err := c.DrawTiledBattlefield(bf, a.tiles, fieldX, fieldY); err != nil {
+		return err
+	}
+
+	// 側欄：省名（3.15 的第 current-1 個三字詞條）
+	if err := c.DrawEntry(a.provName, int(a.current)-1, 3,
+		assets.RGB{R: 0xFF, G: 0xFF, B: 0xA2}, sideX, nameY, true); err != nil {
+		return err
+	}
 
 	a.frame = ebiten.NewImageFromImage(c.Image())
 	a.dirty = false
@@ -131,7 +138,11 @@ func run(dir string, start game.ProvinceID) error {
 	if err != nil {
 		return err
 	}
-	m, err := game.LoadMap(warpos, tername)
+	nwmap, err := read("NWMAP.DAT")
+	if err != nil {
+		return err
+	}
+	m, err := game.LoadMap(warpos, tername, nwmap)
 	if err != nil {
 		return err
 	}
@@ -145,7 +156,22 @@ func run(dir string, start game.ProvinceID) error {
 		return err
 	}
 
+	newterr, err := read("NEWTERR.TPC")
+	if err != nil {
+		return err
+	}
+	rail, err := read("RAIL.TPC")
+	if err != nil {
+		return err
+	}
+	ts, err := render.LoadTileSet(newterr, rail, assets.EGADefaultPalette)
+	if err != nil {
+		return err
+	}
+
 	ebiten.SetWindowSize(render.ModeBGIW*scale, render.ModeBGIH*scale)
 	ebiten.SetWindowTitle("大時代的故事")
-	return ebiten.RunGame(&app{m: m, provName: gf, current: start, dirty: true})
+	return ebiten.RunGame(&app{
+		m: m, provName: gf, tiles: ts, current: start, dirty: true,
+	})
 }

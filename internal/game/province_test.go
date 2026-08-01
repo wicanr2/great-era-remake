@@ -114,7 +114,7 @@ func TestProvinceNeighboursVsMap(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	m, err := LoadMap(readGame(t, "WARPOS.DAT"), readGame(t, "TERNAME.DAT"))
+	m, err := LoadMap(readGame(t, "WARPOS.DAT"), readGame(t, "TERNAME.DAT"), readGame(t, "NWMAP.DAT"))
 	if err != nil {
 		t.Fatal(err)
 	}
