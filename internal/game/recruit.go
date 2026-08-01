@@ -343,3 +343,91 @@ func (w *AIWorld) ReclaimLand(p ProvinceID, politics, stamina uint8) (int, uint8
 	prov.LandValue = uint8(v)
 	return actual, stamina - ReclaimStaminaCost, nil
 }
+
+// ---------------------------------------------------------------------------
+// 慰勞軍民（政略指令 14），出自 `sub_3412B`（`docs/re/22`）。
+// ---------------------------------------------------------------------------
+
+const (
+	// ComfortStaminaGain 是慰勞回補的體力（`add byte ptr es:[di+1Dh], 0Ah`）。
+	ComfortStaminaGain = 10
+	// StaminaMax 是體力上限。
+	StaminaMax = 100
+	// MoraleMax 是士氣上限——**80 不是 100**（`cmp es:[di+1Eh], 50h`）。
+	//
+	// 與實機吻合：`docs/playtest/08` 的五個將領士氣是
+	// 74／67／42／54／30，全部低於 80。
+	MoraleMax = 80
+	// MoraleAbilityDivisor 是士氣回補的除數：帶兵能力 ÷ 5。
+	MoraleAbilityDivisor = 5
+	// ComfortLoyaltyGain 是慰勞回補的將領忠誠度（`add byte ptr es:[di+1], 14h`）。
+	ComfortLoyaltyGain = 20
+	// GeneralLoyaltyMax 是將領忠誠度上限。
+	GeneralLoyaltyMax = 100
+)
+
+// ComfortResult 記錄慰勞軍民影響了誰。
+type ComfortResult struct {
+	// Generals 是被回補的將領數（`Units` 索引）。
+	Generals []int
+	// ProvinceLoyaltyGain 是省的人民忠誠度增量。
+	ProvinceLoyaltyGain int
+}
+
+// Comfort 是慰勞軍民，語意照 `sub_3412B`：
+//
+//	該省每個「可用 + 同勢力」的將領：
+//	    體力 += 10          夾到 100
+//	    士氣 < 80 時 += 帶兵能力 ÷ 5   夾到 80
+//	    忠誠度 += 20        夾到 100
+//	省的人民忠誠度 += 領袖的政治手腕 ÷ 10   夾到 100
+//
+// `leaderPolitics` 是勢力領袖的 `+2`（政治手腕）——原版拿的是
+// `arg_0`（勢力 ID）那個將領的欄位，不是執行慰勞的人。
+//
+// ⚠️ 規則層的將領狀態（體力／士氣／忠誠度）還沒收攏進一個容器，
+// 所以這裡回報「哪些將領被影響」，實際的欄位更新由呼叫端做。
+// 等 `+16` 的語意解出來再一起重整。
+func (w *AIWorld) Comfort(p ProvinceID, leaderPolitics uint8) (ComfortResult, error) {
+	prov, err := w.Table.At(p)
+	if err != nil {
+		return ComfortResult{}, err
+	}
+	var res ComfortResult
+	res.Generals = append(res.Generals, w.RosterOf(p).ids...)
+
+	gain := int(leaderPolitics) / DevelopPoliticsDivisor
+	v := int(prov.Loyalty) + gain
+	if v > LoyaltyMax {
+		v = LoyaltyMax
+	}
+	res.ProvinceLoyaltyGain = v - int(prov.Loyalty)
+	prov.Loyalty = uint8(v)
+	return res, nil
+}
+
+// ComfortGeneral 算一個將領被慰勞之後的體力／士氣／忠誠度。
+//
+// 分開寫是因為原版的三格在 `MAN` 記錄裡，而規則層目前把它們
+// 散在 `StrengthInput`（`F29`／`F30`）與 `General`（`AbilityB`）。
+func ComfortGeneral(stamina, morale, loyalty, ability uint8) (uint8, uint8, uint8) {
+	if s := int(stamina) + ComfortStaminaGain; s > StaminaMax {
+		stamina = StaminaMax
+	} else {
+		stamina = uint8(s)
+	}
+	// 士氣只有**未達上限**時才加——原版先檢查再算。
+	if morale < MoraleMax {
+		if m := int(morale) + int(ability)/MoraleAbilityDivisor; m > MoraleMax {
+			morale = MoraleMax
+		} else {
+			morale = uint8(m)
+		}
+	}
+	if l := int(loyalty) + ComfortLoyaltyGain; l > GeneralLoyaltyMax {
+		loyalty = GeneralLoyaltyMax
+	} else {
+		loyalty = uint8(l)
+	}
+	return stamina, morale, loyalty
+}
