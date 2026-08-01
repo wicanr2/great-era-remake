@@ -23,11 +23,13 @@ import (
 	"sort"
 
 	"github.com/wicanr2/great-era-remake/internal/game"
+	"github.com/wicanr2/great-era-remake/internal/i18n"
 )
 
 func main() {
 	dir := flag.String("game", "workplace/orig/game", "原版素材目錄（唯讀）")
 	turns := flag.Int("turns", 20, "跑幾個回合")
+	localeDir := flag.String("locale", "translations/zh-Hant", "語系資料目錄")
 	verbose := flag.Bool("v", false, "逐省印出決策")
 	fight := flag.Bool("fight", false,
 		"每回合讓前線省對敵省各打一場（見下：**比關掉更接近原版**，但未實跑驗證）")
@@ -37,6 +39,14 @@ func main() {
 		"每回合讓每個省徵兵補滿（**remake 行為**：原版徵兵是玩家的指令 5，"+
 			"電腦怎麼徵還沒解）")
 	flag.Parse()
+
+	// 語系表載不到就退回省編號，不中斷——但**印出來**，
+	// 否則「沒載到」與「載到但是空的」在輸出裡長得一樣。
+	if l, err := i18n.Load(*localeDir); err != nil {
+		fmt.Fprintf(os.Stderr, "語系表載入失敗（省名顯示成編號）：%v\n", err)
+	} else {
+		loc = l
+	}
 
 	if err := run(*dir, *turns, *verbose, *fight, *until, *recruit); err != nil {
 		fmt.Fprintln(os.Stderr, "錯誤:", err)
@@ -235,6 +245,18 @@ func summary(w *game.AIWorld) string {
 			empty++
 		}
 	}
-	return fmt.Sprintf("勢力 %d／有主省 %d／無將領的省 %d／最集中：省 %d 有 %d 人",
-		len(factions), owned, empty, top, topN)
+	return fmt.Sprintf("勢力 %d／有主省 %d／無將領的省 %d／最集中：%s 有 %d 人",
+		len(factions), owned, empty, provName(top), topN)
+}
+
+// loc 是語系表，nil 表示沒載到（省名退回「省 N」）。
+var loc *i18n.Locale
+
+// provName 取省名。這是 `internal/i18n` 的實跑驗證點之一——
+// aisim 是無頭的，跑一次就看得到語系表有沒有真的生效。
+func provName(p game.ProvinceID) string {
+	if loc != nil {
+		return loc.Province(int(p))
+	}
+	return fmt.Sprintf("省 %d", p)
 }

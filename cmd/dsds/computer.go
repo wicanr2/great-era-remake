@@ -92,12 +92,10 @@ func (a *app) runOneComputerAction(p game.ProvinceID, rep *computerTurnReport) b
 		if err != nil {
 			return false
 		}
-		// ⚠️ 訊息用省編號不用省名——**remake 還沒有語系字串表**，
-		// 省名目前只以 `3.15` 的字模形式存在（畫得出來、印不出來）。
-		// 硬湊一個對照表會變成第二份真相（`CLAUDE.md` §7.4），所以不做。
 		rep.attacks = append(rep.attacks,
-			fmt.Sprintf("省 %d 攻 省 %d（%s）",
-				res.Action.From, res.Action.To, outcomeWord(out)))
+			fmt.Sprintf("%s 攻 %s（%s）",
+				a.provinceName(res.Action.From), a.provinceName(res.Action.To),
+				outcomeWord(out)))
 		return true
 	}
 	return false
@@ -122,4 +120,13 @@ func outcomeWord(out game.BattleOutcome) string {
 	default:
 		return "守方守住"
 	}
+}
+
+// provinceName 取省名。語系表沒載到就退回「省 N」——
+// **看得出是哪一省，也看得出語系表沒生效**。
+func (a *app) provinceName(p game.ProvinceID) string {
+	if a.loc != nil {
+		return a.loc.Province(int(p))
+	}
+	return fmt.Sprintf("省 %d", p)
 }

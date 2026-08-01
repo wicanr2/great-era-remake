@@ -649,6 +649,15 @@ DOSBox oracle 可走到「選擇歷史背景」。
 「測試綠不是完成」又應驗一次；`TestChainAOnRealSave` 現在帶一個
 「士氣體力補滿之後就走得到出兵」的對照子測試專門擋這類回歸。
 
+**M6 的第一塊基石上線：語系表**（`translations/zh-Hant/glyphtext.json`）。
+51 檔的 1,664 條詞條從字模反查結果轉成執行期載入的 JSON，
+`internal/i18n` 讀它（**不依賴 Ebiten**，無頭可測）。
+省名不再顯示成編號——`aisim` 實跑印出「最集中：河南省 有 25 人」。
+
+繁中母本**不是翻譯是還原**，而且保留了原版的分散排版（`raw` 欄位存「西　藏」）。
+換語言只要 `-locale translations/en`，不必重編。
+⚠️ 排版層還沒抽離，英文版的字寬行高會溢出（`translations/README.md`）。
+
 ### 6.1 下一步
 
 **M2 是現在的關鍵路徑**——規則層與 Ebiten 呈現層必須等 M2/M3 出規格才能動手

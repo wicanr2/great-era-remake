@@ -40,6 +40,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/game"
+	"github.com/wicanr2/great-era-remake/internal/i18n"
 	"github.com/wicanr2/great-era-remake/internal/ui/render"
 )
 
@@ -87,6 +88,7 @@ type app struct {
 	icons    []*assets.Image // NEWICON.TPC 的兵種圖示
 	battle   *battleState    // 非 nil 表示正在打仗
 	world    *game.AIWorld   // 規則層：政略指令都經過它
+	loc      *i18n.Locale    // 語系表：省名與 UI 詞彙（nil 表示沒載到）
 	rng      *game.Rand      // 原版的 LCG（docs/re/17），固定種子才可重現
 	year     uint16
 	month    uint8
@@ -288,15 +290,19 @@ func main() {
 		"離開時自動存檔的路徑（**不會**覆蓋原版）")
 	// 固定亂數種子是 CLAUDE.md §9 的硬規則：截圖驗收要能重現。
 	seed := flag.Uint("seed", 1, "亂數種子（原版 LCG，docs/re/17）")
+	localeDir := flag.String("locale", "translations/zh-Hant",
+		"語系資料目錄。換一個目錄就換一種語言（CLAUDE.md §6）")
 	flag.Parse()
 
-	if err := run(*gameDir, game.ProvinceID(*start), *savePath, uint32(*seed)); err != nil {
+	if err := run(*gameDir, game.ProvinceID(*start), *savePath, uint32(*seed),
+		*localeDir); err != nil {
 		fmt.Fprintln(os.Stderr, "錯誤:", err)
 		os.Exit(1)
 	}
 }
 
-func run(dir string, start game.ProvinceID, savePath string, seed uint32) error {
+func run(dir string, start game.ProvinceID, savePath string, seed uint32,
+	localeDir string) error {
 	if !start.Valid() {
 		return fmt.Errorf("省編號 %d 超出 1..%d", start, game.ProvinceCount)
 	}
@@ -400,6 +406,14 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32) error 
 		rng: game.NewRand(seed),
 	}
 	a.world = buildWorld(tbl, generals)
+	// 語系表載不到不是致命錯誤——省名會退回「省 N」，其餘照跑。
+	// **不要靜默**：印到 stderr，否則「沒有語系表」與「語系表是壞的」
+	// 在畫面上長得一樣。
+	if loc, err := i18n.Load(localeDir); err != nil {
+		fmt.Fprintf(os.Stderr, "語系表載入失敗（省名會顯示成編號）：%v\n", err)
+	} else {
+		a.loc = loc
+	}
 	if tbl.Date != nil {
 		a.year, a.month = tbl.Date.Year, tbl.Date.Month
 	}
