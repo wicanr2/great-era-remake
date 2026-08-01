@@ -36,6 +36,16 @@ type BattleRunStats struct {
 	// 免得把「秒結束」誤讀成模擬出錯。
 	Decisive     bool
 	DecisiveNote string
+
+	// DecisiveReport 對應原版的 `byte_6B968`（§56）：**戰報畫面要多印一段**。
+	//
+	// ⚠️ 它與 `Decisive` **不是同一件事**：原版只有**分支 A 的值 11**
+	// （守方被壓到 1/5 且叫不到援軍）會設它，分支 B 的值 1（攻方被壓垮）
+	// **不設**。這個不對稱與 §54 的收尾規則是同一類——
+	// **兩條鏈不是同一套規則**，不要合併。
+	//
+	// 這是呈現層的旗標，不影響勝負判定。
+	DecisiveReport bool
 }
 
 // dirToward 找出從 `from` 走到相鄰的 `to` 要用哪個方向。
@@ -173,6 +183,9 @@ func (s *BattleSim) AutoResolveByChain(maxTurns int, gates BattleChainGates,
 			st.AttackerWon, st.Decided = r.DecisiveAttackerWon, true
 			st.Decisive = true
 			st.DecisiveNote = r.Note
+			// 原版 `byte_6B968` 只由**分支 A 的值 11** 設（§56），
+			// 分支 B 的值 1 不設。這裡照同樣的不對稱。
+			st.DecisiveReport = ra.Decisive && d.A.Action == ActADecisive
 			break
 		}
 

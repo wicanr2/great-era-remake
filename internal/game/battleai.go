@@ -286,9 +286,11 @@ func DecideBattleA(in BattleAIInput) BattleDecision {
 // 「這條鏈現在只有部分行為」——測試也拿它來確認清單沒有偷偷縮水。
 //
 // 補完一支就從這裡移除一筆，並在 `docs/re/31` 補一節。
-var UndecidedBattleSteps = []string{
-	"byte_6B968（sub_534FF 的另一個輸出，語意未解）",
-}
+// ⭐ **2026-08-02 起是空的**——決策鏈的每一步都有明確條件了（`docs/re/31` §56）。
+//
+// 保留這個變數而不是刪掉，因為它是「這條鏈有沒有偷偷退化」的哨兵：
+// 往後若發現新的未讀步驟，加回來一筆，測試會叫。
+var UndecidedBattleSteps = []string{}
 
 // BattleActionName 回傳行動的中文名稱，給紀錄與測試訊息用。
 func BattleActionName(a BattleAction) string {

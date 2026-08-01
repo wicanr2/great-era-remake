@@ -88,16 +88,71 @@ func TestBattleActionValuesMatchOriginal(t *testing.T) {
 	}
 }
 
-func TestUndecidedStepsAreTracked(t *testing.T) {
-	// 這份清單是「這條鏈目前只有部分行為」的憑證。
-	// 補完一支就從清單移除——測試在這裡是為了讓縮水這件事被看見。
-	if len(UndecidedBattleSteps) == 0 {
-		t.Skip("清單空了：如果真的全部補完，這個測試該改成驗證決策鏈的完整行為")
+// ⭐ 這條測試換過一次寫法。舊版只在數 `UndecidedBattleSteps` 的長度，
+// 並且自己留了話：「清單空了：如果真的全部補完，這個測試該改成驗證
+// 決策鏈的完整行為」。2026-08-02 `docs/re/31` §56 補完最後一筆，照做。
+//
+// 現在它驗兩件事：清單真的空了，而且**每一個行動都走得到**。
+func TestEveryChainStepIsReachable(t *testing.T) {
+	if n := len(UndecidedBattleSteps); n != 0 {
+		t.Fatalf("未讀步驟又出現 %d 筆：%v —— 決策鏈退化了，先補 docs/re/31",
+			n, UndecidedBattleSteps)
 	}
-	if len(UndecidedBattleSteps) != 8 {
-		t.Logf("未讀步驟從 8 變成 %d —— 若是補完了，記得同步更新 docs/re/31",
-			len(UndecidedBattleSteps))
+
+	// 分支 A 的六個步驟，各給一組讓它走到的輸入。
+	weak := BattleAIInput{SideStrength: 20, FoeStrength: 100} // 我方被壓到 1/5
+	lead := BattleAIInput{SideStrength: 100, FoeStrength: 50, EnableLastSteps: true}
+	for _, c := range []struct {
+		name string
+		in   BattleAIInput
+		want BattleAction
+	}{
+		{"11 必勝結算", weak, ActADecisive},
+		{"12 推倒重來", BattleAIInput{SideStrength: 100, FoeStrength: 100,
+			RatioGateSelf: true, RatioGateFoe: true}, ActAReset},
+		{"19 全面接戰", BattleAIInput{SideStrength: 100, FoeStrength: 100,
+			RatioGateSelf: true}, ActAEngageAll},
+		{"18 挑最弱", withA(lead, func(i *BattleAIInput) { i.AttackerNearCity = true }),
+			ActAWeakest},
+		{"14 斬首只留一個", withA(lead, func(i *BattleAIInput) { i.FoeFewerThanCities = true }),
+			ActADecapitateKeepOne},
+		{"15 斬首都留", lead, ActADecapitateKeepAll},
+		{"17 重算全軍", BattleAIInput{SideStrength: 100, FoeStrength: 100,
+			EnableLastSteps: true, FoeLeaderOnField: true, Sub53619: true}, ActARecompute},
+		{"16 只處理待命", BattleAIInput{SideStrength: 100, FoeStrength: 100,
+			EnableLastSteps: true, FoeLeaderOnField: true}, ActAStandbyOnly},
+		{"13 預設分流", BattleAIInput{SideStrength: 100, FoeStrength: 100}, ActADefault},
+	} {
+		if got := DecideBattleA(c.in); got.Action != c.want {
+			t.Errorf("分支 A %s：實得 %s（步驟 %q）",
+				c.name, BattleActionName(got.Action), got.Step)
+		}
 	}
+
+	// 分支 B 的四個行動。
+	for _, c := range []struct {
+		name string
+		in   BattleAIInput
+		want BattleAction
+	}{
+		{"2 佈防", BattleAIInput{SideStrength: 100, FoeStrength: 100,
+			RatioGateSelf: true, RatioGateFoe: true, DeployGateOpen: true}, ActBDeploy},
+		{"1 必勝結算", BattleAIInput{SideStrength: 20, FoeStrength: 100}, ActBDecisive},
+		{"3 打城市（沒後援）", BattleAIInput{SideStrength: 20, FoeStrength: 100,
+			Sub53619: true}, ActBTakeCity},
+		{"4 打敵方主力周邊", BattleAIInput{SideStrength: 100, FoeStrength: 100,
+			EnableLastSteps: true, FoeLeaderOnField: true}, ActBStrikeForce},
+	} {
+		if got := DecideBattleB(c.in); got.Action != c.want {
+			t.Errorf("分支 B %s：實得 %s（步驟 %q）",
+				c.name, BattleActionName(got.Action), got.Step)
+		}
+	}
+}
+
+func withA(in BattleAIInput, f func(*BattleAIInput)) BattleAIInput {
+	f(&in)
+	return in
 }
 
 func TestDecideBattleARatioGates(t *testing.T) {

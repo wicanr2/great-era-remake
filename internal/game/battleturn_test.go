@@ -102,3 +102,19 @@ func TestBattleTurnCap(t *testing.T) {
 		t.Error("AutoResolve 的上限該對齊原版")
 	}
 }
+
+// §56：戰報旗標（原版 `byte_6B968`）只由**分支 A 的值 11** 設，
+// 分支 B 的值 1 不設——兩條鏈不是同一套規則。
+func TestDecisiveReportIsAsymmetric(t *testing.T) {
+	// 守方被壓到 1/5 以下 → 分支 A 選必勝結算 → 戰報旗標要立起來。
+	sim := mkMultiBattle(t, 3, 3, 200)
+	st := sim.AutoResolveByChain(20, BattleChainGates{}, 201)
+	if !st.Decisive {
+		t.Skipf("這個場面沒觸發必勝結算（%+v），換場面再驗", st.BattleOutcome)
+	}
+	if st.DecisiveReport != (st.Decisions[len(st.Decisions)-1].A.Action == ActADecisive) {
+		t.Errorf("戰報旗標該只在分支 A 選必勝結算時立起來：旗標 %v，分支 A 選 %s",
+			st.DecisiveReport,
+			BattleActionName(st.Decisions[len(st.Decisions)-1].A.Action))
+	}
+}
