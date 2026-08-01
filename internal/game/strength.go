@@ -192,9 +192,13 @@ func RoutWeight(branch uint8) int { return routWeight[branch] }
 
 // CasualtiesEven 算勢均力敵時雙方的兵力損失（`sub_51B94`）。
 //
-//	pct = Round(powE / powF × 100)      ← E 是兵種 4 時再除以 2
+//	pct = Round(atkByE / atkByF × 100)      ← E 是兵種 4 時再除以 2
 //	損失F = Round( 兵力F / 4 / (pct+100) × pct )
 //	損失E = Round( 兵力E / 4 / (pct+100) × 100 )
+//
+// ⚠️ **前兩個參數是「各自打出去的攻擊值」，不是「打在身上的」。**
+// 原版的 `pct = var_8 / var_4`，而 `var_8` 是用 E 的強度算的
+// ——也就是 E 施加於 F 的值。傳反了會變成「打得越兇損失越大」。
 //
 // 兩個係數 `pct/(pct+100)` 與 `100/(pct+100)` 相加恆為 1，
 // 所以**雙方的損失比例合計恆為各自兵力的 1/4**。戰力相等時（pct = 100）
@@ -203,15 +207,20 @@ func RoutWeight(branch uint8) int { return routWeight[branch] }
 // ⚠️ **任一方是兵種 4 時，F 完全不受損失**——原版在寫回 F 的損失之前
 // 檢查兩邊的 `+21`，只要有一邊是 4 就跳過那次寫入。
 //
-// powE／powF 是 `sub_51D68` 算出的兩個戰力值（`Strength` 的產物再經
-// 修正係數）。E 是 `sub_51D68` 的 `arg_E`，F 是 `arg_10`。
-func CasualtiesEven(powE, powF int, forceE, forceF uint16, branchE, branchF uint8) (lossE, lossF int) {
-	if powF <= 0 {
+// 這條規則的**方向未確認**：E／F 與攻守的對應要等 `sub_530B4` 的
+// 呼叫端讀完才知道（`docs/playtest/04` §3）。實跑起來的效果是
+// 「兵種 4 打不動人、自己還會被磨掉」，讀起來怪；若 E 其實是守方，
+// 就變成「兵種 4 防守時攻擊者打不動它」，合理得多。
+//
+// `atkByE`／`atkByF` 是 `sub_51D68` 算出的兩個攻擊值（`Strength` 的產物
+// 再經地形修正係數）。E 是 `sub_51D68` 的 `arg_E`，F 是 `arg_10`。
+func CasualtiesEven(atkByE, atkByF int, forceE, forceF uint16, branchE, branchF uint8) (lossE, lossF int) {
+	if atkByF <= 0 {
 		return 0, 0
 	}
-	pct := round(float64(powE) / float64(powF) * 100)
+	pct := round(float64(atkByE) / float64(atkByF) * 100)
 	if branchE == 4 {
-		pct = round(float64(powE) / float64(powF) * 100 / 2)
+		pct = round(float64(atkByE) / float64(atkByF) * 100 / 2)
 	}
 	denom := float64(pct + 100)
 	lossF = round(float64(forceF) / 4 / denom * float64(pct))
