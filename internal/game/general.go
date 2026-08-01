@@ -26,7 +26,15 @@ const (
 	genOffAbilityA = 0
 	genOffAbilityB = 1
 	genOffAbilityC = 2
-	genOffProvince = 4  // u8，所屬省編號（1-based），0 = 無所屬
+	// genOffExperience 是**經驗**（`docs/playtest/08` 的「經驗」列）。
+	//
+	// ⚠️ **在 `MAN(N).DAT` 裡 274 筆全是 0**，所以拿劇本檔怎麼掃都找不到它
+	// ——實機那張畫面讀的是 `SAVE(1)`。改掃存檔的將領區一次命中
+	// （吳佩孚 30、其餘四人 0，與畫面逐格相同）。
+	//
+	// 這也說明它是**遊戲中累積**的量，開局一律 0。累積規則未解。
+	genOffExperience = 3
+	genOffProvince   = 4 // u8，所屬省編號（1-based），0 = 無所屬
 	genOffForce    = 17 // u16 little-endian
 
 	// 番號四欄，全部是 `FAN(1).15` 的**槽位索引（1-based）**，0 = 沒有。
@@ -39,8 +47,11 @@ const (
 	genOffTitleNumber = 26 // 數字，0 = 沒有編號
 	genOffTitleSuffix = 27 // 「師」「團」「旅」「軍」…
 	genOffFactionName = 28 // 勢力名：1 國民革命軍、4 討賊軍、5 五省聯軍…
-	genOffF19         = 19 // 戰力公式用，語意未解
-	genOffF20         = 20 // 戰力公式用，只有 5 個等級值
+	// genOffF19 是**士兵戰技**、genOffF20 是**武裝程度**——
+	// 兩個都由實機「查閱將領」畫面逐格定名（`docs/playtest/08` §2），
+	// 名字保留 `F` 前綴只是因為戰力公式那邊沿用了舊名。
+	genOffF19 = 19 // 士兵戰技（10..226）
+	genOffF20 = 20 // 武裝程度，只有 5 個等級值 {10,15,40,50,100}
 	genOffBranch      = 21 // 兵種，值域 {1, 4, 5, 6}
 	// genOffStamina 是**體力**（0..100）。
 	//
@@ -50,7 +61,9 @@ const (
 	//
 	// 它同時參與戰力公式（`sub_5A0B9`），所以舊名 `F29` 出現在那裡。
 	genOffStamina = 29
-	genOffF30     = 30 // 戰力公式用，也是每回合衰減 20% 的那一格
+	// genOffF30 是**士氣**（`docs/playtest/08` §4：存檔 65/59/36/47/25
+	// 與畫面的「士氣」列逐格相同）。它同時是每回合衰減 20% 的那一格。
+	genOffF30 = 30
 	genOffRange   = 31 // 遠程攻擊的參數，第一期 274 筆全是 1
 )
 
@@ -144,10 +157,16 @@ type General struct {
 	Stamina uint8
 
 	// 戰力公式（`sub_5A0B9`，`docs/re/08` §4d）要用的另外三個欄位。
-	// **語意未解**——公式用得到，但還沒對上畫面上的名字。
-	// 候選見 `docs/mechanics/60-personnel.md` §6（經驗／士兵攻擊力／
-	// 武裝程度／士兵戰技）。⚠️ 那是名字的集合不是順序，別對號入座。
+	// **三個都已定名**（`docs/playtest/08`，實機逐格對照）：
+	//
+	//	F19 = 士兵戰技    F20 = 武裝程度    F30 = 士氣
+	//
+	// 保留 `F` 前綴是因為戰力公式那邊沿用舊名，不是因為還沒解。
 	F19, F20, F30 uint8
+
+	// Experience 是**經驗**（`+3`）。`MAN(N).DAT` 裡一律 0，
+	// 只有存檔的將領區才有值——它是遊戲中累積的量，累積規則未解。
+	Experience uint8
 
 	// Range 是遠程攻擊的參數（`+31`，`docs/re/09` §1）。
 	// 第一期 274 筆全部是 1，所以看不出值域。
@@ -179,6 +198,7 @@ func ParseGeneral(rec []byte) (General, error) {
 	g.AbilityA = rec[genOffAbilityA]
 	g.AbilityB = rec[genOffAbilityB]
 	g.AbilityC = rec[genOffAbilityC]
+	g.Experience = rec[genOffExperience]
 	g.Province = ProvinceID(rec[genOffProvince])
 	g.Force = binary.LittleEndian.Uint16(rec[genOffForce:])
 	g.TitlePrefix = rec[genOffTitlePrefix]
@@ -285,3 +305,32 @@ func CountOf(gs []General, p ProvinceID) int {
 // 將領筆數要用名表算（`len(Glyphs) / 3`），**不能用「檔案大小 ÷ 33」**——
 // 三個 MAN(N).DAT 都是 9,042 B，但第二三期只有 106 位，其餘是殘料。
 const GeneralNameSlotWidth = 3
+
+// SaveGeneralsOffset 是 `SAVE(N).DT1` 裡**將領區的起點**：5203。
+//
+// 這一格先前標「至今沒找到」（`docs/spec/02` 附錄）。找法很直接：
+// 拿 `MAN(1).DAT` 的 `+21`（兵種）前 60 筆當指紋，在 `.DT1` 裡滑動比對，
+// 只有 5203 這一處全中。
+//
+// ⭐ 有一個獨立的正對照：`general_test.go` 早就在用 **7084** 當
+// 「湖北第一位將領（吳佩孚，第 58 位）」的位置，而
+//
+//	5203 + 57 × 33 = 7084
+//
+// 兩者對得上，所以 5203 不是湊出來的。
+//
+// ⚠️ 省份區到將領區之間還有 3,756 bytes 未解（1447..5202）。
+const SaveGeneralsOffset = 5203
+
+// ParseSaveGenerals 解 `SAVE(N).DT1` 的將領區。
+//
+// `count` 由劇本決定（原版 `word_6BC4A`，第一期 274）。
+// 與 `MAN(N).DAT` 是同一個 33 bytes 佈局——差別只在存檔的欄位是
+// **遊戲中的當下值**：經驗、體力、士氣都會變。
+func ParseSaveGenerals(data []byte, count int) ([]General, error) {
+	if len(data) < SaveGeneralsOffset {
+		return nil, fmt.Errorf("game: .DT1 只有 %d bytes，放不下將領區（起點 %d）",
+			len(data), SaveGeneralsOffset)
+	}
+	return ParseGenerals(data[SaveGeneralsOffset:], count)
+}

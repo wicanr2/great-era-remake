@@ -377,9 +377,15 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 	if err != nil {
 		return err
 	}
-	// 筆數以名表為準——MAN(N).DAT 都是 274 筆的空間，但二三期只有 106 位。
-	generals, err := game.ParseGenerals(mandat,
-		len(fonts.Gen.Glyphs)/game.GeneralNameSlotWidth)
+	// ⛔ 筆數**不能以名表為準**。名表（`MAN215` 106 個名字）比程式實際
+	// 會掃到的筆數少——第二、三期是 191（`word_6BC4A`），
+	// 第 107..191 筆是**沒有姓名的番號部隊**（勢力名 `+28` = 0）。
+	// 照名表解會靜默丟掉 85 支部隊。
+	sc, err := game.ScenarioByStage(1)
+	if err != nil {
+		return err
+	}
+	generals, err := game.ParseGenerals(mandat, sc.Generals)
 	if err != nil {
 		return err
 	}
