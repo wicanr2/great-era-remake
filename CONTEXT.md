@@ -44,6 +44,7 @@
 | **`PLACD.SAV`** | ✅ **是 ZIP**：整包遊戲的 1993 年備份，145/147 檔與 `game/` byte-identical。見 `docs/formats/03-placd-archive.md` |
 | `.MUS`／`.TIM` | ⬜ 未開始；音源未確認 |
 | **`.DAT` 資料表** | 🔶 **39 省是核心維度**：`TERNAME`／`WARPOS` 每省 196 B、`MEM_WAR` 每省 469 B、`TOWN(N)` 每省 37 B。`MAN(N).DAT` 33 B/人 |
+| **將領能力值** | 🔶 `+0` = 戰鬥（攻擊力公式）、**`+2` = 開發**（實機 15/15 零誤差）、`+1` 未知。見 `docs/playtest/07` |
 | **省份資料表** | ✅ **已解**：`TOWN(N).DAT` = 39×37 初始狀態、`SAVE(N).DT1` 前段同結構（相位差 4 B）。資源／人口／城市／地價／兵工廠／忠誠／司令／省長／鄰省全部定名，實機零誤差。見 `docs/spec/03-provinces.md` |
 | **戰場地名** | ✅ **已解**：`TERNAME.DAT` 是**地名索引**不是地形編號，指向 `TN15.<省>`。39/39 零例外（§5.6）|
 | **TPC 圖集** | ✅ **分割已驗證**：`NEWTERR` 22 張地形圖塊、`NEWICON` 18 張兵種圖示（**四個兵種全部對上**：鋼盔／戰車／馬頭／**大砲六朝向**）、`AC` 17 張戰鬥插圖 |
@@ -118,6 +119,7 @@
 | `docs/re/10-troop-transfer.md` | **調動的執行層**：`sub_1408F` 八個模式、兵力門檻、調動即佔領；推翻「剩餘命令數」 | ✅ |
 | `tools/callgraph.py` | **呼叫圖遞移閉包**：查「這條路徑會不會走到 X」。讀骨架會漏分支，呼叫圖不會 | ✅ |
 | `docs/re/14-acted-flag-and-last-step.md` | **`+32` bit 2 = 回合分流開關**（推翻「已徵過稅」）；`sub_15CE3` 讀完也是調動——決策鏈八支零例外 | ✅ |
+| `docs/playtest/07-field-naming-by-screen.md` | **用實機畫面給欄位定名**的手法；`MAN` `+2` = 開發能力（15/15 零誤差）| ✅ |
 | `docs/playtest/06-dosbox-restored.md` | **DOSBox oracle 恢復**：命令數公式實機零誤差（將領 15 → 指令數 2）、兵工廠煤鐵轉彈藥、bit 2 訂正 | ✅ |
 | `docs/re/13-turn-structure-and-roster.md` | **電腦回合結構**：命令數 = 將領數÷8+1（社群說法平反）、清單依攻擊力降序、遷都、攻打是玩家指令 1 | ✅ |
 | `docs/re/12-ai-chain-has-no-attack.md` | ⛔ **決策鏈六步全是調動**：`sub_15925` 不是攻打，是「補窮省」。電腦怎麼發動戰爭未解 | ✅ |

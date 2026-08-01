@@ -96,6 +96,13 @@ func BranchName(branch uint8) string {
 type General struct {
 	// AbilityA/B/C 是三個 0-100 的能力值。
 	//
+	// **`AbilityC`（`+2`）是開發能力** — confirmed（實機）：政略指令 7
+	// 「開發」的「欲派遣何將？」列出的就是這一欄，湖北 15 人
+	// **15/15 全對**（`docs/playtest/07` §2）。
+	//
+	// `AbilityA`（`+0`）進攻擊力公式與名將加成（`docs/re/08` §4）。
+	// `AbilityB`（`+1`）仍未知——要用同樣的手法找一個會列出它的畫面。
+	//
 	// **不知道哪個是統率、武力、政治或忠誠**（docs/spec/02 §1），
 	// 所以刻意不做語意化命名。蔣中正三項全 100 可當 sanity check。
 	AbilityA, AbilityB, AbilityC uint8
