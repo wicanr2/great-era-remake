@@ -53,6 +53,9 @@ type battleState struct {
 	leader game.GeneralID
 	// tbl 是省份表，`sub_534FF`（§47）要掃鄰省找支援。
 	tbl *game.ProvinceTable
+	// supAtk／supDef 是雙方帶進這場戰鬥的資源與兵力總和，
+	// 比率門檻（§48）要用。攻方＝第一方、守方＝第二方。
+	supAtk, supDef game.BattleSupply
 }
 
 // startBattle 從當前省對某個鄰省開戰。
@@ -106,9 +109,29 @@ func (a *app) startBattle(at, from game.ProvinceID) error {
 	if p, err := a.tbl.At(at); err == nil {
 		leader = p.Commander
 	}
-	a.battle = &battleState{sim: sim, turn: 1, leader: leader, tbl: a.tbl}
+	// 雙方帶進戰場的資源（§48 的比率門檻要用）。
+	//
+	// ⚠️ **這是 remake 的取值方式，不是原版的。** 原版存在
+	// `MEM_WAR.DAT` 的 `+0..+7`（`docs/re/05` §2），但「出兵時帶多少」
+	// 是誰決定的還沒解。這裡直接取雙方所屬省的存量當近似，
+	// 並把它標成已知差異——不要拿它對原版做行為驗收。
+	b := &battleState{sim: sim, turn: 1, leader: leader, tbl: a.tbl}
+	b.supAtk = supplyOf(a.tbl, from, atk)
+	b.supDef = supplyOf(a.tbl, at, def)
+	a.battle = b
 	a.screen, a.dirty = screenBattle, true
 	return nil
+}
+
+// supplyOf 組出某一方的 `BattleSupply`：資源取所屬省的存量，
+// 兵力總和照 `sub_3A4CE` 把 10 個槽位的 `+17` 加起來。
+func supplyOf(tbl *game.ProvinceTable, prov game.ProvinceID, units []*game.Combatant) game.BattleSupply {
+	s := game.BattleSupply{Troops: game.TroopTotal(units)}
+	if p, err := tbl.At(prov); err == nil {
+		s.Gold, s.Food = int(p.Gold), int(p.Food)
+		s.Ammo, s.Fuel = int(p.Ammo), int(p.Fuel)
+	}
+	return s
 }
 
 // combatants 把將領表換成戰場單位。
@@ -253,10 +276,20 @@ func (b *battleState) runDefenderAI() {
 	//
 	// 這個判斷控制兩處必勝結算與值 16／17 的分流：
 	// **戰力差五倍而且有後援，才敢直接判勝負。**
+	//
+	// ⭐ 比率門檻（§48）也接上了：**糧食夠但黃金不夠**。
+	// 分支 A 的「我方」是第二方（守方），分支 B 的是第一方（攻方）。
+	//
+	// ⚠️ `phase`（原版 `byte_64900`）的語意仍未解，先給 0。
+	// 它只是門檻的加項，給 0 等於用最寬鬆的那一端。
+	const phase = 0
 	gates := game.BattleChainGates{
-		Sub53619: !game.HasBattleSupport(b.tbl, b.sim.At, b.leader),
+		Sub53619:  !game.HasBattleSupport(b.tbl, b.sim.At, b.leader),
+		RatioSelf: b.supDef.RatioGate(phase),
+		RatioFoe:  b.supAtk.RatioGate(phase),
+		// §43 的 `word_6493A == 0` = **第一方（攻方）的彈藥為 0**。
+		Deploy: b.supAtk.Ammo == 0,
 	}
-	// ⚠️ 其餘兩個 gate（比率門檻、佈防閘門）的來源仍未解（§42），維持 false。
 	d := b.sim.DecideTurn(b.turn, gates, b.leader, 0)
 
 	route := func(to, from game.CellIndex) game.CellIndex {

@@ -26,10 +26,15 @@ type BattleTurnDecision struct {
 // 由呼叫端提供，而不是在這裡瞎猜——來源解出來之後，
 // 把算法補進 `BattleSim.chainGates` 就好，決策鏈本身不用動。
 type BattleChainGates struct {
-	// RatioSelf / RatioFoe 對應 §42 的比率門檻（`sub_3A63C` and `sub_3A730`）。
-	// 來源是 `word_64932/34/36/38` 與 `sub_3A4CE`，**未解**。
+	// RatioSelf / RatioFoe 對應 §48 的比率門檻（`sub_3A63C` and `sub_3A730`）。
+	//
+	// ⭐ 語意已解：**糧食夠但黃金不夠**。用 `BattleSupply.RatioGate(phase)`
+	// 算（`battlesupply.go`），Self 是第二方、Foe 是第一方。
 	RatioSelf, RatioFoe bool
-	// Deploy 對應 §43 的 `word_6493A == 0`，分支 B 值 2 獨有的閘門。**未解**。
+	// Deploy 對應 §43 的 `word_6493A == 0`，分支 B 值 2 獨有的閘門。
+	//
+	// ⭐ 語意已解：**第一方的彈藥為 0**（`docs/re/05` §2 的資源表）。
+	// 沒彈藥就不進攻，改佈防。
 	Deploy bool
 	// Sub53619 對應 §45／§47 的 `sub_53619`——**兩處「必勝結算」都要它為 false**。
 	//
