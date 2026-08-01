@@ -5,15 +5,19 @@ package game
 // **這一層只放已經從程式碼讀出來的規則**，沒解出來的不猜。
 // 目前只有一條完整的算式（每回合衰減）與回合初始化的欄位重置。
 
-// 每回合衰減的兩個常數，來自 WAR.EXE 的 sub_54826。
+// 同一個欄位（執行期單位記錄的 +30）有**兩條不同的衰減規則**，
+// 出現在戰鬥的不同階段。兩個除數都是從 Turbo Pascal 的 48-bit Real
+// 常數解出來的（exponent bias 129，尾數最高 byte 給小數部分）。
 const (
-	// DecayThreshold 是衰減的門檻：值大於它才會衰減。
+	// DecayThreshold 是每回合衰減的門檻：值大於它才會衰減。
 	DecayThreshold = 40
-	// DecayDivisor 是衰減的除數。原版存的是 Turbo Pascal 的 48-bit Real
-	// 常數 CX:SI:DI = 0x0083/0x0000/0x2000：
-	// exponent 0x83 → 2^(131-129) = 4，尾數最高 byte 0x20 → 1.25，
-	// 相乘得 5.0。
+	// DecayDivisor 是每回合衰減的除數。sub_54826 的常數
+	// CX:SI:DI = 0x0083/0x0000/0x2000：2^(131-129) × 1.25 = 5.0。
 	DecayDivisor = 5
+	// CombatDecayDivisor 是戰鬥判定後的衰減除數。sub_53DA9 的常數
+	// CX:SI:DI = 0x0084/0x0000/0x2000：2^(132-129) × 1.25 = 10.0。
+	// **這一條沒有門檻**（該函式裡沒有與 40 的比較）。
+	CombatDecayDivisor = 10
 )
 
 // Decay 套用每回合的衰減：值大於 40 時扣掉當前值的 20%。
@@ -129,4 +133,28 @@ func (b *Battle) EndTurn() {
 			b.Units[s][i].EndTurn()
 		}
 	}
+}
+
+// CombatDecay 套用戰鬥判定後的衰減：無條件扣掉當前值的 10%。
+//
+// 原版：`v -= Round(Real(v) / 10.0)`（`sub_53DA9`）。
+//
+// # ⚠️ 捨入規則有一個未確認的地方
+//
+// `v / 10` 的小數**會碰到 .5**（v = 5, 15, 25, …），
+// 而 `Decay` 那條的 `v / 5` 碰不到，所以那邊怎麼捨入都一樣、這邊不行。
+//
+// Turbo Pascal 的文件說 `Round` 在正好一半時取「絕對值較大的那個」
+// （half-away-from-zero），所以這裡用 `(v + 5) / 10`。
+// 但 Delphi 之後改成 banker's rounding（half-to-even），
+// **而我們沒有實機驗證過這一版 RTL 的行為**。
+//
+// 兩者的差異只在 v ≡ 5 (mod 10) 的 26 個值上，各差 1：
+//
+//	half-away：Round(0.5)=1  Round(1.5)=2  Round(2.5)=3
+//	half-even：Round(0.5)=0  Round(1.5)=2  Round(2.5)=2
+//
+// 要確認就實機打一場，記錄該欄位的變化序列。
+func CombatDecay(v uint8) uint8 {
+	return v - uint8((uint16(v)+CombatDecayDivisor/2)/CombatDecayDivisor)
 }

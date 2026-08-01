@@ -147,3 +147,37 @@ func TestBattleTurnCycle(t *testing.T) {
 		}
 	}
 }
+
+// TestCombatDecay 戰鬥判定後的 10% 衰減，無門檻。
+func TestCombatDecay(t *testing.T) {
+	for _, c := range []struct{ in, want uint8 }{
+		{0, 0},
+		{5, 4},    // Round(0.5)=1（half-away-from-zero）
+		{10, 9},   // Round(1.0)=1
+		{15, 13},  // Round(1.5)=2
+		{40, 36},  // 無門檻，40 也會扣
+		{100, 90}, // Round(10.0)=10
+		{255, 229}, // Round(25.5)=26
+	} {
+		if got := CombatDecay(c.in); got != c.want {
+			t.Errorf("CombatDecay(%d) = %d，預期 %d", c.in, got, c.want)
+		}
+	}
+}
+
+// TestTwoDecayRulesDiffer 兩條衰減規則在同一個值上結果不同——
+// 確認沒有把它們寫成同一件事。
+func TestTwoDecayRulesDiffer(t *testing.T) {
+	// 100：每回合衰減扣 20 → 80；戰鬥衰減扣 10 → 90
+	if Decay(100) != 80 || CombatDecay(100) != 90 {
+		t.Errorf("Decay(100)=%d CombatDecay(100)=%d，預期 80 / 90",
+			Decay(100), CombatDecay(100))
+	}
+	// 門檻以下：每回合衰減不動，戰鬥衰減照扣
+	if Decay(30) != 30 {
+		t.Errorf("Decay(30) 應為 30（門檻以下），實得 %d", Decay(30))
+	}
+	if CombatDecay(30) != 27 {
+		t.Errorf("CombatDecay(30) 應為 27（無門檻），實得 %d", CombatDecay(30))
+	}
+}
