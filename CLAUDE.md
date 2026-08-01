@@ -554,6 +554,27 @@ M0／M1 沒完成之前不要碰 M4 以後。
 - 明列不准做的收尾動作（commit、push、重編、清理）。**沒寫的等於允許**。
 - 收到「我順便做了 X」時，X 一律當事故處理：先查影響範圍再談結果。
 
+### ⛔ 有 subagent 在跑時，主迴圈**不要 `git add -A`**
+
+2026-08-01 的實例：派工 prompt 明文寫了「agent 不准 commit／push／add」，
+但**主迴圈自己**在 agent 還在寫檔時跑 `git add -A && commit`，
+把音訊 agent 的**未完成版** `docs/formats/06-mus-tim-audio.md` 與
+`tools/mus.py` 掃進了 commit `4ccff9d`。
+
+> **「禁止 agent commit」只管住了 agent，沒管住主迴圈。**
+> 邊界要雙向：派工時限制 agent，同時也要限制自己。
+
+作法：subagent 執行期間，主迴圈 commit 一律**列出明確路徑**，
+不用 `-A` 也不用 `.`：
+
+```sh
+git add docs/re/31-battle-ai-chain.md CONTEXT.md internal/game/foo.go
+```
+
+真的要全加就先 `git status --short` 看一遍，確認沒有 agent 正在寫的檔案。
+（這次的後果不嚴重——agent 完成後最終版又被下一個 commit 帶進去了——
+但那是運氣，不是設計。）
+
 ---
 
 ## 11. 目錄結構
