@@ -81,8 +81,15 @@ for step in "${steps[@]}"; do
     action="${step%%:*}"; arg="${step#*:}"
     case "$action" in
         wait) echo "[probe] wait ${arg}s"; sleep "$arg" ;;
-        key)  echo "[probe] key $arg";  xdotool windowfocus "$window"; xdotool key --window "$window" "$arg" ;;
-        type) echo "[probe] type $arg"; xdotool windowfocus "$window"; xdotool type --delay 80 "$arg" ;;
+        # [雷] DOSBox 忽略 XSendEvent，所以不能用 `xdotool key --window`——
+        # 那條路徑送出去的事件會被丟掉，畫面完全沒反應。
+        # 要走 XTEST（不帶 --window），而且視窗必須先 activate 而不只是 focus。
+        key)  echo "[probe] key $arg"
+              xdotool windowactivate --sync "$window" 2>/dev/null || xdotool windowfocus "$window"
+              sleep 0.2; xdotool key --clearmodifiers "$arg" ;;
+        type) echo "[probe] type $arg"
+              xdotool windowactivate --sync "$window" 2>/dev/null || xdotool windowfocus "$window"
+              sleep 0.2; xdotool type --clearmodifiers --delay 120 "$arg" ;;
         shot)
             # 視窗幾何要跟截圖一起記：DOSBox 視窗大小 = 遊戲當下的顯示模式，
             # 光看截圖內容 trim 出來的 bounding box 會被黑邊誤導。
