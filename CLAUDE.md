@@ -188,8 +188,10 @@ DOSBox 設定 `machine=svga_s3`，但這是打包者選的，不代表原版需�
 ### 3.6 其他已知
 
 - `.RGB`（8 個）是**純文字**檔：`5 5 5\r\n` 這種十進位三元組，VGA DAC 0–63 的調色盤。
-- `.MUS`／`.TIM` 成對（`BT02`、`SCENE`、`BATTLE1/2`、`FINAL`）。`BT02.TIM` 裡有
-  `bass2` 這種樂器名字串，看起來是樂器與時序表。
+- `.MUS`／`.TIM` 成對，共 **8 組**（原本這裡只列了 5 組，漏掉 `MAINTHEM`、
+  `STRATEGY`、`WALL`）：`MAINTHEM`(31,227 B，最大，主題曲)、`BATTLE1`、`BATTLE2`、
+  `SCENE`、`FINAL`、`BT02`、`WALL`、`STRATEGY`。檔名對得上場景：政略、戰鬥、過場、結局。
+  `BT02.TIM` 裡有 `bass2` 這種樂器名字串，看起來是樂器與時序表。
 - `GRT.GLB` 239 KB，熵 **7.96 bit/byte** → 壓縮或加密過的封裝，不是裸資料。
 - `PLACD.SAV` 1.2 MB，是所有檔案裡最大的一個，用途未知。
 - `SAVE(1)`／`SAVE(2)` 各有 `.DT1` 與 `.DT2` 兩份，可拿來做存檔 diff。
