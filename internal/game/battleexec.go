@@ -69,6 +69,11 @@ type BattleExecResult struct {
 	Implemented bool
 	// Note 是給人看的說明，未實作時寫「還沒實作」與出處。
 	Note string
+
+	// Decisive 表示這個行動要求**直接判勝負**，不再逐格打（§16 的必勝結算）。
+	// 為真時 `DecisiveAttackerWon` 才有意義，推進器看到就該結束戰鬥。
+	Decisive            bool
+	DecisiveAttackerWon bool
 }
 
 // ExecuteAction 執行決策鏈選出的行動。
@@ -104,6 +109,16 @@ func (s *BattleSim) ExecuteAction(a BattleAction, units, foes []*Combatant,
 		return s.execRecompute(units, route)
 	case ActAWeakest:
 		return s.execWeakest(units, foes, route)
+	case ActADecisive:
+		// 分支 A 選中它 = **第二方（守方）被壓到五分之一以下** → 攻方勝。
+		// 原版 `sub_3B19C(0)` → `sub_54E3B(word_64944, word_64942)`，
+		// 第二個參數是勝方 = `word_64942` = 第一方（§16／§37）。
+		return BattleExecResult{Implemented: true, Decisive: true,
+			DecisiveAttackerWon: true, Note: "必勝結算：守方被壓到 1/5 以下"}
+	case ActBDecisive:
+		// 分支 B 選中它 = **第一方（攻方）被壓到五分之一以下** → 守方勝。
+		return BattleExecResult{Implemented: true, Decisive: true,
+			DecisiveAttackerWon: false, Note: "必勝結算：攻方被壓到 1/5 以下"}
 	}
 	return BattleExecResult{
 		Note: "行動「" + BattleActionName(a) + "」還沒實作（docs/re/31 §41 有語意，執行層待補）",

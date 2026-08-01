@@ -52,15 +52,15 @@ func TestExecuteActionReportsUnimplemented(t *testing.T) {
 	noRoute := func(to, from CellIndex) CellIndex { return NoCell }
 	// ⚠️ 這份清單是「執行層還缺什麼」的憑證。實作一個就從這裡移除一筆
 	// ——測試會在你忘了移除時紅給你看（2026-08-02 值 12/13/14/15 實作後就發生過）。
-	for _, a := range []BattleAction{
-		ActADecisive, // 11／1 必勝結算：要接九步結算，不是指派命令
-	} {
+	// ⭐ 13 種行動**全部實作完了**。這個測試改成守住反面：
+	// 未知的行動編號必須回 Implemented=false，不得靜默當成沒事。
+	for _, a := range []BattleAction{0, 5, 20, 99} {
 		got := sim.ExecuteAction(a, sim.Defender, sim.Attacker, noRoute)
 		if got.Implemented {
-			t.Errorf("行動 %s 還沒實作，不該回 Implemented=true", BattleActionName(a))
+			t.Errorf("未知行動 %d 不該回 Implemented=true", a)
 		}
 		if got.Note == "" {
-			t.Errorf("行動 %s 未實作時要有說明", BattleActionName(a))
+			t.Errorf("未知行動 %d 要有說明", a)
 		}
 	}
 }

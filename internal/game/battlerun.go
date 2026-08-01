@@ -10,9 +10,12 @@ package game
 //
 // ⚠️ **既有的 `AutoResolve` 保留不動。** 它用的是簡化行為
 // （朝最近的敵人走），與這裡是兩套獨立的推進方式。
-// 保留的理由：決策鏈還有 2/13 個行動沒實作、3 個底層判斷的語意未解，
-// 現在就把 `AutoResolve` 拆掉，等於用一個不完整的東西換掉一個能跑完的。
-// 兩套並存才能對照——`TestChainRunMatchesShape` 就是在比它們的差異。
+// 保留的理由：**13 種行動雖然都實作了，但三個底層判斷的語意仍未解**
+// （比率門檻的來源、`sub_534FF` 的輸出、兩個旗標），那些由呼叫端傳。
+// 在它們解出來之前，這條鏈的行為與原版還有已知落差，兩套並存才能對照。
+//
+// ⭐ 實測（3v3、守方 5000×3）：**10 回合、移動 4、交戰 6、未實作 0、
+// 攻方損 4715 守方損 3396**——決策鏈能把一場戰鬥完整跑完。
 
 // BattleRunStats 是一場決策鏈驅動的戰鬥跑完之後的統計。
 type BattleRunStats struct {
@@ -27,6 +30,12 @@ type BattleRunStats struct {
 	Unimplemented int
 	// Moves / Engagements 是實際移動與交戰的次數。
 	Moves, Engagements int
+
+	// Decisive 表示這場戰鬥是被**必勝結算**判掉的，不是打到一方全滅。
+	// 原版戰力差五倍時就不再逐格打（§16）——這個旗標讓呼叫端分得出來，
+	// 免得把「秒結束」誤讀成模擬出錯。
+	Decisive     bool
+	DecisiveNote string
 }
 
 // dirToward 找出從 `from` 走到相鄰的 `to` 要用哪個方向。
@@ -152,6 +161,19 @@ func (s *BattleSim) AutoResolveByChain(maxTurns int, gates BattleChainGates,
 		}
 		if !ra.Implemented {
 			st.Unimplemented++
+		}
+
+		// ⭐ 必勝結算：戰力差五倍時原版不再逐格打，直接判勝負（§16）。
+		// 兩條鏈都可能選中它，先到先算——分支 B 先跑，所以它優先。
+		if rb.Decisive || ra.Decisive {
+			r := rb
+			if !rb.Decisive {
+				r = ra
+			}
+			st.AttackerWon, st.Decided = r.DecisiveAttackerWon, true
+			st.Decisive = true
+			st.DecisiveNote = r.Note
+			break
 		}
 
 		for _, u := range append(append([]*Combatant(nil), s.Attacker...), s.Defender...) {

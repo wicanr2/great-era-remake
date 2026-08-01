@@ -9,7 +9,7 @@ import "testing"
 // ⚠️ **兵力對比也要設計**。預備隊投入與主將親征都看「首位單位戰力
 // vs 敵軍總戰力」的優勢等級（§17）——攻方劣勢時原版**正確地什麼都不做**，
 // 那是「打不過就不打」，不是實作缺口。所以這裡讓攻方壓倒性優勢。
-func mkMultiBattle(t *testing.T, nAtk, nDef int) *BattleSim {
+func mkMultiBattle(t *testing.T, nAtk, nDef int, defForce uint16) *BattleSim {
 	t.Helper()
 	m := loadTestMap(t)
 	const wu, zhang = GeneralID(58), GeneralID(166)
@@ -40,7 +40,7 @@ func mkMultiBattle(t *testing.T, nAtk, nDef int) *BattleSim {
 	}
 	var defenders []*Combatant
 	for i := 0; i < nDef; i++ {
-		u := mkUnit(GeneralID(201+i), zhang, Branch1, 2500) // 讓攻方首位單位取得優勢
+		u := mkUnit(GeneralID(201+i), zhang, Branch1, defForce)
 		u.Cell = cells[i]
 		defenders = append(defenders, u)
 	}
@@ -53,7 +53,9 @@ func mkMultiBattle(t *testing.T, nAtk, nDef int) *BattleSim {
 }
 
 func TestAutoResolveByChainRuns(t *testing.T) {
-	sim := mkMultiBattle(t, 3, 3)
+	// 守方 5000×3：攻方首位單位取得優勢（預備隊會投入），
+	// 但沒到五倍差，所以不會被必勝結算秒判。
+	sim := mkMultiBattle(t, 3, 3, 5000)
 	st := sim.AutoResolveByChain(60, BattleChainGates{}, 201)
 
 	if st.Turns == 0 {
@@ -81,9 +83,12 @@ func TestAutoResolveByChainRuns(t *testing.T) {
 func TestChainRunActuallyMovesAndFights(t *testing.T) {
 	// 決策鏈驅動的推進器必須真的讓單位動起來、真的打起來——
 	// 否則它只是一個很貴的空轉迴圈。
-	sim := mkMultiBattle(t, 3, 3)
+	sim := mkMultiBattle(t, 3, 3, 5000)
 	st := sim.AutoResolveByChain(60, BattleChainGates{}, 201)
 
+	// ⚠️ **不要求整場不觸發必勝結算**——打到後來一方被打殘，
+	// 五倍門檻就會在戰鬥中途成立，那是原版的「打殘了就收工」（§16）。
+	// 這裡只要求「真的動起來、真的打起來」。
 	if st.Moves == 0 {
 		t.Error("整場沒有任何移動——推進器沒接上命令")
 	}
@@ -146,4 +151,28 @@ func TestStepByOrderClearsNextCell(t *testing.T) {
 	if sim.stepByOrder(u) {
 		t.Error("沒有下一跳不該移動")
 	}
+}
+
+
+func TestChainRunDecisiveResolution(t *testing.T) {
+	// ⭐ §16：戰力差五倍時原版不再逐格打，直接判勝負。
+	// 守方 2500×3 對攻方 20000×3，五倍門檻成立。
+	sim := mkMultiBattle(t, 3, 3, 2500)
+	st := sim.AutoResolveByChain(60, BattleChainGates{}, 201)
+
+	if !st.Decisive {
+		t.Fatalf("戰力差五倍該被必勝結算判掉，實際跑了 %d 回合", st.Turns)
+	}
+	if !st.Decided {
+		t.Error("必勝結算該算分出勝負")
+	}
+	if !st.AttackerWon {
+		t.Errorf("守方被輾壓該是攻方勝（%s）", st.DecisiveNote)
+	}
+	// 秒判：不該打滿很多回合。
+	if st.Turns > 2 {
+		t.Errorf("必勝結算該在頭一兩回合就觸發，實際 %d 回合", st.Turns)
+	}
+	// ⚠️ 這種結束方式沒有戰損——原版是「不打了直接判」，不是打光對方。
+	t.Logf("必勝結算於第 %d 回合：%s", st.Turns, st.DecisiveNote)
 }
