@@ -104,7 +104,7 @@ func TestBeginTurnResets(t *testing.T) {
 //
 // 順序照 sub_54DAC：`+32 &= 0xBF` 然後 `+20 = 勝方`。
 func TestCaptureFollowsOriginal(t *testing.T) {
-	p := Province{Commander: 58, Flags: ProvinceFlagInBattle | ProvinceFlagTaxed}
+	p := Province{Commander: 58, Flags: ProvinceFlagInBattle | ProvinceFlagActed}
 	if !p.InBattle() {
 		t.Fatal("前提不成立：應該在戰鬥中")
 	}
@@ -115,7 +115,7 @@ func TestCaptureFollowsOriginal(t *testing.T) {
 	if p.Commander != 98 {
 		t.Errorf("司令應改成 98，實得 %d", p.Commander)
 	}
-	if !p.Taxed() {
+	if !p.Acted() {
 		t.Error("不該動到其他位元（已徵稅）")
 	}
 

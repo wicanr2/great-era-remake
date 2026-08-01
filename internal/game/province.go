@@ -45,14 +45,21 @@ const (
 //
 // 初始檔（TOWN(N).DAT）全 39 省都是 0，存檔裡才會設。
 const (
-	// ProvinceFlagTaxed 是 bit 2。**假說**：本月已徵過稅。
+	// ProvinceFlagActed 是 bit 2：**這個省本回合已經處理過** — confirmed。
 	//
-	// 依據：`4.15` 詞條 42 是「已徵過稅」，而徵稅每月限一次正好需要一個旗標。
-	// SAVE(1) 有 25 個省設了它、SAVE(2) 只有 4 個，符合「回合中後段 vs 初期」；
-	// **無主的省一律沒設**（不會徵稅）。
+	// ⛔ 這一格原本標「假說：本月已徵過稅」，依據是 `4.15` 詞條 42
+	// 有「已徵過稅」而 `SAVE(1)` 剛好 25 省設了它。**程式碼推翻了它**
+	// （`docs/re/14` §1）：
 	//
-	// ⚠️ 沒有實機驗證。要確認就實機徵稅一次、存檔、比對這個 bit。
-	ProvinceFlagTaxed = 0x04
+	//	sub_10193（玩家指令選單）    or  al, 4    ← 玩家下完命令
+	//	sub_13D23（電腦回合初始化）  or  al, 4    ← 電腦開始跑這個省
+	//	sub_10AB5（主迴圈）          and al, 4    ← 立起來就跳過
+	//	sub_383EF                    and al, 0FBh ← 對全 39 省清掉
+	//
+	// **它同時是玩家與電腦的分流開關**：主迴圈看到 bit 2 就跳過玩家選單。
+	// 存檔裡有 25 省設它，是因為存檔當下那一輪已經輪過那些省；
+	// 「無主的省一律沒設」也因此成立——無主省兩條路徑都不進。
+	ProvinceFlagActed = 0x04
 
 	// ProvinceFlagInBattle 是 bit 6：**這個省正在打仗**。
 	//
@@ -300,8 +307,8 @@ func (t *ProvinceTable) FirstAttackable(from ProvinceID) ProvinceID {
 	return ns[0]
 }
 
-// Taxed 回報這個省本月是否已徵過稅（假說，見 ProvinceFlagTaxed）。
-func (p *Province) Taxed() bool { return p.Flags&ProvinceFlagTaxed != 0 }
+// Acted 回報這個省本回合是否已經處理過（見 ProvinceFlagActed）。
+func (p *Province) Acted() bool { return p.Flags&ProvinceFlagActed != 0 }
 
 // InBattle 回報這個省是不是正在打仗（bit 6）。
 func (p *Province) InBattle() bool { return p.Flags&ProvinceFlagInBattle != 0 }

@@ -318,8 +318,11 @@ func TestAttackableSkipsUnowned(t *testing.T) {
 // TestProvinceFlags 記錄 +32 旗標的實測分佈。
 //
 // 初始檔全 0；SAVE(1) 有 25 個省設了 bit 2、SAVE(2) 只有 4 個，
-// 而且**無主的省一律沒設**。這是「已徵過稅」假說的依據
-// （docs/spec/03 §2）。數字是釘住現況用的回歸檢查。
+// 而且**無主的省一律沒設**。
+//
+// bit 2 = **本回合已經處理過**（`docs/re/14` §1，程式碼證據）
+// ——存檔當下那一輪已經輪過 25 個省。無主省不設，是因為它兩條
+// 路徑（玩家選單／電腦回合）都不進。數字是釘住現況用的回歸檢查。
 func TestProvinceFlags(t *testing.T) {
 	for _, name := range []string{"TOWN(1).DAT", "TOWN(2).DAT", "TOWN(3).DAT"} {
 		tbl, err := ParseTownFile(readGame(t, name))
@@ -335,7 +338,7 @@ func TestProvinceFlags(t *testing.T) {
 
 	for _, c := range []struct {
 		file  string
-		taxed int
+		acted int
 	}{
 		{"SAVE(1).DT1", 25},
 		{"SAVE(2).DT1", 4},
@@ -347,16 +350,16 @@ func TestProvinceFlags(t *testing.T) {
 		n := 0
 		for i := range tbl.Province {
 			p := &tbl.Province[i]
-			if !p.Taxed() {
+			if !p.Acted() {
 				continue
 			}
 			n++
 			if !p.Commander.Valid() {
-				t.Errorf("%s 第 %d 省無主卻設了已徵稅旗標", c.file, i+1)
+				t.Errorf("%s 第 %d 省無主卻被標為已處理", c.file, i+1)
 			}
 		}
-		if n != c.taxed {
-			t.Errorf("%s 設了 bit 2 的省應為 %d 個，實得 %d", c.file, c.taxed, n)
+		if n != c.acted {
+			t.Errorf("%s 設了 bit 2 的省應為 %d 個，實得 %d", c.file, c.acted, n)
 		}
 		// bit 6 是「正在打仗」的暫時旗標，戰後由 sub_54DAC 清除，
 		// 所以存檔裡不該出現。
