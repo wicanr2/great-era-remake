@@ -196,6 +196,7 @@ func joinTurn(when, ai string) string {
 // 「規則還沒接」與「規則接了但這回合沒觸發」看起來一樣。
 func describeComputerTurn(rep computerTurnReport) string {
 	var parts []string
+	parts = append(parts, rep.relocations...)
 	if rep.comforts > 0 {
 		parts = append(parts, fmt.Sprintf("慰勞 %d", rep.comforts))
 	}

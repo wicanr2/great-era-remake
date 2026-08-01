@@ -13,15 +13,15 @@ import (
 // 迴圈直到命令數用完。這裡做的是**決策鏈 A 那一段**，因為它是唯一會
 // 出兵的地方，也是玩家最有感的部分。
 //
-// ⚠️ **還沒接的**：內政（依 `byte_6FE7E` 分支）、`sub_19B89`、遷都
-// （`sub_1398D`，`docs/re/13` §4 已解）、收尾 `sub_1AC01`。
-// 照實標記，不假裝跑了完整的回合。
+// ⚠️ **還沒接的**：內政（依 `byte_6FE7E` 分支）、`sub_19B89`、
+// 收尾 `sub_1AC01`。照實標記，不假裝跑了完整的回合。
 
 // computerTurnReport 是一次電腦回合的結果，用來組訊息。
 type computerTurnReport struct {
-	comforts  int
-	transfers int
-	attacks   []string
+	comforts    int
+	transfers   int
+	attacks     []string
+	relocations []string
 }
 
 // runComputerTurn 讓所有非玩家勢力行動一輪。
@@ -68,6 +68,13 @@ func (a *app) runOneComputerAction(p game.ProvinceID, rep *computerTurnReport) b
 		// 這裡用同一支 `ProvinceForceTotal`，**不是代入值**。
 		TotalForce: a.world.ProvinceForceTotal(p, a.generals),
 	}
+	// 遷都排在兩條決策鏈**之前**（`docs/re/13` §6），而且會消耗一個命令數。
+	if r := a.world.Relocate(p, prov.Commander, a.generals); r.Moved {
+		rep.relocations = append(rep.relocations,
+			fmt.Sprintf("%s → %s 遷都", a.provinceName(r.From), a.provinceName(r.To)))
+		return true
+	}
+
 	res := a.world.ChainA(p, a.generals, opt)
 	if res.Action.Kind == game.AINone {
 		// 決策鏈 A 沒做出決定 → 換決策鏈 B（`sub_15F3C`，六步全是調動）。
