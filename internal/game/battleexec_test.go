@@ -53,11 +53,8 @@ func TestExecuteActionReportsUnimplemented(t *testing.T) {
 	// ⚠️ 這份清單是「執行層還缺什麼」的憑證。實作一個就從這裡移除一筆
 	// ——測試會在你忘了移除時紅給你看（2026-08-02 值 12/13/14/15 實作後就發生過）。
 	for _, a := range []BattleAction{
-		ActADecisive,     // 11／1 必勝結算：要接九步結算，不是指派命令
-		ActBStrikeForce,  // 4  打敵方主力周邊
-		ActAStandbyOnly,  // 16 只處理待命與已出發
-		ActARecompute,    // 17 重算全軍
-		ActAWeakest,      // 18 挑最弱（統計段未讀完，先不做）
+		ActADecisive, // 11／1 必勝結算：要接九步結算，不是指派命令
+		ActAWeakest,  // 18 挑最弱（sub_3E24F 的統計段未讀完，先不做）
 	} {
 		got := sim.ExecuteAction(a, sim.Defender, sim.Attacker, noRoute)
 		if got.Implemented {
@@ -288,5 +285,89 @@ func TestExecResetClearsThenReassigns(t *testing.T) {
 	}
 	if got.Assigned > 0 && a.Command != BattleCmdStandby && !a.Assigned() {
 		t.Error("重置後的單位狀態不一致")
+	}
+}
+
+func TestExecRecomputeLoopOrder(t *testing.T) {
+	// §14：三個迴圈，順序有意義。
+	sim := mkTracedBattle(t, 20000, 18000)
+	route := func(to, from CellIndex) CellIndex { return to }
+	d := sim.Defender[0]
+
+	// 迴圈 1：命令 3 且沒有目標格 → 降成 2。
+	a := sim.Attacker[0]
+	a.Command = BattleCmdSeekTarget
+	a.NextCell = NoCell
+	a.TargetUnit = 0
+	sim.ExecuteAction(ActARecompute, sim.Attacker, sim.Defender, route)
+	if a.Command != BattleCmdStandby {
+		t.Errorf("命令 3 沒目標格該降成 2，實際 %d", a.Command)
+	}
+
+	// 有目標的會重算下一格。
+	a.Command = BattleCmdCommitted
+	a.TargetUnit = d.General
+	a.NextCell = NoCell
+	got := sim.ExecuteAction(ActARecompute, sim.Attacker, sim.Defender, route)
+	if got.Assigned == 0 || a.NextCell != d.Cell {
+		t.Errorf("該重算出下一格 %d，實際 %d（assigned=%d）", d.Cell, a.NextCell, got.Assigned)
+	}
+
+	// 目標已陣亡就算不出來。
+	d.Strength.Force = 0
+	a.NextCell = NoCell
+	got = sim.ExecuteAction(ActARecompute, sim.Attacker, sim.Defender, route)
+	if got.Assigned != 0 {
+		t.Errorf("目標陣亡時不該算出下一格，實際 assigned=%d", got.Assigned)
+	}
+}
+
+func TestExecStandbyOnlyFiltersByCommand(t *testing.T) {
+	// §35：命令 2 無條件處理；命令 4／5 要後期；其餘跳過。
+	sim := mkTracedBattle(t, 20000, 18000)
+	route := func(to, from CellIndex) CellIndex { return to }
+
+	a := sim.Attacker[0]
+	// 命令 1 不在處理範圍。
+	a.Command = BattleCmdGarrison
+	a.NextCell = NoCell
+	if got := sim.ExecuteAction(ActAStandbyOnly, sim.Attacker, sim.Defender, route); got.Assigned != 0 {
+		t.Errorf("命令 1 不該被處理，實際 %d", got.Assigned)
+	}
+	// 命令 2 會。
+	a.Command = BattleCmdStandby
+	if got := sim.ExecuteAction(ActAStandbyOnly, sim.Attacker, sim.Defender, route); got.Assigned == 0 {
+		t.Error("命令 2 該被處理")
+	}
+	// 前期時命令 4／5 被跳過（用內部的 stage 版本驗）。
+	a.Command = BattleCmdUnknown5
+	a.NextCell = NoCell
+	early := sim.execStandbyOnlyStage(sim.Attacker, sim.Defender, route, false)
+	if early.Assigned != 0 {
+		t.Errorf("前期不該處理命令 5，實際 %d", early.Assigned)
+	}
+	late := sim.execStandbyOnlyStage(sim.Attacker, sim.Defender, route, true)
+	if late.Assigned == 0 {
+		t.Error("後期該處理命令 5")
+	}
+}
+
+func TestExecStrikeForceDoesNotSetAssignedBit(t *testing.T) {
+	// §29：值 4 與值 3 的差別之一——**成功後不標旗標**。
+	sim := mkTracedBattle(t, 20000, 18000)
+	route := func(to, from CellIndex) CellIndex { return to }
+	a := sim.Attacker[0]
+	a.Command = BattleCmdSeekTarget
+	a.Flags13 = 0
+
+	got := sim.ExecuteAction(ActBStrikeForce, sim.Attacker, sim.Defender, route)
+	if !got.Implemented {
+		t.Fatal("打主力周邊已經實作了")
+	}
+	if got.Assigned > 0 && a.Assigned() {
+		t.Error("值 4 不該立 +13 bit 7——那是值 3 才做的（§29 的對照表）")
+	}
+	if got.Assigned > 0 && a.TargetUnit == 0 {
+		t.Error("該設目標單位")
 	}
 }

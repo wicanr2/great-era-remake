@@ -96,6 +96,12 @@ func (s *BattleSim) ExecuteAction(a BattleAction, units, foes []*Combatant,
 		return s.execDecapitate(units, foes, route, true)
 	case ActADecapitateKeepAll:
 		return s.execDecapitate(units, foes, route, false)
+	case ActBStrikeForce:
+		return s.execStrikeForce(units, foes, route)
+	case ActAStandbyOnly:
+		return s.execStandbyOnly(units, foes, route)
+	case ActARecompute:
+		return s.execRecompute(units, route)
 	}
 	return BattleExecResult{
 		Note: "行動「" + BattleActionName(a) + "」還沒實作（docs/re/31 §41 有語意，執行層待補）",
@@ -392,4 +398,174 @@ func (s *BattleSim) execDecapitate(units, foes []*Combatant,
 		mode = "駐守的都留"
 	}
 	return BattleExecResult{Assigned: n, Implemented: true, Note: "斬首（" + mode + "）"}
+}
+
+
+// execStrikeForce 是值 4：**打敵方主力周邊**（§29）。
+//
+// 骨架與值 3（打城市）相同，只換中心點：
+//
+//	中心 = 敵方主力所在格（原版 word_64944 指到的單位）
+//	候選 = 距離中心兩格之內、站著單位的格（§25 的 sub_55BCC）
+//	→ 只派命令 3 與 4 的單位，逐一試路，第一個走得通的當目標
+//
+// ⚠️ 與值 3 的另一個差別：**成功後不標旗標**（§29 的對照表）。
+func (s *BattleSim) execStrikeForce(units, foes []*Combatant,
+	route func(to, from CellIndex) CellIndex) BattleExecResult {
+	center := firstLiving(foes)
+	if center == nil {
+		return BattleExecResult{Implemented: true, Note: "敵方主力不在場"}
+	}
+
+	// 候選：距離中心兩格之內、站著單位的格（§25）。
+	var pool []GeneralID
+	for i := 0; i < CellCount; i++ {
+		c := CellIndex(i)
+		v := s.Occ[c]
+		if v == 0 || !WithinTwoSteps(c, center.Cell) {
+			continue
+		}
+		pool = append(pool, v)
+	}
+	if len(pool) == 0 {
+		return BattleExecResult{Implemented: true, Note: "主力周邊沒有單位"}
+	}
+
+	cellOf := func(id GeneralID) CellIndex {
+		if u := s.Unit(id); u != nil {
+			return u.Cell
+		}
+		return NoCell
+	}
+	n := 0
+	for _, u := range units {
+		if u == nil || !u.Alive() {
+			continue
+		}
+		if u.Command != BattleCmdSeekTarget && u.Command != BattleCmdCommitted {
+			continue // 只派命令 3 與 4（§23）
+		}
+		got := AssignTargetFrom(pool, u.Cell, cellOf, route)
+		if got.Target == 0 {
+			continue
+		}
+		// ⚠️ 值 4 不標 +13 bit 7，所以不用 AssignTo。
+		u.TargetUnit, u.NextCell = got.Target, got.NextCell
+		n++
+	}
+	return BattleExecResult{Assigned: n, Implemented: true,
+		Note: "打主力周邊：候選 " + itoa(len(pool)) + " 個"}
+}
+
+// execStandbyOnly 是值 16：**只處理待命與已出發的單位**（§35）。
+//
+//	命令 2        無條件處理
+//	命令 4 / 5    要 `byte_64900 ≥ 5` 才處理（`lateStage`）
+//	其餘          跳過
+//	已經與目標相鄰就不動
+//
+// `lateStage` 對應原版的 `byte_64900 ≥ 5`——那個變數第三次出現
+// （§17 的 > 4、§35 的 ≥ 5、§42 的加項），**語意仍未解**，
+// 所以由呼叫端傳。
+func (s *BattleSim) execStandbyOnly(units, foes []*Combatant,
+	route func(to, from CellIndex) CellIndex) BattleExecResult {
+	return s.execStandbyOnlyStage(units, foes, route, true)
+}
+
+func (s *BattleSim) execStandbyOnlyStage(units, foes []*Combatant,
+	route func(to, from CellIndex) CellIndex, lateStage bool) BattleExecResult {
+	center := firstLiving(foes)
+	if center == nil {
+		return BattleExecResult{Implemented: true, Note: "敵方不在場"}
+	}
+	n, skipped := 0, 0
+	for _, u := range units {
+		if u == nil || !u.Alive() {
+			continue
+		}
+		switch u.Command {
+		case BattleCmdStandby: // 命令 2：無條件
+		case BattleCmdCommitted, BattleCmdUnknown5: // 命令 4／5：要後期
+			if !lateStage {
+				skipped++
+				continue
+			}
+		default:
+			continue
+		}
+		if Adjacent(u.Cell, center.Cell) {
+			continue // 已相鄰就不動（§35）
+		}
+		next := route(center.Cell, u.Cell)
+		if next == NoCell {
+			continue
+		}
+		u.AssignTo(center.General, next)
+		n++
+	}
+	note := "只處理待命與已出發"
+	if skipped > 0 {
+		note += "（前期，跳過 " + itoa(skipped) + " 個命令 4／5）"
+	}
+	return BattleExecResult{Assigned: n, Implemented: true, Note: note}
+}
+
+// execRecompute 是值 17：**重算全軍的行動**（§14）。
+//
+// 原版三個迴圈，順序有意義：
+//
+//	1. 命令 3 且沒有目標格 → 降成 2
+//	2. 命令 2／4／5 一批    → 重算下一格
+//	3. 命令 1 單獨一批      → 重算下一格
+//
+// ⚠️ 命令 1 單獨最後處理，不與 2／4／5 混在一起——那是「守城」與
+// 「移動」兩種性質的分界（§14 的語意線索）。
+func (s *BattleSim) execRecompute(units []*Combatant,
+	route func(to, from CellIndex) CellIndex) BattleExecResult {
+	// 迴圈 1：命令 3 的清理。
+	for _, u := range units {
+		if u == nil || !u.Alive() {
+			continue
+		}
+		if u.Command == BattleCmdSeekTarget && u.NextCell == NoCell {
+			u.Command = BattleCmdStandby
+		}
+	}
+
+	recalc := func(u *Combatant) bool {
+		if u.TargetUnit == 0 {
+			return false
+		}
+		t := s.Unit(u.TargetUnit)
+		if t == nil || !t.Alive() {
+			return false
+		}
+		next := route(t.Cell, u.Cell)
+		u.NextCell = next
+		return next != NoCell
+	}
+
+	n := 0
+	// 迴圈 2：命令 2／4／5 一批。
+	for _, u := range units {
+		if u == nil || !u.Alive() {
+			continue
+		}
+		switch u.Command {
+		case BattleCmdStandby, BattleCmdCommitted, BattleCmdUnknown5:
+			if recalc(u) {
+				n++
+			}
+		}
+	}
+	// 迴圈 3：命令 1 單獨一批。
+	for _, u := range units {
+		if u == nil || !u.Alive() {
+			continue
+		}
+		if u.Command == BattleCmdGarrison && recalc(u) {
+			n++
+		}
+	}
+	return BattleExecResult{Assigned: n, Implemented: true, Note: "重算全軍的下一格"}
 }
