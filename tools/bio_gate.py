@@ -59,10 +59,22 @@ BANNED = ["剿匪", "漢奸", "賣國", "竊據", "悍將", "名將", "梟雄",
 #
 # 改成**構詞規則**：「剿匪」後面接一個職務詞，就是機構全稱不是評價。
 # 這樣不必窮舉每一個地名前綴與職務組合。
+#
+# ⛔ 第二次修：構詞規則寫得太緊，`剿匪總預備軍司令官`（C2 的 `#296`）
+# 仍然被擋，承辦者只能**把官職全名從正文刪掉**——
+# **那正是 §14.3 警告的事：一律當違規會逼人刪掉原件名稱。**
+#
+# 改法有兩層：
+#   1. 允許「剿匪」與職務詞之間夾幾個字（總預備軍、臨時、邊區…）
+#   2. ⭐ **「剿匪」永遠不進「該擋」那一級**——比對不到就丟去複審。
+#      這個詞在公文職稱裡太常見，自動擋掉的代價（刪原件名）
+#      高於放過的代價（多一筆人工複審）。
 OFFICIAL_NAME = re.compile(
-    r"剿匪(總司令部|總司令|副總司令|司令部|司令|總指揮部|總指揮|"
-    r"總部|軍|督辦|會辦|委員會|行營)"
+    r"剿匪[\u4e00-\u9fff]{0,4}?"
+    r"(司令官|司令部|總司令|司令|總指揮|指揮官|督辦|會辦|委員會|行營|總隊|總部|軍|署|處)"
 )
+# 這些詞就算比對不到官職形狀，也只送複審不直接擋（理由同上）。
+NEVER_STOP = ("剿匪",)
 # 事件的官方名稱（不是構詞規則能涵蓋的，仍用清單）。
 ALLOW_IN_NAME = ["和平解放"]
 # 帶歸屬詞又加引號的引述稱呼，§4.3 列為「限制使用」而非禁止
@@ -105,11 +117,11 @@ def banned_hits(text: str) -> tuple[list[str], list[str]]:
             ctx = text[max(0, m.start() - 8): m.end() + 8]
             if any(a in ctx for a in ALLOW_IN_NAME):
                 continue  # 事件的官方名稱，不是評價
-            # 機構全稱：「剿匪」＋職務詞。用構詞規則不用字串清單。
+            # 機構全稱：「剿匪」＋（夾幾個字）＋職務詞。構詞規則不是字串清單。
             if OFFICIAL_NAME.match(text, m.start()):
                 continue
             quoted = "「" + w in ctx or w + "」" in ctx
-            if quoted and any(a in ctx for a in ATTRIBUTION):
+            if (quoted and any(a in ctx for a in ATTRIBUTION)) or w in NEVER_STOP:
                 review.append(f"{w}（…{ctx}…）")
             else:
                 stop.append(f"{w}（…{ctx}…）")
