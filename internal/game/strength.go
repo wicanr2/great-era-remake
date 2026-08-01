@@ -79,6 +79,11 @@ const LeaderChiang GeneralID = 1
 
 // Strength 算出一個單位的戰力，逐步照 `sub_5A0B9`。
 //
+// **這支同時是電腦 AI 的評估函式。** `sub_5B983`（AI 挑調動目標時
+// 用來排序省份的那支）就是把一個省所有可用將領的 `sub_5A0B9` 加總
+// （`docs/mechanics/70-ai.md` §6h）。所以 remake 的 AI 必須用**同一份
+// 實作**，否則電腦的判斷會與實際戰果脫節。
+//
 // 每一步都有 Round，所以**順序不能重排**——原版是一連串
 // `Round(Real ...)`，中途的截斷會累積。這裡用整數運算重現：
 // 除數都是正整數、被除數非負，所以 `(x + d/2) / d` 等價於
@@ -268,4 +273,25 @@ func clampLoss(loss int, force uint16) int {
 		return int(force)
 	}
 	return loss
+}
+
+// ProvinceStrength 是一個省所有可用將領的戰力總和，語意照 `sub_5B983`
+// （`docs/mechanics/70-ai.md` §6h）。
+//
+// 三個條件與 `ProvinceTable.AvailableGenerals` 差一項：**這裡不看效忠對象**，
+// 只要「在這個省」且「可用」就算。原版就是這樣寫的。
+//
+// 電腦挑調動目標時拿它排序，所以它是 AI 的局勢評估函式。
+func ProvinceStrength(p ProvinceID, units []CombatUnit, in []StrengthInput, opt StrengthOpts) int {
+	total := 0
+	for i := range units {
+		u := &units[i]
+		if u.General == 0 || u.Province != p || !u.Active {
+			continue
+		}
+		if i < len(in) {
+			total += Strength(in[i], opt)
+		}
+	}
+	return total
 }
