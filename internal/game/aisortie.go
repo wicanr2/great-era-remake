@@ -150,3 +150,82 @@ func PlanSortie(roster []GeneralID, homeStrength, targetStr int,
 	}
 	return plan
 }
+
+// ── 湊完兵之後的出兵閘門（`sub_174C9` `loc_1754F`..`loc_175B9`）──────────
+
+// AISortieMinGenerals 是**出兵的最低人數：3**。
+//
+// 兩種難度都有這道門檻，只是位置不同：
+//
+//	高難度：`sub_174C9` 的 `cmp byte ptr ss:[di-5], 3 / jb 不出兵`
+//	低難度：`sub_16A9E` 收尾時 `已收 < 3 → *arg_C = 0`
+//
+// 湊不到三個人就不打。
+const AISortieMinGenerals = 3
+
+// AISortieGateRatio 是出兵閘門的倍率：**名單戰力 ≥ 目標省戰力 × 2**
+// （`sub_17437`）。
+//
+// ⚠️ 與湊兵的停止倍率 **2.5** 不同（`AISortieStopRatioNum`）。
+// 湊兵可能因為別的條件先停（人數上限、清單掃完），那時戰力不到 2.5 倍；
+// 這道閘門用比較寬鬆的 2 倍再確認一次。
+const AISortieGateRatio = 2
+
+// SortieGateInput 是出兵閘門要看的東西。
+type SortieGateInput struct {
+	// Approved 是湊兵函式寫回的放行旗標（原版 `狀態[-12h]`）。
+	Approved bool
+	// Count 是名單人數（原版 `狀態[-5]`）。
+	Count int
+	// PlanStrength 是名單的攻擊力總和。
+	PlanStrength int
+	// TargetStrength 是目標省的戰力總和。
+	TargetStrength int
+	// TargetDesperate 是 `sub_17019(目標省)`：目標是不是軟柿子
+	// （缺糧又被包圍，`aidesperate.go`）。
+	TargetDesperate bool
+	// Field234 / Field236 是外層狀態的 `[-234h]` 與 `[-236h]`。
+	//
+	// ⚠️ 兩格的語意都是**假說**：`[-236h]` 疑似兵力總和
+	// （`aisupply.go` 的 `totalForce` 同一格），`[-234h]` 未解。
+	// 步驟 5 的前置也用同一組門檻（3 與 63,392）。
+	Field234, Field236 int
+}
+
+// AISortieField236Threshold 是 `[-236h]` 的門檻，決策鏈 A 步驟 5
+// 與這道閘門用的是同一個數字。
+const AISortieField236Threshold = 0xF7A0 // 63,392
+
+// SortieGate 決定湊好的兵到底出不出（`sub_174C9` `loc_17568`）。
+//
+//	if !Approved 或 Count < 3:            不出兵
+//	if 名單戰力 ≥ 目標戰力 × 2:            出兵    ← sub_17437
+//	if 目標是軟柿子:                       出兵    ← sub_17019
+//	if [-234h] < 3:                       不出兵
+//	if [-234h] > 3:                       出兵
+//	if [-236h] ≥ 63,392:                  出兵
+//	否則                                   不出兵
+//
+// 讀作：**湊夠了就打；沒湊夠但對方快垮了也打；兩者都不成立就看家底夠不夠厚。**
+//
+// ⚠️ `[-28h]` 那 10 格（`sub_17437` 掃的）是出兵名單的副本，
+// 由 `sub_173B5` 從 `[-0EEh]` 複製過來——但 `sub_173B5` **只在高難度呼叫**。
+// 低難度大概是由 `sub_16905`（未讀）做同樣的事，**未驗**（`docs/re/30` §5d）。
+func SortieGate(in SortieGateInput) bool {
+	if !in.Approved || in.Count < AISortieMinGenerals {
+		return false
+	}
+	if in.PlanStrength >= in.TargetStrength*AISortieGateRatio {
+		return true
+	}
+	if in.TargetDesperate {
+		return true
+	}
+	switch {
+	case in.Field234 < 3:
+		return false
+	case in.Field234 > 3:
+		return true
+	}
+	return in.Field236 >= AISortieField236Threshold
+}

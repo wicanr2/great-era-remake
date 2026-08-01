@@ -124,3 +124,72 @@ func TestPlanSortieEmpty(t *testing.T) {
 		t.Errorf("空清單的結果不對：%+v", plan)
 	}
 }
+
+// 出兵閘門的六條分支。
+func TestSortieGate(t *testing.T) {
+	base := SortieGateInput{
+		Approved: true, Count: 3,
+		PlanStrength: 100, TargetStrength: 100, // 100 < 200 → 第一關不過
+		Field234: 3, Field236: 0, // 兩個追加條件都不過
+	}
+	if SortieGate(base) {
+		t.Error("四條放行條件都不成立，不該出兵")
+	}
+
+	t.Run("旗標沒放行就不出兵", func(t *testing.T) {
+		in := base
+		in.Approved = false
+		in.PlanStrength = 100000 // 戰力再高也沒用
+		if SortieGate(in) {
+			t.Error("Approved=false 應該直接否決")
+		}
+	})
+	t.Run("人數不足就不出兵", func(t *testing.T) {
+		in := base
+		in.Count = AISortieMinGenerals - 1
+		in.PlanStrength = 100000
+		if SortieGate(in) {
+			t.Errorf("人數 %d < %d 應該直接否決", in.Count, AISortieMinGenerals)
+		}
+	})
+	t.Run("戰力達兩倍就出兵", func(t *testing.T) {
+		in := base
+		in.PlanStrength = in.TargetStrength * AISortieGateRatio
+		if !SortieGate(in) {
+			t.Error("名單戰力剛好兩倍就該放行（原版相等時 fallthrough 到放行）")
+		}
+	})
+	t.Run("目標是軟柿子就出兵", func(t *testing.T) {
+		in := base
+		in.TargetDesperate = true
+		if !SortieGate(in) {
+			t.Error("目標缺糧又被包圍，即使沒湊到兩倍也該打")
+		}
+	})
+	t.Run("Field234 大於 3 就出兵", func(t *testing.T) {
+		in := base
+		in.Field234 = 4
+		if !SortieGate(in) {
+			t.Error("[-234h] > 3 應該放行")
+		}
+	})
+	t.Run("Field234 小於 3 一律不出兵", func(t *testing.T) {
+		in := base
+		in.Field234 = 2
+		in.Field236 = AISortieField236Threshold // 這時 236 不該有機會生效
+		if SortieGate(in) {
+			t.Error("[-234h] < 3 應該直接否決，不看 [-236h]")
+		}
+	})
+	t.Run("Field234 等於 3 時才看 Field236", func(t *testing.T) {
+		in := base
+		in.Field236 = AISortieField236Threshold
+		if !SortieGate(in) {
+			t.Error("[-234h] == 3 且 [-236h] 達門檻應該放行")
+		}
+		in.Field236 = AISortieField236Threshold - 1
+		if SortieGate(in) {
+			t.Error("[-236h] 差一就不該放行")
+		}
+	})
+}
