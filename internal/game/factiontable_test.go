@@ -1,6 +1,9 @@
 package game
 
-import "testing"
+import (
+	"bytes"
+	"testing"
+)
 
 // 11 + 24 + 24 = 59，而且 24 × 59 要對得上區塊大小。
 func TestFactionSlotArithmetic(t *testing.T) {
@@ -119,5 +122,35 @@ func TestFactionRelationRejectsBadIndex(t *testing.T) {
 	}
 	if _, err := tbl.Relation(0, FactionSlotCount); err == nil {
 		t.Error("槽編號超界該回錯")
+	}
+}
+
+// ⭐⭐ 最硬的一條證據：拿**兩份不同的存檔**比對。
+//
+// 前 10 槽是資料 → 兩份存檔在劇本開頭應該完全一樣（外交關係還沒動過）。
+// 後 14 槽是殘留 → 兩份存檔應該完全不一樣（那是記憶體裡剛好剩下的東西）。
+//
+// 這比「對角線為 0」更強：對角線只證明結構切對了，跨存檔比對證明的是
+// **哪些槽是資料**——而那正是第一版 Active() 判錯的地方。
+func TestFactionSlotsAcrossTwoSaves(t *testing.T) {
+	a := readGame(t, "SAVE(1).DT1")
+	b := readGame(t, "SAVE(2).DT1")
+	blk, err := SaveBlockByGlobal("byte_6EFAA")
+	if err != nil {
+		t.Fatal(err)
+	}
+	row := func(data []byte, i int) []byte {
+		s := blk.Offset + i*FactionSlotSize
+		return data[s : s+FactionSlotSize]
+	}
+	for i := 0; i < 10; i++ {
+		if !bytes.Equal(row(a, i), row(b, i)) {
+			t.Errorf("槽 %d 是資料，兩份劇本開頭的存檔該一模一樣", i)
+		}
+	}
+	for i := 10; i < FactionSlotCount; i++ {
+		if bytes.Equal(row(a, i), row(b, i)) {
+			t.Errorf("槽 %d 若真是殘留，兩份存檔不該一模一樣", i)
+		}
 	}
 }
