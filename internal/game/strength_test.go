@@ -328,3 +328,75 @@ func TestCasualtiesRoutAnnihilationThreshold(t *testing.T) {
 		t.Errorf("未知兵種的損失 = %d，應為 0", got)
 	}
 }
+
+// 攻擊力公式對照 DOSBox「查閱將領」畫面的「士兵攻擊力」欄 — **5/5 零誤差**。
+//
+// 這是 `docs/re/08` §4 那條從 48-bit Real 反推出來的公式第一次
+// 拿實機畫面驗證（`docs/playtest/08` §3）。畫面的體力／士氣是
+// 一個月後的值，所以直接代入畫面上的數字，不從存檔讀。
+//
+// ⚠️ 第一版測試把 `Faction` 傳成 1（蔣中正）觸發了 ×1.5 加成，
+// 算出來全部是畫面的 1.5 倍。吳佩孚那一系的勢力是 58。
+// **比值穩定在 1.5 正好是「多套了一個加成」的指紋**——
+// 如果公式本身錯了，比值不會這麼整齊。
+func TestStrengthMatchesViewScreen(t *testing.T) {
+	rows := []struct {
+		name                 string
+		ability, skill, arms uint8
+		stamina, morale      uint8
+		force                uint16
+		screen               int
+	}{
+		{"吳佩孚", 90, 50, 10, 55, 74, 20000, 33},
+		{"陳家謨", 84, 44, 10, 100, 67, 6000, 9},
+		{"楊源溏", 61, 21, 10, 100, 42, 4500, 2},
+		{"劉佐龍", 72, 32, 10, 100, 54, 6000, 5},
+		{"孫建業", 50, 10, 10, 100, 30, 5500, 1},
+	}
+	opt := StrengthOpts{Stage: 1}
+	for _, r := range rows {
+		in := StrengthInput{
+			Ability: r.ability, Force: r.force,
+			F19: r.skill, F20: r.arms, F29: r.stamina, F30: r.morale,
+			Branch: BranchInfantry, General: 58, Faction: 58,
+		}
+		if got := Strength(in, opt); got != r.screen {
+			t.Errorf("%s 算出 %d，實機畫面是 %d", r.name, got, r.screen)
+		}
+	}
+	t.Logf("%d 個將領的攻擊力與實機畫面逐一相符", len(rows))
+}
+
+// 五個欄位的名字來自「查閱將領」畫面（`docs/playtest/08` §2）。
+// 這條測試釘住「哪個 offset 對應畫面哪一列」，改壞了會靜靜漂掉。
+func TestGeneralFieldsMatchViewScreen(t *testing.T) {
+	gs, err := ParseGenerals(readGame(t, "MAN(1).DAT"), 274)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// 將領 58-62（吳佩孚、陳家謨、楊源溏、劉佐龍、孫建業）
+	want := map[string]struct {
+		off  int
+		vals []uint8
+	}{
+		"帶兵能力": {0, []uint8{90, 84, 61, 72, 50}},
+		"忠誠度":  {1, []uint8{100, 58, 52, 77, 51}},
+		"政治手腕": {2, []uint8{94, 53, 41, 59, 44}},
+		"士兵戰技": {19, []uint8{50, 44, 21, 32, 10}},
+		"武裝程度": {20, []uint8{10, 10, 10, 10, 10}},
+	}
+	for name, w := range want {
+		for k, v := range w.vals {
+			if got := gs[58+k-1].Raw[w.off]; got != v {
+				t.Errorf("%s：將領 %d 的 +%d 是 %d，畫面是 %d",
+					name, 58+k, w.off, got, v)
+			}
+		}
+	}
+	// 士兵數是 u16，另外驗。
+	for k, v := range []uint16{20000, 6000, 4500, 6000, 5500} {
+		if got := gs[58+k-1].Force; got != v {
+			t.Errorf("士兵數：將領 %d 是 %d，畫面是 %d", 58+k, got, v)
+		}
+	}
+}
