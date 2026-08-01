@@ -13,14 +13,80 @@ import (
 // MAN(1).DAT 的 9,042 ÷ 274 人 = 33 整除。
 const GeneralRecordSize = 33
 
-// 已定名欄位在記錄內的位移。其餘 30 個 byte 語意未解。
+// 已定名欄位在記錄內的位移。
+//
+// **這些偏移與執行期單位記錄（基址 0x7A7D）完全相同**——`MAN(N).DAT`
+// 的 33 bytes 是原地載入的，不是另一套佈局。三個哨兵值印證了這件事
+// （`docs/spec/02` §3）：
+//
+//	+5  檔案裡 274 筆**全部是 255**  ← 執行期的「不在場上」
+//	+8  全部是 0                    ← 攻守旗標，檔案裡都是守方
+//	+16 只有 {0, 1, 32}             ← bit 0 = 可行動
 const (
 	genOffAbilityA = 0
 	genOffAbilityB = 1
 	genOffAbilityC = 2
 	genOffProvince = 4  // u8，所屬省編號（1-based），0 = 無所屬
 	genOffForce    = 17 // u16 little-endian
+	genOffF19      = 19 // 戰力公式用，語意未解
+	genOffF20      = 20 // 戰力公式用，只有 5 個等級值
+	genOffBranch   = 21 // 兵種，值域 {1, 4, 5, 6}
+	genOffF29      = 29 // 戰力公式用，0..100
+	genOffF30      = 30 // 戰力公式用，也是每回合衰減 20% 的那一格
+	genOffRange    = 31 // 遠程攻擊的參數，第一期 274 筆全是 1
 )
+
+// 兵種。**這四個名字是有證據的**（`docs/spec/02` §4）：
+// 每個兵種的兵力上限與社群傳的滿員數完全一致，三期零例外。
+const (
+	BranchInfantry = Branch1 // 1，滿員 20,000
+	BranchArtiller = Branch4 // 4，滿員 2,000。遠程兵種（docs/re/09）
+	BranchArmour   = Branch5 // 5，滿員 200。全遊戲只有一個
+	BranchCavalry  = Branch6 // 6，滿員 10,000
+)
+
+// branchFullStrength 是各兵種的**滿員數**。
+//
+// 這是**社群資料第一次被原版資料證實**：`CLAUDE.md` §1.5 記的
+// 20000／10000／2000／200 全部對上第一期 `MAN(1).DAT` 的最大值，
+// 而且四個一起對上，不是巧合。
+//
+// ⚠️ **這不是硬性上限。** 第三期的騎兵有一筆 12,000，超過 10,000。
+// 三期的編制不同：
+//
+//	期別   步兵          砲兵     裝甲兵   騎兵
+//	 1     500..20000   1000..2000  200   500..10000
+//	 2    9501..20000   2000..2000   —    5000..7000
+//	 3    9500..12000   2000..2000  100   5000..12000
+//
+// 徵兵／整編會不會夾到滿員數，**還沒在程式碼裡找到**。
+// 在找到之前，這張表只當「第一期的滿員數」用，不要拿來當驗證條件。
+var branchFullStrength = map[uint8]uint16{
+	BranchInfantry: 20000,
+	BranchArtiller: 2000,
+	BranchArmour:   200,
+	BranchCavalry:  10000,
+}
+
+// BranchFullStrength 回傳兵種的滿員數（第一期），未知兵種回 0。
+//
+// ⚠️ 不是硬性上限，見上。
+func BranchFullStrength(branch uint8) uint16 { return branchFullStrength[branch] }
+
+// BranchName 回傳兵種名。
+func BranchName(branch uint8) string {
+	switch branch {
+	case BranchInfantry:
+		return "步兵"
+	case BranchArtiller:
+		return "砲兵"
+	case BranchArmour:
+		return "裝甲兵"
+	case BranchCavalry:
+		return "騎兵"
+	}
+	return "未知"
+}
 
 // General 是一位將領。
 //
@@ -34,9 +100,21 @@ type General struct {
 	// 所以刻意不做語意化命名。蔣中正三項全 100 可當 sanity check。
 	AbilityA, AbilityB, AbilityC uint8
 
-	// Force 是兵力。實測上限 20000（步兵師滿員），
-	// 但騎兵師 10000／炮兵旅 2000／裝甲 200 這三個社群數字尚未驗證。
+	// Force 是兵力。滿員數依兵種而定，見 BranchFullStrength——
+	// 四個數字（20000／10000／2000／200）在第一期全部對上，
+	// 但**不是硬性上限**（第三期的騎兵有一筆 12,000）。
 	Force uint16
+
+	// Branch 是兵種（`+21`），值域 {1, 4, 5, 6}。
+	Branch uint8
+
+	// 戰力公式（`sub_5A0B9`，`docs/re/08` §4d）要用的四個欄位。
+	// **它們的語意未解**——公式用得到，但不知道畫面上叫什麼。
+	F19, F20, F29, F30 uint8
+
+	// Range 是遠程攻擊的參數（`+31`，`docs/re/09` §1）。
+	// 第一期 274 筆全部是 1，所以看不出值域。
+	Range uint8
 
 	// Province 是所屬省編號（1-based），0 表示無所屬。
 	//
@@ -57,6 +135,10 @@ func ParseGeneral(rec []byte) (General, error) {
 			GeneralRecordSize, len(rec))
 	}
 	copy(g.Raw[:], rec)
+	g.Branch = rec[genOffBranch]
+	g.F19, g.F20 = rec[genOffF19], rec[genOffF20]
+	g.F29, g.F30 = rec[genOffF29], rec[genOffF30]
+	g.Range = rec[genOffRange]
 	g.AbilityA = rec[genOffAbilityA]
 	g.AbilityB = rec[genOffAbilityB]
 	g.AbilityC = rec[genOffAbilityC]

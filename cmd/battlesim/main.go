@@ -27,9 +27,9 @@ func main() {
 		fail(err)
 	}
 
-	// 攻守各兩個部隊。屬性用中庸值——原版的將領屬性表還沒解完
-	// （`MAN(N).DAT` 的 33 bytes 只解出 5 個欄位），所以這裡不假裝
-	// 讀得出真實數值，用固定值把規則跑通。
+	// 攻守各兩個部隊。屬性用固定值只是為了讓輸出可預期；
+	// 真實資料的版本在 `cmd/dsds` 與 `cmd/screenshot -battle`
+	// （`MAN(N).DAT` 的欄位已全部對上，`docs/spec/02` §3）。
 	atk := []*game.Combatant{
 		unit(101, 58, game.Branch1, 20000, 80),
 		unit(102, 58, game.Branch4, 2000, 70),

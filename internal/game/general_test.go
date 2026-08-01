@@ -194,3 +194,154 @@ func TestGeneralProvinceRange(t *testing.T) {
 		}
 	}
 }
+
+// 滿員數：四個數字全部對上社群傳的說法。
+//
+// ⚠️ 只在**第一期**成立。第三期的騎兵有一筆 12,000 超過 10,000
+// ——這條測試原本寫成「三期零例外」，被資料打臉後改成如實反映。
+func TestBranchFullStrengthMatchesEraOne(t *testing.T) {
+	gs, err := ParseGenerals(readGame(t, "MAN(1).DAT"), 274)
+	if err != nil {
+		t.Fatal(err)
+	}
+	max := map[uint8]uint16{}
+	for i := range gs {
+		g := &gs[i]
+		if BranchFullStrength(g.Branch) == 0 {
+			t.Errorf("第 %d 筆的兵種 %d 不在值域 {1,4,5,6}", i+1, g.Branch)
+			continue
+		}
+		if g.Force > max[g.Branch] {
+			max[g.Branch] = g.Force
+		}
+	}
+	for b, want := range map[uint8]uint16{
+		BranchInfantry: 20000, BranchArtiller: 2000,
+		BranchArmour: 200, BranchCavalry: 10000,
+	} {
+		if max[b] != want {
+			t.Errorf("%s 的第一期最大兵力 = %d，應為 %d（社群說的滿員數）",
+				BranchName(b), max[b], want)
+		}
+	}
+
+	// 三期的兵種代號都必須在值域內——這條才是真的零例外。
+	for _, era := range []struct {
+		file string
+		n    int
+	}{{"MAN(2).DAT", 106}, {"MAN(3).DAT", 106}} {
+		gs, err := ParseGenerals(readGame(t, era.file), era.n)
+		if err != nil {
+			t.Fatalf("%s: %v", era.file, err)
+		}
+		for i := range gs {
+			if BranchFullStrength(gs[i].Branch) == 0 {
+				t.Errorf("%s 第 %d 筆的兵種 %d 不在值域", era.file, i+1, gs[i].Branch)
+			}
+		}
+	}
+
+	// 第三期的騎兵確實超過第一期的滿員數——把這個例外釘住，
+	// 免得將來有人把 BranchFullStrength 當成硬性上限。
+	third, err := ParseGenerals(readGame(t, "MAN(3).DAT"), 106)
+	if err != nil {
+		t.Fatal(err)
+	}
+	over := 0
+	for i := range third {
+		if third[i].Branch == BranchCavalry &&
+			third[i].Force > BranchFullStrength(BranchCavalry) {
+			over++
+		}
+	}
+	if over == 0 {
+		t.Error("第三期應該有騎兵超過 10000——這個例外消失了，重看資料")
+	}
+}
+
+// 執行期記錄就是檔案記錄——三個哨兵值印證。
+func TestFileRecordMatchesRuntimeLayout(t *testing.T) {
+	gs, err := ParseGenerals(readGame(t, "MAN(1).DAT"), 274)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := range gs {
+		r := gs[i].Raw
+		// +5 = 戰場格編號，檔案裡全部是「不在場上」的哨兵 0xFF。
+		if r[5] != 0xFF {
+			t.Errorf("第 %d 筆的 +5 = %d，應為 0xFF（不在場上）", i+1, r[5])
+		}
+		// +8 = 攻守旗標，檔案裡全部是 0。
+		if r[8] != 0 {
+			t.Errorf("第 %d 筆的 +8 = %d，應為 0", i+1, r[8])
+		}
+		// +16 的 bit 0 是「可行動」，其餘位元沒觀察到別的組合。
+		if r[16]&^byte(0x21) != 0 {
+			t.Errorf("第 %d 筆的 +16 = %#02x，出現預期外的位元", i+1, r[16])
+		}
+	}
+}
+
+// 兵種 5 全遊戲只有一個——這是很強的資料特徵，別讓它靜靜消失。
+func TestArmourIsUnique(t *testing.T) {
+	for _, era := range []struct {
+		file string
+		n    int
+		want int
+	}{{"MAN(1).DAT", 274, 1}, {"MAN(2).DAT", 106, 0}, {"MAN(3).DAT", 106, 1}} {
+		gs, err := ParseGenerals(readGame(t, era.file), era.n)
+		if err != nil {
+			t.Fatal(err)
+		}
+		n := 0
+		for i := range gs {
+			if gs[i].Branch == BranchArmour {
+				n++
+			}
+		}
+		if n != era.want {
+			t.Errorf("%s 的裝甲兵有 %d 個，應為 %d", era.file, n, era.want)
+		}
+	}
+}
+
+// 用真實資料算戰力：十大勢力領袖應該都是滿員，蔣中正應該最強。
+func TestStrengthWithRealGenerals(t *testing.T) {
+	gs, err := ParseGenerals(readGame(t, "MAN(1).DAT"), 274)
+	if err != nil {
+		t.Fatal(err)
+	}
+	strengthOf := func(id int) int {
+		g := &gs[id-1]
+		return Strength(StrengthInput{
+			Ability: g.AbilityA, Force: g.Force,
+			F19: g.F19, F20: g.F20, F29: g.F29, F30: g.F30,
+			Branch: g.Branch, General: GeneralID(id),
+		}, StrengthOpts{Stage: 1})
+	}
+
+	// 十大勢力領袖（docs/spec/03 §3）全部是滿員步兵。
+	leaders := []int{1, 3, 4, 58, 98, 141, 146, 156, 157, 166}
+	for _, id := range leaders {
+		g := &gs[id-1]
+		if g.Branch != BranchInfantry {
+			t.Errorf("領袖 %d 的兵種是 %d，預期步兵", id, g.Branch)
+		}
+		if g.Force != BranchFullStrength(BranchInfantry) {
+			t.Errorf("領袖 %d 的兵力 %d，預期滿員 %d",
+				id, g.Force, BranchFullStrength(BranchInfantry))
+		}
+	}
+
+	// 蔣中正（ID 1）在十大領袖裡戰力最高。
+	chiang := strengthOf(1)
+	for _, id := range leaders {
+		if id == 1 {
+			continue
+		}
+		if s := strengthOf(id); s >= chiang {
+			t.Errorf("領袖 %d 的戰力 %d >= 蔣中正的 %d", id, s, chiang)
+		}
+	}
+	t.Logf("蔣中正戰力 %d", chiang)
+}

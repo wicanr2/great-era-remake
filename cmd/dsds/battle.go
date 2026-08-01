@@ -96,9 +96,8 @@ func (a *app) startBattle(at, from game.ProvinceID) error {
 
 // combatants 把將領表換成戰場單位。
 //
-// ⚠️ 將領的兵種與戰力屬性**還沒從 `MAN(N).DAT` 解出來**
-// （33 bytes 只解出 5 個欄位，`docs/spec/02`），所以除了兵力之外
-// 都用固定值。**這是 remake 的暫代，不是原版數值。**
+// 屬性全部來自 `MAN(N).DAT`——執行期記錄與檔案記錄是同一套佈局
+// （`docs/spec/02` §3），所以兵種、戰力欄位都直接讀檔案。
 func combatants(gs []game.General, prov game.ProvinceID) []*game.Combatant {
 	var out []*game.Combatant
 	for i := range gs {
@@ -114,8 +113,8 @@ func combatants(gs []game.General, prov game.ProvinceID) []*game.Combatant {
 			},
 			Strength: game.StrengthInput{
 				Ability: g.AbilityA, Force: g.Force,
-				F19: 60, F20: 60, F29: 64, F30: 80,
-				Branch: game.Branch1, General: id, Faction: game.GeneralID(prov),
+				F19: g.F19, F20: g.F20, F29: g.F29, F30: g.F30,
+				Branch: g.Branch, General: id, Faction: game.GeneralID(prov),
 			},
 		})
 	}
