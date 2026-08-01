@@ -97,13 +97,22 @@ func (r Roster) Get(i int) int {
 	return r.ids[i-1]
 }
 
-// RosterOf 建某省的將領清單。
+// RosterOf 建某省的將領清單，語意照 `sub_13B44`（`docs/re/13` §1）。
 //
-// 條件照 `sub_5A881`／`sub_306CF` 共用的那三條：所屬省相符、可用、
-// 且效忠該省司令。**清單順序是將領表的順序**——原版的清單怎麼排
-// 還沒追到（在 `sub_15F3C` 裡），這裡先照表序，標為假說。
+// 篩選三條與 `sub_5A881`／`sub_306CF` 一致：所屬省相符、可用、
+// 且效忠該省司令。
 //
-// 順序會影響模式 0/2/3/4/6 挑到誰，所以這一條**必須驗**才能宣稱行為對齊。
+// **順序是攻擊力（`sub_5A0B9`）由高到低。** 這一條先前標「未驗」，
+// 現在 confirmed——`sub_13B44` 建完清單就跑一輪降序排序。
+//
+// 順序決定模式 0/2/3/4/6 挑到誰，語意因此變得很清楚：
+//
+//	模式 0  調走 1..count-1     → **最弱的那個留守**
+//	模式 6  只調第一個          → 派出**最強的**
+//	模式 2/3 從尾端往前         → 從**最弱的**開始挑
+//	模式 4  後半段              → **較弱的那一半**
+//
+// 強的先派出去、弱的留下——與電腦「分散不集中」的整體傾向一致。
 func (w *AIWorld) RosterOf(p ProvinceID) Roster {
 	prov, err := w.Table.At(p)
 	if err != nil {
@@ -112,11 +121,49 @@ func (w *AIWorld) RosterOf(p ProvinceID) Roster {
 	var r Roster
 	for i := range w.Units {
 		u := &w.Units[i]
+		// ⚠️ 原版比的是 `+16 == 1`，不是 `+16 & 1`。目前觀察到的
+		// `+16` 只有 {0, 1, 32} 三個值，兩種寫法結果相同
+		// （32 & 1 == 0），但若出現別的值就會分歧。
 		if u.Active && u.Province == p && u.Faction == prov.Commander {
 			r.ids = append(r.ids, i)
 		}
 	}
+	// 依攻擊力降序。原版是「外層 i、內層 j=i+1、比較後交換」，
+	// **不是穩定排序**——同分時的順序取決於交換過程，所以照抄寫法。
+	for i := 0; i < len(r.ids); i++ {
+		for j := i + 1; j < len(r.ids); j++ {
+			if w.strengthAt(r.ids[j]) > w.strengthAt(r.ids[i]) {
+				r.ids[i], r.ids[j] = r.ids[j], r.ids[i]
+			}
+		}
+	}
 	return r
+}
+
+// strengthAt 是 `sub_5A0B9`（攻擊力公式）套在某個將領上。
+func (w *AIWorld) strengthAt(i int) int {
+	if i < 0 || i >= len(w.Strengths) {
+		return 0
+	}
+	return Strength(w.Strengths[i], w.Opts)
+}
+
+// CommandsFor 是一個省這回合能下幾個命令，出自 `sub_13D23`：
+//
+//	mov     ax, ss:[di-22Eh]     ; 將領清單長度
+//	cwd
+//	mov     cx, 8
+//	idiv    cx
+//	inc     ax                   ; 將領數 ÷ 8 + 1
+//	mov     ss:[di-232h], ax
+//
+// **這就是社群說的「每個省份有命令數上限」**（`CLAUDE.md` §1.5），
+// 而且是算出來的：將領越多，能下的命令越多。
+//
+// `sub_1ACCC` 的主迴圈跑到這個數字歸零才換下一個省，
+// `sub_1398D`（遷都）與 `sub_174C9` 各消耗一次（`docs/re/13` §2）。
+func (w *AIWorld) CommandsFor(p ProvinceID) int {
+	return w.RosterOf(p).Len()/8 + 1
 }
 
 // TransferReport 是一次調動的結果。

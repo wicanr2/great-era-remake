@@ -89,15 +89,20 @@ func run(dir string, turns int, verbose, fight bool) error {
 			if err != nil || prov.Commander == 0 {
 				continue
 			}
-			a, rep := w.Step(p)
-			if a.Kind == game.AINone {
-				continue
-			}
-			stats[a.Step]++
-			moved += len(rep.Moved)
-			if verbose && len(rep.Moved) > 0 {
-				fmt.Printf("  T%02d 省 %2d → %2d　%s　模式 %d　搬 %d 人%s\n",
-					t, a.From, a.To, a.Step, a.TransferKind, len(rep.Moved), alertMark(rep))
+			// 一個省可以下好幾個命令，數量 = 將領數 ÷ 8 + 1
+			// （`sub_13D23`）。原版的主迴圈 `sub_1ACCC` 跑到它歸零為止。
+			budget := w.CommandsFor(p)
+			for cmd := 0; cmd < budget; cmd++ {
+				a, rep := w.Step(p)
+				if a.Kind == game.AINone {
+					break
+				}
+				stats[a.Step]++
+				moved += len(rep.Moved)
+				if verbose && len(rep.Moved) > 0 {
+					fmt.Printf("  T%02d 省 %2d → %2d　%s　模式 %d　搬 %d 人%s\n",
+						t, a.From, a.To, a.Step, a.TransferKind, len(rep.Moved), alertMark(rep))
+				}
 			}
 		}
 		if fight {

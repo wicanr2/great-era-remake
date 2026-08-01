@@ -383,3 +383,81 @@ func TestRescueTargetsMatchFilters(t *testing.T) {
 	}
 	t.Logf("SAVE(1) 的救援候選共 %d 個", total)
 }
+
+// 清單依攻擊力**降序**（`sub_13B44`）。這條先前標「未驗」，
+// 現在是 confirmed，而且它決定了模式 0/2/3/4/6 挑到誰。
+func TestRosterSortedByStrengthDesc(t *testing.T) {
+	w := realWorld(t)
+	checked := 0
+	for p := ProvinceID(1); p <= ProvinceCount; p++ {
+		r := w.RosterOf(p)
+		if r.Len() < 2 {
+			continue
+		}
+		checked++
+		for i := 1; i < r.Len(); i++ {
+			a, b := w.strengthAt(r.Get(i)), w.strengthAt(r.Get(i+1))
+			if a < b {
+				t.Errorf("省 %d 清單第 %d 個戰力 %d < 第 %d 個 %d，沒有降序",
+					p, i, a, i+1, b)
+			}
+		}
+	}
+	if checked == 0 {
+		t.Fatal("沒有省有兩個以上將領，測不出排序")
+	}
+	t.Logf("驗過 %d 個省的清單排序", checked)
+}
+
+// 排序的實際後果：模式 6 派出最強的，模式 0 把最弱的留下。
+func TestTransferModesPickByStrength(t *testing.T) {
+	w := realWorld(t)
+	from := busiestProvince(w)
+	r := w.RosterOf(from)
+	if r.Len() < 3 {
+		t.Fatalf("省 %d 只有 %d 個將領", from, r.Len())
+	}
+	strongest, weakest := r.Get(1), r.Get(r.Len())
+	if w.strengthAt(strongest) < w.strengthAt(weakest) {
+		t.Fatal("排序沒生效，後面的測試沒有意義")
+	}
+	to := emptyNeighbour(t, w, from)
+
+	rep := w.ApplyTransfer(from, TransferFirst, to)
+	if len(rep.Moved) != 1 || rep.Moved[0] != strongest {
+		t.Errorf("模式 6 該派出最強的 %d，實際搬了 %v", strongest, rep.Moved)
+	}
+
+	w2 := realWorld(t)
+	weakest2 := w2.RosterOf(from).Get(w2.RosterOf(from).Len())
+	w2.ApplyTransfer(from, TransferAll, to)
+	if w2.Units[weakest2].Province != from {
+		t.Errorf("模式 0 該把最弱的 %d 留下，但他被搬走了", weakest2)
+	}
+}
+
+// 命令數 = 將領數 ÷ 8 + 1（`sub_13D23`）。
+//
+// 這是社群那條「每個省份有命令數上限」的程式碼依據
+// ——先前找錯格子（`docs/re/10` §1 推翻的那次），現在找到了。
+func TestCommandsFormula(t *testing.T) {
+	w := realWorld(t)
+	for p := ProvinceID(1); p <= ProvinceCount; p++ {
+		n := w.RosterOf(p).Len()
+		if got, want := w.CommandsFor(p), n/8+1; got != want {
+			t.Errorf("省 %d 有 %d 個將領，命令數算出 %d，應為 %d", p, n, got, want)
+		}
+	}
+	// 沒有將領的省仍然有 1 個命令——原版是先除再加一，不是特例。
+	empty := ProvinceID(0)
+	for p := ProvinceID(1); p <= ProvinceCount; p++ {
+		if w.RosterOf(p).Len() == 0 {
+			empty = p
+			break
+		}
+	}
+	if empty != 0 && w.CommandsFor(empty) != 1 {
+		t.Errorf("無將領的省 %d 命令數是 %d，公式說應為 1", empty, w.CommandsFor(empty))
+	}
+	t.Logf("最忙的省有 %d 個命令", w.CommandsFor(busiestProvince(w)))
+}
