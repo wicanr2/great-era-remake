@@ -30,7 +30,7 @@
 | **敘事文本** | ✅ **是畫成圖的**：`NEWSDATA.DAT` = 17 條新聞橫幅（215×16 BGI 圖）。不是字模序列 |
 | `.RGB` 調色盤 | ✅ 純文字，16 行 RGB **百分比**（不是 DAC）。見 `docs/formats/04-tpc-bgi-image.md` |
 | **`.GLB`／`.GTB` 圖庫** | ✅ **confirmed**：PKWARE DCL implode + 13 B 目錄，45 筆全解。**逐像素 round-trip 通過**。見 `docs/formats/02-glb-image-library.md` |
-| **執行檔反組譯（M2）** | 🔶 **4/5 已進 IDA**。編譯器：`WAR`/`SR` = Turbo Pascal，`GRT`/`GRTE` = Borland C++，`SDFA` 解不開。見 `docs/re/01`、`docs/re/02` |
+| **執行檔反組譯（M2）** | 🔶 4/5 進 IDA（`SDFA` 解不開）。**戰鬥模組已定位**：`sub_39B6E` ← `PROGRAM+537`，主迴圈在 `+18F`–`+6F4`。見 `docs/re/04` |
 | **`PLACD.SAV`** | ✅ **是 ZIP**：整包遊戲的 1993 年備份，145/147 檔與 `game/` byte-identical。見 `docs/formats/03-placd-archive.md` |
 | `.MUS`／`.TIM` | ⬜ 未開始；音源未確認 |
 | **`.DAT` 資料表** | 🔶 **39 省是核心維度**：`TERNAME`／`WARPOS` 每省 196 B、`MEM_WAR` 每省 469 B。`MAN(N).DAT` 33 B/人。欄位語意未解 |
@@ -60,6 +60,7 @@
 | `docs/re/01-war-exe-turbo-pascal.md` | **`WAR.EXE` 是 Turbo Pascal**；字模槽寬、圖集分割、雙磁碟路徑、磁片提示 | ✅ |
 | `docs/re/02-grt-exe-borland-c.md` | **五支執行檔盤點**：編譯器、角色、PKLITE 自動解包、DCL 字串佐證 | ✅ |
 | `docs/re/03-war-exe-is-the-game.md` | **`WAR.EXE` 是遊戲本體**；39 省資料表結構、存檔 `.DT2` = 39×469 | ✅ |
+| `docs/re/04-battle-module.md` | **戰鬥模組定位**：`sub_39B6E` 主函式、呼叫圖、32 個函式清單 | ✅ |
 | `docs/playtest/02-load-save-strategy-phase.md` | **政略畫面實測**：13 個省份欄位、15 個指令、命令數上限、密碼可過 | ✅ |
 | `docs/spec/01-map-and-terrain.md` | **地圖規格**：39 省鄰接表（READY）、14×14 戰場格子（READY）、地形編號（DRAFT）| ✅ |
 | `docs/spec/02-generals.md` | **將領規格**：33 B 記錄、三個能力值、兵力 u16、省兵力 = 將領加總（READY）| ✅ |
@@ -182,7 +183,9 @@ DOSBox oracle 可走到「選擇歷史背景」。
 
 | # | 項目 | 說明 |
 |---|---|---|
-| 1 | **`.DT1` 記憶體佈局** | recsize = 14,683 = 整檔一次讀，**不是定長記錄陣列**。要反追資料被搬到哪些全域變數，別再用「檔案÷省數」猜（已錯兩次，見 `docs/playtest/02` §6）|
+| 1 | **戰鬥主迴圈** | `sub_39B6E` 的 `+18F`–`+6F4`。六角格、機動力、地形修正、戰損都在裡面。**M3 最大的一塊** |
+| 1a | 地形語意 | 從 `sub_4EFBE`（讀 `tername.dat`）寫入的緩衝區往下追，看 23 種編號怎麼被用 |
+| 1b | **`.DT1` 記憶體佈局** | recsize = 14,683 = 整檔一次讀，**不是定長記錄陣列**。要反追資料被搬到哪些全域變數，別再用「檔案÷省數」猜（已錯兩次，見 `docs/playtest/02` §6）|
 | 1b | 其餘 13 個政略指令 | 已確定 1=調動、6=查閱。**一次 timeline 只測一個**，別靠 ESC 回主選單（ESC 語意不明，上次因此誤判，見 `docs/playtest/02` §5.4）|
 | 1d | 地形編號語意 | 0–22 共 23 種，語意未知。打進戰鬥畫面對照，或從 `WAR.EXE` 讀 `TERNAME.DAT` 後的分支反追 |
 | 1e | `NWMAP.DAT` | 15,360 B，**不是**鄰接表（鄰接在 `WARPOS.DAT`）。內容像 u16 對且含 `0x1001`/`0x4001` 旗標，用途待查 |
