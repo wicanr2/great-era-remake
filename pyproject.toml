@@ -5,6 +5,7 @@ description = "《大時代的故事》逆向工具（字模反查、資產解�
 requires-python = ">=3.12"
 dependencies = [
     "pillow>=10.0",   # 字模/圖像的視覺驗證輸出
+    "numpy>=1.26",    # 截圖逐像素比對（tools/map_diff.py）
 ]
 
 [tool.uv]
