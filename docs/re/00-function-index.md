@@ -214,7 +214,7 @@
 | `sub_3A817` | `sub_3A817` \| 0 \| **5.0** \| 第二方被壓到第一方的 1/5 以下 \| 成立才繼續 \| | `docs/re/31-battle-ai-chain.md`（另 1 份） | 11 |
 | `sub_3A885` | 兩者的觸發條件在 §16 的倍率表裡：值 12 由 `sub_3A817`／`sub_3A885`／ | `docs/re/31-battle-ai-chain.md` | 3 |
 | `sub_3A8C8` | if !決定: sub_3A8C8 ; 19 | `docs/re/31-battle-ai-chain.md` | 2 |
-| `sub_3A8F7` | `sub_3A8F7` 傳的是 `AX=5280h BX=1EB8h DX=2B85h`， | `docs/re/31-battle-ai-chain.md` | 9 |
+| `sub_3A8F7` | `sub_3A8F7` 傳的是 `AX=5280h BX=1EB8h DX=2B85h`， | `docs/re/31-battle-ai-chain.md` | 10 |
 | `sub_3A94E` | if !決定 且 byte_6FFCA & 4: sub_3A94E ; 16 / 17 | `docs/re/31-battle-ai-chain.md` | 4 |
 | `sub_3A988` | **7**（80h）\| `sub_3A988` \| `word[796h + i×2] & 2000h` \| | `docs/re/31-battle-ai-chain.md` | 3 |
 | `sub_3A9C9` | **6**（40h）\| `sub_3A9C9` \| `將領[word_64944].+4 == byte_6FFC4` \| | `docs/re/31-battle-ai-chain.md` | 3 |
@@ -250,7 +250,7 @@
 | `sub_3D261` | **1. 設它的是分支 A 的行動函式**——`sub_3CBD9`(值 12)、`sub_3D261`、 | `docs/re/31-battle-ai-chain.md` | 6 |
 | `sub_3D411` | sub_3D411(狀態, &城市清單, 城市數) | `docs/re/31-battle-ai-chain.md` | 2 |
 | `sub_3D57B` | 13 \| `sub_3D57B` \| **預設**（五步都沒決定時）\| | `docs/re/31-battle-ai-chain.md` | 7 |
-| `sub_3D823` | +0 \| byte \| `sub_3D823`／`sub_3E24F` \| **3** \| | `docs/re/31-battle-ai-chain.md` | 5 |
+| `sub_3D823` | +0 \| byte \| `sub_3D823`／`sub_3E24F` \| **3** \| | `docs/re/31-battle-ai-chain.md`（另 1 份） | 8 |
 | `sub_3DAEF` | if 將領[u].+12 == 0FFh: sub_3DAEF(...) | `docs/re/31-battle-ai-chain.md` | 4 |
 | `sub_3DD05` | +0 \| byte \| `sub_3CBD9`／`sub_3D57B`／`sub_3DD05`／`sub_3DED9` \| **2** \| | `docs/re/31-battle-ai-chain.md` | 7 |
 | `sub_3DED9` | +0 \| byte \| `sub_3CBD9`／`sub_3D57B`／`sub_3DD05`／`sub_3DED9` \| **2** \| | `docs/re/31-battle-ai-chain.md` | 14 |
@@ -368,7 +368,7 @@
 | `sub_55CEC` | `sub_55CEC(unit, cell, n)` 用六鄰位移表數**該格周圍的敵方單位數**， | `docs/mechanics/30-combat.md`（另 2 份） | 13 |
 | `sub_55FBE` | 決策鏈開頭先跑 `sub_55FBE`： | `docs/re/31-battle-ai-chain.md` | 7 |
 | `sub_560D7` | 格 = sub_560D7(2, 將領[u].+5) | `docs/re/31-battle-ai-chain.md` | 4 |
-| `sub_567B9` | 10. `sub_567B9` = **移動單位** — **confirmed（欄位）** | `docs/re/31-battle-ai-chain.md` | 27 |
+| `sub_567B9` | 10. `sub_567B9` = **移動單位** — **confirmed（欄位）** | `docs/re/31-battle-ai-chain.md` | 29 |
 | `sub_579F4` | 旗標[sub_579F4(mode, u)] = 1 ; 標記「這個單位有任務了」 | `docs/re/31-battle-ai-chain.md` | 3 |
 | `sub_57B15` | sub_57B15(arg_2, arg_4) ; 遠程攻擊 | `docs/re/09-ranged-attack.md` | 2 |
 | `sub_58172` | sub_58172(單位) | `docs/re/07-battlefield-geometry.md` | 1 |
