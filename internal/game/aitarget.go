@@ -105,3 +105,125 @@ func (w *AIWorld) ChainATarget(cands []ProvinceID, faction GeneralID, advanced b
 	}
 	return best
 }
+
+// ── 步驟 6：被包圍時的突圍目標（`sub_17236`）────────────────────────────
+
+// AIBreakoutMinProvinces 是突圍的前置門檻：**我方省份數要 > 2**。
+//
+//	cmp     [bp+var_4], 2
+//	ja      繼續              ; > 2，也就是 **≥ 3**
+//	否則直接回 0
+//
+// 剩兩個省以下就不突圍了——沒有可以接應的後方，打出去也無處可去。
+const AIBreakoutMinProvinces = 3
+
+// FactionProvinceCount 數某勢力有幾個省（`sub_17236` 的第一段迴圈）。
+//
+// 原版掃 `1 .. word_7001E`，`word_7001E` 就是省份總數。
+func (w *AIWorld) FactionProvinceCount(faction GeneralID) int {
+	n := 0
+	for i := ProvinceID(1); ; i++ {
+		p, err := w.Table.At(i)
+		if err != nil {
+			break
+		}
+		if p.Commander == faction {
+			n++
+		}
+	}
+	return n
+}
+
+// BreakoutTarget 挑被包圍時要打哪個鄰省（`sub_17236`）。
+//
+// 兩層鄰省搜尋：
+//
+//	for nb1 in 當前省的鄰省:
+//	    for nb2 in nb1 的鄰省:
+//	        if 省[nb2].司令 == 我方 且 nb2 != 當前省:
+//	            回 nb1                          ← 回的是**第一層**
+//
+// 讀作：**突圍的方向要朝著能連回自己領地的那一邊**。
+// 打下 `nb1` 之後，我方就從 `nb2` 那一側接上了，不會變成一塊飛地。
+//
+// 回 0 表示挑不出來（呼叫端就不出兵）。
+//
+// ⚠️ 函式**不檢查 `nb1` 是不是敵方**。步驟 6 的前提是 `Encircled` 為真，
+// 那時每個鄰省都是敵人，所以不需要再查——但這條前提是呼叫端給的，
+// 單獨用這個函式時要自己保證。照抄原版，不補防禦。
+//
+// ⚠️ **第一個找到就回**，不比較好壞。候選順序來自鄰省表，
+// 與 `MostConnectedTarget` 一樣受排列影響。
+func (w *AIWorld) BreakoutTarget(current ProvinceID, faction GeneralID) ProvinceID {
+	if w.FactionProvinceCount(faction) < AIBreakoutMinProvinces {
+		return 0
+	}
+	prov, err := w.Table.At(current)
+	if err != nil {
+		return 0
+	}
+	for _, nb1 := range prov.Neighbours {
+		p1, err := w.Table.At(nb1)
+		if err != nil {
+			continue
+		}
+		for _, nb2 := range p1.Neighbours {
+			if nb2 == current {
+				continue
+			}
+			p2, err := w.Table.At(nb2)
+			if err != nil || p2.Commander != faction {
+				continue
+			}
+			return nb1
+		}
+	}
+	return 0
+}
+
+// AIChainASkippedProvinces 是**開頭就跳過整條決策鏈 A** 的省
+// （`sub_17ADA+E`..`+36`）：37 臺灣省、38 海南島、39 緬甸。
+//
+// 條件是「當前省在這三個裡面 **且** `byte_6FFCA & 2`」——bit 1 沒設就照跑。
+//
+// 這三個省各只有**一個**鄰省（臺灣→24 福建、海南島→36 廣東、緬甸→34 雲南），
+// 而且初始都無主。整條決策鏈的核心（挑鄰省、三層優先序、包圍判定）
+// 對只有一個鄰省的省沒有意義，`Encircled` 更會因為「唯一的鄰省是敵人」
+// 而永遠成立，誤觸發突圍。
+//
+// ⛔ `docs/re/28` §2 原本把這一段記成「那三個**勢力**不跑決策鏈 A」。
+// `ss:[arg_0+0Ah]` 是**當前省編號**不是勢力——它被原封不動傳給
+// `sub_16E77(狀態, 省)` 與 `sub_5A9F6(省)`，兩支的參數都是省。
+var AIChainASkippedProvinces = [...]ProvinceID{37, 38, 39}
+
+// AIBreakoutSkippedProvinces 是**步驟 6 單獨排除**的省（`sub_17ADA+525`..`+533`）：
+// 只有 37 臺灣省與 38 海南島，**不含 39 緬甸**。
+//
+// 兩份清單不一樣是有道理的：緬甸與雲南陸路相連，臺灣與海南島是離島。
+// 突圍要打出去，離島打不出去。
+var AIBreakoutSkippedProvinces = [...]ProvinceID{37, 38}
+
+// AIChainASkipsProvince 回報某省會不會在決策鏈 A 開頭就被跳過。
+//
+// `bit1` 來自 `byte_6FFCA & 2`。
+func AIChainASkipsProvince(p ProvinceID, bit1 bool) bool {
+	if !bit1 {
+		return false
+	}
+	for _, s := range AIChainASkippedProvinces {
+		if s == p {
+			return true
+		}
+	}
+	return false
+}
+
+// AIBreakoutSkipsProvince 回報某省會不會被步驟 6 排除（與 `byte_6FFCA` 無關）。
+func AIBreakoutSkipsProvince(p ProvinceID) bool {
+	for _, s := range AIBreakoutSkippedProvinces {
+		if s == p {
+			return true
+		}
+	}
+	return false
+}

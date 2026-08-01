@@ -166,3 +166,89 @@ func TestChainATargetPriority(t *testing.T) {
 		}
 	})
 }
+
+// 突圍門檻：我方省份數 ≥ 3。
+func TestBreakoutNeedsThreeProvinces(t *testing.T) {
+	w, _, _ := hostileWorld(t) // 全部屬於勢力 8
+	// 勢力 7 一個省都沒有 → 一定挑不出來。
+	if got := w.BreakoutTarget(1, 7); got != 0 {
+		t.Errorf("我方 0 個省還挑得出 %d，應該回 0", got)
+	}
+	// 給勢力 7 兩個省，仍不到門檻。
+	setCommander(t, w, 1, 7)
+	setCommander(t, w, 2, 7)
+	if w.FactionProvinceCount(7) != 2 {
+		t.Fatalf("前提不成立：勢力 7 應該有 2 個省，實際 %d", w.FactionProvinceCount(7))
+	}
+	if got := w.BreakoutTarget(1, 7); got != 0 {
+		t.Errorf("我方 2 個省還挑得出 %d，門檻是 %d", got, AIBreakoutMinProvinces)
+	}
+}
+
+// 突圍目標挑「它自己也接壤到另一個我方省」的鄰省。
+//
+// 用真實地圖：省 1 鄰省 [2 3 4 5 6 8]，省 3 鄰省 [1 4 8]。
+// 讓省 8 屬於我方，則從省 1 出發時省 3 合格（省 3 接壤省 8，而省 8 != 省 1）。
+func TestBreakoutTargetPicksConnectedNeighbour(t *testing.T) {
+	w, _, _ := hostileWorld(t)
+	// 我方（勢力 7）要有 ≥ 3 個省才過門檻。
+	for _, p := range []ProvinceID{1, 8, 20, 21} {
+		setCommander(t, w, p, 7)
+	}
+	got := w.BreakoutTarget(1, 7)
+	if got == 0 {
+		t.Fatal("應該挑得出突圍目標")
+	}
+	// 驗證挑出來的確實滿足條件，而不是碰巧。
+	p1, err := w.Table.At(got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ok := false
+	for _, nb2 := range p1.Neighbours {
+		p2, err := w.Table.At(nb2)
+		if err != nil {
+			continue
+		}
+		if nb2 != 1 && p2.Commander == 7 {
+			ok = true
+		}
+	}
+	if !ok {
+		t.Errorf("挑了省 %d，但它沒有接壤到當前省以外的我方省（鄰省 %v）",
+			got, p1.Neighbours)
+	}
+	// 我方只剩當前省一個鄰居可連時（把 8 拿掉），答案要變。
+	setCommander(t, w, 8, 8)
+	if again := w.BreakoutTarget(1, 7); again == got {
+		t.Errorf("拿掉省 8 之後仍挑 %d，代表判斷沒真的看第二層鄰省", again)
+	}
+}
+
+// 兩份跳過清單不同：決策鏈 A 三省、步驟 6 只有兩省（緬甸不在內）。
+func TestSkippedProvinceLists(t *testing.T) {
+	// bit 1 沒設就不跳過任何省。
+	for _, p := range AIChainASkippedProvinces {
+		if AIChainASkipsProvince(p, false) {
+			t.Errorf("byte_6FFCA bit 1 未設時不該跳過省 %d", p)
+		}
+		if !AIChainASkipsProvince(p, true) {
+			t.Errorf("bit 1 設起來時應該跳過省 %d", p)
+		}
+	}
+	// 39 緬甸在決策鏈 A 的清單裡，但不在步驟 6 的清單裡。
+	if !AIChainASkipsProvince(39, true) {
+		t.Error("緬甸（39）應該在決策鏈 A 的跳過清單裡")
+	}
+	if AIBreakoutSkipsProvince(39) {
+		t.Error("緬甸（39）不該在步驟 6 的排除清單裡——它與雲南陸路相連")
+	}
+	for _, p := range []ProvinceID{37, 38} {
+		if !AIBreakoutSkipsProvince(p) {
+			t.Errorf("離島省 %d 應該被步驟 6 排除", p)
+		}
+	}
+	if AIBreakoutSkipsProvince(1) {
+		t.Error("省 1 不該被排除")
+	}
+}
