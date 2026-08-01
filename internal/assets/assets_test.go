@@ -308,3 +308,83 @@ func itoa(n int) string {
 	}
 	return string(b)
 }
+
+// TestProvinceGridsSymmetry 驗證從 WARPOS.DAT 導出的鄰接表完全對稱。
+//
+// 這是解析正確與否最有力的檢查：任何 off-by-one 或 row/column 搞反
+// 都會讓對稱性破裂。實測 39 個省 0 個不對稱。
+func TestProvinceGridsSymmetry(t *testing.T) {
+	g, err := ParseProvinceGrids(gameFile(t, "WARPOS.DAT"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bad := g.IsSymmetric(); len(bad) != 0 {
+		t.Fatalf("鄰接關係有 %d 個不對稱：%v", len(bad), bad[:min(5, len(bad))])
+	}
+}
+
+// TestProvinceNeighbours 用 DOSBox 實機畫面對照鄰接表。
+//
+// 實機的攻打子選單顯示河南（19）可攻打 11,16,18,20,21,22；
+// 檔案導出的多一個 26（湖北，當時玩家控制的省，所以選單不列）。
+func TestProvinceNeighbours(t *testing.T) {
+	g, err := ParseProvinceGrids(gameFile(t, "WARPOS.DAT"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range []struct {
+		province int
+		want     []int
+		note     string
+	}{
+		{19, []int{11, 16, 18, 20, 21, 22, 26}, "河南（實機對照）"},
+		{37, []int{24}, "臺灣省 → 福建，離島度數 1"},
+		{38, []int{36}, "海南島 → 廣東"},
+		{39, []int{34}, "緬甸 → 雲南"},
+	} {
+		got, err := g.Neighbours(tc.province)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(got) != len(tc.want) {
+			t.Errorf("省 %d（%s）鄰省 = %v，預期 %v", tc.province, tc.note, got, tc.want)
+			continue
+		}
+		for i := range got {
+			if got[i] != tc.want[i] {
+				t.Errorf("省 %d（%s）鄰省 = %v，預期 %v", tc.province, tc.note, got, tc.want)
+				break
+			}
+		}
+	}
+}
+
+// TestTerrainGrids 驗證 TERNAME.DAT 也是 39×196，且值域在 0-14。
+//
+// 地形編號的語意未解（docs/spec/01 §4），這裡只鎖住結構與值域。
+func TestTerrainGrids(t *testing.T) {
+	g, err := ParseProvinceGrids(gameFile(t, "TERNAME.DAT"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	maxv := byte(0)
+	for k := 0; k < ProvinceCount; k++ {
+		for _, v := range g[k] {
+			if v > maxv {
+				maxv = v
+			}
+		}
+	}
+	// 值域 0-22 是掃過全部 39 省得到的。初稿只看河南一省推成 1-14，是錯的。
+	if maxv > 22 {
+		t.Errorf("地形編號最大值 = %d，預期 <= 22", maxv)
+	}
+	t.Logf("地形編號值域 0..%d", maxv)
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
