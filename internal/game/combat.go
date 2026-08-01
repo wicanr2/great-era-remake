@@ -108,6 +108,22 @@ type CombatUnit struct {
 
 	// Decaying 對應 +30：大於 40 時每回合衰減 20%。語意未知。
 	Decaying uint8
+
+	// Command 對應 `+9`：**這個單位這一輪要做什麼**（值域 1–6）。
+	// 常數與語意見 `battleforce.go` 的 `BattleCmd*`（`docs/re/31` §15）。
+	Command uint8
+
+	// NextCell 對應 `+12`：**朝目標走的下一格**。`NoCell`（0xFF）表示沒有。
+	//
+	// `sub_47EAA` 設命令 1 時一併寫它（值來自 `sub_47B6D`）；
+	// `sub_3DED9` 發現命令 3 卻沒有它就把命令降回 2；
+	// `sub_3B492` 拿它比對城市格來剔除「已經有人去了」的城市。
+	NextCell CellIndex
+
+	// TargetUnit 對應 `+10`：**目標單位的 ID**。0 表示沒有目標單位
+	// ——`sub_47EAA` 設命令 1（前往城市）時就明確寫 0，因為那時
+	// 目標是「格」不是「單位」。
+	TargetUnit GeneralID
 }
 
 // BeginTurn 套用回合開始的重置，順序照 sub_5446D。
