@@ -297,3 +297,49 @@ func (w *AIWorld) BuildArsenal(p ProvinceID, n int) (int, error) {
 	prov.Arsenals += uint8(n)
 	return n, nil
 }
+
+// ---------------------------------------------------------------------------
+// 開發的另外兩項：墾地（`sub_241D0`）與挖金礦（`sub_24535`）。
+// 見 `docs/re/21`。
+// ---------------------------------------------------------------------------
+
+const (
+	// LandValueMax 是地價上限（`cmp byte ptr [di-6224h], 0C8h`）。
+	LandValueMax = 200
+	// ReclaimStaminaCost 是墾地消耗的體力（`sub byte ptr [di+7A9Ah], 5`）。
+	ReclaimStaminaCost = 5
+	// ReclaimStaminaNeed 是墾地的體力門檻（`cmp byte ptr [di+7A9Ah], 5`）。
+	ReclaimStaminaNeed = 5
+	// MineStaminaNeed 是挖金礦的體力門檻（`cmp byte ptr [di+7A9Ah], 14h`）
+	// ——比墾地高四倍。
+	MineStaminaNeed = 20
+	// DevelopPoliticsDivisor 是開發的成效除數：效果 = 政治手腕 ÷ 10
+	// （`mov cx, 0Ah / div cx`，兩項都用）。
+	DevelopPoliticsDivisor = 10
+)
+
+// ReclaimLand 是墾地：派一個將領去，地價 += 政治手腕 ÷ 10，體力 −5。
+//
+// 地價夾在 200 以下。回傳實際增加的地價。
+//
+// `politics` 是將領記錄的 `+2`（政治手腕，`docs/playtest/08` §2），
+// `stamina` 是 `+29`（體力）。**兩個都由呼叫端傳進來**——規則層的
+// 將領狀態還沒有統一的容器，等 `+16` 的語意解出來再收攏。
+func (w *AIWorld) ReclaimLand(p ProvinceID, politics, stamina uint8) (int, uint8, error) {
+	prov, err := w.Table.At(p)
+	if err != nil {
+		return 0, stamina, err
+	}
+	if stamina < ReclaimStaminaNeed {
+		return 0, stamina, fmt.Errorf("game: 體力 %d 不足 %d，不能墾地",
+			stamina, ReclaimStaminaNeed)
+	}
+	gain := int(politics) / DevelopPoliticsDivisor
+	v := int(prov.LandValue) + gain
+	if v > LandValueMax {
+		v = LandValueMax
+	}
+	actual := v - int(prov.LandValue)
+	prov.LandValue = uint8(v)
+	return actual, stamina - ReclaimStaminaCost, nil
+}
