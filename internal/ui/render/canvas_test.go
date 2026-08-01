@@ -126,11 +126,10 @@ func TestSpriteTransparency(t *testing.T) {
 // TestDrawGlyph 驗證字模繪製：bit=1 畫前景，bit=0 不畫（透明）。
 func TestDrawGlyph(t *testing.T) {
 	var g assets.Glyph
-	// 第 0 列最左一點亮，其餘全暗
-	g[0] = 0x80
+	g[0] = 0x80 // 第 0 列最左一點亮
 	c := NewCanvas(assets.GlyphW, assets.GlyphH)
 	fg := assets.RGB{R: 0xFF, G: 0xFF, B: 0xFF}
-	c.DrawGlyph(g, fg, 0, 0)
+	c.DrawGlyph(g, fg, 0, 0, false)
 
 	if r, _, _, _ := c.Image().At(0, 0).RGBA(); r == 0 {
 		t.Error("(0,0) 的 bit 是 1，應該畫上前景")
@@ -140,18 +139,66 @@ func TestDrawGlyph(t *testing.T) {
 	}
 }
 
-// TestDrawEntryKeepsPadding 驗證 DrawEntry 不濾掉空白字模。
+// TestEmbolden 驗證加粗：每列與自己右移一位 OR。
+func TestEmbolden(t *testing.T) {
+	var g assets.Glyph
+	g[0] = 0x80 // 1000_0000 → 加粗後 1100_0000
+	b := Embolden(g)
+	if b[0] != 0xC0 {
+		t.Errorf("加粗後第 0 列 = %#x，預期 0xC0", b[0])
+	}
+}
+
+// TestGlyphRoundTripAgainstOriginal 拿字模重繪原版畫面上的中文，逐像素比對。
 //
-// assets.GlyphFile.Entry 會濾掉空白（那是給文字還原用的），
-// 但畫面上的空白格子是排版的一部分，繪製時不能省。
+// 這是 CLAUDE.md §5 步驟 3 的驗收標準。政略畫面的「湖北省」三字用 3.15
+// 的字模畫成，位置 (18,16)、(38,16)、(58,16)，字距 20、加粗、前景 (174,0,0)。
+//
+// 加粗這一步是量出來的：不加粗的話最佳匹配還差 49 個像素
+// （畫面 132 個前景點 vs 原始字模 83 個）。
+func TestGlyphRoundTripAgainstOriginal(t *testing.T) {
+	data := readFile(t, gameDir, "3.15")
+	f, err := assets.ParseGlyphFile(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	shot := loadPNG(t, "35-game.png")
+
+	const (
+		hubeiEntry = 25 // 湖北省是 3.15 的第 26 個詞條（0-based 25）
+		slotWidth  = 3
+		baseX      = 18
+		baseY      = 16
+	)
+	fg := assets.RGB{R: 174, G: 0, B: 0}
+
+	for i := 0; i < slotWidth; i++ {
+		g := Embolden(f.Glyphs[hubeiEntry*slotWidth+i])
+		x0 := baseX + i*GlyphAdvance
+		var diff int
+		for gy := 0; gy < assets.GlyphH; gy++ {
+			for gx := 0; gx < assets.GlyphW; gx++ {
+				r, gg, b, _ := shot.At(x0+gx, baseY+gy).RGBA()
+				isRed := uint8(r>>8) == fg.R && uint8(gg>>8) == fg.G && uint8(b>>8) == fg.B
+				if isRed != g.At(gx, gy) {
+					diff++
+				}
+			}
+		}
+		if diff != 0 {
+			t.Errorf("第 %d 個字 @(%d,%d) 與原版相異 %d 個像素", i+1, x0, baseY, diff)
+		}
+	}
+}
+
+// TestDrawEntryKeepsPadding 驗證 DrawEntry 不濾掉空白字模。
 func TestDrawEntryKeepsPadding(t *testing.T) {
 	data := readFile(t, gameDir, "MAN115")
 	f, err := assets.ParseGlyphFile(data)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// 找一個兩字姓名（三格中有一格空白）
-	var k int = -1
+	k := -1
 	for i := 0; i < f.EntryCount(3); i++ {
 		e, err := f.Entry(i, 3)
 		if err != nil {
@@ -165,12 +212,11 @@ func TestDrawEntryKeepsPadding(t *testing.T) {
 	if k < 0 {
 		t.Skip("MAN115 裡沒有兩字姓名")
 	}
-	c := NewCanvas(assets.GlyphW*3, assets.GlyphH)
-	if err := c.DrawEntry(f, k, 3, assets.RGB{R: 0xFF}, 0, 0); err != nil {
+	c := NewCanvas(GlyphAdvance*3, assets.GlyphH)
+	if err := c.DrawEntry(f, k, 3, assets.RGB{R: 0xFF}, 0, 0, true); err != nil {
 		t.Fatal(err)
 	}
-	// 三格都在畫布範圍內，沒有因為濾掉空白而左移
-	if c.Bounds().Dx() != assets.GlyphW*3 {
-		t.Errorf("畫布寬 = %d，預期 %d", c.Bounds().Dx(), assets.GlyphW*3)
+	if c.Bounds().Dx() != GlyphAdvance*3 {
+		t.Errorf("畫布寬 = %d，預期 %d", c.Bounds().Dx(), GlyphAdvance*3)
 	}
 }
