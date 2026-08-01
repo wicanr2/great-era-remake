@@ -130,3 +130,32 @@ func FirstPositiveCity(scores []CityScore) CellIndex {
 	}
 	return NoCell
 }
+
+// WithinTwoSteps 是 `sub_55BCC(a, b)`：**a 在 b 的兩步之內嗎**。
+//
+//	sub_55BCC(a, b) = sub_510E0(a, b) 或 sub_55AB7(a, b)
+//
+// 前者是一步（邊界／相鄰規則），後者是兩層六方向掃描（`docs/re/31` §25）。
+// 原版兩層迴圈各自跑 `sub_510E0` 過濾越界，這裡用既有的 `Neighbour`
+// ——它本來就只回合法的鄰格。
+//
+// `sub_3BCED` 拿它篩候選：**距離目標城市兩格之內、站著單位的格。**
+//
+// ⭐ `a == b` **成立**——兩層掃描會走出去再走回來（n1 是 b 的鄰格，
+// n2 是 n1 的鄰格，其中一個就是 b 自己）。原版沒有排除這個情形，照抄。
+func WithinTwoSteps(a, b CellIndex) bool {
+	if !a.Valid() || !b.Valid() {
+		return false
+	}
+	if Adjacent(a, b) {
+		return true
+	}
+	for _, n1 := range b.Neighbours() {
+		for _, n2 := range n1.Neighbours() {
+			if n2 == a {
+				return true
+			}
+		}
+	}
+	return false
+}

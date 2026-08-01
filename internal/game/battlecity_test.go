@@ -134,3 +134,44 @@ func TestFirstPositiveCitySkipsZeroDistance(t *testing.T) {
 		t.Errorf("沒有城市時要回 NoCell，實際 %d", got)
 	}
 }
+
+func TestWithinTwoSteps(t *testing.T) {
+	mid, err := CellAt(6, 6)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// ⭐ 同一格**成立**：原版的兩層掃描會走出去再走回來
+	// （n1 = b 的鄰格，n2 = n1 的鄰格，其中一個就是 b 本身）。
+	// 第一版測試斷言成 false，是斷言寫錯不是實作錯。
+	if !WithinTwoSteps(mid, mid) {
+		t.Error("同一格該成立——走出去再走回來，原版也是這樣")
+	}
+	ns := mid.Neighbours()
+	if len(ns) == 0 {
+		t.Fatal("中央格應該有六個鄰格")
+	}
+	for _, n := range ns {
+		if !WithinTwoSteps(n, mid) {
+			t.Errorf("一步的鄰格 %d 該成立", n)
+		}
+		for _, n2 := range n.Neighbours() {
+			if n2 == mid {
+				continue
+			}
+			if !WithinTwoSteps(n2, mid) {
+				t.Errorf("兩步的格 %d 該成立", n2)
+			}
+		}
+	}
+	// 隔很遠的不成立。
+	far, err := CellAt(0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if WithinTwoSteps(far, mid) {
+		t.Errorf("格 %d 離 %d 超過兩步，不該成立", far, mid)
+	}
+	if WithinTwoSteps(NoCell, mid) || WithinTwoSteps(mid, NoCell) {
+		t.Error("NoCell 一律不成立")
+	}
+}

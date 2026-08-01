@@ -5,7 +5,7 @@
 **動手讀任何 `sub_` 之前先在這裡 grep 它。**
 `CLAUDE.md` §7.1「動手挖之前先查手上已有的」——這份索引就是為了讓那一條真的做得到。
 
-目前 **391** 個函式在文件裡有紀錄。
+目前 **392** 個函式在文件裡有紀錄。
 
 | 函式 | 目前的結論（摘自文件）| 出處 | 提及次數 |
 |---|---|---|---:|
@@ -209,7 +209,7 @@
 | `sub_38DFE` | `WAR.EXE` 裡**只有一支函式**比較 `'6'`：`sub_38DFE`（`0x38DFE`， | `docs/mechanics/30-combat.md`（另 1 份） | 3 |
 | `sub_3964E` | **傳入的是司令 ID 已經是 confirmed**——§5 從另一條路（`sub_3964E` 用同一個 | `docs/mechanics/70-ai.md`（另 8 份） | 15 |
 | `sub_39B6E` | 戰鬥主迴圈 `sub_39B6E` 逐一處理戰場單位： | `docs/mechanics/30-combat.md`（另 9 份） | 25 |
-| `sub_3A320` | **戰鬥中的 AI** \| ✅ **骨架已解**（`docs/re/31`）：`sub_3F698` 主入口 → `sub_3AB99` 決策鏈（與政略同構：兩分支、優先序、已決定旗標）→ 分派到 **13 種行動… | `docs/mechanics/70-ai.md`（另 1 份） | 9 |
+| `sub_3A320` | **戰鬥中的 AI** \| ✅ **骨架已解**（`docs/re/31`）：`sub_3F698` 主入口 → `sub_3AB99` 決策鏈（與政略同構：兩分支、優先序、已決定旗標）→ 分派到 **13 種行動… | `docs/mechanics/70-ai.md`（另 1 份） | 10 |
 | `sub_3A766` | 這解釋了整條鏈的形狀：`sub_3A766`（§6）檢查那些城市格有沒有被攻方站住 | `docs/re/31-battle-ai-chain.md` | 2 |
 | `sub_3A817` | `sub_3A817` \| 0 \| **5.0** \| 第二方被壓到第一方的 1/5 以下 \| 成立才繼續 \| | `docs/re/31-battle-ai-chain.md`（另 1 份） | 9 |
 | `sub_3A885` | if !決定: sub_3A885 ; 12 | `docs/re/31-battle-ai-chain.md` | 2 |
@@ -316,7 +316,7 @@
 | `sub_50783` | `sub_50783` 每格呼叫 `sub_506B0` 算出基準成本填進 `byte_91E`， | `docs/re/07-battlefield-geometry.md` | 1 |
 | `sub_507C7` | `sub_507C7`（兩支戰損函式都會在特定條件下呼叫它） | `docs/re/08-combat-damage.md` | 1 |
 | `sub_50FF5` | +5 \| **戰場格編號 0..195**，`0xFF` = 不在場上 \| `sub_50FF5`、`sub_41513`（`docs/re/07` §2）\| | `docs/mechanics/30-combat.md`（另 2 份） | 9 |
-| `sub_510E0` | 位移表由 `sub_4E65C` 填、邊界規則在 `sub_510E0`（`docs/re/07` §6）： | `docs/mechanics/30-combat.md`（另 2 份） | 6 |
+| `sub_510E0` | 位移表由 `sub_4E65C` 填、邊界規則在 `sub_510E0`（`docs/re/07` §6）： | `docs/mechanics/30-combat.md`（另 2 份） | 11 |
 | `sub_51399` | sub_51399(0, A.格, B.格) | `docs/re/08-combat-damage.md` | 1 |
 | `sub_517BE` | sub_517BE(A, B) | `docs/re/08-combat-damage.md` | 1 |
 | `sub_51844` | `arg_C != 0 且 arg_8 == 0` 時還會先跑 `sub_51844`（98 行，未讀）。 | `docs/re/08-combat-damage.md` | 2 |
@@ -347,13 +347,14 @@
 | `sub_546D1` | `sub_546D1`（九步結算的第三步）： | `docs/mechanics/40-economy.md`（另 3 份） | 5 |
 | `sub_54826` | `sub_54826` 裡有一段完整的算式： | `docs/mechanics/30-combat.md`（另 4 份） | 12 |
 | `sub_54CFD` | 3i. 誰是攻方：`sub_54391` 與 `sub_54CFD` — **confirmed** | `docs/mechanics/30-combat.md`（另 1 份） | 5 |
-| `sub_54DAC` | 3f. 佔領：`sub_54DAC` — **confirmed** | `docs/mechanics/30-combat.md`（另 2 份） | 8 |
+| `sub_54DAC` | 3f. 佔領：`sub_54DAC` — **confirmed** | `docs/mechanics/30-combat.md`（另 2 份） | 9 |
 | `sub_54E3B` | if arg_0 != 0: sub_54E3B(word_64942, word_64944) | `docs/re/31-battle-ai-chain.md`（另 1 份） | 8 |
-| `sub_55632` | sub_55632(&清單, 1, 主將格) ; 收集 **37 格** | `docs/re/31-battle-ai-chain.md` | 6 |
-| `sub_55BCC` | ⚠️ `sub_55632`（產生格清單）與 `sub_55BCC`（篩選）都**未讀**， | `docs/re/31-battle-ai-chain.md` | 3 |
+| `sub_55632` | sub_55632(&清單, 1, 主將格) ; 收集 **37 格** | `docs/re/31-battle-ai-chain.md` | 10 |
+| `sub_55AB7` | sub_55BCC(a, b) = sub_510E0(a, b) 或 sub_55AB7(a, b) | `docs/re/31-battle-ai-chain.md` | 3 |
+| `sub_55BCC` | `sub_55BCC(a, b)` 是兩個判斷的 or： | `docs/re/31-battle-ai-chain.md` | 5 |
 | `sub_55CEC` | `sub_55CEC(unit, cell, n)` 用六鄰位移表數**該格周圍的敵方單位數**， | `docs/mechanics/30-combat.md`（另 2 份） | 13 |
 | `sub_55FBE` | 決策鏈開頭先跑 `sub_55FBE`： | `docs/re/31-battle-ai-chain.md` | 5 |
-| `sub_567B9` | 10. `sub_567B9` = **移動單位** — **confirmed（欄位）** | `docs/re/31-battle-ai-chain.md` | 18 |
+| `sub_567B9` | 10. `sub_567B9` = **移動單位** — **confirmed（欄位）** | `docs/re/31-battle-ai-chain.md` | 19 |
 | `sub_57B15` | sub_57B15(arg_2, arg_4) ; 遠程攻擊 | `docs/re/09-ranged-attack.md` | 2 |
 | `sub_58172` | sub_58172(單位) | `docs/re/07-battlefield-geometry.md` | 1 |
 | `sub_58209` | sub_58209(1, 旗標陣列, 數量, &清單, u) | `docs/re/31-battle-ai-chain.md` | 1 |
