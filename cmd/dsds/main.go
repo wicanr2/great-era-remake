@@ -89,6 +89,7 @@ type app struct {
 	battle   *battleState    // 非 nil 表示正在打仗
 	world    *game.AIWorld   // 規則層：政略指令都經過它
 	loc      *i18n.Locale    // 語系表：省名與 UI 詞彙（nil 表示沒載到）
+	cmdBudget *game.CommandBudget // 每省這個月剩餘的指令數（docs/re/13 §2）
 	rng      *game.Rand      // 原版的 LCG（docs/re/17），固定種子才可重現
 	year     uint16
 	month    uint8
@@ -141,6 +142,12 @@ func (a *app) Update() error {
 			if target == 0 {
 				return nil
 			}
+			// 出兵消耗一個指令數（`sub_174C9`，`docs/re/13` §2）。
+			if !a.cmdBudget.Spend(a.current) {
+				a.report(fmt.Sprintf("%s 這個月的指令數用完了",
+					a.provinceName(a.current)))
+				return nil
+			}
 			if err := a.startBattle(target, a.current); err != nil {
 				fmt.Fprintln(os.Stderr, "開戰失敗:", err)
 			}
@@ -150,11 +157,11 @@ func (a *app) Update() error {
 		// 其餘按了沒反應——那勝過假裝有效果（strategy.go 開頭）。
 		switch {
 		case inpututil.IsKeyJustPressed(ebiten.KeyDigit4):
-			a.report(a.execTax())
+			a.report(a.withBudget(a.current, a.execTax))
 		case inpututil.IsKeyJustPressed(ebiten.KeyDigit7):
 			a.screen, a.dirty = screenDevelop, true
 		case inpututil.IsKeyJustPressed(ebiten.KeyC):
-			a.report(a.execComfort())
+			a.report(a.withBudget(a.current, a.execComfort))
 		case inpututil.IsKeyJustPressed(ebiten.KeyE):
 			a.report(a.endTurn())
 		}
@@ -167,7 +174,9 @@ func (a *app) Update() error {
 		}
 		for i, k := range []ebiten.Key{ebiten.KeyDigit1, ebiten.KeyDigit2, ebiten.KeyDigit3} {
 			if inpututil.IsKeyJustPressed(k) {
-				a.report(a.execDevelop(i + 1))
+				sub := i + 1
+				a.report(a.withBudget(a.current,
+					func() string { return a.execDevelop(sub) }))
 				a.screen = screenCommand
 			}
 		}
@@ -406,6 +415,7 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 		rng: game.NewRand(seed),
 	}
 	a.world = buildWorld(tbl, generals)
+	a.cmdBudget = game.NewCommandBudget(a.world)
 	// 語系表載不到不是致命錯誤——省名會退回「省 N」，其餘照跑。
 	// **不要靜默**：印到 stderr，否則「沒有語系表」與「語系表是壞的」
 	// 在畫面上長得一樣。

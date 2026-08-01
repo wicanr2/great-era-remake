@@ -164,6 +164,8 @@ func (a *app) endTurn() string {
 
 	a.month++
 	if a.month <= 12 {
+		// 換月：指令數重新算（`docs/re/13` §2）。
+		a.cmdBudget.Reset()
 		// 跨月清徵稅旗標。原版在哪裡做還沒讀到，但「每月限一次」
 		// 這條是 confirmed（`docs/re/18`），沒有月結算的話徵稅只能做一次。
 		for p := game.ProvinceID(1); p <= game.ProvinceCount; p++ {
@@ -175,6 +177,7 @@ func (a *app) endTurn() string {
 	}
 
 	a.month = 1
+	a.cmdBudget.Reset()
 	st := &game.GameState{Stage: 1, Year: uint8(a.year), Month: a.month}
 	rep := a.world.AdvanceYear(st, a.generals, 0, nil)
 	a.year = uint16(st.Year)
