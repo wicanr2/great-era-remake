@@ -436,3 +436,49 @@ func TestFactionNameMatchesHistory(t *testing.T) {
 		t.Errorf("一半以上的將領沒有勢力名（%d/%d），欄位可能認錯了", zero, len(gs))
 	}
 }
+
+// 滿員數要與 `sub_18A67`（`docs/re/32` §7）的四個 `cmp` 常數一致。
+//
+// 那一支是「這個部隊滿員了嗎」，電腦徵兵的觸發條件就是「有人沒滿員」。
+// 這是滿員數的**程式碼側**證據，與 `docs/spec/02` §4 的資料側觀察
+// （`MAN(N).DAT` 三期的最大值）互相獨立。
+func TestBranchFullStrengthMatchesSub18A67(t *testing.T) {
+	want := map[uint8]uint16{
+		1: 20000, // 步兵
+		6: 10000, // 騎兵
+		4: 2000,  // 砲兵
+		5: 200,   // 裝甲
+	}
+	for branch, full := range want {
+		if got := BranchFullStrength(branch); got != full {
+			t.Errorf("兵種 %d 的滿員 %d，sub_18A67 的 cmp 常數是 %d",
+				branch, got, full)
+		}
+	}
+	if BranchFullStrength(99) != 0 {
+		t.Error("未知兵種應該回 0——sub_18A67 對這四個以外的兵種不做判斷")
+	}
+}
+
+// ⚠️ 權重與滿員數**不**成反比：騎兵是例外。
+//
+// 這個測試存在的理由是防止有人重新引入「滿員 = 20000 ÷ 權重」那條推導
+// （`strength.go` 的舊註解就是那樣寫的）。
+func TestBranchWeightIsNotInverseOfFullStrength(t *testing.T) {
+	products := map[uint8]int{}
+	for _, b := range []uint8{1, 4, 5, 6} {
+		products[b] = BranchWeight(b) * int(BranchFullStrength(b))
+	}
+	for _, b := range []uint8{1, 4, 5} {
+		if products[b] != 20000 {
+			t.Errorf("兵種 %d 的 權重×滿員 = %d，預期 20000", b, products[b])
+		}
+	}
+	if products[6] == 20000 {
+		t.Error("騎兵的 權重×滿員 竟然也是 20000——" +
+			"那條推導本來就對騎兵不成立，這個測試是為了守住這件事")
+	}
+	if products[6] != 40000 {
+		t.Errorf("騎兵的 權重×滿員 = %d，預期 40000（4 × 10000）", products[6])
+	}
+}
