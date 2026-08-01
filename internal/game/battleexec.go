@@ -448,16 +448,29 @@ func (s *BattleSim) execStrikeForce(units, foes []*Combatant,
 		return BattleExecResult{Implemented: true, Note: "敵方主力不在場"}
 	}
 
-	// 候選：距離中心兩格之內、站著單位的格（§25）。
+	// 候選：距離中心兩格之內、站著**對方**單位的格（§25／§57）。
+	//
+	// ⛔ 初版收「所有站著單位的格」，**漏了陣營條件**——§25 只讀到位置判斷
+	// 就停了，§57 補完 `sub_3BCED` 才看到 `if 將領[u].+8 != 0: 跳過`。
+	// 後果是我方單位也會被列進候選，然後被派去打自己人。
+	foeSet := make(map[GeneralID]bool, len(foes))
+	for _, f := range foes {
+		if f != nil {
+			foeSet[f.General] = true
+		}
+	}
 	var pool []GeneralID
 	for i := 0; i < CellCount; i++ {
 		c := CellIndex(i)
 		v := s.Occ[c]
-		if v == 0 || !WithinTwoSteps(c, center.Cell) {
+		if v == 0 || !foeSet[v] || !WithinTwoSteps(c, center.Cell) {
 			continue
 		}
 		pool = append(pool, v)
 	}
+	// ⚠️ **`sub_3BCED` 的 `mode == 1` 還沒接**：那個模式會把「當前交戰省的司令」
+	// 無條件加進候選（只要他在場上，不管離中心多遠，§57）。
+	// 哪些呼叫端用 mode 1 尚未查——§23／§24 兩支確定是 mode 0。
 	if len(pool) == 0 {
 		return BattleExecResult{Implemented: true, Note: "主力周邊沒有單位"}
 	}

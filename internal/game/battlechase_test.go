@@ -258,3 +258,42 @@ func TestFallbackDoesNotTouchNextCell(t *testing.T) {
 		t.Errorf("目標該被清成 0，實得 %d", u.TargetUnit)
 	}
 }
+
+// §57：值 4 的候選清單**只收對方單位**。初版漏了陣營條件，
+// 會把我方單位列進候選然後派去打自己人。
+func TestStrikeForcePoolExcludesOwnUnits(t *testing.T) {
+	sim := mkNoCityBattle(t, 3, 2, 5000)
+	sim.BeginTurn()
+	for _, u := range sim.Attacker {
+		u.Command = BattleCmdSeekTarget
+		u.ClearAssignment()
+	}
+	// 把攻方全部擠到守方主力旁邊——沒有陣營過濾的話，
+	// 他們會互相成為候選。
+	lead := sim.Defender[0]
+	n := 0
+	for _, c := range lead.Cell.Neighbours() {
+		if n >= len(sim.Attacker) {
+			break
+		}
+		if sim.Occ[c] == 0 {
+			sim.Move(sim.Attacker[n].General, dirToward(sim.Attacker[n].Cell, c))
+			sim.Attacker[n].Cell = c
+			sim.Occ[c] = sim.Attacker[n].General
+			n++
+		}
+	}
+	r := sim.ExecuteAction(ActBStrikeForce, sim.Attacker, sim.Defender, directRoute)
+	if !r.Implemented {
+		t.Fatal("值 4 該是已實作的")
+	}
+	atk := map[GeneralID]bool{}
+	for _, u := range sim.Attacker {
+		atk[u.General] = true
+	}
+	for _, u := range sim.Attacker {
+		if u.TargetUnit != 0 && atk[u.TargetUnit] {
+			t.Errorf("將領 %d 被派去打我方的 %d", u.General, u.TargetUnit)
+		}
+	}
+}
