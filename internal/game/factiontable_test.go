@@ -187,3 +187,66 @@ func TestFactionLeadersBlockAgreesWithSlots(t *testing.T) {
 		t.Errorf("勢力表數出 %d 個、領袖表數出 %d 個", got, lead.Count())
 	}
 }
+
+// 區塊 7 的反查表：九位領袖各自指回自己的槽（1-based）。
+func TestFactionOfGeneralPointsLeadersToTheirSlot(t *testing.T) {
+	data := readGame(t, "SAVE(1).DT1")
+	lead, err := ParseFactionLeaders(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rev, err := ParseFactionOfGeneral(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	n := 0
+	for slot, id := range lead {
+		if id == 0 {
+			continue
+		}
+		if got := rev.SlotOf(id, lead); got != uint8(slot+1) {
+			t.Errorf("領袖 %d 該指回槽 %d（1-based），實得 %d", id, slot+1, got)
+		}
+		n++
+	}
+	if n != 9 {
+		t.Fatalf("該檢查 9 位領袖，實際 %d 位", n)
+	}
+	// ⛔ 非領袖一律回 0——底下那 265 格是殘留，不是資料。
+	for id := GeneralID(1); id <= SaveGeneralCount; id++ {
+		isLeader := false
+		for _, l := range lead {
+			if l == id {
+				isLeader = true
+			}
+		}
+		if !isLeader && rev.SlotOf(id, lead) != 0 {
+			t.Fatalf("將領 %d 不是領袖，該回 0", id)
+		}
+	}
+}
+
+// ⭐ 殘留的證明：兩份存檔在這 274 格裡幾乎全都不同。
+func TestFactionOfGeneralIsMostlyGarbage(t *testing.T) {
+	a, err := ParseFactionOfGeneral(readGame(t, "SAVE(1).DT1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := ParseFactionOfGeneral(readGame(t, "SAVE(2).DT1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	same := 0
+	for i := range a {
+		if a[i] == b[i] {
+			same++
+		}
+	}
+	// 九位領袖必定相同；其餘應該幾乎全異。抓一個寬鬆但有意義的上限。
+	if same > 20 {
+		t.Errorf("兩份存檔有 %d 格相同——若真是殘留不該這麼多，假說要重新檢視", same)
+	}
+	if same < 9 {
+		t.Errorf("至少九位領袖該相同，實得 %d", same)
+	}
+}

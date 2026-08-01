@@ -222,3 +222,61 @@ func (f FactionLeaders) Count() int {
 	}
 	return n
 }
+
+// FactionOfGeneral 是 `.DT1` 區塊 7（`byte_6EE98`，274 B）——
+// **將領 ID → 勢力編號（1-based）的反查表**。
+//
+// 原版以 `[di-5319h]` + 將領 ID 存取（`ds:0ACE7h`，1-based）。典型用法：
+//
+//	省編號 → ×37 → 省份 +20 司令 → 這張表 → cmp 0Ah
+//	（「這個省的司令是不是第 10 個勢力」，也就是蔣中正的國民革命軍）
+//
+// ⛔ **只有勢力領袖那幾格是真的，其餘 265 格是未初始化的殘留。**
+//
+// 證據：兩份存檔比對，274 格裡只有 **10 格相同**——九位領袖，加一格巧合。
+// 而且拿「該將領所屬省的司令」去對，274 人裡只有那 9 位領袖吻合（4%）。
+//
+// ⚠️ 所以**不要**拿它當「這個將領效忠誰」的來源。原版查它之前一定先取
+// 省份 `+20` 司令，也就是**只用領袖 ID 查**。
+type FactionOfGeneral [SaveGeneralCount]uint8
+
+// SaveGeneralCount 是 `.DT1` 的將領筆數。
+const SaveGeneralCount = 274
+
+// ParseFactionOfGeneral 解出反查表。
+func ParseFactionOfGeneral(data []byte) (FactionOfGeneral, error) {
+	var out FactionOfGeneral
+	blk, err := SaveBlockByGlobal("byte_6EE98")
+	if err != nil {
+		return out, err
+	}
+	if len(data) < blk.Offset+blk.Size {
+		return out, fmt.Errorf("game: .DT1 只有 %d bytes，放不下勢力反查表（需要 %d）",
+			len(data), blk.Offset+blk.Size)
+	}
+	copy(out[:], data[blk.Offset:blk.Offset+blk.Size])
+	return out, nil
+}
+
+// SlotOf 查某個**勢力領袖**屬於第幾個勢力槽（1-based），
+// 不是領袖或超出範圍就回 0。
+//
+// `leaders` 是拿來擋殘留的——沒有它，這張表會對任何將領都回一個像樣的數字。
+func (f FactionOfGeneral) SlotOf(id GeneralID, leaders FactionLeaders) uint8 {
+	if id < 1 || int(id) > SaveGeneralCount {
+		return 0
+	}
+	if leaders.Count() > 0 {
+		found := false
+		for _, l := range leaders {
+			if l == id {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return 0
+		}
+	}
+	return f[id-1]
+}
