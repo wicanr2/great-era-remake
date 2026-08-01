@@ -117,6 +117,14 @@ func (s *BattleSim) ExecuteAction(a BattleAction, units, foes []*Combatant,
 //	→ 城市空著：改追附近的人（§24，這裡未實作）
 func (s *BattleSim) execTakeCity(units []*Combatant,
 	route func(to, from CellIndex) CellIndex) BattleExecResult {
+	// ⭐ §19 的骨架第一步：值 3 與值 4 都**先跑預備隊投入**（`sub_3C26A`），
+	// 那支把待命(2) 的單位轉成命令 4，後面的派工才有東西可派。
+	//
+	// ⛔ 漏掉這一步的後果是整場戰鬥空轉——決策鏈每回合都選值 3，
+	// 但所有單位都是待命，而值 3 只派命令 3 與 4
+	// （2026-08-02 被 `TestChainRunActuallyMovesAndFights` 抓到）。
+	s.activateReserves(units)
+
 	cities := CityCells(s.Field)
 	if len(cities) == 0 {
 		return BattleExecResult{Implemented: true, Note: "戰場上沒有城市"}
@@ -414,6 +422,8 @@ func (s *BattleSim) execDecapitate(units, foes []*Combatant,
 // ⚠️ 與值 3 的另一個差別：**成功後不標旗標**（§29 的對照表）。
 func (s *BattleSim) execStrikeForce(units, foes []*Combatant,
 	route func(to, from CellIndex) CellIndex) BattleExecResult {
+	s.activateReserves(units) // 與值 3 同一個前置（§29 的呼叫序列比對）
+
 	center := firstLiving(foes)
 	if center == nil {
 		return BattleExecResult{Implemented: true, Note: "敵方主力不在場"}
@@ -658,4 +668,46 @@ func (s *BattleSim) execWeakest(units, foes []*Combatant,
 	}
 	return BattleExecResult{Assigned: n, Implemented: true,
 		Note: "挑最弱：圍城敵軍 " + itoa(len(pool)) + " 個"}
+}
+
+
+// activateReserves 是 `sub_3C26A` 的前半（§17）：**把待命的單位投入**。
+//
+// 留幾個待命由「首位單位對敵軍全體的優勢等級」決定：
+//
+//	劣勢 留 2      優勢 留 1      壓倒 留 0
+//
+// 值 3（打城市）與值 4（打主力周邊）都以這一步開頭（§19／§29 的呼叫序列）。
+//
+// ⚠️ 原版還有四道前置決定「要不要跑這一步」（§19），那四道包含
+// 未解的 `byte_6AA84` bit 6/7，這裡一律跑——**標為差異**。
+func (s *BattleSim) activateReserves(units []*Combatant) {
+	lead := firstLiving(units)
+	if lead == nil {
+		return
+	}
+	// 對手是另一方——用 Attacking 判斷 `units` 是哪一方。
+	foes := s.Defender
+	if !lead.Attacking {
+		foes = s.Attacker
+	}
+	adv := AdvantageLevel(s.StrengthOf(lead), s.SideStrength(foes))
+
+	// `ActivateReserves` 吃 index 1..10 的命令陣列（原版的槽位佈局）。
+	cmds := make([]uint8, UnitsPerSide+1)
+	idx := make([]*Combatant, UnitsPerSide+1)
+	n := 0
+	for _, u := range units {
+		if u == nil || !u.Alive() || n >= UnitsPerSide {
+			continue
+		}
+		n++
+		cmds[n], idx[n] = u.Command, u
+	}
+	ActivateReserves(cmds, adv)
+	for i := 1; i <= n; i++ {
+		if idx[i] != nil {
+			idx[i].Command = cmds[i]
+		}
+	}
 }

@@ -44,12 +44,26 @@ type BattleSim struct {
 // 守方本來就在場上（`docs/re/07` §5）。所以守方的落點由呼叫端給定，
 // 這裡只檢查它們合法。
 func NewBattleSim(m *Map, at, from ProvinceID, attacker, defender []*Combatant, opt StrengthOpts) (*BattleSim, error) {
-	// ⚠️ `+12`／`+10` 的 Go 零值不等於原版的「沒有」——`NextCell` 的 0
-	// 是合法格編號（原版哨兵是 0xFF）。在唯一入口正規化，
-	// 免得呼叫端漏設就變成「所有單位都要走到格 0」。
+	// ⚠️ **Go 的零值對不上原版的欄位語意，在唯一入口一次修好。**
+	//
+	//	`+12` NextCell  原版哨兵是 0xFF，而 Go 零值 0 是**合法格編號**
+	//	`+9`  Command   原版值域是 1–6，Go 零值 0 **不是有效值**
+	//
+	// 兩者的症狀不同但同源：前者讓「還沒指派」被讀成「要走到格 0」，
+	// 後者讓單位被所有「只派命令 N」的行動跳過，整場空轉。
+	// 都不會報錯，只會安靜地錯（2026-08-02 各被測試抓到一次）。
+	//
+	// ⚠️ 命令補成 2（待命）是 **remake 的補充**——原版單位進場時的命令
+	// 由哪裡設定還沒解，2 是值域裡最中性的那個（不需要目標格，§15）。
 	for _, u := range append(append([]*Combatant(nil), attacker...), defender...) {
-		if u != nil && u.NextCell == 0 && u.TargetUnit == 0 {
+		if u == nil {
+			continue
+		}
+		if u.NextCell == 0 && u.TargetUnit == 0 {
 			u.NextCell = NoCell
+		}
+		if u.Command == 0 {
+			u.Command = BattleCmdStandby
 		}
 	}
 
