@@ -24,15 +24,16 @@ func main() {
 	dir := flag.String("game", "workplace/orig/game", "原版素材目錄（唯讀）")
 	out := flag.String("out", "workplace/shots", "輸出目錄")
 	prov := flag.Int("province", 0, "只畫某一省（1-39），0 = 全部")
+	menu := flag.Bool("menu", false, "右側改畫政略指令選單")
 	flag.Parse()
 
-	if err := run(*dir, *out, game.ProvinceID(*prov)); err != nil {
+	if err := run(*dir, *out, game.ProvinceID(*prov), *menu); err != nil {
 		fmt.Fprintln(os.Stderr, "錯誤:", err)
 		os.Exit(1)
 	}
 }
 
-func run(dir, out string, only game.ProvinceID) error {
+func run(dir, out string, only game.ProvinceID, menu bool) error {
 	read := func(name string) ([]byte, error) {
 		return os.ReadFile(filepath.Join(dir, name))
 	}
@@ -53,6 +54,11 @@ func run(dir, out string, only game.ProvinceID) error {
 	if err != nil {
 		return err
 	}
+	w4, err := assets.ParseGlyphFile(must("4.15"))
+	if err != nil {
+		return err
+	}
+	cmdFonts := render.CommandFonts{W2: fonts.W2, W4: w4}
 	// 用 EGA 預設調色盤——原版戰場配哪個 .RGB 還沒查出來（8 個檔名都不像戰場），
 	// 所以顏色不保證與實機逐像素相同（internal/assets/palette.go 的說明）。
 	ts, err := render.LoadTileSet(must("NEWTERR.TPC"), must("RAIL.TPC"),
@@ -101,8 +107,21 @@ func run(dir, out string, only game.ProvinceID) error {
 		if err := c.DrawStrategyPanel(d, fonts); err != nil {
 			return err
 		}
+		if menu {
+			// 指令選單蓋在戰場上，對照實機的「司令，請下命令？」清單。
+			if err := c.DrawCommandPage(cmdFonts,
+				assets.RGB{R: 0xAE, G: 0x00, B: 0x00},
+				assets.RGB{R: 0xFF, G: 0xFF, B: 0xA2},
+				190, 14, render.ModeBGIW-190, render.ModeBGIH-14); err != nil {
+				return err
+			}
+		}
 
-		path := filepath.Join(out, fmt.Sprintf("province-%02d.png", id))
+		name := fmt.Sprintf("province-%02d.png", id)
+		if menu {
+			name = fmt.Sprintf("menu-%02d.png", id)
+		}
+		path := filepath.Join(out, name)
 		f, err := os.Create(path)
 		if err != nil {
 			return err
