@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/wicanr2/great-era-remake/internal/game"
 )
@@ -149,11 +150,18 @@ func (a *app) execDevelop(sub int) string {
 	return ""
 }
 
-// endTurn 推進一個月。跨年時跑年度結算（`docs/re/25`）。
+// endTurn 推進一個月：先讓電腦行動，再推進時間。跨年跑年度結算（`docs/re/25`）。
 //
 // ⚠️ 原版的回合結構是「逐省下指令、每省有指令數上限」（`docs/re/13`），
-// 這裡只做時間推進——**完整的回合流程還沒接**，照實標記。
+// 玩家這一側還沒接上指令數上限——**照實標記**。
+// 電腦那一側已經照命令數公式跑（`cmd/dsds/computer.go`）。
 func (a *app) endTurn() string {
+	// 電腦回合：決策鏈 A（`docs/re/28`）。玩家勢力是目前所在省的司令。
+	var ai string
+	if prov, err := a.tbl.At(a.current); err == nil && prov.Commander != 0 {
+		ai = describeComputerTurn(a.runComputerTurn(prov.Commander))
+	}
+
 	a.month++
 	if a.month <= 12 {
 		// 跨月清徵稅旗標。原版在哪裡做還沒讀到，但「每月限一次」
@@ -163,15 +171,42 @@ func (a *app) endTurn() string {
 				prov.Flags &^= game.ProvinceFlagTaxed
 			}
 		}
-		return fmt.Sprintf("民國 %d 年 %d 月", a.year, a.month)
+		return joinTurn(fmt.Sprintf("民國 %d 年 %d 月", a.year, a.month), ai)
 	}
 
 	a.month = 1
 	st := &game.GameState{Stage: 1, Year: uint8(a.year), Month: a.month}
 	rep := a.world.AdvanceYear(st, a.generals, 0, nil)
 	a.year = uint16(st.Year)
-	return fmt.Sprintf("民國 %d 年 1 月：%d 省人口成長共 %d 人",
-		a.year, rep.Grown, rep.Growth)
+	return joinTurn(fmt.Sprintf("民國 %d 年 1 月：%d 省人口成長共 %d 人",
+		a.year, rep.Grown, rep.Growth), ai)
+}
+
+// joinTurn 把時間訊息與電腦回合的訊息接起來。
+func joinTurn(when, ai string) string {
+	if ai == "" {
+		return when
+	}
+	return when + "｜" + ai
+}
+
+// describeComputerTurn 把電腦回合的結果講成一句話。
+//
+// 一件事都沒做時回空字串——**不要印「電腦無動作」**，那會讓
+// 「規則還沒接」與「規則接了但這回合沒觸發」看起來一樣。
+func describeComputerTurn(rep computerTurnReport) string {
+	var parts []string
+	if rep.comforts > 0 {
+		parts = append(parts, fmt.Sprintf("慰勞 %d", rep.comforts))
+	}
+	if rep.transfers > 0 {
+		parts = append(parts, fmt.Sprintf("調動 %d", rep.transfers))
+	}
+	parts = append(parts, rep.attacks...)
+	if len(parts) == 0 {
+		return ""
+	}
+	return "電腦：" + strings.Join(parts, "、")
 }
 
 // report 記錄指令結果。畫面上還沒有訊息列，先印到 stderr——

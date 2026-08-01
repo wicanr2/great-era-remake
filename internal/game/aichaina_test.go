@@ -1,6 +1,9 @@
 package game
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 // chainAWorld 造一個「勢力 7 佔省 1、周圍是敵人 8」的世界，
 // 並把將領全部搬到省 1。
@@ -145,4 +148,83 @@ func TestChainAAttackCandidatesSkipInBattle(t *testing.T) {
 	if before == 0 {
 		t.Skip("原本就沒有候選，測不出差異")
 	}
+}
+
+// 在**真實存檔**上跑一輪決策鏈 A，統計行動分佈。
+//
+// 這不是斷言某個數字，是**驗證電腦真的會動**——單元測試都是人造世界，
+// 全綠不代表接上真實資料後不會整輪空轉（`CLAUDE.md` §10.4：測試綠只是
+// 沒退步）。分佈印出來供人看，只在「一件事都沒做」時判失敗。
+func TestChainAOnRealSave(t *testing.T) {
+	w := realWorld(t)
+	gens, err := ParseGenerals(readGame(t, "MAN(1).DAT"), 274)
+	if err != nil {
+		t.Fatal(err)
+	}
+	opt := ChainAOpts{Hard: true, EnableStep5: true, EnableLastThree: true}
+
+	kinds := map[string]int{}
+	steps := map[string]int{}
+	acted := 0
+	for p := ProvinceID(1); p <= ProvinceCount; p++ {
+		prov, err := w.Table.At(p)
+		if err != nil || prov.Commander == 0 {
+			continue
+		}
+		opt.TotalForce = w.ProvinceForceTotal(p, gens)
+		res := w.ChainA(p, gens, opt)
+		if res.Action.Kind == AINone {
+			kinds["（無動作）"]++
+			continue
+		}
+		acted++
+		switch res.Action.Kind {
+		case AIComfort:
+			kinds["慰勞"]++
+		case AITransfer:
+			kinds["調動"]++
+		case AIAttack:
+			kinds[fmt.Sprintf("出兵(模式%d)", res.SortieMode)]++
+		}
+		steps[res.Action.Step]++
+	}
+
+	for k, v := range kinds {
+		t.Logf("  %-14s %d 省", k, v)
+	}
+	for k, v := range steps {
+		t.Logf("  由「%s」決定：%d", k, v)
+	}
+	if acted == 0 {
+		t.Error("39 省跑完一輪，電腦一件事都沒做——決策鏈接上真實資料後整輪空轉")
+	}
+
+	// ⚠️ 開局這一輪的結果是「慰勞 + 調動，零出兵」。那**不是 bug**：
+	// 步驟 0 的慰勞門檻在高難度是「體力 < 80 或 士氣 < 70」，開局多數
+	// 部隊達不到，於是慰勞壓過後面所有步驟。實機也是打了幾個月才看到
+	// 電腦攻過來（`docs/playtest/14` 是 8 月）。
+	//
+	// 但「零出兵」與「出兵的步驟根本接不上」在這個統計裡長得一樣，
+	// 所以再做一次對照：把士氣體力補滿，看後面的步驟會不會接手。
+	t.Run("士氣體力補滿之後就走得到出兵", func(t *testing.T) {
+		full := append([]General(nil), gens...)
+		for i := range full {
+			full[i].Stamina, full[i].F30 = 100, MoraleMax
+		}
+		attacks := 0
+		for p := ProvinceID(1); p <= ProvinceCount; p++ {
+			prov, err := w.Table.At(p)
+			if err != nil || prov.Commander == 0 {
+				continue
+			}
+			opt.TotalForce = w.ProvinceForceTotal(p, full)
+			if w.ChainA(p, full, opt).Action.Kind == AIAttack {
+				attacks++
+			}
+		}
+		t.Logf("  補滿之後出兵 %d 省", attacks)
+		if attacks == 0 {
+			t.Error("沒有任何省出兵——步驟 1／4／5／6 可能都接不上")
+		}
+	})
 }

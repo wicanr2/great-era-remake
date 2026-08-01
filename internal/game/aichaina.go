@@ -64,32 +64,38 @@ func (w *AIWorld) ChainA(p ProvinceID, gens []General, opt ChainAOpts) ChainARes
 
 	supplyOK := w.AISupplyOK(p, opt.TotalForce, opt.EnableLastThree, opt.Hard)
 
-	// ── 步驟 1／2：往救援目標走一步 ────────────────────────────────
+	// ── 步驟 1：打通去救援的路 ─────────────────────────────────────
+	//
+	// ⚠️ **三道前置缺一不可**（`docs/re/28` §2，`loc_17BAC`）：
+	//
+	//	有敵對鄰省（`sub_5B7DC`）  ← 第一版漏了這道，見下
+	//	非第一期
+	//	司令 != 1
 	//
 	// 終點是「我方的、前線的、戰力 < 2000、未交戰」的省（`sub_149C8`），
 	// 回傳的是**下一跳**。那一跳是敵省就打下來，是自己人或無主就調動。
-	if hop := w.rescueHop(p, prov.Commander); hop != 0 {
-		hp, err := w.Table.At(hop)
-		if err == nil {
-			enemy := hp.Commander != 0 && hp.Commander != prov.Commander
-			switch {
-			case enemy && !opt.FirstStage && prov.Commander != 1:
-				// 步驟 1：擋路的敵省，條件齊了就打下來。
-				if w.AIHasAdvantage(p, hop, opt.Hard) &&
-					w.GeneralCount(p) >= AIStep1MinGenerals && supplyOK {
-					return ChainAResult{
-						Action:     AIAction{Kind: AIAttack, From: p, To: hop, Step: "步驟 1 打通救援的路"},
-						SortieMode: 2,
-					}
-				}
-			case !enemy:
-				// 自己人或無主省，直接調動過去。步驟 2（第一期）走的也是這條。
-				if opt.FirstStage && opt.Spectating {
-					break
-				}
+	//
+	// ⛔ 第一版沒檢查「有敵對鄰省」，於是**每一個省都走這一步**——
+	// 後方省也去找救援目標、也調動，把步驟 3 之後整個擋住。
+	// 症狀是「39 省跑一輪零出兵」，而單元測試全綠看不出來
+	// （`TestChainAOnRealSave` 的對照子測試就是為了抓它）。
+	if w.Hostile(p) != 0 && !opt.FirstStage && prov.Commander != 1 {
+		if r, ok := w.rescueStep(p, prov, supplyOK, opt, "步驟 1"); ok {
+			return r
+		}
+	}
+
+	// ── 步驟 2：第一期只調動，不出兵 ───────────────────────────────
+	//
+	// 前置是「第一期、非觀戰、`sub_5B76E` 鄰接」。
+	// ⚠️ `sub_5B76E` 未讀，這裡用「有敵對鄰省」近似——**標為差異**。
+	if opt.FirstStage && !opt.Spectating && w.Hostile(p) != 0 {
+		if hop := w.rescueHop(p, prov.Commander); hop != 0 {
+			if hp, err := w.Table.At(hop); err == nil &&
+				(hp.Commander == 0 || hp.Commander == prov.Commander) {
 				return ChainAResult{Action: AIAction{
 					Kind: AITransfer, From: p, To: hop, TransferKind: 1,
-					Step: "步驟 1／2 往救援目標調動"}}
+					Step: "步驟 2 第一期調動"}}
 			}
 		}
 	}
@@ -144,6 +150,37 @@ func (w *AIWorld) ChainA(p ProvinceID, gens []General, opt ChainAOpts) ChainARes
 	}
 
 	return ChainAResult{Action: AIAction{From: p}}
+}
+
+// rescueStep 是步驟 1 的動作部分：拿到下一跳之後決定打還是調。
+//
+// 回 `ok == false` 表示這一步沒做出決定，鏈要繼續往下走。
+func (w *AIWorld) rescueStep(p ProvinceID, prov *Province, supplyOK bool,
+	opt ChainAOpts, label string) (ChainAResult, bool) {
+	hop := w.rescueHop(p, prov.Commander)
+	if hop == 0 {
+		return ChainAResult{}, false
+	}
+	hp, err := w.Table.At(hop)
+	if err != nil {
+		return ChainAResult{}, false
+	}
+	if hp.Commander != 0 && hp.Commander != prov.Commander {
+		// 擋路的敵省，條件齊了就打下來。
+		if w.AIHasAdvantage(p, hop, opt.Hard) &&
+			w.GeneralCount(p) >= AIStep1MinGenerals && supplyOK {
+			return ChainAResult{
+				Action:     AIAction{Kind: AIAttack, From: p, To: hop, Step: label + " 打通救援的路"},
+				SortieMode: 2,
+			}, true
+		}
+		// 條件不齊 → 這一步不做決定，鏈繼續往下（原版 `loc_17C6C` 的分流）。
+		return ChainAResult{}, false
+	}
+	// 自己人或無主省，直接調動過去。
+	return ChainAResult{Action: AIAction{
+		Kind: AITransfer, From: p, To: hop, TransferKind: 1,
+		Step: label + " 往救援目標調動"}}, true
 }
 
 // 兩道將領數門檻。
