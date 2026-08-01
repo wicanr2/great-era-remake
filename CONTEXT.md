@@ -114,6 +114,12 @@
 
 ## 3. 文件索引
 
+> 📸 **`docs/images/` 是 `CLAUDE.md` §9 的唯一例外**（使用者明示 2026-08-01）：
+> README 展示截圖含原版字模與美術，因為那是渲染結果不是資產本身。
+> `deny_scan.sh` 只放行 `docs/images/*.png`，其他位置的 PNG 一律擋。
+> 重產：`tools/go.sh run ./cmd/screenshot -province 26 [-menu] -out workplace/shots`
+
+
 > ⚡ **讀任何 `sub_XXXXX` 之前先 grep `docs/re/00-function-index.md`**
 > （自動產生，391 個函式）。這個專案的反組譯筆記已超過三十份，
 > 光靠記憶會一再重讀已經解過的函式。
