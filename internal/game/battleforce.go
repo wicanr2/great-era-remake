@@ -1,6 +1,6 @@
 package game
 
-// 戰場上的**戰力比判定**（`sub_3A320`）與**主將優勢等級**（`sub_58D4A`）。
+// 戰場上的**戰力比判定**（`sub_3A320`）與**首位單位優勢等級**（`sub_58D4A`）。
 //
 // 這兩支是戰鬥 AI 的共用度量衡：戰鬥 AI 幾乎每個判斷都先問一句
 // 「現在誰占上風、差多少」，答案就出自這裡。
@@ -65,35 +65,39 @@ const (
 	AIBattleRatioBehindDen = 2
 )
 
-// ── 主將優勢等級（`sub_58D4A`）────────────────────────────────────────
+// ── 首位單位優勢等級（`sub_58D4A`）──────────────────────────────────
 
 // 三個等級。
 const (
-	// AIAdvantageBehind 是主將戰力 < 敵軍總戰力。
+	// AIAdvantageBehind 是首位單位戰力 < 敵軍總戰力。
 	AIAdvantageBehind = 0
-	// AIAdvantageAhead 是主將戰力 ≥ 敵軍總戰力。
+	// AIAdvantageAhead 是首位單位戰力 ≥ 敵軍總戰力。
 	AIAdvantageAhead = 1
-	// AIAdvantageOverwhelming 是主將戰力 ≥ 敵軍總戰力 × 2。
+	// AIAdvantageOverwhelming 是首位單位戰力 ≥ 敵軍總戰力 × 2。
 	AIAdvantageOverwhelming = 2
 )
 
-// AdvantageLevel 是 `sub_58D4A`：拿**主將一個人**的攻擊力，
+// AdvantageLevel 是 `sub_58D4A`：拿**首位單位一個人**的攻擊力，
 // 跟**敵方全部單位**的攻擊力總和比。
 //
-//	敵方總和 × 2 ≤ 主將   → 2（壓倒）
-//	敵方總和     ≤ 主將   → 1（優勢）
+// ⚠️ 「首位單位」是 `word_64902`，即第一方單位陣列的第 1 格。
+// 把它當成「主將」是**推論**（`docs/re/31` §20）：`sub_3C26A` 的兩個
+// 計數迴圈都從 index 2 起、第 1 格單獨處理，形狀對得上而已。
+//
+//	敵方總和 × 2 ≤ 首位單位   → 2（壓倒）
+//	敵方總和     ≤ 首位單位   → 1（優勢）
 //	否則                  → 0（劣勢）
 //
-// ⚠️ 一人對全軍，看起來不公平，但主將的戰力通常是全軍最高
+// ⚠️ 一人對全軍，看起來不公平，但首位單位的戰力通常是全軍最高
 // （攻擊力公式吃能力值與兵力，`strength.go`）。這是原版的寫法，照抄。
 //
 // 原版的 `×2` 走 `Round(Real(敵方總和 × 2))`；因為乘的是整數 2，
 // `Round` 不會改變結果，這裡直接用整數。
-func AdvantageLevel(leaderStrength, foeTotal int) int {
-	if foeTotal*2 <= leaderStrength {
+func AdvantageLevel(firstUnitStrength, foeTotal int) int {
+	if foeTotal*2 <= firstUnitStrength {
 		return AIAdvantageOverwhelming
 	}
-	if foeTotal <= leaderStrength {
+	if foeTotal <= firstUnitStrength {
 		return AIAdvantageAhead
 	}
 	return AIAdvantageBehind
@@ -101,7 +105,7 @@ func AdvantageLevel(leaderStrength, foeTotal int) int {
 
 // ── 預備隊的投入（`sub_3C26A` 前半）──────────────────────────────────
 
-// AIReserveKeep 回傳**要留幾個單位待命**，由主將優勢等級決定：
+// AIReserveKeep 回傳**要留幾個單位待命**，由首位單位的優勢等級決定：
 //
 //	劣勢(0) → 留 2      優勢(1) → 留 1      壓倒(2) → 留 0
 //
@@ -131,7 +135,7 @@ func AIReserveKeep(advantage int) int {
 //
 // ⚠️ **倒著掃**（10 → 2），而且**從 index 2 起**——index 1 不碰。
 // 原版兩個迴圈的邊界都是 `[2, 10]`，index 1 在別處另外處理
-// （`sub_3C26A` 後半只動 `word_64902` 指到的主將）。
+// （`sub_3C26A` 後半只動 `word_64902` 指到的首位單位）。
 func ActivateReserves(cmds []uint8, advantage int) {
 	standby := 0
 	for i := 2; i <= 10 && i < len(cmds); i++ {
@@ -157,7 +161,7 @@ func ActivateReserves(cmds []uint8, advantage int) {
 // 語意來自 `docs/re/31` §15／§16。**4 與 5 仍未完全確定**。
 
 const (
-	// BattleCmdGarrison 是 **1：前往城市駐守**（主將專屬）。
+	// BattleCmdGarrison 是 **1：前往城市駐守**（首位單位專屬）。
 	// `sub_47EAA` 只在 `u == word_64902` 時設它，且已經站在城市上就不設；
 	// `sub_3D0AC` 看到「命令 1 且站在城市上」就交接並改成 6。
 	BattleCmdGarrison uint8 = 1
@@ -169,7 +173,7 @@ const (
 	// BattleCmdCommitted 是 **4：預備隊被投入**。
 	//
 	// ⚠️ 語意是**推論**。已知的是：待命(2) 的單位在優勢時會被轉成 4
-	// （`ActivateReserves`），而主將在優勢等級 1 時也設 4、等級 2 時設 3。
+	// （`ActivateReserves`），而首位單位在優勢等級 1 時也設 4、等級 2 時設 3。
 	// 從「壓倒性優勢才設 3」推得 **4 比 3 保守**。
 	BattleCmdCommitted uint8 = 4
 	// BattleCmdUnknown5 是 **5：語意未知**。
