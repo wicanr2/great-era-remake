@@ -21,19 +21,38 @@ const ProvinceCount = assets.ProvinceCount
 // Valid 回報這個省編號是否在合法範圍。
 func (p ProvinceID) Valid() bool { return p >= 1 && p <= ProvinceCount }
 
-// Terrain 是地形編號，0..22。
+// PlaceIndex 是格子上的**地名索引**，1-based；0 表示這一格沒有地名。
 //
-// **語意未解**（docs/spec/01 §4）：目前只知道值域，不知道哪個數字是山、河、平原。
-// 在查明之前一律以原始編號傳遞，不做語意化命名，也不要自行賦予防禦修正。
-type Terrain byte
+// [訂正] 這個欄位一度被當成「地形編號 0..22」（docs/spec/01 舊版）。
+// 實際上 k > 0 代表該格是本省地名表 `TN15.<省編號>` 的第 k 個詞條。
+// 證據：全 39 省的最大值都**恰好等於**該省地名表的詞條數，零例外
+// （廣西 22 個地名 → 最大值 22；海南島 7 個 → 最大值 7）。
+// 舊說的「值域 0..22」只是「地名最多的省有 22 個地名」的副作用。
+//
+// 地形性質由地名的種類隱含：湖北的 9 號是長江，佔 33 格；6 號是大別山，
+// 佔 21 格；漢口、武昌這些城市各佔 1 格。
+type PlaceIndex byte
 
 // Battlefield 是一個省的 14×14 戰場格子。
 type Battlefield struct {
 	// Owner[y][x] 是該格所屬的省編號；0 表示本省腹地。
 	// 非零格代表邊界，也就是敵方可能的進入方向。
 	Owner [assets.GridH][assets.GridW]ProvinceID
-	// Terrain[y][x] 是地形編號。
-	Terrain [assets.GridH][assets.GridW]Terrain
+	// Place[y][x] 是地名索引，指向該省的 TN15 地名表。
+	Place [assets.GridH][assets.GridW]PlaceIndex
+}
+
+// MaxPlace 回傳這張戰場用到的最大地名索引，也就是該省的地名數。
+func (b *Battlefield) MaxPlace() PlaceIndex {
+	var mx PlaceIndex
+	for y := range b.Place {
+		for _, v := range b.Place[y] {
+			if v > mx {
+				mx = v
+			}
+		}
+	}
+	return mx
 }
 
 // Map 是整張戰略地圖：39 個省的鄰接關係與各自的戰場格子。
@@ -78,7 +97,7 @@ func LoadMap(warpos, tername []byte) (*Map, error) {
 		for y := 0; y < assets.GridH; y++ {
 			for x := 0; x < assets.GridW; x++ {
 				m.fields[k].Owner[y][x] = ProvinceID(pos[k].At(x, y))
-				m.fields[k].Terrain[y][x] = Terrain(ter[k].At(x, y))
+				m.fields[k].Place[y][x] = PlaceIndex(ter[k].At(x, y))
 			}
 		}
 	}

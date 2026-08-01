@@ -100,11 +100,12 @@ func TestBattlefieldGrid(t *testing.T) {
 	if got := bf.Owner[5][5]; got != 0 {
 		t.Errorf("河南戰場 (5,5) 的所屬省 = %d，預期 0（本省腹地）", got)
 	}
-	// 地形值域
+	// 地名索引不得超出該省地名表的範圍（河南 TN15.19 有 14 條）。
+	// 全 39 省的驗證在 place_test.go。
 	for y := 0; y < assets.GridH; y++ {
 		for x := 0; x < assets.GridW; x++ {
-			if bf.Terrain[y][x] > 22 {
-				t.Fatalf("地形編號 %d 超出 0..22 於 (%d,%d)", bf.Terrain[y][x], x, y)
+			if bf.Place[y][x] > 14 {
+				t.Fatalf("河南的地名索引 %d 超出 0..14 於 (%d,%d)", bf.Place[y][x], x, y)
 			}
 		}
 	}
