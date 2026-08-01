@@ -130,3 +130,56 @@ func TestChaseNoFoes(t *testing.T) {
 		t.Errorf("沒有敵人該回 0，實得 %d", n)
 	}
 }
+
+func TestAttackerFewerThanCities(t *testing.T) {
+	// §53：`sub_56D13` = 攻方在場單位數 < 城市格數。
+	sim := mkNoCityBattle(t, 1, 2, 5000)
+	nCity := len(CityCells(sim.Field))
+	if nCity == 0 {
+		t.Skip("這張圖沒有城市格")
+	}
+	if got, want := sim.AttackerFewerThanCities(), 1 < nCity; got != want {
+		t.Errorf("攻方 1 個、城市 %d 個 → 該回 %v，實得 %v", nCity, want, got)
+	}
+}
+
+func TestAttackerNearCityDetectsApproach(t *testing.T) {
+	// §6：城市格上或距離 2 以內站著攻方單位。
+	sim := mkNoCityBattle(t, 1, 1, 5000)
+	cities := CityCells(sim.Field)
+	if len(cities) == 0 {
+		t.Skip("這張圖沒有城市格")
+	}
+	// 把攻方挪到遠離所有城市的地方——找不到就跳過（圖太小）。
+	far := NoCell
+	for i := 0; i < CellCount; i++ {
+		c := CellIndex(i)
+		col, row := c.ColRow()
+		if sim.Field.Tiles[row][col].MoveCost() >= 255 {
+			continue
+		}
+		near := false
+		for _, cc := range cities {
+			if WithinTwoSteps(c, cc) {
+				near = true
+				break
+			}
+		}
+		if !near {
+			far = c
+			break
+		}
+	}
+	if far == NoCell {
+		t.Skip("這張圖每一格都在城市兩步之內")
+	}
+	sim.Attacker[0].Cell = far
+	if sim.AttackerNearCity() {
+		t.Error("攻方離所有城市都超過兩步，不該算逼近")
+	}
+	// 挪到城市上 → 一定算逼近（WithinTwoSteps(c, c) 成立）。
+	sim.Attacker[0].Cell = cities[0]
+	if !sim.AttackerNearCity() {
+		t.Error("攻方站在城市上該算逼近")
+	}
+}

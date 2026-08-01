@@ -25,9 +25,28 @@ func TestDecideBattleADecisive(t *testing.T) {
 func TestDecideBattleAEvenTriggersDecapitate(t *testing.T) {
 	// sub_3A8F7 要 byte_6FFCA & 4，且條件**不成立**才出手
 	//（不成立 = 敵方 < 我方的 2/3 = 我方領先）。
+	//
+	// ⭐ §53：這一步是三向分流，不是單一行動。
 	in := BattleAIInput{SideStrength: 100, FoeStrength: 50, EnableLastSteps: true}
-	if got := DecideBattleA(in); got.Action != ActADecapitateKeepOne {
-		t.Errorf("我方領先且啟用後段，該走斬首，實際 %s", BattleActionName(got.Action))
+
+	// 有攻方單位逼近城市 → 18（挑最弱的圍城者），優先度最高。
+	near := in
+	near.AttackerNearCity = true
+	near.FoeFewerThanCities = true // 就算這個也成立，18 仍然優先
+	if got := DecideBattleA(near); got.Action != ActAWeakest {
+		t.Errorf("有敵軍逼近城市該挑最弱的，實際 %s", BattleActionName(got.Action))
+	}
+
+	// 沒人逼近、而且攻方單位比城市少 → 14（只留一個守城，大膽出擊）。
+	few := in
+	few.FoeFewerThanCities = true
+	if got := DecideBattleA(few); got.Action != ActADecapitateKeepOne {
+		t.Errorf("敵軍比城市少該只留一個守城，實際 %s", BattleActionName(got.Action))
+	}
+
+	// 兩個都不成立 → 15（駐守的都留，保守）。
+	if got := DecideBattleA(in); got.Action != ActADecapitateKeepAll {
+		t.Errorf("敵軍不比城市少該把駐守的都留下，實際 %s", BattleActionName(got.Action))
 	}
 	// 旗標沒開就跳過這一步。
 	in.EnableLastSteps = false

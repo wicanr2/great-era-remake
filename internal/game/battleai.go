@@ -88,20 +88,32 @@ type BattleAIInput struct {
 	FoeStrength int
 	// FirstUnitStrength 是首位單位的攻擊力（`sub_58D4A` 用）。
 	FirstUnitStrength int
-	// RatioGateSelf / RatioGateFoe 是 §42 那組比率門檻的結果
+	// RatioGateSelf / RatioGateFoe 是 §48 那組比率門檻的結果
 	// （原版 `sub_3A63C` 與 `sub_3A730` 的 and，各對一方求值）。
 	//
-	//	門檻 = ( 比率 + byte_64900 ) < 15
+	//	門檻 = ( 每 150 兵分到的資源 + byte_64900 ) < 15
 	//
-	// ⚠️ **比率的來源未解**——`word_64932/34/36/38` 是分子、`sub_3A4CE` 是分母，
-	// 形狀像按比例衰減的累積量但沒有證據。所以這兩個布林由呼叫端傳，
-	// 決策鏈本身不算。來源解出來之後只要改呼叫端，這裡的邏輯不動。
+	// ⭐ 語意已解（§48／§49）：分子是雙方帶進戰場的**糧食與黃金**，
+	// 分母是兵力總和。糧食那條的分母正好是每回合的糧食消耗，
+	// 所以它字面上就是「**糧食還能撐幾回合**」。複合條件是
+	// **糧食夠但黃金不夠**，用 `BattleSupply.RatioGate` 算。
 	RatioGateSelf bool
 	RatioGateFoe  bool
 
 	// DeployGateOpen 是分支 B 值 2 獨有的額外閘門（原版 `word_6493A == 0`，§43）。
-	// ⚠️ 語意未解。
+	// ⭐ 語意已解（§48）：**攻方的彈藥為 0**。沒彈藥就不進攻，改佈防。
 	DeployGateOpen bool
+
+	// AttackerNearCity 是 `sub_3A766`（§6）：**城市格上或距離 2 內有攻方單位**。
+	// 分支 A 第四步用它挑 18（挑最弱的圍城者）。
+	AttackerNearCity bool
+	// FoeFewerThanCities 是 `sub_56D13`（§53）：**攻方的單位數比城市格數少**。
+	//
+	//	sub_56D13() = sub_56CD0() < 城市數
+	//	              └ 第一方（攻方）非零槽位數
+	//
+	// 分支 A 第四步用它在 14（只留一個守城）與 15（駐守的都留）之間選。
+	FoeFewerThanCities bool
 
 	// FoeLeaderOnField 是 `sub_56D49(0)`：**當前交戰省的司令本人
 	// 在不在守方的隊伍裡**（§44）。
@@ -240,9 +252,20 @@ func DecideBattleA(in BattleAIInput) BattleDecision {
 	// 條件是**不成立**才往下走（§16 的表）——也就是「敵方 < 我方的 2/3」。
 	if in.EnableLastSteps && !ForceRatioLE(in.SideStrength, in.FoeStrength,
 		AIBattleRatioEvenNum, AIBattleRatioEvenDen) {
-		// ⚠️ 這一步給 14／15／18 三個值，怎麼選**未讀**。
-		// 取 14（斬首、只留一個守城）當代表——標為已知偏差。
-		return BattleDecision{Action: ActADecapitateKeepOne, Step: "sub_3A8F7 勢均"}
+		// ⭐ 三向分流已解（§53）：
+		//
+		//	有攻方單位逼近城市      → 18 挑最弱的圍城者
+		//	否則 攻方單位數 < 城市數 → 14 斬首，只留一個守城
+		//	否則                    → 15 斬首，駐守的都留
+		//
+		// 語意很順：**敵人少就大膽出擊，敵人多就保留守軍。**
+		if in.AttackerNearCity {
+			return BattleDecision{Action: ActAWeakest, Step: "sub_3A8F7 有敵軍逼近城市"}
+		}
+		if in.FoeFewerThanCities {
+			return BattleDecision{Action: ActADecapitateKeepOne, Step: "sub_3A8F7 敵軍比城市少"}
+		}
+		return BattleDecision{Action: ActADecapitateKeepAll, Step: "sub_3A8F7 敵軍不比城市少"}
 	}
 
 	// 第五步 `sub_3A94E`（§43）：`sub_56D49(0)` 是前置，
@@ -264,9 +287,7 @@ func DecideBattleA(in BattleAIInput) BattleDecision {
 //
 // 補完一支就從這裡移除一筆，並在 `docs/re/31` 補一節。
 var UndecidedBattleSteps = []string{
-	"sub_3A8F7 在 14／15／18 之間怎麼選（分支 A 第四步）",
-	"比率門檻的來源：word_64932/34/36/38 與 sub_3A4CE（§42 挖到第五層停手）",
-	"sub_534FF 的第二個輸出（決定 sub_53619）＋ word_6493A ＋ byte_6B968",
+	"byte_6B968（sub_534FF 的另一個輸出，語意未解）",
 }
 
 // BattleActionName 回傳行動的中文名稱，給紀錄與測試訊息用。

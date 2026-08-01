@@ -91,15 +91,21 @@ func (s *BattleSim) DecideTurn(turn int, g BattleChainGates,
 	atk := s.SideStrength(s.Attacker)
 	def := s.SideStrength(s.Defender)
 
+	// 分支 A 第四步的兩個輸入（§53）。兩個都只跟局面有關，這裡直接算。
+	nearCity := s.AttackerNearCity()
+	fewer := s.AttackerFewerThanCities()
+
 	// 分支 A（第二方 ≈ 守方）：「我方」是守方。
 	inA := BattleAIInput{
-		SideStrength:     def,
-		FoeStrength:      atk,
-		RatioGateSelf:    g.RatioSelf,
-		RatioGateFoe:     g.RatioFoe,
-		FoeLeaderOnField: LeaderOnField(s.Defender, defenderLeader),
-		Sub53619:         g.Sub53619,
-		EnableLastSteps:  g.EnableLastSteps,
+		SideStrength:       def,
+		FoeStrength:        atk,
+		RatioGateSelf:      g.RatioSelf,
+		RatioGateFoe:       g.RatioFoe,
+		FoeLeaderOnField:   LeaderOnField(s.Defender, defenderLeader),
+		Sub53619:           g.Sub53619,
+		EnableLastSteps:    g.EnableLastSteps,
+		AttackerNearCity:   nearCity,
+		FoeFewerThanCities: fewer,
 	}
 	// 分支 B（第一方 ≈ 攻方）：「我方」是攻方。
 	inB := BattleAIInput{

@@ -303,7 +303,6 @@ func itoa(n int) string {
 	return string(b[i:])
 }
 
-
 // execReset 是值 12：**推倒重來**（§33）。
 //
 //	先把每個單位打回待命（`sub_3B15E`：+9=2、+12=0xFF、+10=0）
@@ -431,7 +430,6 @@ func (s *BattleSim) execDecapitate(units, foes []*Combatant,
 	return BattleExecResult{Assigned: n, Implemented: true, Note: "斬首（" + mode + "）"}
 }
 
-
 // execStrikeForce 是值 4：**打敵方主力周邊**（§29）。
 //
 // 骨架與值 3（打城市）相同，只換中心點：
@@ -547,9 +545,9 @@ func (s *BattleSim) execStandbyOnlyStage(units, foes []*Combatant,
 //
 // 原版三個迴圈，順序有意義：
 //
-//	1. 命令 3 且沒有目標格 → 降成 2
-//	2. 命令 2／4／5 一批    → 重算下一格
-//	3. 命令 1 單獨一批      → 重算下一格
+//  1. 命令 3 且沒有目標格 → 降成 2
+//  2. 命令 2／4／5 一批    → 重算下一格
+//  3. 命令 1 單獨一批      → 重算下一格
 //
 // ⚠️ 命令 1 單獨最後處理，不與 2／4／5 混在一起——那是「守城」與
 // 「移動」兩種性質的分界（§14 的語意線索）。
@@ -602,7 +600,6 @@ func (s *BattleSim) execRecompute(units []*Combatant,
 	}
 	return BattleExecResult{Assigned: n, Implemented: true, Note: "重算全軍的下一格"}
 }
-
 
 // execWeakest 是值 18：**在圍著我方城市的敵軍裡，挑最弱的打**（§46）。
 //
@@ -690,7 +687,6 @@ func (s *BattleSim) execWeakest(units, foes []*Combatant,
 	return BattleExecResult{Assigned: n, Implemented: true,
 		Note: "挑最弱：圍城敵軍 " + itoa(len(pool)) + " 個"}
 }
-
 
 // activateReserves 是 `sub_3C26A` 的前半（§17）：**把待命的單位投入**。
 //

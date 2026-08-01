@@ -79,3 +79,40 @@ func (s *BattleSim) ChaseAssign(units, foes []*Combatant,
 	}
 	return n
 }
+
+// AttackerNearCity 是 `sub_3A766`（§6）：**城市格上、或距離 2 以內，
+// 站著攻方單位**。
+//
+// 分支 A 第四步用它挑值 18（挑最弱的圍城者）——問的是
+// 「我的城市被人逼近了嗎」。
+func (s *BattleSim) AttackerNearCity() bool {
+	// 原版兩關：那格站的是攻方（`+8 != 0`），或 `sub_55CEC(2, ...)` > 0
+	// ——距離 2 以內有敵人。`WithinTwoSteps(c, c)` 成立（原版沒排除），
+	// 所以「站在城市上」被第二關涵蓋，不必分開判。
+	for _, c := range CityCells(s.Field) {
+		for _, u := range s.Attacker {
+			if u != nil && u.Alive() && u.Cell.Valid() && WithinTwoSteps(u.Cell, c) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// AttackerFewerThanCities 是 `sub_56D13`（§53）：
+// **攻方在場的單位數 < 戰場上的城市格數**。
+//
+//	sub_56D13() = sub_56CD0() < 城市數
+//	              └ 掃第一方的 10 個槽位數非零的
+//
+// 分支 A 第四步用它在 14（只留一個守城）與 15（駐守的都留）之間選。
+// 語意很順：**敵人少就大膽出擊，敵人多就保留守軍。**
+func (s *BattleSim) AttackerFewerThanCities() bool {
+	n := 0
+	for _, u := range s.Attacker {
+		if u != nil && u.Alive() {
+			n++
+		}
+	}
+	return n < len(CityCells(s.Field))
+}

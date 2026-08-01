@@ -80,10 +80,15 @@ type BattleSupply struct {
 //
 //	( 每 150 兵分到的量 + phase ) < 15
 //
-// `phase` 是 `byte_64900`，第三次出現在決策鏈裡（§17 的 `> 4`、§35 的 `≥ 5`、
-// 這裡的加項）。⚠️ **語意仍未解**，形狀像階段或難度，由呼叫端傳。
-func SupplyTight(resource, troops, phase int) bool {
-	return SupplyPerTroop(resource, troops)+phase < AIBattleSupplyCap
+// ⭐ `turn` 是原版的 `byte_64900` = **回合數**（§49）。加上它之後
+// 整條式子有了字面意義：
+//
+//	還能撐幾回合 + 已經打了幾回合 < 15
+//	  = 這批補給撐不到第 15 回合（戰鬥上限 16 回合）
+//
+// 所以「吃緊」不是抽象的比率門檻，是**撐不到終局**。
+func SupplyTight(resource, troops, turn int) bool {
+	return SupplyPerTroop(resource, troops)+turn < AIBattleSupplyCap
 }
 
 // RatioGate 是決策鏈實際用的那個複合條件：**糧食夠、但黃金不夠**。
@@ -97,8 +102,8 @@ func SupplyTight(resource, troops, phase int) bool {
 // ⭐ 實際數量級：門檻等價於「資源 < 兵力 / 10」。省份的糧食通常遠高於這條線
 // （實機湖北 18,050），黃金通常低於（4,200）——所以 `!糧食吃緊 && 黃金吃緊`
 // 是**常見狀態**，那三個行動是主線而不是例外。
-func (s BattleSupply) RatioGate(phase int) bool {
-	return !SupplyTight(s.Food, s.Troops, phase) && SupplyTight(s.Gold, s.Troops, phase)
+func (s BattleSupply) RatioGate(turn int) bool {
+	return !SupplyTight(s.Food, s.Troops, turn) && SupplyTight(s.Gold, s.Troops, turn)
 }
 
 // TroopTotal 是 `sub_3A4CE`：一方 10 個槽位的兵力總和。

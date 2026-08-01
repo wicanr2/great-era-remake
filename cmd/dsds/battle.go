@@ -302,13 +302,14 @@ func (b *battleState) runDefenderAI() {
 	// ⭐ 比率門檻（§48）也接上了：**糧食夠但黃金不夠**。
 	// 分支 A 的「我方」是第二方（守方），分支 B 的是第一方（攻方）。
 	//
-	// ⚠️ `phase`（原版 `byte_64900`）的語意仍未解，先給 0。
-	// 它只是門檻的加項，給 0 等於用最寬鬆的那一端。
-	const phase = 0
+	// ⭐ 那個加項就是**回合數**（原版 `byte_64900`，§49）：
+	//
+	//	還能撐幾回合 + 已經打了幾回合 < 15
+	//	  = 補給撐不到第 15 回合（戰鬥上限 16）
 	gates := game.BattleChainGates{
 		Sub53619:  !game.HasBattleSupport(b.tbl, b.sim.At, b.leader, b.units),
-		RatioSelf: b.supDef.RatioGate(phase),
-		RatioFoe:  b.supAtk.RatioGate(phase),
+		RatioSelf: b.supDef.RatioGate(b.turn),
+		RatioFoe:  b.supAtk.RatioGate(b.turn),
 		// §43 的 `word_6493A == 0` = **第一方（攻方）的彈藥為 0**。
 		Deploy: b.supAtk.Ammo == 0,
 	}
