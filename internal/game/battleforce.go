@@ -37,11 +37,13 @@ func ForceRatioLE(mine, foe, num, den int) bool {
 // 所以**倍率越大，越是在問「我方是不是被輾壓」**。
 const (
 	// AIBattleRatioCollapseNum/Den 是 **5.0**：我方 × 5 ≤ 敵方，
-	// 即**我方被壓到敵方的五分之一以下**。
+	// 即**我方被壓到敵方的五分之一以下**。這是**必勝門檻**。
 	//
 	// 兩個呼叫端對稱（`sub_3A817` 看第二方、`sub_3AA51` 看第一方），
-	// 成立之後接 `sub_53619` 並設事件碼 `byte_6AA85`。
-	// ⚠️ 事件碼的語意未解，**不要**寫成「撤退」或「投降」。
+	// 成立之後設的決策值都導向 `sub_3B19C` → `sub_54E3B`，
+	// 也就是**九步結算**（`docs/mechanics/30-combat.md` §3）。
+	//
+	// 讀作：**一方戰力不到對方的五分之一，電腦不打了，直接判勝負。**
 	AIBattleRatioCollapseNum = 5
 	AIBattleRatioCollapseDen = 1
 
