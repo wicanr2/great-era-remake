@@ -88,7 +88,7 @@ func (s *BattleSim) ExecuteAction(a BattleAction, units, foes []*Combatant,
 	route func(to, from CellIndex) CellIndex) BattleExecResult {
 	switch a {
 	case ActBTakeCity:
-		return s.execTakeCity(units, route)
+		return s.execTakeCity(units, foes, route)
 	case ActBDeploy:
 		return s.execDeploy(units)
 	case ActAEngageAll:
@@ -130,7 +130,7 @@ func (s *BattleSim) ExecuteAction(a BattleAction, units, foes []*Combatant,
 //	掃全場城市 → 每個算距離 → 升序排 → 取第一個正分
 //	→ 城市有守軍：全員往城市走，目標是那個守軍
 //	→ 城市空著：改追附近的人（§24，這裡未實作）
-func (s *BattleSim) execTakeCity(units []*Combatant,
+func (s *BattleSim) execTakeCity(units, foes []*Combatant,
 	route func(to, from CellIndex) CellIndex) BattleExecResult {
 	// ⭐ §19 的骨架第一步：值 3 與值 4 都**先跑預備隊投入**（`sub_3C26A`），
 	// 那支把待命(2) 的單位轉成命令 4，後面的派工才有東西可派。
@@ -157,7 +157,13 @@ func (s *BattleSim) execTakeCity(units []*Combatant,
 	})
 	target := FirstPositiveCity(scores)
 	if target == NoCell {
-		return BattleExecResult{Implemented: true, Note: "沒有可打的敵方城市"}
+		// ⭐ 挑不到城市時原版不是收工，是**改去追人**（`sub_3B9D8`，§52）。
+		// 逐一試敵方單位取第一個走得通的，而且每個敵人有 3 倍的火力額度。
+		if n := s.ChaseAssign(units, foes, route); n > 0 {
+			return BattleExecResult{Assigned: n, Implemented: true,
+				Note: "沒有城市可打，改追敵方單位"}
+		}
+		return BattleExecResult{Implemented: true, Note: "沒有可打的敵方城市，也追不到人"}
 	}
 
 	// 城市上的守軍就是目標單位（§23）。
