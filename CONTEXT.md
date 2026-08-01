@@ -120,6 +120,7 @@
 | `docs/re/10-troop-transfer.md` | **調動的執行層**：`sub_1408F` 八個模式、兵力門檻、調動即佔領；推翻「剩餘命令數」 | ✅ |
 | `tools/callgraph.py` | **呼叫圖遞移閉包**：查「這條路徑會不會走到 X」。讀骨架會漏分支，呼叫圖不會 | ✅ |
 | `docs/re/14-acted-flag-and-last-step.md` | **`+32` bit 2 = 回合分流開關**（推翻「已徵過稅」）；`sub_15CE3` 讀完也是調動——決策鏈八支零例外 | ✅ |
+| `docs/re/19-loyalty.md` | **忠誠度的五個寫入點全掃**：+20 回補（電腦內政）、徵稅兩段、秘密行動 ×0.8、戰鬥扣。慰勞軍民**不改**省的忠誠度 | ✅ |
 | `docs/re/18-tax-formula.md` | **徵稅公式全解**：`Random(Round(Sqrt(人口)×5))+300` clamp [1500,6500]、忠誠度 −30。**五次乾淨取樣全部對上**：黃金 5/5 打上限、糧食 5/5 落在範圍內、忠誠度兩段扣法零誤差、bit 7 = 已徵過稅 | ✅ |
 | `docs/re/17-random.md` | **亂數全解**：Turbo Pascal LCG `seed×134775813+1`、`RandSeed` 在 `ds:072Ah`、`Randomize` 用系統時間。**序列完全可重現** | ✅ |
 | `docs/playtest/12-tax-command.md` | **徵稅實測 ×3**：只動黃金與糧食、忠誠度大跌。**同省同操作結果不同 → 亂數 confirmed**，所以不能寫成確定公式 | ✅ |

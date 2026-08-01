@@ -218,3 +218,32 @@ func (w *AIWorld) Tax(p ProvinceID, rng *Rand) (TaxResult, error) {
 	prov.Flags |= ProvinceFlagTaxed
 	return TaxResult{Gold: gold, Food: food, LoyaltyAfter: prov.Loyalty}, nil
 }
+
+// ---------------------------------------------------------------------------
+// 忠誠度：全檔只有五個地方會改它（`docs/re/19`）。
+// ---------------------------------------------------------------------------
+
+// LoyaltyMax 是人民忠誠度的上限（`cmp byte ptr [di-6222h], 64h`）。
+const LoyaltyMax = 100
+
+// LoyaltyRestGain 是電腦內政「休養」一次回補的忠誠度
+// （`sub_1A100` 的 `add byte ptr [di-6222h], 14h`），加完夾到 100。
+//
+// 它由 `sub_1ACCC` 在 `byte_6FE7E == 6` 那條內政分支呼叫
+// （`docs/re/13` §6），**是電腦專屬的行為**——玩家那邊沒有對應的指令
+// （慰勞軍民不改省的忠誠度，見 `docs/re/19` §3）。
+const LoyaltyRestGain = 20
+
+// RestoreLoyalty 是 `sub_1A100`：忠誠度 +20，夾到 100。
+func (w *AIWorld) RestoreLoyalty(p ProvinceID) error {
+	prov, err := w.Table.At(p)
+	if err != nil {
+		return err
+	}
+	v := int(prov.Loyalty) + LoyaltyRestGain
+	if v > LoyaltyMax {
+		v = LoyaltyMax
+	}
+	prov.Loyalty = uint8(v)
+	return nil
+}

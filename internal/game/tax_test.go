@@ -132,3 +132,44 @@ func TestTaxSetsTaxedFlag(t *testing.T) {
 		t.Error("徵稅不該動 bit 2（那是回合分流用的）")
 	}
 }
+
+// 忠誠度回補：+20，夾到 100（`sub_1A100`）。
+func TestRestoreLoyalty(t *testing.T) {
+	cases := []struct{ before, after uint8 }{
+		{0, 20}, {41, 61}, {85, 100}, {100, 100}, {95, 100},
+	}
+	for _, c := range cases {
+		w := realWorld(t)
+		prov, _ := w.Table.At(19)
+		prov.Loyalty = c.before
+		if err := w.RestoreLoyalty(19); err != nil {
+			t.Fatal(err)
+		}
+		if prov.Loyalty != c.after {
+			t.Errorf("忠誠度 %d 回補後是 %d，應為 %d", c.before, prov.Loyalty, c.after)
+		}
+	}
+}
+
+// 徵稅 → 回補 → 徵稅，忠誠度不會變成負數也不會超過 100。
+func TestLoyaltyStaysInRange(t *testing.T) {
+	w := realWorld(t)
+	prov, _ := w.Table.At(19)
+	prov.Loyalty = 50
+	rng := NewRand(1)
+	for i := 0; i < 30; i++ {
+		if _, err := w.Tax(19, rng); err != nil {
+			t.Fatal(err)
+		}
+		if prov.Loyalty > LoyaltyMax {
+			t.Fatalf("第 %d 輪忠誠度 %d 超過上限", i, prov.Loyalty)
+		}
+		if err := w.RestoreLoyalty(19); err != nil {
+			t.Fatal(err)
+		}
+		if prov.Loyalty > LoyaltyMax {
+			t.Fatalf("第 %d 輪回補後忠誠度 %d 超過上限", i, prov.Loyalty)
+		}
+	}
+	t.Logf("徵稅／回補交替 30 輪後忠誠度 = %d", prov.Loyalty)
+}
