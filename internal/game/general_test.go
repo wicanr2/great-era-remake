@@ -370,3 +370,69 @@ func TestFullStrengthIsTwentyThousandOverWeight(t *testing.T) {
 		}
 	}
 }
+
+// 番號四欄（`+25`/`+26`/`+27`/`+28`）是 `FAN(1).15` 的槽位索引。
+//
+// 湖北的五個將領對上實機「查閱將領」畫面的「番號」列：
+// 討賊軍 / 討賊軍第25師 / 討賊軍暫1師 / 討賊軍暫2師 / 討賊軍暫3師
+func TestUnitTitleFields(t *testing.T) {
+	gs, err := ParseGenerals(readGame(t, "MAN(1).DAT"), 274)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []struct {
+		id                              int
+		faction, prefix, number, suffix uint8
+	}{
+		{58, 4, 0, 0, 0},    // 討賊軍（司令，沒有番號）
+		{59, 4, 10, 25, 18}, // 討賊軍第25師
+		{60, 4, 13, 1, 18},  // 討賊軍暫1師
+		{61, 4, 13, 2, 18},  // 討賊軍暫2師
+		{62, 4, 13, 3, 18},  // 討賊軍暫3師
+	}
+	for _, w := range want {
+		g := &gs[w.id-1]
+		if g.FactionName != w.faction || g.TitlePrefix != w.prefix ||
+			g.TitleNumber != w.number || g.TitleSuffix != w.suffix {
+			t.Errorf("將領 %d 番號 = %d/%d/%d/%d，實機是 %d/%d/%d/%d",
+				w.id, g.FactionName, g.TitlePrefix, g.TitleNumber, g.TitleSuffix,
+				w.faction, w.prefix, w.number, w.suffix)
+		}
+	}
+}
+
+// 勢力名槽位對上 1926 年的歷史割據——這是獨立於畫面的第二重驗證。
+//
+// `FAN(1).15` 的槽位（1-based）：
+// 1 國民革命軍、2 鎮威軍、3 安國軍、4 討賊軍、5 五省聯軍、
+// 6 湘軍、7 黔軍、8 滇軍、9 川軍、43 直系晉軍、44 直系陜軍
+func TestFactionNameMatchesHistory(t *testing.T) {
+	gs, err := ParseGenerals(readGame(t, "MAN(1).DAT"), 274)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// 將領 ID → 期望的勢力名槽位。挑的是各勢力的第一個將領。
+	want := map[int]uint8{
+		1:   1,  // 蔣中正 → 國民革命軍
+		58:  4,  // 吳佩孚 → 討賊軍
+		98:  5,  // 孫傳芳 → 五省聯軍
+		166: 2,  // 張作霖 → 鎮威軍
+		4:   43, // 閻錫山那一系 → 直系晉軍
+	}
+	for id, slot := range want {
+		if got := gs[id-1].FactionName; got != slot {
+			t.Errorf("將領 %d 的勢力名槽位是 %d，應為 %d", id, got, slot)
+		}
+	}
+	// 沒有勢力名的將領（槽位 0）應該是少數。
+	zero := 0
+	for i := range gs {
+		if gs[i].FactionName == 0 {
+			zero++
+		}
+	}
+	t.Logf("274 個將領裡有 %d 個沒有勢力名", zero)
+	if zero > len(gs)/2 {
+		t.Errorf("一半以上的將領沒有勢力名（%d/%d），欄位可能認錯了", zero, len(gs))
+	}
+}

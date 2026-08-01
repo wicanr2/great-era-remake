@@ -28,12 +28,23 @@ const (
 	genOffAbilityC = 2
 	genOffProvince = 4  // u8，所屬省編號（1-based），0 = 無所屬
 	genOffForce    = 17 // u16 little-endian
-	genOffF19      = 19 // 戰力公式用，語意未解
-	genOffF20      = 20 // 戰力公式用，只有 5 個等級值
-	genOffBranch   = 21 // 兵種，值域 {1, 4, 5, 6}
-	genOffF29      = 29 // 戰力公式用，0..100
-	genOffF30      = 30 // 戰力公式用，也是每回合衰減 20% 的那一格
-	genOffRange    = 31 // 遠程攻擊的參數，第一期 274 筆全是 1
+
+	// 番號四欄，全部是 `FAN(1).15` 的**槽位索引（1-based）**，0 = 沒有。
+	// 名字來自實機「查閱將領」的「番號」列（`docs/playtest/08`），
+	// 對應關係逐格驗過（`docs/spec/02` §番號）。
+	//
+	//	討賊軍第25師 = 勢力名[4] + 前綴[10] + 25 + 後綴[18]
+	//	              = 討賊軍   + 第       + 25 + 師
+	genOffTitlePrefix = 25 // 「第」「暫」「騎」「砲」「新」…
+	genOffTitleNumber = 26 // 數字，0 = 沒有編號
+	genOffTitleSuffix = 27 // 「師」「團」「旅」「軍」…
+	genOffFactionName = 28 // 勢力名：1 國民革命軍、4 討賊軍、5 五省聯軍…
+	genOffF19         = 19 // 戰力公式用，語意未解
+	genOffF20         = 20 // 戰力公式用，只有 5 個等級值
+	genOffBranch      = 21 // 兵種，值域 {1, 4, 5, 6}
+	genOffF29         = 29 // 戰力公式用，0..100
+	genOffF30         = 30 // 戰力公式用，也是每回合衰減 20% 的那一格
+	genOffRange       = 31 // 遠程攻擊的參數，第一期 274 筆全是 1
 )
 
 // 兵種。**這四個名字是有證據的**（`docs/spec/02` §4）：
@@ -113,6 +124,10 @@ type General struct {
 	// 但**不是硬性上限**（第三期的騎兵有一筆 12,000）。
 	Force uint16
 
+	// TitlePrefix / TitleNumber / TitleSuffix / FactionName 組成部隊番號，
+	// 前後綴與勢力名都是 `FAN(1).15` 的槽位索引（1-based，0 = 無）。
+	TitlePrefix, TitleNumber, TitleSuffix, FactionName uint8
+
 	// Branch 是兵種（`+21`），值域 {1, 4, 5, 6}。
 	Branch uint8
 
@@ -152,6 +167,10 @@ func ParseGeneral(rec []byte) (General, error) {
 	g.AbilityC = rec[genOffAbilityC]
 	g.Province = ProvinceID(rec[genOffProvince])
 	g.Force = binary.LittleEndian.Uint16(rec[genOffForce:])
+	g.TitlePrefix = rec[genOffTitlePrefix]
+	g.TitleNumber = rec[genOffTitleNumber]
+	g.TitleSuffix = rec[genOffTitleSuffix]
+	g.FactionName = rec[genOffFactionName]
 	return g, nil
 }
 
@@ -166,6 +185,10 @@ func (g *General) Bytes() [GeneralRecordSize]byte {
 	out[genOffAbilityC] = g.AbilityC
 	out[genOffProvince] = byte(g.Province)
 	binary.LittleEndian.PutUint16(out[genOffForce:], g.Force)
+	out[genOffTitlePrefix] = g.TitlePrefix
+	out[genOffTitleNumber] = g.TitleNumber
+	out[genOffTitleSuffix] = g.TitleSuffix
+	out[genOffFactionName] = g.FactionName
 	return out
 }
 
