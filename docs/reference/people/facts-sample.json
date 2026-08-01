@@ -1,0 +1,576 @@
+{
+  "$comment": "10 篇試寫的事實骨架。schema 定義見 docs/design/21-biography-authoring-spec.md §2。這是研究素材，不是執行期資料。",
+  "schema_version": "1",
+  "generated": "2026-08-01",
+  "batch": "sample-10",
+  "sources": {
+    "S-GPOST": {
+      "tier": "A",
+      "title": "中華民國政府官職資料庫（國立政治大學圖書館）",
+      "url": "https://gpost.lib.nccu.edu.tw/",
+      "note": "取自《政府公報》《國民政府公報》的任免令，逐筆帶日期。對中低階將領的覆蓋遠優於維基。",
+      "fetched": "2026-08-01"
+    },
+    "S-WPZH": {
+      "tier": "B",
+      "title": "中文維基百科",
+      "url": "https://zh.wikipedia.org/",
+      "note": "以有引註的條目為限；消歧義頁與無引註段落不採用。",
+      "fetched": "2026-08-01"
+    },
+    "S-DIGROC": {
+      "tier": "A",
+      "title": "中國文化大學《中華百科全書》民國近代史人物庫",
+      "url": "https://digroc.pccu.edu.tw/",
+      "note": "直接 fetch 回 403，本輪僅取得搜尋摘要片段，未核對全文，證據等級降一級處理。",
+      "fetched": "2026-08-01"
+    },
+    "S-1937NJ": {
+      "tier": "B",
+      "title": "南京民間抗日戰爭博物館：林詩學〈國民黨粵系六十六軍始末〉",
+      "url": "http://www.1937nanjing.org/kanzhanlishi/laobingkoushu/2021/0506/3836.html",
+      "fetched": "2026-08-01"
+    },
+    "S-TYDAO": {
+      "tier": "C",
+      "title": "太原道《山西文史》：大同和平解放的經過",
+      "url": "http://www.tydao.com/suwu/jindai/0521-datong.htm",
+      "note": "地方文史整理稿，無逐條引註。只當線索，不計入獨立來源數。",
+      "fetched": "2026-08-01"
+    },
+    "S-GDLQW": {
+      "tier": "C",
+      "title": "廣東老區網／抗日戰爭紀念網：〈記雲浮籍著名抗日將領葉肇〉",
+      "url": "http://www.gdlqw.com/hxwh/hssj/content/post_552605.html",
+      "note": "同一篇文章在兩站轉載，算一個來源。",
+      "fetched": "2026-08-01"
+    },
+    "S-CN-ENCY": {
+      "tier": "C",
+      "title": "百度百科／求真百科／華人百科／百科知識等中文百科站",
+      "url": "",
+      "note": "文本互相轉載、同源，一律合併計為一個 Tier C 線索，不計入獨立來源數。",
+      "fetched": "2026-08-01"
+    }
+  },
+  "people": [
+    {
+      "id": 1,
+      "name_ingame": "蔣中正",
+      "name_common": "蔣中正",
+      "identity": {
+        "courtesy": "介石",
+        "aliases": ["蔣周泰", "蔣志清", "蔣介石"],
+        "disambiguation": null
+      },
+      "life": {
+        "birth": { "year": 1887, "month": 10, "day": 31, "src": ["S-WPZH"], "conf": "high" },
+        "death": { "year": 1975, "month": 4, "day": 5, "src": ["S-WPZH"], "conf": "high" },
+        "birthplace": { "value": "浙江省寧波府奉化縣", "src": ["S-WPZH"], "conf": "high" }
+      },
+      "education": [
+        { "year": 1907, "institution": "通國陸軍速成學堂", "program": "炮兵", "src": ["S-WPZH"], "conf": "medium" },
+        { "year": 1908, "institution": "東京振武學校", "program": null, "end_year": 1910, "src": ["S-WPZH"], "conf": "high" },
+        { "year": 1910, "institution": "日本陸軍第十三師團野戰炮兵第十九聯隊", "program": "實習，未完成即因辛亥革命返國", "src": ["S-WPZH"], "conf": "medium" }
+      ],
+      "posts": [
+        { "from": "1918-03", "title": "援閩粵軍總司令部作戰科主任", "src": ["S-WPZH"], "conf": "medium" },
+        { "from": "1924-05-03", "title": "陸軍軍官學校（黃埔）校長", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1926-06-05", "title": "國民革命軍總司令", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1928-10-10", "to": "1931-12-15", "title": "國民政府主席", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1930-11-24", "title": "行政院院長", "note": "三度任職，最後一任至 1945-06-25", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1931-12-15", "to": "1946-05-31", "title": "國民政府軍事委員會委員長", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1938-04-01", "title": "中國國民黨總裁", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1942-01-03", "title": "同盟國中國戰區陸空軍最高統帥", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1948-05-20", "to": "1949-01-21", "title": "中華民國總統", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1950-03-01", "to": "1975-04-05", "title": "中華民國總統（復職）", "src": ["S-WPZH"], "conf": "high" }
+      ],
+      "events": [
+        { "when": "1926-07", "where": "廣州起，沿粵漢、津浦線北進", "role": "國民革命軍總司令", "name": "北伐", "outcome": "1928 年完成形式統一", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1936-12-12", "where": "西安", "role": "被扣留者", "name": "西安事變", "outcome": "遭張學良、楊虎城扣留後獲釋", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1937-07", "where": "全國", "role": "國民政府軍事委員會委員長", "name": "中國抗日戰爭全面爆發", "outcome": "統籌對日作戰至 1945", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1943-11", "where": "埃及開羅", "role": "與會領袖", "name": "開羅會議", "outcome": "議定戰後對日處置方向", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1949-12", "where": "臺灣", "role": "主導者", "name": "中華民國政府遷臺", "outcome": "政府機關遷往臺北", "src": ["S-WPZH"], "conf": "high" }
+      ],
+      "ending": { "when": "1975-04-05", "where": "臺北士林官邸", "how": "病逝", "src": ["S-WPZH"], "conf": "high" },
+      "verified_by": ["S-WPZH"],
+      "confidence": "high",
+      "conflicts": [
+        {
+          "field": "education",
+          "statements": [
+            { "src": "本人生前自述（經二手文獻轉述）", "says": "日本陸軍士官學校第六期畢業" },
+            { "src": "S-WPZH（依日方校史紀錄）", "says": "僅肄業於東京振武學校並在聯隊實習，未就讀日本陸軍士官學校" }
+          ],
+          "resolved": false,
+          "note": "查證助手未取得學術原文（黃自進等）逐字核對，維持並列。因與遊戲三期無關，依取捨優先序未寫入正文。"
+        }
+      ],
+      "gaps": ["本輪只用了一個獨立來源（維基）；國史館《事略稿本》未展開核對。核心事實屬公共知識、無爭議，仍判 high，但下一批應補一個 Tier A 來源。"]
+    },
+    {
+      "id": 58,
+      "name_ingame": "吳佩孚",
+      "name_common": "吳佩孚",
+      "identity": { "courtesy": "子玉", "aliases": [], "disambiguation": null },
+      "life": {
+        "birth": { "year": 1874, "month": 4, "day": 22, "src": ["S-WPZH"], "conf": "high" },
+        "death": { "year": 1939, "month": 12, "day": 4, "src": ["S-WPZH"], "conf": "high" },
+        "birthplace": { "value": "山東省登州府蓬萊縣", "src": ["S-WPZH", "S-DIGROC"], "conf": "high" }
+      },
+      "education": [
+        { "year": 1896, "institution": "登州府", "program": "秀才", "src": ["S-WPZH"], "conf": "high" },
+        { "year": 1898, "institution": "淮軍聶士成部", "program": "投效", "src": ["S-WPZH"], "conf": "medium" },
+        { "year": 1902, "institution": "保定陸軍速成學堂", "program": "測繪科", "src": ["S-WPZH"], "conf": "high" },
+        { "year": 1906, "institution": "北洋陸軍講武堂", "program": "畢業", "src": ["S-WPZH"], "conf": "high" }
+      ],
+      "posts": [
+        { "from": "1906", "title": "陸軍第三鎮步隊十一標第一營督隊官", "src": ["S-WPZH"], "conf": "medium" },
+        { "from": "1911", "title": "炮兵第三標標統", "src": ["S-WPZH"], "conf": "medium" },
+        { "from": "1918-02-05", "title": "署理陸軍第三師師長", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1920-09-02", "title": "直魯豫副巡閱使", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1921-08-09", "title": "兩湖巡閱使", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1922", "title": "陸軍上將、孚威上將軍", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1923-11-11", "title": "直魯豫巡閱使", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1924-09", "title": "討逆軍總司令", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1925", "title": "十四省討賊聯軍總司令", "src": ["S-WPZH"], "conf": "high" }
+      ],
+      "events": [
+        { "when": "1920-07", "where": "京津一帶", "role": "直系主將", "name": "直皖戰爭", "outcome": "直奉聯手擊敗皖系", "src": ["S-WPZH", "S-DIGROC"], "conf": "high" },
+        { "when": "1922-04", "where": "京漢、津浦沿線", "role": "直系主將", "name": "第一次直奉戰爭", "outcome": "奉系退往山海關外", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1924-09", "where": "山海關一線", "role": "討逆軍總司令", "name": "第二次直奉戰爭", "outcome": "因馮玉祥回師北京而戰敗", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1926-08", "where": "湖北汀泗橋、賀勝橋", "role": "直系主將", "name": "國民革命軍北伐", "outcome": "直軍主力被擊潰，武漢失守", "src": ["S-WPZH"], "conf": "high" }
+      ],
+      "ending": { "when": "1939-12-04", "where": "北平", "how": "死因無定論，見 conflicts", "src": ["S-WPZH"], "conf": "medium" },
+      "verified_by": ["S-WPZH", "S-DIGROC"],
+      "confidence": "high",
+      "conflicts": [
+        {
+          "field": "ending.how",
+          "statements": [
+            { "src": "S-WPZH（國民政府方面說法）", "says": "拒絕出任日方職務後，遭日方人員施治致死" },
+            { "src": "S-WPZH（前軍統人員李直峰說法）", "says": "重慶方面藉其牙疾令特工處置" },
+            { "src": "S-WPZH（現代部分研究）", "says": "1939-12-02 拔牙後感染引發敗血症，屬醫療意外" }
+          ],
+          "resolved": false,
+          "note": "三說皆見於同一維基條目並標明無定論。已寫入正文，句型為「一說…，一說…，一說…」。"
+        },
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-WPZH", "says": "1920-09-02 直魯豫副巡閱使" },
+            { "src": "S-DIGROC", "says": "1920-07 直皖戰爭時任討賊軍前敵總司令兼西路總指揮" }
+          ],
+          "resolved": false,
+          "note": "未釐清是否為同期並存的兩個職務。正文只寫時間明確的那一項。"
+        }
+      ],
+      "gaps": []
+    },
+    {
+      "id": 158,
+      "name_ingame": "楊森",
+      "name_common": "楊森",
+      "identity": {
+        "courtesy": "子惠",
+        "aliases": ["楊淑澤", "楊伯堅", "道號玉勇"],
+        "disambiguation": "維基「楊森」是消歧義頁。本條指四川廣安出身的川軍將領（維基條目「楊森 (中華民國將領)」），已排除清朝進士楊森、香港政治人物楊森、藥廠 Janssen（楊森）、棒球員楊森。判別依據：籍貫四川廣安 + 字子惠 + 生卒 1884–1977。另有一次搜尋摘要出現「楊森…湖南人」，無法核實原頁（403），判為摘要誤植，不採用。"
+      },
+      "life": {
+        "birth": { "year": 1884, "month": 2, "day": 20, "src": ["S-WPZH"], "conf": "high" },
+        "death": { "year": 1977, "month": 5, "day": 15, "src": ["S-WPZH"], "conf": "high" },
+        "birthplace": { "value": "四川省順慶府廣安州", "src": ["S-WPZH"], "conf": "high" }
+      },
+      "education": [
+        { "year": 1904, "institution": "四川陸軍速成學堂", "program": "入學", "end_year": 1908, "src": ["S-WPZH"], "conf": "high" }
+      ],
+      "posts": [
+        { "from": "1915-12", "title": "雲南護國軍第一軍第二梯團中校參謀", "src": ["S-WPZH"], "conf": "medium" },
+        { "from": "1917-02-16", "title": "陸軍步兵上校", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1920-12-30", "title": "瀘永鎮守使", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1923-09-05", "title": "陸軍中將", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1924-03-08", "title": "陸軍上將", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1924-05-27", "title": "督理四川軍務善後事宜", "src": ["S-GPOST", "S-WPZH"], "conf": "high" },
+        { "from": "1925-05-16", "to": "1926-01-09", "title": "北京政府參謀總長（署理）", "src": ["S-GPOST", "S-WPZH"], "conf": "high" },
+        { "from": "1926-10", "to": "1944-12", "title": "國民革命軍第二十軍軍長", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1927-11-07", "title": "國民政府軍事委員會委員", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1938-01", "title": "國民革命軍第二十七集團軍總司令", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1945-01-18", "to": "1948-04", "title": "貴州省政府主席", "src": ["S-GPOST", "S-WPZH"], "conf": "high" },
+        { "from": "1948-04", "to": "1949", "title": "重慶市市長", "src": ["S-WPZH"], "conf": "medium" }
+      ],
+      "events": [
+        { "when": "1915-12", "where": "雲南、四川", "role": "護國軍中校參謀", "name": "護國戰爭", "outcome": "由駐川滇軍轉入護國軍", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1925-07", "where": "四川", "role": "發動者", "name": "四川統一戰役", "outcome": "失利，退往漢口", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1927-05", "where": "湖北", "role": "第五路軍前敵總指揮", "name": "東征武漢", "outcome": "為國民革命軍（葉挺部）擊退", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1937", "where": "上海", "role": "第二十軍軍長", "name": "淞滬會戰", "outcome": "率部出川，編入第十九集團軍參戰", "src": ["S-WPZH"], "conf": "high" }
+      ],
+      "ending": { "when": "1977-05-15", "where": "臺北", "how": "病逝", "src": ["S-WPZH"], "conf": "high" },
+      "verified_by": ["S-WPZH", "S-GPOST"],
+      "confidence": "high",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-WPZH", "says": "1923–1924 任中央陸軍第十六師師長；1948–1949 任重慶市市長" },
+            { "src": "S-GPOST", "says": "未收錄這兩項" }
+          ],
+          "resolved": false,
+          "note": "官職資料庫以中央任免令為主，地方兼職與軍系內部任命未必收錄；此為覆蓋範圍落差，不等於維基有誤。正文保留重慶市市長（遊戲期外，一句帶過），刪去第十六師師長。"
+        }
+      ],
+      "gaps": ["S-GPOST 本輪只取回前 20 筆（共 50 筆），未取完整任職表。"]
+    },
+    {
+      "id": 204,
+      "name_ingame": "孫殿英",
+      "name_common": "孫殿英",
+      "identity": {
+        "courtesy": "魁元",
+        "aliases": ["孫科元", "乳名金貴", "時人稱「東陵大盜」（他稱，非本名）"],
+        "disambiguation": null
+      },
+      "life": {
+        "birth": { "year": 1889, "month": null, "day": null, "src": ["S-WPZH", "S-DIGROC"], "conf": "high" },
+        "death": { "year": 1947, "month": 9, "day": 30, "src": ["S-WPZH"], "conf": "high" },
+        "birthplace": { "value": "河南省歸德府永城縣", "src": ["S-WPZH", "S-DIGROC"], "conf": "high" }
+      },
+      "education": [
+        { "year": null, "institution": null, "program": "無正規軍校學歷；早年於河南、安徽一帶帶領地方武裝", "src": ["S-WPZH", "S-DIGROC"], "conf": "medium" }
+      ],
+      "posts": [
+        { "from": "1922", "title": "豫西鎮守使丁香玲部副官、機槍連連長", "src": ["S-WPZH", "S-DIGROC"], "conf": "high" },
+        { "from": "1925-03", "title": "國民軍第三軍（胡景翼部）師長", "src": ["S-WPZH"], "conf": "medium" },
+        { "from": "1925", "title": "直魯聯軍師長", "src": ["S-WPZH", "S-DIGROC"], "conf": "low", "note": "年份與番號兩來源不合，見 conflicts" },
+        { "from": "1927", "title": "第十四軍軍長兼大名鎮守使", "src": ["S-WPZH", "S-DIGROC"], "conf": "high" },
+        { "from": "1928-05", "title": "國民革命軍第十二軍軍長", "src": ["S-WPZH", "S-DIGROC"], "conf": "high" },
+        { "from": "1930", "title": "第四方面軍第五路總指揮", "src": ["S-DIGROC"], "conf": "medium", "note": "digroc 另載兼安徽省主席，維基未見" },
+        { "from": "1933-02", "title": "第四十一軍軍長", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1943-04-23", "title": "日方「和平救國軍」司令、豫北保安司令", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1945-08", "title": "新編第四路軍總指揮", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1946-07", "title": "暫編第三縱隊司令", "src": ["S-WPZH"], "conf": "medium" }
+      ],
+      "events": [
+        { "when": "1928-07", "where": "河北遵化清東陵（裕陵、定陵）", "role": "主導者，令部下譚溫江執行", "name": "東陵掘陵", "outcome": "取走陪葬器物，事後未受追究", "src": ["S-WPZH", "S-DIGROC"], "conf": "high" },
+        { "when": "1933-02", "where": "熱河赤峰", "role": "第四十一軍軍長", "name": "熱河作戰", "outcome": "與日軍作戰七晝夜後撤退", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1934-01", "where": "寧夏", "role": "第四十一軍軍長", "name": "四馬拒孫之役", "outcome": "與馬鴻逵、馬鴻賓、馬步芳、馬步青部作戰", "src": ["S-DIGROC"], "conf": "medium" },
+        { "when": "1943-04-23", "where": "河南林縣", "role": "所部指揮官", "name": "林縣失守後改隸日方", "outcome": "所部改編為「和平救國軍」", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1947-05-02", "where": "河南湯陰", "role": "暫編第三縱隊司令", "name": "湯陰作戰", "outcome": "被中國人民解放軍俘獲", "src": ["S-WPZH"], "conf": "high" }
+      ],
+      "ending": { "when": "1947-09-30", "where": "河北省武安縣戰俘營", "how": "身故；一說絕食，一說因病", "src": ["S-WPZH"], "conf": "medium" },
+      "verified_by": ["S-WPZH", "S-DIGROC"],
+      "confidence": "high",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-WPZH", "says": "1925 年後任奉系張宗昌部第五師師長、直魯聯軍第二十五師師長" },
+            { "src": "S-DIGROC", "says": "1926 年投張宗昌，任直魯聯軍褚玉璞部第五師師長" }
+          ],
+          "resolved": false,
+          "note": "年份（1925/1926）與番號（第二十五師）皆不合。正文只寫「其後改隸直魯聯軍任師長」，不寫年份與番號。"
+        },
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-DIGROC", "says": "1924 年為鎮嵩軍收編任旅長；1930 年兼安徽省主席" },
+            { "src": "S-WPZH", "says": "未列此二項年份" }
+          ],
+          "resolved": false
+        },
+        {
+          "field": "ending.how",
+          "statements": [
+            { "src": "S-WPZH", "says": "絕食而死" },
+            { "src": "S-WPZH", "says": "長期吸食鴉片致病故" }
+          ],
+          "resolved": false
+        }
+      ],
+      "editorial_notes": [
+        "本篇是編輯方針的壓力測試。原 people.json 的 faction 欄位寫成「多次易幟（直系→鎮嵩軍→…→日軍→汪精衛政府→…）」，屬敘事性歸納而非機構名；骨架改為逐條列任職，讓易幟成為序列本身的結果，不另下判語。",
+        "「東陵大盜」是他稱綽號。依 §21 spec §4.3，綽號可寫但必須帶歸屬（「時人稱」），不得當主語或定性。",
+        "不使用「投敵」「漢奸」「偽軍」。1943 年改隸日方一事只寫時間、單位名稱與職務。"
+      ],
+      "gaps": ["S-DIGROC 僅取得搜尋摘要，未核對全文。"]
+    },
+    {
+      "id": 93,
+      "name_ingame": "王獻臣",
+      "name_common": "王獻臣",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "中文維基「王献臣」條目是明代拙政園創建者（1493 年進士），非同一人，已排除。"
+      },
+      "life": {
+        "birth": { "year": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1923-07", "to": "1924-02", "title": "福建陸軍第三師師長", "org": "原福建督軍李厚基部", "station": "長汀", "src": ["S-WPZH"], "conf": "medium" },
+        { "from": "1913-11-27", "title": "授陸軍步兵中尉兼上尉", "src": ["S-GPOST"], "conf": "low", "note": "見 conflicts：與上一列是否同一人待考" },
+        { "from": "1914-07-15", "title": "授陸軍步兵上尉", "src": ["S-GPOST"], "conf": "low" },
+        { "from": "1915-05-08", "title": "授陸軍步兵少校", "src": ["S-GPOST"], "conf": "low" },
+        { "from": "1919-01-10", "title": "授陸軍步兵中校兼上校", "src": ["S-GPOST"], "conf": "low" },
+        { "from": "1921-09-02", "title": "加銜陸軍少將", "src": ["S-GPOST"], "conf": "low" },
+        { "from": "1923-04-14", "title": "汀杭鎮守使", "src": ["S-GPOST"], "conf": "low" },
+        { "from": "1923-08-23", "title": "授陸軍中將", "src": ["S-GPOST"], "conf": "low" }
+      ],
+      "events": [
+        { "when": "1923-07", "where": "福建漳州", "role": "四名共組者之一", "name": "「聯軍辦事處」成立", "outcome": "與粵軍黃大偉、贛軍賴世璜、桂軍劉志陸割據閩南汀漳道一帶", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1924-02", "where": "福建漳州", "role": "共組者", "name": "「聯軍辦事處」瓦解", "outcome": "北洋方面介入、張毅倒戈後解體；王獻臣其後行止不詳", "src": ["S-WPZH"], "conf": "medium" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-WPZH", "S-GPOST"],
+      "confidence": "low",
+      "conflicts": [
+        {
+          "field": "identity",
+          "statements": [
+            { "src": "S-WPZH", "says": "王獻臣為李厚基舊部、福建陸軍第三師師長，原駐長汀，1923-07–1924-02 參與漳州「聯軍辦事處」" },
+            { "src": "S-GPOST", "says": "一名王獻臣自 1913 年起歷敘陸軍步兵中尉至中校，1921 年加銜陸軍少將，1923-04-14 任汀杭鎮守使，1923-08-23 授陸軍中將" }
+          ],
+          "resolved": false,
+          "note": "⚠️ 沒有任何來源把這兩筆直接連起來。汀杭鎮守使的轄區（汀州、上杭，即閩西長汀一帶）與時間都與前者相合，但這是本輪查證者的推定，不是來源的陳述。依 §21 spec §5.3，推定的接合一律降為 low，正文用「待考句」呈現，不得逕自合併。"
+        }
+      ],
+      "gaps": [
+        "生卒年、籍貫、字號、學歷、結局皆查無。",
+        "《漳州文史資料選輯》（漳州市政協，1982）是維基該段的引註來源，本輪無管道取得原書。這是下一步最該補的一手材料。"
+      ]
+    },
+    {
+      "id": 353,
+      "name_ingame": "葉肇",
+      "name_common": "葉肇",
+      "identity": { "courtesy": "伯芹", "aliases": ["葉賡泮（原名）"], "disambiguation": null },
+      "life": {
+        "birth": { "year": 1892, "src": ["S-GDLQW"], "conf": "low" },
+        "death": { "year": 1953, "src": ["S-GDLQW"], "conf": "low" },
+        "birthplace": { "value": "廣東省新興縣（今雲浮市新興縣）", "src": ["S-GDLQW"], "conf": "low", "note": "「雲浮籍」與「廣東新興」不衝突：新興縣今屬雲浮市。" }
+      },
+      "education": [
+        { "year": 1919, "institution": "保定陸軍軍官學校", "program": "第六期", "src": ["S-WPZH", "S-GDLQW"], "conf": "medium" }
+      ],
+      "posts": [
+        { "from": "1936-01-29", "title": "陸軍少將", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1936-08-07", "title": "陸軍第一百五十二師師長", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1936-09-30", "title": "陸軍第一百六十師師長", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1936-10-05", "title": "陸軍中將", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1937", "title": "國民革命軍第六十六軍軍長（以第一百六十師師長兼）", "src": ["S-WPZH", "S-1937NJ"], "conf": "high" },
+        { "from": "1939-秋", "title": "國民革命軍第三十七集團軍總司令", "src": ["S-WPZH", "S-GDLQW"], "conf": "high" },
+        { "from": "1949-08-03", "title": "廣州綏靖公署副主任兼廣州綏靖公署西江指揮所指揮官", "src": ["S-GPOST"], "conf": "high" }
+      ],
+      "events": [
+        { "when": "1937-08", "where": "上海吳淞口", "role": "第六十六軍軍長", "name": "淞滬會戰", "outcome": "激戰一月，損失慘重", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1937-12", "where": "南京", "role": "第六十六軍軍長", "name": "南京保衛戰", "outcome": "突圍時一度為日軍俘獲後脫離；殘部較完整撤出", "src": ["S-WPZH", "S-1937NJ"], "conf": "high" },
+        { "when": "1938-初", "where": "廣東、湖南攸縣", "role": "第六十六軍軍長", "name": "重建第六十六軍", "outcome": "整補後駐湖南攸縣", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1938-07", "where": "江西德安萬家嶺", "role": "第六十六軍軍長", "name": "武漢會戰／萬家嶺戰役", "outcome": "完成阻絕防禦任務", "src": ["S-WPZH", "S-1937NJ"], "conf": "high" },
+        { "when": "1939-末", "where": "廣西永淳", "role": "第三十七集團軍總司令", "name": "桂南會戰", "outcome": "未依令按時開拔至永淳，遭免職", "src": ["S-WPZH"], "conf": "medium" },
+        { "when": "1949-12", "where": "廣東肇慶、新興、雲浮", "role": "殘部指揮官", "name": "所部潰散", "outcome": "殘部被殲，本人經香港赴臺灣", "src": ["S-GDLQW"], "conf": "low" }
+      ],
+      "ending": { "when": "1953", "where": "臺灣", "how": "病故，終年 61 歲", "src": ["S-GDLQW"], "conf": "low" },
+      "verified_by": ["S-GPOST", "S-WPZH", "S-1937NJ", "S-GDLQW"],
+      "confidence": "medium",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-GPOST", "says": "1949-08-03 任廣州綏靖公署副主任兼西江指揮所指揮官" },
+            { "src": "S-GDLQW", "says": "1949 年 3 月調任廣州市警備司令部司令兼廣州綏靖公署副主任" }
+          ],
+          "resolved": false,
+          "note": "任命日期與兼職不合。正文採 S-GPOST（Tier A，帶公報日期），不寫 3 月一說——依 §21 spec §4.4，Tier A 與 Tier C 相衝時不並列，直接採 A 並在骨架記帳。"
+        }
+      ],
+      "gaps": ["生卒年、籍貫、晚年去向只有一個 Tier C 來源（同一篇文章的兩處轉載）。這是本篇判 medium 而非 high 的唯一原因。"],
+      "supersedes": "原 people.json 此筆來源為抗日戰爭紀念網（Tier C）+ 維基第六十六軍條目。本輪新增 S-GPOST（Tier A）五筆帶日期的任免令，並補上原文缺漏的 1939 年桂南會戰免職一事。"
+    },
+    {
+      "id": 356,
+      "name_ingame": "劉膺古",
+      "name_common": "劉膺古",
+      "identity": { "courtesy": "邦銳", "aliases": [], "disambiguation": null },
+      "life": {
+        "birth": { "year": 1894, "month": 3, "day": 18, "src": ["S-CN-ENCY"], "conf": "low" },
+        "death": { "year": 1966, "month": 6, "day": 10, "src": ["S-CN-ENCY"], "conf": "low" },
+        "birthplace": { "value": "浙江省寧海縣", "src": ["S-CN-ENCY"], "conf": "low" }
+      },
+      "education": [
+        { "year": null, "institution": "保定陸軍軍官學校", "program": "期別有第四期與第八期兩說", "src": ["S-CN-ENCY"], "conf": "low" }
+      ],
+      "posts": [
+        { "from": "1927-11-28", "title": "國民政府軍事委員會參謀廳第二局第六科科長", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1928-12-11", "title": "國民政府參謀本部上校參謀", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1929-09-23", "title": "國軍編遣委員會直轄第三編遣分區辦事處委員", "src": ["S-GPOST", "S-CN-ENCY"], "conf": "high" },
+        { "from": "1930-03-24", "title": "參謀本部參謀", "src": ["S-GPOST", "S-CN-ENCY"], "conf": "high" },
+        { "from": "1933-12-14", "title": "贛粵閩湘鄂剿匪軍西路第二縱隊司令", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1936-02-01", "title": "湖南省保安處處長", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1936-10-16", "title": "陸軍少將", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1938-01", "to": "1939-02", "title": "國民革命軍第八十七軍軍長（首任）", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1938-03-04", "title": "湖南省保安處處長（再任）", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1938-06-24", "title": "陸軍中將", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1949-07-11", "title": "總統府參軍", "src": ["S-GPOST"], "conf": "high" }
+      ],
+      "events": [
+        { "when": "1938-01", "where": "湖南", "role": "首任軍長", "name": "第八十七軍成軍", "outcome": "由湖南省保安團隊改編的第一百九十八師、第一百九十九師合編而成，隸軍事委員會直轄", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1938-06", "where": "武漢周邊", "role": "第八十七軍軍長", "name": "武漢會戰", "outcome": "率部參戰", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1939-02", "where": "—", "role": "卸任軍長", "name": "第八十七軍改隸與換將", "outcome": "所轄兩師調第十八軍，軍長由周祥初接任", "src": ["S-WPZH"], "conf": "high" }
+      ],
+      "ending": { "when": null, "where": null, "how": "1949 年任總統府參軍後去向未查得；卒年 1966 僅 Tier C 來源", "src": ["S-CN-ENCY"], "conf": "low" },
+      "verified_by": ["S-GPOST", "S-WPZH", "S-CN-ENCY"],
+      "confidence": "medium",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-WPZH", "says": "1939-02 卸任軍長後調軍官訓練團第二總隊總隊長" },
+            { "src": "S-CN-ENCY", "says": "1939 年任第十九集團軍副總司令" }
+          ],
+          "resolved": false,
+          "note": "兩說皆未見於 S-GPOST。已寫入正文，句型為「一說…，一說…」。"
+        },
+        {
+          "field": "education",
+          "statements": [
+            { "src": "S-CN-ENCY（百度系）", "says": "保定軍校第八期步科" },
+            { "src": "S-CN-ENCY（保定將領名錄轉貼）", "says": "保定軍校第四期" }
+          ],
+          "resolved": false,
+          "note": "兩說皆 Tier C。正文寫「期別有兩說」，不採任一。"
+        }
+      ],
+      "gaps": ["生卒年、籍貫僅 Tier C。原 people.json 的「第四路軍參謀長」「新編第七師參謀長」「第十六師副師長」三項本輪未在任何獨立來源核實，已從骨架剔除。"],
+      "supersedes": "原 people.json 此筆主來源為百度百科。本輪以 S-GPOST（Tier A，10 筆帶日期任免令）與 S-WPZH 第八十七軍條目重建，剔除三項無法核實的職務。"
+    },
+    {
+      "id": 367,
+      "name_ingame": "許鴻林",
+      "name_common": "許鴻林",
+      "identity": { "courtesy": null, "aliases": [], "disambiguation": null },
+      "life": {
+        "birth": { "year": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [
+        { "year": null, "institution": "保定陸軍軍官學校", "program": null, "src": ["S-CN-ENCY"], "conf": "low", "note": "僅見於論壇轉貼的「保定軍校將領錄」，無獨立佐證。未寫入正文。" }
+      ],
+      "posts": [
+        { "from": "1933-03-09", "title": "陸軍第六十六師參謀長", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1935-05-01", "title": "陸軍步兵上校", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1937-05-07", "title": "陸軍少將", "src": ["S-GPOST"], "conf": "high" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST"],
+      "confidence": "low",
+      "conflicts": [],
+      "gaps": [
+        "生卒年、籍貫、字號、結局全部查無。",
+        "只有一個可靠來源（S-GPOST）。三筆任免令之間有 2 年空隙，無法串成連續的任職序列。",
+        "下一步：《民國職官年表》（劉壽林等編）查 1933 年陸軍第六十六師的編成與所屬軍系，可望定位其所屬派系。"
+      ],
+      "supersedes": "原 people.json 此筆唯一來源是文學城 BBS 貼文（Tier C），內容僅「保定出身、軍階少將」。本輪改以 S-GPOST（Tier A）取得三筆帶日期的任免令。信心度仍判 low——來源可靠度升級了，但獨立來源數仍是 1。"
+    },
+    {
+      "id": 368,
+      "name_ingame": "于鎮河",
+      "name_common": "于鎮河",
+      "identity": { "courtesy": null, "aliases": [], "disambiguation": null },
+      "life": {
+        "birth": { "year": 1898, "src": ["S-CN-ENCY", "S-TYDAO"], "conf": "low" },
+        "death": { "year": 1985, "month": 10, "src": ["S-CN-ENCY", "S-TYDAO"], "conf": "low" },
+        "birthplace": { "value": "山西省渾源縣", "src": ["S-CN-ENCY"], "conf": "low" }
+      },
+      "education": [
+        { "year": 1923, "institution": "山西陸軍學校", "program": null, "src": ["S-TYDAO"], "conf": "low", "note": "Tier C，未寫入正文。" }
+      ],
+      "posts": [
+        { "from": "1936-08-26", "title": "陸軍少將", "src": ["S-GPOST"], "conf": "high" },
+        { "from": "1947-10", "title": "大同軍事指揮部總指揮官", "src": ["S-WPZH"], "conf": "high" },
+        { "from": "1947-10", "title": "第八集團軍副總司令兼第十九軍軍長", "src": ["S-WPZH"], "conf": "medium" },
+        { "from": "1949-後", "title": "山西省人民政府參事", "src": ["S-WPZH", "S-TYDAO"], "conf": "medium" }
+      ],
+      "events": [
+        { "when": "1937", "where": "山西平型關、忻口", "role": "新編獨立第四旅旅長", "name": "太原會戰相關作戰", "outcome": "參戰", "src": ["S-TYDAO"], "conf": "low", "note": "Tier C 單一來源，未寫入正文。" },
+        { "when": "1949-04-26", "where": "大同城外", "role": "守軍最高指揮官", "name": "大同和平交接談判", "outcome": "守軍派師長田尚志、副師長王元令出城為代表", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1949-04-27", "where": "大同三十里舖", "role": "守軍方（由陳泮喜代表）", "name": "雙方會談", "outcome": "與孟祥祉等人會談", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1949-04-29", "where": "大同", "role": "守軍最高指揮官", "name": "簽訂「和平解放大同協議書」", "outcome": "守軍放下武器", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1949-05-01", "where": "大同", "role": "—", "name": "解放軍入城接管", "outcome": "大同易手", "src": ["S-WPZH"], "conf": "high" }
+      ],
+      "ending": { "when": "1985-10", "where": "山西", "how": "逝世", "src": ["S-CN-ENCY", "S-TYDAO"], "conf": "low" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-WPZH", "says": "第八集團軍副總司令" },
+            { "src": "S-TYDAO（經搜尋摘要，未核對原文）", "says": "第十八集團軍副總司令" }
+          ],
+          "resolved": false,
+          "note": "⚠️ 未寫入正文。第十八集團軍是抗戰期間八路軍的番號，用在晉綏軍將領身上明顯異常；且本輪只看到搜尋引擎摘要，沒核對 S-TYDAO 原文，無法排除是摘要誤植。依 §21 spec §4.4，未核對原文的分歧只進骨架不進正文。"
+        }
+      ],
+      "gaps": [
+        "生卒年、籍貫、學歷、抗戰期間經歷都只有 Tier C 來源。",
+        "S-TYDAO 原文未核對（只有搜尋摘要）。下一步應直接抓該頁全文。"
+      ],
+      "supersedes": "原 people.json 此筆唯一來源是百度百科。本輪新增 S-GPOST（1936 敘少將）與 S-WPZH「大同和平解放」條目（1947 職務、1949 談判逐日經過），把「稱『晉北指揮』」這個來源不明的稱謂換成有出處的正式職銜。"
+    },
+    {
+      "id": 383,
+      "name_ingame": "張淦",
+      "name_common": "張淦",
+      "identity": {
+        "courtesy": "潔齋",
+        "aliases": ["號濟公", "時人稱「羅盤將軍」（他稱）"],
+        "disambiguation": null
+      },
+      "life": {
+        "birth": { "year": 1897, "src": ["S-CN-ENCY"], "conf": "low" },
+        "death": { "year": 1959, "month": 2, "src": ["S-CN-ENCY"], "conf": "low" },
+        "birthplace": { "value": "廣西省桂林", "src": ["S-CN-ENCY"], "conf": "low" }
+      },
+      "education": [
+        { "year": null, "institution": "廣西陸軍速成學校", "program": null, "src": ["S-CN-ENCY"], "conf": "low" }
+      ],
+      "posts": [
+        { "from": null, "title": "國民革命軍第二十一集團軍參謀長", "src": ["S-WPZH"], "conf": "medium" },
+        { "from": "1938", "title": "國民革命軍第七軍軍長（接周祖晃）", "src": ["S-WPZH", "S-CN-ENCY"], "conf": "high" },
+        { "from": "1939-11-13", "title": "陸軍中將", "src": ["S-GPOST", "S-CN-ENCY"], "conf": "high" },
+        { "from": "1947", "title": "第三兵團司令官（轄第七軍、第四十八軍）", "src": ["S-WPZH"], "conf": "medium", "note": "年份有分歧，見 conflicts" },
+        { "from": "1949-07-16", "title": "華中軍政長官公署副長官", "src": ["S-GPOST", "S-CN-ENCY"], "conf": "high" }
+      ],
+      "events": [
+        { "when": "1937–1938", "where": "上海、徐州、武漢", "role": "第七軍軍長", "name": "淞滬會戰、徐州會戰、武漢會戰", "outcome": "率部參戰", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1949-09", "where": "湖南青樹坪", "role": "第三兵團司令官", "name": "青樹坪戰役", "outcome": "所部獲勝", "src": ["S-WPZH", "S-CN-ENCY"], "conf": "medium" },
+        { "when": "1949-10", "where": "湖南衡陽、寶慶", "role": "第三兵團司令官", "name": "衡寶戰役", "outcome": "兵團損失重大，退入廣西", "src": ["S-WPZH"], "conf": "high" },
+        { "when": "1949-12-01", "where": "廣西博白", "role": "第三兵團司令官", "name": "廣西戰役", "outcome": "為中國人民解放軍俘獲", "src": ["S-CN-ENCY"], "conf": "medium" }
+      ],
+      "ending": { "when": "1959-02", "where": "北京功德林戰犯管理所", "how": "病故", "src": ["S-CN-ENCY"], "conf": "low" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-WPZH", "says": "1947 年升任第三兵團司令官" },
+            { "src": "S-CN-ENCY", "says": "1948 年 8 月任第三兵團司令官" }
+          ],
+          "resolved": false,
+          "note": "已寫入正文，句型為「一說…，一說…」。"
+        }
+      ],
+      "gaps": [
+        "生卒年、字號、籍貫、學歷、結局全部只有 Tier C（百度系互相轉載，合併算一個來源）。",
+        "綽號「羅盤將軍」與其由來只有 Tier C，未達兩來源門檻，未寫入正文。",
+        "第三兵團被俘與後續拘押的細節，Tier A/B 來源只確認到「廣西戰役中三兵團損失重大」，博白被俘的日期仍待 Tier A 佐證。"
+      ],
+      "supersedes": "原 people.json 此筆來源為求真百科 + 網易號文章。本輪新增 S-GPOST（1939 敘中將、1949 華中軍政長官公署副長官，兩筆日期與 Tier C 說法完全吻合）與 S-WPZH 第七軍條目。Tier C 的日期經 Tier A 對上，可信度提高，但生卒仍無獨立佐證。"
+    }
+  ]
+}
