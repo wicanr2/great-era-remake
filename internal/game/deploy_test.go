@@ -269,3 +269,55 @@ func TestDeployAvoidsCellsNextToEnemies(t *testing.T) {
 		t.Error("第一輪找不到安全格時，原版會硬塞，不該失敗")
 	}
 }
+
+// 移動：格子轉移、佔用表兩邊都要更新、機動力照扣。
+func TestMoveConsumesMovementAllowance(t *testing.T) {
+	var occ Occupancy
+	start, _ := CellAt(6, 6)
+	u := &CombatUnit{General: 58, Cell: start, Max: 10, Current: 10}
+	occ[start] = u.General
+
+	dst, err := occ.Move(u, DirDown, 3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want, _ := CellAt(6, 7); dst != want {
+		t.Errorf("落點 = %d，應為 %d", dst, want)
+	}
+	if u.Cell != dst {
+		t.Errorf("單位的格沒更新：%d", u.Cell)
+	}
+	if u.Current != 7 {
+		t.Errorf("剩餘機動力 = %d，應為 7", u.Current)
+	}
+	if occ[start] != 0 {
+		t.Errorf("舊格沒清空：occ[%d] = %d", start, occ[start])
+	}
+	if occ[dst] != u.General {
+		t.Errorf("新格沒指回單位：occ[%d] = %d", dst, occ[dst])
+	}
+
+	// 機動力不足要擋下，而且不能動到任何狀態。
+	before := *u
+	if _, err := occ.Move(u, DirDown, 99); err == nil {
+		t.Error("機動力不足卻走得動")
+	}
+	if *u != before {
+		t.Error("移動失敗卻改了單位狀態")
+	}
+
+	// 目標格有人也要擋。
+	nb, _ := u.Cell.Neighbour(DirUp)
+	occ[nb] = 999
+	if _, err := occ.Move(u, DirUp, 1); err == nil {
+		t.Error("目標格有人卻走得進去")
+	}
+
+	// 出界要擋。
+	edge, _ := CellAt(0, 0)
+	e := &CombatUnit{General: 1, Cell: edge, Max: 9, Current: 9}
+	occ[edge] = 1
+	if _, err := occ.Move(e, DirUp, 1); err == nil {
+		t.Error("走出上邊界卻沒被擋")
+	}
+}

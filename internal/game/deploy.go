@@ -70,7 +70,7 @@ func CellAt(col, row int) (CellIndex, error) {
 }
 
 // 六角鄰接。位移表出自 `sub_4E65C`，邊界規則出自 `sub_510E0`
-// （`docs/re/07` §7）。
+// （`docs/re/07` §6）。
 
 // HexDir 是六個方向，編號與原版一致（`sub_55CEC` 的迴圈跑 1..6）。
 type HexDir int
@@ -233,4 +233,35 @@ func (o *Occupancy) enemyNeighbours(c CellIndex, enemy func(GeneralID) bool) int
 		}
 	}
 	return n
+}
+
+// Move 把單位從現在的格移到相鄰的一格，語意照 `sub_4A1C0`
+// 與其呼叫端 `sub_4ABFD` 的三道 gate（`docs/re/07` §7）：
+//
+//  1. 目標格必須六角相鄰且在界內（`sub_510E0`）
+//  2. 目標格必須可進入（`sub_4A583`，規則未解——這裡用「沒人站」代替，
+//     真正的規則解出來之前不要當成完整判斷）
+//  3. 剩餘機動力 `+7` 必須 >= 該步的成本
+//
+// **成本怎麼算未解**，所以由呼叫端傳進來。原版的成本是一張以方向為索引的
+// 表，在移動前算好，推測與目標格的地形有關，但沒有追到填表處。
+func (o *Occupancy) Move(u *CombatUnit, d HexDir, cost uint8) (CellIndex, error) {
+	if u.General == 0 || !u.Cell.Valid() {
+		return NoCell, fmt.Errorf("game: 單位不在場上，無法移動")
+	}
+	dst, ok := u.Cell.Neighbour(d)
+	if !ok {
+		return NoCell, fmt.Errorf("game: 格 %d 的方向 %d 出界", u.Cell, d)
+	}
+	if o[dst] != 0 {
+		return NoCell, fmt.Errorf("game: 格 %d 已被單位 %d 佔住", dst, o[dst])
+	}
+	if u.Current < cost {
+		return NoCell, fmt.Errorf("game: 剩餘機動力 %d 不足 %d", u.Current, cost)
+	}
+	o[u.Cell] = 0
+	u.Cell = dst
+	u.Current -= cost
+	o[dst] = u.General
+	return dst, nil
 }
