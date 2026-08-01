@@ -122,3 +122,55 @@ func TestSpriteTransparency(t *testing.T) {
 		t.Error("索引 1 應該畫上去")
 	}
 }
+
+// TestDrawGlyph 驗證字模繪製：bit=1 畫前景，bit=0 不畫（透明）。
+func TestDrawGlyph(t *testing.T) {
+	var g assets.Glyph
+	// 第 0 列最左一點亮，其餘全暗
+	g[0] = 0x80
+	c := NewCanvas(assets.GlyphW, assets.GlyphH)
+	fg := assets.RGB{R: 0xFF, G: 0xFF, B: 0xFF}
+	c.DrawGlyph(g, fg, 0, 0)
+
+	if r, _, _, _ := c.Image().At(0, 0).RGBA(); r == 0 {
+		t.Error("(0,0) 的 bit 是 1，應該畫上前景")
+	}
+	if r, gg, b, _ := c.Image().At(1, 0).RGBA(); r != 0 || gg != 0 || b != 0 {
+		t.Error("(1,0) 的 bit 是 0，應該保持底色（透明）")
+	}
+}
+
+// TestDrawEntryKeepsPadding 驗證 DrawEntry 不濾掉空白字模。
+//
+// assets.GlyphFile.Entry 會濾掉空白（那是給文字還原用的），
+// 但畫面上的空白格子是排版的一部分，繪製時不能省。
+func TestDrawEntryKeepsPadding(t *testing.T) {
+	data := readFile(t, gameDir, "MAN115")
+	f, err := assets.ParseGlyphFile(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// 找一個兩字姓名（三格中有一格空白）
+	var k int = -1
+	for i := 0; i < f.EntryCount(3); i++ {
+		e, err := f.Entry(i, 3)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(e) == 2 {
+			k = i
+			break
+		}
+	}
+	if k < 0 {
+		t.Skip("MAN115 裡沒有兩字姓名")
+	}
+	c := NewCanvas(assets.GlyphW*3, assets.GlyphH)
+	if err := c.DrawEntry(f, k, 3, assets.RGB{R: 0xFF}, 0, 0); err != nil {
+		t.Fatal(err)
+	}
+	// 三格都在畫布範圍內，沒有因為濾掉空白而左移
+	if c.Bounds().Dx() != assets.GlyphW*3 {
+		t.Errorf("畫布寬 = %d，預期 %d", c.Bounds().Dx(), assets.GlyphW*3)
+	}
+}
