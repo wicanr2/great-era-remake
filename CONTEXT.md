@@ -120,6 +120,7 @@
 | `docs/re/10-troop-transfer.md` | **調動的執行層**：`sub_1408F` 八個模式、兵力門檻、調動即佔領；推翻「剩餘命令數」 | ✅ |
 | `tools/callgraph.py` | **呼叫圖遞移閉包**：查「這條路徑會不會走到 X」。讀骨架會漏分支，呼叫圖不會 | ✅ |
 | `docs/re/14-acted-flag-and-last-step.md` | **`+32` bit 2 = 回合分流開關**（推翻「已徵過稅」）；`sub_15CE3` 讀完也是調動——決策鏈八支零例外 | ✅ |
+| `docs/re/16-game-over.md` | **勝負判定全解**：覆滅／統一／**第一期時限民國 26 年 7 月（七七事變）**；結局代碼寫進 `Config.dat` 給 `GRTE.EXE` | ✅ |
 | `docs/playtest/11-invented-rule-cost.md` | ⛔ **一條自己發明的規則讓長跑差了兩個勢力**；移除後 4→2、拿下省 63→81 | ✅ |
 | `docs/playtest/10-recruit-economics.md` | **徵兵：10 兵 = 1 黃金**（兩樣本+一次計算零誤差）；選單結構、「重新整編」確認存在 | ✅ |
 | `docs/playtest/09-full-loop-dryrun.md` | **端到端跑完 300 回合**：穩定不崩，但勢力 9→3 後凍結——暴露「只有消耗沒有補充」 | ✅ |
