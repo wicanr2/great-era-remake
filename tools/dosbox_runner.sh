@@ -20,6 +20,13 @@ xvfb_pid=$!
 for _ in $(seq 1 50); do [[ -S /tmp/.X11-unix/X99 ]] && break; sleep 0.1; done
 [[ -S /tmp/.X11-unix/X99 ]] || { echo "Xvfb 沒起來" >&2; exit 1; }
 
+# [雷] Xvfb 起來時**沒有鍵盤映射表**（`xmodmap -pk` 輸出 0 行）。
+# 沒有 keymap，xdotool 送出的鍵盤事件產不出有效的 keycode，
+# DOSBox 收到也解讀不了——畫面完全沒反應，而且 xdotool 不會報錯。
+setxkbmap -display :99 us 2>/dev/null || true
+keymap_rows=$(xmodmap -display :99 -pk 2>/dev/null | wc -l)
+echo "[probe] keymap 載入 ${keymap_rows} 列"
+
 cleanup() { kill "${dosbox_pid:-}" 2>/dev/null || true; kill "$xvfb_pid" 2>/dev/null || true; }
 trap cleanup EXIT
 
