@@ -131,7 +131,7 @@ func TestDecideBattleBDeployAndStrike(t *testing.T) {
 
 	// §42：值 4 要 EnableLastSteps 且 sub_56D49。
 	in = base
-	in.EnableLastSteps, in.Sub56D49 = true, true
+	in.EnableLastSteps, in.FoeLeaderOnField = true, true
 	if got := DecideBattleB(in); got.Action != ActBStrikeForce {
 		t.Errorf("該走打敵方主力周邊，實際 %s", BattleActionName(got.Action))
 	}
@@ -147,7 +147,7 @@ func TestDecideBattleAStep5(t *testing.T) {
 	base := BattleAIInput{SideStrength: 100, FoeStrength: 80, EnableLastSteps: true}
 
 	in := base
-	in.Sub56D49, in.Sub53619 = true, true
+	in.FoeLeaderOnField, in.Sub53619 = true, true
 	if got := DecideBattleA(in); got.Action != ActARecompute {
 		t.Errorf("sub_53619 為真該走重算全軍，實際 %s", BattleActionName(got.Action))
 	}
@@ -156,7 +156,7 @@ func TestDecideBattleAStep5(t *testing.T) {
 		t.Errorf("sub_53619 為假該走只處理待命，實際 %s", BattleActionName(got.Action))
 	}
 	// 前置不成立就落到預設。
-	in.Sub56D49 = false
+	in.FoeLeaderOnField = false
 	if got := DecideBattleA(in); got.Action != ActADefault {
 		t.Errorf("前置不成立該落到預設，實際 %s", BattleActionName(got.Action))
 	}

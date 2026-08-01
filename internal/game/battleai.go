@@ -103,10 +103,14 @@ type BattleAIInput struct {
 	// ⚠️ 語意未解。
 	DeployGateOpen bool
 
-	// Sub56D49 是 `sub_56D49(0)` 的結果——**三處共用**的前置：
-	// 值 4（`sub_3AABA`）、值 16／17（`sub_3A94E`）、值 19 的前置（§40）。
-	// ⚠️ 81 行未讀，是這條線目前投報最高的一支。
-	Sub56D49 bool
+	// FoeLeaderOnField 是 `sub_56D49(0)`：**當前交戰省的司令本人
+	// 在不在守方的隊伍裡**（§44）。
+	//
+	// 原版掃第二方的 10 個單位，看有沒有一個就是 `word_64944`（省司令）。
+	// 四個決策點共用它——值 4、值 16、值 17、值 19。
+	//
+	// ⭐ **守方主帥親自坐鎮，是電腦改變打法的觸發點。**
+	FoeLeaderOnField bool
 
 	// Sub53619 是 `sub_53619(0)` 的結果，決定值 16 還是 17（§43）。
 	// ⚠️ 未讀。§16 的 5.0 必勝門檻成立後也接它。
@@ -152,7 +156,7 @@ func DecideBattleB(in BattleAIInput) BattleDecision {
 
 	// 第三步 `sub_3AABA` → 值 4（§42）：`sub_56D49(0)` 成立就設。
 	// ⚠️ `sub_56D49` 未讀（81 行，三處共用），用 `Sub56D49` 讓呼叫端傳。
-	if in.EnableLastSteps && in.Sub56D49 {
+	if in.EnableLastSteps && in.FoeLeaderOnField {
 		return BattleDecision{Action: ActBStrikeForce, Step: "sub_3AABA"}
 	}
 
@@ -210,7 +214,7 @@ func DecideBattleA(in BattleAIInput) BattleDecision {
 
 	// 第五步 `sub_3A94E`（§43）：`sub_56D49(0)` 是前置，
 	// `sub_53619(0)` 決定 16 還是 17。
-	if in.EnableLastSteps && in.Sub56D49 {
+	if in.EnableLastSteps && in.FoeLeaderOnField {
 		if in.Sub53619 {
 			return BattleDecision{Action: ActARecompute, Step: "sub_3A94E"}
 		}
@@ -231,7 +235,7 @@ var UndecidedBattleSteps = []string{
 	"sub_3A8F7 在 14／15／18 之間怎麼選",
 	"sub_3AA51 在 1／3 之間怎麼選",
 	"比率門檻的來源：word_64932/34/36/38 與 sub_3A4CE（§42 挖到第五層停手）",
-	"sub_56D49（81 行，三處共用：值 4／16／17／19）＋ sub_53619 ＋ word_6493A",
+	"sub_53619（決定值 16 還是 17）＋ word_6493A（分支 B 值 2 的閘門）",
 }
 
 // BattleActionName 回傳行動的中文名稱，給紀錄與測試訊息用。
