@@ -4,6 +4,7 @@
     ./tools/py.sh tools/addr.py -6221h
     ./tools/py.sh tools/addr.py 7A8Bh 62A8h 625Ah 7A92h
     ./tools/py.sh tools/addr.py --bases          列出所有已知基址
+    ./tools/py.sh tools/addr.py byte_6F532       IDA 符號／線性位址也吃
 
 ## 為什麼要這個（2026-08-01）
 
@@ -29,16 +30,63 @@
 
 import sys
 
+# ── ⭐⭐ 兩套位址是同一件事（2026-08-02 解開）─────────────────────────
+#
+# 同一塊記憶體在這個專案裡有**兩個名字**，而且兩份索引原本互不相通：
+#
+#   IDA 的線性位址   byte_6F532        （反組譯筆記、savelayout.go 用這個）
+#   遊戲的 ds: 偏移   ds:0B382h         （組語裡實際出現的是這個）
+#
+# 換算：**線性 = DSEG_BASE + ds偏移**。`DSEG_BASE` 不是推的——
+# 直接問 IDA 的段表（`get_segm_start`），`dseg` 起點就是它。
+#
+# ⚠️ 組語裡的負位移就是 ds 偏移的補數：`[di-435Bh]` == `[di+0BCA5h]`。
+# 這件事害我 grep `byte_6F532` 查不到自己寫過的註解——
+# `internal/game/ceasefire.go` 早就記著「每省 60 B 的戰爭記錄表 ds:B346h，
+# 39 × 60 = 2,340 B」，而那正是 `.DT1` 的區塊 2。
+# **答案在自己的程式碼裡，只是用另一個名字寫的。**
+DSEG_BASE = 0x641B0  # WAR.EXE 的 dseg 起點（IDA 段表，confirmed）
+
+
+def lin_to_ds(lin: int) -> int:
+    """IDA 線性位址 → 遊戲的 ds: 偏移。"""
+    return (lin - DSEG_BASE) & 0xFFFF
+
+
+def ds_to_lin(off: int) -> int:
+    """遊戲的 ds: 偏移 → IDA 線性位址。"""
+    return DSEG_BASE + (off & 0xFFFF)
+
+
 # ── 記錄基址（16-bit，可為負，會被當成 0x10000 的補數）─────────────────
 #
 # 每一列：基址 → (名稱, 記錄大小, 出處, 推論等級)
+#
+# ⭐ 通則（2026-08-02）：**這些基址都是「真正的起點 − 一筆大小」**，
+# 因為省編號是 **1-based**（省 1..39）。組語的形狀一律是
+# `mul <一筆大小>` → `add di, <基址>`，省編號 1 就落在真正的第一筆上。
+# 拿基址直接當「第 0 筆的位址」會整整差一筆。
 BASES = [
     (0x7A7D, "執行期單位記錄", 33, "docs/re/05 / docs/spec/02", "confirmed"),
     (-0x6235, "省份記錄", 37, "docs/re/20 §基址", "confirmed"),
+    (-0x4CBA, "戰爭記錄", 60, "docs/formats/07 §3 / ceasefire.go", "confirmed"),
+    (-0x435B, "停火狀態", 1, "docs/formats/07 §6 / ceasefire.go", "confirmed"),
 ]
 
 # ── 已解出的欄位（記錄名 → {偏移: (語意, 出處, 推論等級)}）──────────────
 FIELDS = {
+    "戰爭記錄": {
+        0: ("交戰的一方（`sub_21168` 在停火中時二選一回傳）；"
+            "⚠️ 兩份存檔的值都不像將領 ID，語意未解",
+            "docs/formats/07 §3", "未知"),
+        2: ("交戰的另一方（同上）", "docs/formats/07 §3", "未知"),
+        38: ("u16 陣列的起點（`sub_2D812` 以 var×2 索引寫入）；兩份存檔全零",
+             "docs/formats/07 §3", "未知"),
+    },
+    "停火狀態": {
+        0: ("停火中則 > 0；同意停火時 `inc`，形狀像剩餘月數但沒有證據",
+            "docs/formats/07 §6 / ceasefire.go", "強證據"),
+    },
     "執行期單位記錄": {
         0: ("能力值", "docs/spec/02", "confirmed"),
         3: ("經驗（劇本檔一律 0，只有存檔有值）", "docs/spec/02 §7 / playtest/08", "confirmed"),
