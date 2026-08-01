@@ -12,6 +12,7 @@ INT 66h 的外部驅動程式（`SDFA.EXE`）解譯。
     tools/py.sh tools/mus.py events     # 解析事件串並統計
     tools/py.sh tools/mus.py midi       # 匯出 Standard MIDI File 到 workplace/audio/midi/
     tools/py.sh tools/mus.py notes NAME # 列出單曲的音符（含音高名）
+    tools/py.sh tools/mus.py style      # 編制、調式吻合度、音級分佈
 
 輸出一律寫到 workplace/audio/（已 gitignore）；原版素材唯讀。
 """
@@ -324,6 +325,40 @@ def cmd_notes(song: str, limit: int = 120) -> None:
         print(f"  {NOTE_NAMES[pc]:<3}{c:>5}")
 
 
+MAJOR = [0, 2, 4, 5, 7, 9, 11]
+GONG = [0, 2, 4, 7, 9]          # 宮五聲（= 西洋大調五聲）
+
+
+def _fit(pcs: Counter[int], scale: list[int]) -> tuple[float, int]:
+    tot = sum(pcs.values()) or 1
+    return max(((sum(c for p, c in pcs.items() if p in {(r + i) % 12 for i in scale}) / tot, r)
+                for r in range(12)))
+
+
+def cmd_style() -> None:
+    """調式與編制分析——`docs/design/30-audio-direction.md` §1 那幾張表的來源。"""
+    print(f"{'曲名':<10}{'秒':>7}{'BPM':>5}{'模式':>5}{'聲部':>5}{'音色':>5}  編制")
+    for song in SONGS:
+        m = parse_mus((AUDIO / f"{song}.MUS").read_bytes())
+        t = parse_tim((AUDIO / f"{song}.TIM").read_bytes())
+        ch = sorted({s & 0xF for _, s, _ in m["events"] if s < 0xF0})
+        h = m["hdr"]
+        print(f"{song:<10}{h['seconds']:>7.1f}{h['basicTempo']:>5}"
+              f"{'打擊' if h['soundMode'] else '旋律':>5}{len(ch):>5}{t['count']:>5}  "
+              f"{','.join(t['names'])}")
+
+    print("\n音級分佈與調式吻合度（僅旋律聲部 0–5）")
+    for song in SONGS:
+        m = parse_mus((AUDIO / f"{song}.MUS").read_bytes())
+        pcs = Counter(p[0] % 12 for _, s, p in m["events"]
+                      if s < 0xF0 and (s >> 4) == 9 and p[1] != 0 and (s & 0xF) < 6)
+        tot = sum(pcs.values()) or 1
+        fm, fp = _fit(pcs, MAJOR), _fit(pcs, GONG)
+        print(f"{song:<10} n={tot:<5} 大調七聲 {fm[0]:.2f}@{NOTE_NAMES[fm[1]]:<3}"
+              f" 五聲 {fp[0]:.2f}@{NOTE_NAMES[fp[1]]:<3} | "
+              + " ".join(f"{NOTE_NAMES[i]}:{pcs.get(i, 0) * 100 // tot:>2}%" for i in range(12)))
+
+
 def main(argv: list[str]) -> int:
     cmd = argv[1] if len(argv) > 1 else "tim"
     if cmd == "tim":
@@ -334,6 +369,8 @@ def main(argv: list[str]) -> int:
         cmd_events()
     elif cmd == "midi":
         cmd_midi()
+    elif cmd == "style":
+        cmd_style()
     elif cmd == "notes":
         cmd_notes(argv[2] if len(argv) > 2 else "MAINTHEM")
     else:

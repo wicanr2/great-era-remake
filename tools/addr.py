@@ -98,29 +98,42 @@ def parse(tok: str) -> int:
     return -v if neg else v
 
 
-def explain(addr: int) -> list[str]:
+def lookup(addr: int) -> list[dict]:
+    """回傳結構化的查詢結果，**含推論等級**。
+
+    ⚠️ 等級一定要跟著語意一起傳出去。使用者 2026-08-01 質疑
+    「在 IDA 裡命名」的理由正是：**名字不帶推論等級，讀起來像事實**，
+    取錯了就把錯誤烙進之後每一次 dump。附加式的註記若也拿掉等級，
+    就犯同一個錯。
+    """
     out = []
     a = norm(addr)
 
-    # 1) 直接命中全域表
     for base, (desc, src, level) in GLOBALS.items():
         if norm(base) == a:
-            out.append(f"  ⭐ 全域：{desc}")
-            out.append(f"     出處 {src}｜{level}")
+            out.append({"kind": "全域", "desc": desc, "src": src, "level": level})
 
-    # 2) 落在某個記錄的欄位上
     for base, name, size, src, level in BASES:
         delta = (a - norm(base)) & 0xFFFF
-        # 只在合理範圍內解釋：欄位偏移應該小於記錄大小
         if delta < size:
             fields = FIELDS.get(name, {})
             if delta in fields:
                 d, fsrc, flevel = fields[delta]
-                out.append(f"  ⭐ {name} **+{delta}** = {d}")
-                out.append(f"     基址 {fmt(base)}（{src}，{level}）｜欄位出處 {fsrc}｜{flevel}")
+                out.append({"kind": f"{name} +{delta}", "desc": d,
+                            "src": fsrc, "level": flevel})
             else:
-                out.append(f"  ・{name} +{delta}（**這個欄位還沒解**）")
-                out.append(f"     基址 {fmt(base)}（{src}）")
+                out.append({"kind": f"{name} +{delta}", "desc": "這個欄位還沒解",
+                            "src": src, "level": "未知"})
+    return out
+
+
+def explain(addr: int) -> list[str]:
+    """人讀的版本（`addr.py` 直接執行時用）。"""
+    out = []
+    for r in lookup(addr):
+        mark = "⭐" if r["level"] == "confirmed" else "・"
+        out.append(f"  {mark} {r['kind']}：{r['desc']}")
+        out.append(f"     出處 {r['src']}｜**{r['level']}**")
     return out
 
 
