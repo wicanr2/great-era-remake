@@ -99,6 +99,19 @@ type BattleAIInput struct {
 	RatioGateSelf bool
 	RatioGateFoe  bool
 
+	// DeployGateOpen 是分支 B 值 2 獨有的額外閘門（原版 `word_6493A == 0`，§43）。
+	// ⚠️ 語意未解。
+	DeployGateOpen bool
+
+	// Sub56D49 是 `sub_56D49(0)` 的結果——**三處共用**的前置：
+	// 值 4（`sub_3AABA`）、值 16／17（`sub_3A94E`）、值 19 的前置（§40）。
+	// ⚠️ 81 行未讀，是這條線目前投報最高的一支。
+	Sub56D49 bool
+
+	// Sub53619 是 `sub_53619(0)` 的結果，決定值 16 還是 17（§43）。
+	// ⚠️ 未讀。§16 的 5.0 必勝門檻成立後也接它。
+	Sub53619 bool
+
 	// EnableLastSteps 是 `byte_6FFCA & 4`：**啟用後面幾步**。
 	//
 	// 與政略決策鏈的「啟用最後三步」是同一個位元、同一個手法
@@ -118,7 +131,18 @@ type BattleAIInput struct {
 // 所以這裡跑出來的結果會偏向「必勝結算」與「預設打城市」兩種。
 // 這是**已知的偏差**，不是 bug——補讀那兩支之前不要拿它對原版做行為驗收。
 func DecideBattleB(in BattleAIInput) BattleDecision {
-	// 第一步 `sub_3A9F4` → 值 2（佈防）。**未讀**，先不決定。
+	// 第一步 `sub_3A9F4` → 值 2（佈防）。
+	//
+	// ⭐⭐ 條件與分支 A 的 `sub_3A885`（值 12）**完全相同**，
+	// 只多一個 `word_6493A == 0`（§43）：
+	//
+	//	同一個局勢下，分支 A 選「推倒重來」、分支 B 選「佈防」——
+	//	兩者都是重整型的行動，兩條鏈的反應是同構的。
+	//
+	// ⚠️ `word_6493A` 的語意未解，用 `DeployGateOpen` 讓呼叫端傳。
+	if in.RatioGateSelf && in.RatioGateFoe && in.DeployGateOpen {
+		return BattleDecision{Action: ActBDeploy, Step: "sub_3A9F4 兩方比率門檻"}
+	}
 
 	// 第二步 `sub_3AA51`：第一方被壓到第二方的五分之一以下 → 必勝結算。
 	if ForceRatioLE(in.SideStrength, in.FoeStrength,
@@ -126,9 +150,11 @@ func DecideBattleB(in BattleAIInput) BattleDecision {
 		return BattleDecision{Action: ActBDecisive, Step: "sub_3AA51 必勝門檻"}
 	}
 
-	// 第三步 `sub_3AABA` → 值 4。**未讀**，先不決定。
-	// 原版這一步要 `byte_6FFCA & 4` 才跑，旗標留在這裡當紀錄。
-	_ = in.EnableLastSteps
+	// 第三步 `sub_3AABA` → 值 4（§42）：`sub_56D49(0)` 成立就設。
+	// ⚠️ `sub_56D49` 未讀（81 行，三處共用），用 `Sub56D49` 讓呼叫端傳。
+	if in.EnableLastSteps && in.Sub56D49 {
+		return BattleDecision{Action: ActBStrikeForce, Step: "sub_3AABA"}
+	}
 
 	return BattleDecision{Action: ActBTakeCity, Step: "預設"}
 }
@@ -182,7 +208,14 @@ func DecideBattleA(in BattleAIInput) BattleDecision {
 		return BattleDecision{Action: ActADecapitateKeepOne, Step: "sub_3A8F7 勢均"}
 	}
 
-	// 第五步 `sub_3A94E` → 值 16／17。**未讀**。
+	// 第五步 `sub_3A94E`（§43）：`sub_56D49(0)` 是前置，
+	// `sub_53619(0)` 決定 16 還是 17。
+	if in.EnableLastSteps && in.Sub56D49 {
+		if in.Sub53619 {
+			return BattleDecision{Action: ActARecompute, Step: "sub_3A94E"}
+		}
+		return BattleDecision{Action: ActAStandbyOnly, Step: "sub_3A94E"}
+	}
 
 	return BattleDecision{Action: ActADefault, Step: "預設"}
 }
@@ -194,13 +227,11 @@ func DecideBattleA(in BattleAIInput) BattleDecision {
 //
 // 補完一支就從這裡移除一筆，並在 `docs/re/31` 補一節。
 var UndecidedBattleSteps = []string{
-	"sub_3A94E → 值 16／17（分支 A 第五步）",
 	"sub_3A817 在 11／12／16／17 之間怎麼選",
 	"sub_3A8F7 在 14／15／18 之間怎麼選",
-	"sub_3A9F4 → 值 2（分支 B 第一步，何時佈防）",
 	"sub_3AA51 在 1／3 之間怎麼選",
 	"比率門檻的來源：word_64932/34/36/38 與 sub_3A4CE（§42 挖到第五層停手）",
-	"sub_56D49（值 4 與值 19 的共用前置，81 行）",
+	"sub_56D49（81 行，三處共用：值 4／16／17／19）＋ sub_53619 ＋ word_6493A",
 }
 
 // BattleActionName 回傳行動的中文名稱，給紀錄與測試訊息用。

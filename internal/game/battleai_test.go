@@ -113,3 +113,51 @@ func TestDecideBattleARatioGates(t *testing.T) {
 		t.Errorf("必勝門檻該先攔下，實際 %s", BattleActionName(got.Action))
 	}
 }
+
+func TestDecideBattleBDeployAndStrike(t *testing.T) {
+	base := BattleAIInput{SideStrength: 100, FoeStrength: 90} // 不觸發必勝門檻
+
+	// §43：值 2（佈防）與分支 A 值 12 條件相同，只多 DeployGateOpen。
+	in := base
+	in.RatioGateSelf, in.RatioGateFoe, in.DeployGateOpen = true, true, true
+	if got := DecideBattleB(in); got.Action != ActBDeploy {
+		t.Errorf("兩方比率門檻 + 閘門開 該走佈防，實際 %s", BattleActionName(got.Action))
+	}
+	// 閘門關就跳過這一步。
+	in.DeployGateOpen = false
+	if got := DecideBattleB(in); got.Action == ActBDeploy {
+		t.Error("word_6493A 閘門關著時不該佈防")
+	}
+
+	// §42：值 4 要 EnableLastSteps 且 sub_56D49。
+	in = base
+	in.EnableLastSteps, in.Sub56D49 = true, true
+	if got := DecideBattleB(in); got.Action != ActBStrikeForce {
+		t.Errorf("該走打敵方主力周邊，實際 %s", BattleActionName(got.Action))
+	}
+	in.EnableLastSteps = false
+	if got := DecideBattleB(in); got.Action != ActBTakeCity {
+		t.Errorf("旗標沒開該落到預設打城市，實際 %s", BattleActionName(got.Action))
+	}
+}
+
+func TestDecideBattleAStep5(t *testing.T) {
+	// §43：sub_3A94E 用 sub_56D49 當前置、sub_53619 決定 16 還是 17。
+	// 要避開第四步（sub_3A8F7），所以讓「敵方 ≥ 我方 2/3」成立。
+	base := BattleAIInput{SideStrength: 100, FoeStrength: 80, EnableLastSteps: true}
+
+	in := base
+	in.Sub56D49, in.Sub53619 = true, true
+	if got := DecideBattleA(in); got.Action != ActARecompute {
+		t.Errorf("sub_53619 為真該走重算全軍，實際 %s", BattleActionName(got.Action))
+	}
+	in.Sub53619 = false
+	if got := DecideBattleA(in); got.Action != ActAStandbyOnly {
+		t.Errorf("sub_53619 為假該走只處理待命，實際 %s", BattleActionName(got.Action))
+	}
+	// 前置不成立就落到預設。
+	in.Sub56D49 = false
+	if got := DecideBattleA(in); got.Action != ActADefault {
+		t.Errorf("前置不成立該落到預設，實際 %s", BattleActionName(got.Action))
+	}
+}
