@@ -30,12 +30,16 @@ const (
 	AINone AIActionKind = iota
 	// AITransfer 是調動（`sub_14F9A`）。決策鏈六步裡有五步做這個。
 	AITransfer
-	// AIAttack 是攻打。
+	// AIAttack 是出兵。
 	//
-	// ⚠️ **政略決策鏈裡沒有任何一步會產生它**——六步全是調動
-	// （`docs/re/12`）。留著這個值是因為攻打確實存在（`docs/re/06`
-	// 解過進入戰鬥的三個 gate），只是觸發它的地方還沒找到。
+	// ⛔ 這裡原本寫「政略決策鏈裡沒有任何一步會產生它」。**那是錯的**——
+	// 決策鏈 **B**（`Decide`，`sub_15F3C`）確實六步全是調動，
+	// 但決策鏈 **A**（`ChainA`，`sub_17ADA`）的步驟 1／4／5／6 都會出兵
+	// （`docs/re/28`、`docs/re/29`，實機已驗 `docs/playtest/14`）。
 	AIAttack
+
+	// AIComfort 是慰勞軍民（`sub_3412B`），決策鏈 A 的步驟 0。
+	AIComfort
 )
 
 // AIWorld 是決策要用到的世界狀態。
