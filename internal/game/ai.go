@@ -64,10 +64,10 @@ const (
 	AISpreadMinGenerals = 3
 	// AISupplyMinGenerals 是往補給省調動的門檻（`sub_15A9A`，§6k）。
 	AISupplyMinGenerals = 4
-	// AIPoorestFrontGenerals / AIPoorestRearGenerals 是 `sub_15925` 的前置
+	// AIRichestFrontGenerals / AIRichestRearGenerals 是 `sub_15925` 的前置
 	// 門檻（`docs/re/12`）。**25 幾乎不可能達到**，所以前線省這一步等於關閉。
-	AIPoorestFrontGenerals = 25
-	AIPoorestRearGenerals  = 5
+	AIRichestFrontGenerals = 25
+	AIRichestRearGenerals  = 5
 	// AITransferableFrontCap / AITransferableRearCap 是 `sub_1588C` 收目標時
 	// 對「自己的省」的將領數上限。
 	AITransferableFrontCap = 15
@@ -198,7 +198,7 @@ func (w *AIWorld) chain(p ProvinceID) []func(ProvinceID) AIAction {
 		steps = []func(ProvinceID) AIAction{
 			w.pullBack,
 			func(q ProvinceID) AIAction { return w.generalTransfer(q, 2) },
-			func(q ProvinceID) AIAction { return w.poorestTransfer(q, true) },
+			func(q ProvinceID) AIAction { return w.richestTransfer(q, true) },
 		}
 	} else {
 		steps = []func(ProvinceID) AIAction{
@@ -206,7 +206,7 @@ func (w *AIWorld) chain(p ProvinceID) []func(ProvinceID) AIAction {
 			w.spreadOut,
 			func(q ProvinceID) AIAction { return w.generalTransfer(q, 1) },
 			w.reinforceFront,
-			func(q ProvinceID) AIAction { return w.poorestTransfer(q, false) },
+			func(q ProvinceID) AIAction { return w.richestTransfer(q, false) },
 		}
 	}
 	if w.EnableExtra {
@@ -493,7 +493,7 @@ func (w *AIWorld) supplyTransfer(p ProvinceID) AIAction {
 	return AIAction{}
 }
 
-// poorestTransfer 是 `sub_15925`（`docs/re/12`）。
+// richestTransfer 是 `sub_15925`（`docs/re/12`）。
 //
 // ⛔ **這一支原本被當成「攻打」，是誤判。** 它最後呼叫的是
 // `sub_14F9A(狀態, 2, 目標)`——調動，而且目標篩選 `sub_1588C`
@@ -507,12 +507,25 @@ func (w *AIWorld) supplyTransfer(p ProvinceID) AIAction {
 // 25 這個數字幾乎不會達到（`sub_1527A` 的增援上限才 15），
 // 所以**前線省這一步實際上等於關閉**。
 //
-// 目標依省份記錄 `+0`（黃金）**升序**排，挑最窮的那個
-// ——把部隊送去自己最缺錢的省。
-func (w *AIWorld) poorestTransfer(p ProvinceID, frontline bool) AIAction {
-	need := AIPoorestRearGenerals
+// 目標依省份記錄 `+0`（黃金）**降冪**排，挑**最富**的那個
+// ——把部隊送去自己最有錢的省。
+//
+// ⛔ 2026-08-01 訂正：這裡原本寫「升序、挑最窮」。`sub_14EBA` 的交換條件是
+//
+//	cx = 黃金(候選[i])      ; i 是外圈
+//	ax = 黃金(候選[j])      ; j 是內圈
+//	cmp ax, cx
+//	jbe 不換                ; 候選[j] ≤ 候選[i] 才跳過 → **大的往前換**
+//
+// 舊筆記把 `jbe` 讀成「大的不換」，方向整個反了。組語只有這一個指令決定
+// 排序方向，重讀即可確認，沒有其他證據支持舊說法。
+//
+// 訂正後與 `sub_15A9A`「往補給充足的省調動」（§6k）方向一致——
+// 兩支都是**往養得起兵的地方集中**，而不是把兵送去窮省。
+func (w *AIWorld) richestTransfer(p ProvinceID, frontline bool) AIAction {
+	need := AIRichestRearGenerals
 	if frontline {
-		need = AIPoorestFrontGenerals
+		need = AIRichestFrontGenerals
 	}
 	if w.GeneralCount(p) < need {
 		return AIAction{}
@@ -530,7 +543,7 @@ func (w *AIWorld) poorestTransfer(p ProvinceID, frontline bool) AIAction {
 		if np.Flags&ProvinceFlagInBattle != 0 {
 			continue
 		}
-		if best == 0 || int(np.Gold) < bestGold {
+		if best == 0 || int(np.Gold) > bestGold {
 			best, bestGold = n, int(np.Gold)
 		}
 	}
@@ -538,7 +551,7 @@ func (w *AIWorld) poorestTransfer(p ProvinceID, frontline bool) AIAction {
 		return AIAction{}
 	}
 	return AIAction{Kind: AITransfer, From: p, To: best,
-		TransferKind: int(TransferUnderHalfCapped), Step: "sub_15925 補窮省"}
+		TransferKind: int(TransferUnderHalfCapped), Step: "sub_15925 往富省集中"}
 }
 
 // transferable 是 `sub_1588C`：這個鄰省可不可以當目標。

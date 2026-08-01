@@ -114,7 +114,7 @@ func TestDecideProducesValidActions(t *testing.T) {
 		}
 		// 決策鏈實際會產生的調動類型：
 		//   0/1  一般調動（sub_150FC）
-		//   2    補窮省（sub_15925）
+		//   2    往富省集中（sub_15925）
 		//   3    分兵（sub_15667）
 		//   4    撤回後方（sub_1541E）、增援前線、補給調動
 		switch a.TransferKind {
@@ -367,4 +367,52 @@ func TestSpecialProvincesMatchWarposSentinel(t *testing.T) {
 func assetsProvinceGrids(t *testing.T) (*assets.ProvinceGrids, error) {
 	t.Helper()
 	return assets.ParseProvinceGrids(readGame(t, "WARPOS.DAT"))
+}
+
+// `sub_15925` 挑目標的方向：**黃金最多**的鄰省，不是最少的。
+//
+// ⛔ 這個測試是 2026-08-01 訂正時補的。舊實作挑最窮的，整套測試卻全綠——
+// 因為沒有任何一個測試檢查過排序方向，只檢查「目標是不是鄰省」。
+// 方向錯誤在行為統計裡也看不出來（兩個方向都會產生調動），
+// 這正是 `CLAUDE.md` §7.7「測試綠不是完成」的例子。
+func TestRichestTransferPicksRichest(t *testing.T) {
+	w := realWorld(t)
+	prov, err := w.Table.At(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ns := w.neighbours(prov)
+	if len(ns) < 2 {
+		t.Skip("省 1 的鄰省太少，測不了排序方向")
+	}
+
+	// 讓當前省有足夠的將領過門檻，鄰省全部是可調動的無主省。
+	prov.Commander = 7
+	w.Units = nil
+	for i := 0; i < AIRichestRearGenerals; i++ {
+		w.Units = append(w.Units, CombatUnit{Province: 1, Faction: 7, Active: true})
+		w.Strengths = append(w.Strengths, StrengthInput{})
+	}
+	var rich ProvinceID
+	for i, n := range ns {
+		np, err := w.Table.At(n)
+		if err != nil {
+			continue
+		}
+		np.Commander = 0 // 無主 → sub_1588C 直接放行
+		np.Flags &^= ProvinceFlagInBattle
+		np.Gold = uint16(1000 * (i + 1))
+		rich = n // 最後一個最有錢
+	}
+
+	a := w.richestTransfer(1, false)
+	if a.Kind != AITransfer {
+		t.Fatalf("應該產生調動，實際是 %v", a.Kind)
+	}
+	if a.To != rich {
+		got, _ := w.Table.At(a.To)
+		want, _ := w.Table.At(rich)
+		t.Errorf("挑了省 %d（黃金 %d），應該挑最富的省 %d（黃金 %d）",
+			a.To, got.Gold, rich, want.Gold)
+	}
 }

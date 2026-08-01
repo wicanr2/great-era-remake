@@ -86,22 +86,55 @@ jmp     結束
 
 ---
 
-## 5. `sub_14EBA`：挑最窮的省 — confirmed
+## 5. `sub_14EBA`：挑**最富**的省 — confirmed（2026-08-01 訂正）
 
 ```
-複製候選陣列（8 bytes，1-based）
+複製候選陣列（8 bytes，1-based）到堆疊
 for i = 1 .. n-1:
     for j = i+1 .. n:
-        if 省份[候選[j]].+0 < 省份[候選[i]].+0:  swap
+        if 省份[候選[j]].+0 > 省份[候選[i]].+0:  swap
 回 候選[1]
 ```
 
-排序鍵是省份記錄的 `+0` = **黃金**（`docs/spec/03` §2），
-交換條件 `cmp ax, cx / jbe 不換` 讓小的排前面——**升序**。
+排序鍵是省份記錄的 `+0` = **黃金**（`docs/spec/03` §2），選擇排序，**降冪**，
+所以回傳的是黃金最多的那個。
+
+### ⛔ 這一節原本寫「升序、挑最窮」，方向反了
+
+原文：
+
+```
+cx = 黃金(候選[i])       ; var_B = i，外圈
+ax = 黃金(候選[j])       ; var_C = j，內圈
+cmp     ax, cx
+jbe     short loc_14F78  ; ← 候選[j] ≤ 候選[i] 才跳過
+```
+
+`jbe` 的條件是 **ax ≤ cx 不換**，等於「只有內圈的比外圈的大才交換」，
+交換後外圈位置持有較大值——降冪。舊筆記把它讀成「小的排前面」，
+是把 `jbe` 的方向與 `ax`／`cx` 的歸屬一起弄反了。
+
+**排序方向由這一個指令單獨決定**，沒有其他證據支持舊說法；
+重讀同一段組語即可確認，不需要新的 oracle。
+
+相等時 `jbe` 也跳過，所以**相等保留較前面的**（原鄰省順序）。
+Go 實作用 `>` 比較，行為一致。
+
+### 訂正後與 §6k 方向一致
+
+`sub_15A9A`「往**補給充足**的省調動」（`70-ai.md` §6k）是早就 confirmed 的。
+舊的「挑最窮」讓兩支調動方向相反，訂正後兩支一致：
+
+> **把部隊往養得起兵的地方集中。**
 
 所以 `sub_15925` 的語意是：
 
-> **把部隊送去自己最缺錢的鄰省（或無主的鄰省）。**
+> **把部隊送去自己最有錢的鄰省（或無主的鄰省）。**
+
+⚠️ 這條訂正沒有被任何測試擋下來——舊實作挑最窮，整套測試仍全綠，
+因為測試只檢查「目標是不是鄰省」，從沒檢查排序方向。
+`TestRichestTransferPicksRichest` 是補上的方向測試，已用正對照確認它
+在舊實作下會紅。
 
 ---
 
@@ -166,7 +199,7 @@ call    sub_10193
 
 | 檔案 | 改了什麼 |
 |---|---|
-| `internal/game/ai.go` | `attack` → `poorestTransfer`，加 `transferable`（`sub_1588C`）與兩道門檻 |
+| `internal/game/ai.go` | `attack` → `richestTransfer`，加 `transferable`（`sub_1588C`）與兩道門檻 |
 | `internal/game/ai_test.go` | `TestGatesKeepAttackReachable` 的前提失效，改成 `TestGatesLeaveLaterStepsReachable` |
 | `docs/mechanics/70-ai.md` | §6i 的「調動與攻打兩種」訂正 |
 | `CONTEXT.md` | 推翻清單 5.15 |
