@@ -151,12 +151,15 @@ func (s *BattleSim) StrengthOf(u *Combatant) int {
 // `sub_53DA9` 那條鏈上，而那支的入口條件（`+8` 的狀態機、七項選單）
 // 尚未讀完。這裡只負責「一次交戰算多少」。
 //
-// ⚠️ **`a` 對應原版的 `arg_E`、`b` 對應 `arg_10`，但哪一個是攻方沒有確認。**
-// `sub_530B4` 的呼叫端還沒讀。這個對應會影響兵種 4 的特例方向
-// （`docs/playtest/04` §3）：實跑起來變成「兵種 4 打不動人」，
-// 如果原版的 A 其實是守方，那條特例讀起來會合理得多。
-// **在讀完呼叫端之前不要改**——訂正比新結論需要更硬的證據。
-func (s *BattleSim) Engage(a, b *Combatant) (lossA, lossB int, err error) {
+// **參數順序：`attacker` 是發動攻擊的一方。** 原版的對應是
+// `attacker → arg_10 (F)`、`target → arg_E (E)`——與直覺相反，
+// 但有證據（`docs/re/09` §2）：`sub_42C8F` 讓兵種 4 對射程內的目標
+// 發動遠程攻擊時，兵種 4 那個單位是 `arg_4`，一路傳下去就是 F。
+//
+// 這也讓「任一方是兵種 4 時 F 不受損失」變得合理：
+// **遠程攻擊者不吃反擊**。
+func (s *BattleSim) Engage(attacker, target *Combatant) (lossAttacker, lossTarget int, err error) {
+	a, b := attacker, target
 	if a == nil || b == nil {
 		return 0, 0, fmt.Errorf("game: 交戰雙方不得為 nil")
 	}
@@ -169,19 +172,20 @@ func (s *BattleSim) Engage(a, b *Combatant) (lossA, lossB int, err error) {
 	atkOnB := AttackValue(s.StrengthOf(a), ta, a.Branch(), tb, b.Branch())
 	atkOnA := AttackValue(s.StrengthOf(b), tb, b.Branch(), ta, a.Branch())
 
+	// 攻擊者是 F、目標是 E（見上）。
 	if Lopsided(atkOnA, atkOnB) {
 		// 一面倒：損失由「打在自己身上的攻擊值」決定。
-		lossA, lossB = CasualtiesRout(atkOnA, atkOnB,
-			a.Force(), b.Force(), a.Branch(), b.Branch())
+		lossTarget, lossAttacker = CasualtiesRout(atkOnB, atkOnA,
+			b.Force(), a.Force(), b.Branch(), a.Branch())
 	} else {
-		// 勢均力敵：pct 用「各自打出去的攻擊值」之比，
-		// **不是打在身上的**——傳反會變成「打得越兇損失越大」。
-		lossA, lossB = CasualtiesEven(atkOnB, atkOnA,
-			a.Force(), b.Force(), a.Branch(), b.Branch())
+		// 勢均力敵：pct 用「各自打出去的攻擊值」之比。
+		// E = target、F = attacker，所以 atkByE 是目標打出去的那個。
+		lossTarget, lossAttacker = CasualtiesEven(atkOnA, atkOnB,
+			b.Force(), a.Force(), b.Branch(), a.Branch())
 	}
-	a.applyLoss(lossA)
-	b.applyLoss(lossB)
-	return lossA, lossB, nil
+	a.applyLoss(lossAttacker)
+	b.applyLoss(lossTarget)
+	return lossAttacker, lossTarget, nil
 }
 
 func (s *BattleSim) tileOf(u *Combatant) assets.Tile {
