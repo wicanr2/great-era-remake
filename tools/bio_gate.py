@@ -2,6 +2,7 @@
 
     ./tools/py.sh tools/bio_gate.py batch09
     ./tools/py.sh tools/bio_gate.py --all
+    ./tools/py.sh tools/bio_gate.py --cross    # 跨批次：重複 id 與整體進度
 
 四項檢查：格數 ≤ 340、可畫性、`facts.json` 合法且 id 對得上、禁用詞。
 
@@ -176,11 +177,45 @@ def gate(batch: str) -> int:
     return 0 if bad == 0 else 1
 
 
+def cross_check() -> int:
+    """跨批次檢查：**同一個 id 有沒有被兩批各做一次**，以及全體進度。
+
+    ⛔ 2026-08-02 踩到：派工分群用 `faction` 的「含」字比對，
+    `#11 朱培德` 同時含「滇」與「國民革命軍」，於是 C3 與 C4 各做了一次。
+    警語擋不住這種事（我在派工單裡明明寫了「不在既有 facts-*.json 裡」），
+    所以做成檢查。
+    """
+    raw = json.loads((PEOPLE / "people.json").read_text(encoding="utf-8"))
+    ppl = {p["id"]: p for p in (raw["people"] if isinstance(raw, dict) else raw)}
+    owner: dict[int, list[str]] = {}
+    conf: dict[str, int] = {}
+    for f in sorted(PEOPLE.glob("facts-*.json")):
+        try:
+            j = json.loads(f.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as e:
+            print(f"⛔ {f.name} JSON 壞了：{e}")
+            return 1
+        b = f.stem.replace("facts-", "")
+        for p in j.get("people", []):
+            owner.setdefault(p["id"], []).append(b)
+            conf[p.get("confidence", "?")] = conf.get(p.get("confidence", "?"), 0) + 1
+
+    dups = {i: b for i, b in owner.items() if len(b) > 1}
+    print(f"跨批次：已建骨架 {len(owner)} 筆 / 名冊 {len(ppl)} 筆")
+    print(f"  自撰 confidence 分佈：{conf}")
+    print(f"  ⛔ 重複的 id：{dups}" if dups else "  重複的 id：✔ 無")
+    rest = sorted(set(ppl) - set(owner))
+    print(f"  未做：{len(rest)} 筆" + (f"（前 10：{rest[:10]}）" if rest else ""))
+    return 1 if dups else 0
+
+
 def main() -> int:
     argv = sys.argv[1:]
     if not argv or argv[0] in ("-h", "--help"):
         print(__doc__)
         return 0
+    if argv[0] == "--cross":
+        return cross_check()
     if argv[0] == "--all":
         batches = sorted(p.stem.replace("bios-", "") for p in PEOPLE.glob("bios-*.md"))
     else:
