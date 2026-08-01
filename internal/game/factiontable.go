@@ -10,12 +10,13 @@ import "fmt"
 //
 //	勢力槽 = 24 × 59 byte
 //
-//	+0        u8      領袖的將領 ID（1-based；0 = 空槽）
-//	+1        u8      恆為 0（未解）
+//	+0        u16     領袖的將領 ID（1-based；0 = 空槽）
+//	                  ⛔ 初稿讀成 u8 + 「+1 恆為 0（未解）」。`sub_3512B` 用
+//	                  `mov es:[di], ax` 一次寫兩個 byte——**+1 是高位元組**。
 //	+2        u8      未解，劇本開場由 `sub_32FB2` 寫死
 //	+3..+10   8×u8    全部 0FFh，24 槽都一樣
-//	+11..+34  24×u8   對其餘 24 個勢力的關係值
-//	+35..+58  24×u8   前 10 槽全零（未解）
+//	+11..+34  24×u8   對其餘 24 個勢力的關係值（1-based 索引）
+//	+35..+58  24×u8   與關係值成對的第二個維度（1-based；開局全零）
 //
 // 11 + 24 + 24 = 59 ✔
 //
@@ -31,8 +32,7 @@ const (
 	// FactionSlotSize 是每個勢力槽的大小。
 	FactionSlotSize = 59
 
-	facOffLeader    = 0
-	facOffUnknown1  = 1
+	facOffLeader    = 0 // u16
 	facOffUnknown2  = 2
 	facOffSentinels = 3
 	facOffRelation  = 11
@@ -45,11 +45,25 @@ const (
 // 用途未解；`0xFF` 在這個專案裡一貫是「沒有」的哨兵（`CLAUDE.md` §7 第 6.5 條）。
 const FactionSentinel = 0xFF
 
-// FactionRelationDefault 是開局時彼此的關係值。
+// 關係值的兩個常數，來自 `sub_34A4E`——某個勢力做了某件事之後，
+// **其他所有勢力對它的關係值**被這樣處理：
 //
-// ⚠️ **不要叫它「敵對」**——開局所有勢力對彼此都是這個值，
-// 而遊戲裡並不是所有人一開始就在打仗。定名要等外交指令的反組譯。
-const FactionRelationDefault = 100
+//	rel < 150  →  rel = 100      （拉回預設）
+//	rel ≥ 150  →  rel -= 20      （原本友好的，扣 20）
+//
+// 所以 100 是預設值、150 是一道門檻，而且**關係值可以超過 100**。
+// 同一支函式還把兩邊的 `+35..+58` 都清成 0。
+//
+// ⚠️ 「150 以上 = 同盟」「`+35..+58` = 盟約狀態」是**推論**，不是驗過的。
+// 觸發這支函式的事件也還沒追（呼叫者 `sub_3523B`）。
+const (
+	// FactionRelationDefault 是開局值，也是 `sub_34A4E` 的拉回目標。
+	FactionRelationDefault = 100
+	// FactionRelationFriendly 是 `sub_34A4E` 的分界（`cmp ..., 96h`）。
+	FactionRelationFriendly = 150
+	// FactionRelationPenalty 是超過門檻時扣的量（`sub ..., 14h`）。
+	FactionRelationPenalty = 20
+)
 
 // FactionSlot 是一個勢力槽。
 type FactionSlot struct {
@@ -66,8 +80,9 @@ type FactionSlot struct {
 
 // ⛔ **不要用「領袖 ID 非零」判斷這個槽有沒有勢力。**
 //
-// 後 14 個殘留槽的 `+0` 也是非零（103、12、142…），拿去查名冊還會查到人，
-// 看起來完全像資料。第一版的 `Active()` 就是這樣寫的，被測試當場抓到。
+// 後 14 個殘留槽的 `+0` 也是非零（當 u16 讀是 27239、1548、40590…；
+// 當初誤讀成 u8 時更糟——103、12、142 拿去查名冊還會查到人）。
+// 第一版的 `Active()` 就是這樣寫的，被測試當場抓到。
 //
 // 資料裡有更硬的判準：**對角線**。真正被初始化過的槽，
 // `Relations[i][i]` 一定是 0（自己對自己）；殘留槽是隨機值。
@@ -92,7 +107,7 @@ func ParseFactionTable(data []byte) (FactionTable, error) {
 	b := data[blk.Offset : blk.Offset+blk.Size]
 	for i := range t {
 		row := b[i*FactionSlotSize : (i+1)*FactionSlotSize]
-		t[i].Leader = GeneralID(row[facOffLeader])
+		t[i].Leader = GeneralID(row[facOffLeader]) | GeneralID(row[facOffLeader+1])<<8
 		t[i].Unknown2 = row[facOffUnknown2]
 		copy(t[i].Relations[:], row[facOffRelation:facOffTrailing])
 		copy(t[i].Trailing[:], row[facOffTrailing:])
@@ -102,9 +117,9 @@ func ParseFactionTable(data []byte) (FactionTable, error) {
 
 // Initialized 回答這個槽有沒有被初始化過。
 //
-// 判準是對角線為 0。⚠️ 這是**從資料歸納**的判準，不是從程式碼驗的——
-// 原版用什麼決定「有幾個勢力」還沒追到（候選：劇本表或某個全域計數）。
-// 在追到之前，這是唯一擋得住殘留槽的判準。
+// 判準是對角線為 0。這原本是**從資料歸納**的啟發式，現在有了獨立佐證：
+// `FactionLeaders`（`.DT1` 區塊 6）是同一份領袖清單，而且**空槽是乾淨的 0**。
+// 兩者在北伐存檔上完全一致。
 func (t FactionTable) Initialized(i int) bool {
 	return i >= 0 && i < FactionSlotCount && t[i].Relations[i] == 0
 }
@@ -165,6 +180,43 @@ func (t FactionTable) InitializedSlots() int {
 	n := 0
 	for i := range t {
 		if t.Initialized(i) {
+			n++
+		}
+	}
+	return n
+}
+
+// FactionLeaders 是 `.DT1` 區塊 6（`byte_6EE68`，48 B）——**24 × u16 的勢力領袖表**。
+//
+// 內容與勢力表的 `+0` 欄一模一樣，差別在**這一份的空槽是乾淨的 0**，
+// 而勢力表的空槽帶著未初始化的殘留。所以要問「有幾個勢力」，問這一份。
+//
+// 原版以 `[di-534Ah]` + 勢力編號×2 存取（`sub_3512B`），1-based。
+type FactionLeaders [FactionSlotCount]GeneralID
+
+// ParseFactionLeaders 解出領袖表。
+func ParseFactionLeaders(data []byte) (FactionLeaders, error) {
+	var out FactionLeaders
+	blk, err := SaveBlockByGlobal("byte_6EE68")
+	if err != nil {
+		return out, err
+	}
+	if len(data) < blk.Offset+blk.Size {
+		return out, fmt.Errorf("game: .DT1 只有 %d bytes，放不下領袖表（需要 %d）",
+			len(data), blk.Offset+blk.Size)
+	}
+	b := data[blk.Offset : blk.Offset+blk.Size]
+	for i := range out {
+		out[i] = GeneralID(b[i*2]) | GeneralID(b[i*2+1])<<8
+	}
+	return out, nil
+}
+
+// Count 是有勢力的槽數。
+func (f FactionLeaders) Count() int {
+	n := 0
+	for _, id := range f {
+		if id != 0 {
 			n++
 		}
 	}

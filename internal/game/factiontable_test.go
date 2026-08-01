@@ -154,3 +154,36 @@ func TestFactionSlotsAcrossTwoSaves(t *testing.T) {
 		}
 	}
 }
+
+// ⭐⭐ 區塊 6 是同一份領袖清單的乾淨版本——拿它交叉驗證勢力表的 `+0`。
+//
+// 這同時證明兩件事：`+0` 真的是 u16（初稿讀成 u8），
+// 以及槽 10..23 真的是空的（領袖表那邊是乾淨的 0，不是殘留）。
+func TestFactionLeadersBlockAgreesWithSlots(t *testing.T) {
+	data := readGame(t, "SAVE(1).DT1")
+	tbl, err := ParseFactionTable(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	lead, err := ParseFactionLeaders(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 10; i++ {
+		if lead[i] != tbl[i].Leader {
+			t.Errorf("槽 %d：領袖表 %d，勢力表 %d", i, lead[i], tbl[i].Leader)
+		}
+	}
+	for i := 10; i < FactionSlotCount; i++ {
+		if lead[i] != 0 {
+			t.Errorf("槽 %d 在領袖表該是乾淨的 0，實得 %d", i, lead[i])
+		}
+	}
+	if got := lead.Count(); got != 9 {
+		t.Errorf("北伐該有 9 個勢力，領袖表數出 %d", got)
+	}
+	// 兩份資料對「哪些槽有勢力」要給出同一個答案。
+	if got := len(tbl.ActiveFactions()); got != lead.Count() {
+		t.Errorf("勢力表數出 %d 個、領袖表數出 %d 個", got, lead.Count())
+	}
+}
