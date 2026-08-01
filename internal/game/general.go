@@ -42,9 +42,16 @@ const (
 	genOffF19         = 19 // 戰力公式用，語意未解
 	genOffF20         = 20 // 戰力公式用，只有 5 個等級值
 	genOffBranch      = 21 // 兵種，值域 {1, 4, 5, 6}
-	genOffF29         = 29 // 戰力公式用，0..100
-	genOffF30         = 30 // 戰力公式用，也是每回合衰減 20% 的那一格
-	genOffRange       = 31 // 遠程攻擊的參數，第一期 274 筆全是 1
+	// genOffStamina 是**體力**（0..100）。
+	//
+	// 證據是畫面文字（`docs/re/27`）：`sub_241D0`（墾地）與 `sub_24535`（挖金礦）
+	// 檢查這一格不足時，印的正是「**士兵體力不足**」。慰勞軍民 `sub_3412B`
+	// 也對它 +10 並夾到 100，與畫面「體力」對得上（`docs/re/22`）。
+	//
+	// 它同時參與戰力公式（`sub_5A0B9`），所以舊名 `F29` 出現在那裡。
+	genOffStamina = 29
+	genOffF30     = 30 // 戰力公式用，也是每回合衰減 20% 的那一格
+	genOffRange   = 31 // 遠程攻擊的參數，第一期 274 筆全是 1
 )
 
 // 兵種。**這四個名字是有證據的**（`docs/spec/02` §4）：
@@ -131,9 +138,16 @@ type General struct {
 	// Branch 是兵種（`+21`），值域 {1, 4, 5, 6}。
 	Branch uint8
 
-	// 戰力公式（`sub_5A0B9`，`docs/re/08` §4d）要用的四個欄位。
-	// **它們的語意未解**——公式用得到，但不知道畫面上叫什麼。
-	F19, F20, F29, F30 uint8
+	// Stamina 是**體力**（`+29`，0..100）。開發指令的門檻就是它
+	// （墾地 ≥5、挖金礦 ≥20），不足時原版印「士兵體力不足」。
+	// 它同時是戰力公式的一項。
+	Stamina uint8
+
+	// 戰力公式（`sub_5A0B9`，`docs/re/08` §4d）要用的另外三個欄位。
+	// **語意未解**——公式用得到，但還沒對上畫面上的名字。
+	// 候選見 `docs/mechanics/60-personnel.md` §6（經驗／士兵攻擊力／
+	// 武裝程度／士兵戰技）。⚠️ 那是名字的集合不是順序，別對號入座。
+	F19, F20, F30 uint8
 
 	// Range 是遠程攻擊的參數（`+31`，`docs/re/09` §1）。
 	// 第一期 274 筆全部是 1，所以看不出值域。
@@ -160,7 +174,7 @@ func ParseGeneral(rec []byte) (General, error) {
 	copy(g.Raw[:], rec)
 	g.Branch = rec[genOffBranch]
 	g.F19, g.F20 = rec[genOffF19], rec[genOffF20]
-	g.F29, g.F30 = rec[genOffF29], rec[genOffF30]
+	g.Stamina, g.F30 = rec[genOffStamina], rec[genOffF30]
 	g.Range = rec[genOffRange]
 	g.AbilityA = rec[genOffAbilityA]
 	g.AbilityB = rec[genOffAbilityB]

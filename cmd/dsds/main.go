@@ -1,8 +1,11 @@
 // dsds 是《大時代的故事》remake 的執行檔。
 //
 // 目前做到的：載入原版資料，用**原版的地形圖塊**畫出各省的 14×14 戰場，
-// 側欄顯示省名，可切換省份。
-// 遊戲邏輯（戰鬥、政略指令、存檔）尚未實作——那些的規格還沒解出來。
+// 側欄顯示省份狀態，可切換省份、打仗、下已解出的政略指令、存檔。
+//
+// **只接規則層已 confirmed 的指令**（徵稅／開發三項／慰勞／攻打）。
+// 運補、商業、外交、秘密行動的公式還沒讀出來，按了沒反應——
+// 那勝過假裝有效果（`cmd/dsds/strategy.go` 開頭）。
 //
 //	tools/go.sh run ./cmd/dsds -game workplace/orig/game
 //
@@ -10,8 +13,18 @@
 //
 //	← →      切換省份
 //	Enter    叫出政略指令選單
-//	ESC      關掉選單／取消離開
+//	ESC      關掉選單／退回上一層／取消離開
 //	F10      離開，跳 Y／N 確認並自動存檔；存檔失敗就不離開
+//
+// 指令選單裡：
+//
+//	4        徵稅（每月限一次）
+//	7        開發 → 1 墾地　2 建兵工廠　3 挖金礦
+//	C        慰勞軍民（原版是指令 14）
+//	A        對第一個可攻打的鄰省開戰
+//	E        結束回合，推進一個月；跨年跑年度結算
+//
+// 指令結果印在 stderr，面板的數值會即時更新。
 //
 // 需要顯示器。無頭環境請跑 internal/ui/render 的測試，
 // 那一層不依賴 Ebiten，會逐像素比對原版截圖。
@@ -59,6 +72,7 @@ const (
 	screenMap     screen = iota // 戰場 + 省份面板
 	screenCommand               // 政略指令選單
 	screenBattle                // 戰鬥（見 battle.go）
+	screenDevelop               // 開發的三個子項（見 strategy.go）
 	screenQuit                  // 離開確認
 )
 
@@ -72,6 +86,11 @@ type app struct {
 	cmdFonts render.CommandFonts
 	icons    []*assets.Image // NEWICON.TPC 的兵種圖示
 	battle   *battleState    // 非 nil 表示正在打仗
+	world    *game.AIWorld   // 規則層：政略指令都經過它
+	rng      *game.Rand      // 原版的 LCG（docs/re/17），固定種子才可重現
+	year     uint16
+	month    uint8
+	msg      string // 上一個指令的結果，印到 stderr
 	current  game.ProvinceID
 	screen   screen
 	savePath string // 離開時自動存檔的目標（不覆蓋原版）
@@ -122,6 +141,32 @@ func (a *app) Update() error {
 			}
 			if err := a.startBattle(target, a.current); err != nil {
 				fmt.Fprintln(os.Stderr, "開戰失敗:", err)
+			}
+			return nil
+		}
+		// 已接上的政略指令。**只接規則層 confirmed 的**，
+		// 其餘按了沒反應——那勝過假裝有效果（strategy.go 開頭）。
+		switch {
+		case inpututil.IsKeyJustPressed(ebiten.KeyDigit4):
+			a.report(a.execTax())
+		case inpututil.IsKeyJustPressed(ebiten.KeyDigit7):
+			a.screen, a.dirty = screenDevelop, true
+		case inpututil.IsKeyJustPressed(ebiten.KeyC):
+			a.report(a.execComfort())
+		case inpututil.IsKeyJustPressed(ebiten.KeyE):
+			a.report(a.endTurn())
+		}
+		return nil
+
+	case screenDevelop:
+		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+			a.screen, a.dirty = screenCommand, true
+			return nil
+		}
+		for i, k := range []ebiten.Key{ebiten.KeyDigit1, ebiten.KeyDigit2, ebiten.KeyDigit3} {
+			if inpututil.IsKeyJustPressed(k) {
+				a.report(a.execDevelop(i + 1))
+				a.screen = screenCommand
 			}
 		}
 		return nil
@@ -194,15 +239,18 @@ func (a *app) compose() error {
 		Force:    game.ForceOf(a.generals, a.current),
 		Generals: game.CountOf(a.generals, a.current),
 	}
-	if a.tbl.Date != nil {
-		data.Year, data.Month = a.tbl.Date.Year, a.tbl.Date.Month
-	}
+	data.Year, data.Month = a.year, a.month
 	if err := c.DrawStrategyPanel(data, a.fonts); err != nil {
 		return err
 	}
 
 	switch a.screen {
 	case screenCommand:
+		if err := c.DrawCommandPage(a.cmdFonts, panelInk, panelPaper,
+			fieldX, fieldY, render.ModeBGIW-fieldX, render.ModeBGIH-fieldY); err != nil {
+			return err
+		}
+	case screenDevelop:
 		if err := c.DrawCommandPage(a.cmdFonts, panelInk, panelPaper,
 			fieldX, fieldY, render.ModeBGIW-fieldX, render.ModeBGIH-fieldY); err != nil {
 			return err
@@ -238,15 +286,17 @@ func main() {
 	// CLAUDE.md §9：原版資產唯讀，存檔一律寫到別的地方。
 	savePath := flag.String("save", "workplace/saves/SAVE(1).DT1",
 		"離開時自動存檔的路徑（**不會**覆蓋原版）")
+	// 固定亂數種子是 CLAUDE.md §9 的硬規則：截圖驗收要能重現。
+	seed := flag.Uint("seed", 1, "亂數種子（原版 LCG，docs/re/17）")
 	flag.Parse()
 
-	if err := run(*gameDir, game.ProvinceID(*start), *savePath); err != nil {
+	if err := run(*gameDir, game.ProvinceID(*start), *savePath, uint32(*seed)); err != nil {
 		fmt.Fprintln(os.Stderr, "錯誤:", err)
 		os.Exit(1)
 	}
 }
 
-func run(dir string, start game.ProvinceID, savePath string) error {
+func run(dir string, start game.ProvinceID, savePath string, seed uint32) error {
 	if !start.Valid() {
 		return fmt.Errorf("省編號 %d 超出 1..%d", start, game.ProvinceCount)
 	}
@@ -342,11 +392,18 @@ func run(dir string, start game.ProvinceID, savePath string) error {
 
 	ebiten.SetWindowSize(render.ModeBGIW*scale, render.ModeBGIH*scale)
 	ebiten.SetWindowTitle("大時代的故事")
-	return ebiten.RunGame(&app{
+	a := &app{
 		m: m, tbl: tbl, generals: generals, fonts: fonts, cmdFonts: cmdFonts,
 		tiles: ts, icons: icons, origSave: origSave, savePath: savePath,
 		current: start, dirty: true,
-	})
+		// 固定種子：`CLAUDE.md` §9 要求截圖驗收可重現。
+		rng: game.NewRand(seed),
+	}
+	a.world = buildWorld(tbl, generals)
+	if tbl.Date != nil {
+		a.year, a.month = tbl.Date.Year, tbl.Date.Month
+	}
+	return ebiten.RunGame(a)
 }
 
 // loadProvinces 讀省份狀態：優先用存檔 SAVE(1).DT1，讀不到就退回

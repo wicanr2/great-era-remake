@@ -315,7 +315,7 @@ func TestStrengthWithRealGenerals(t *testing.T) {
 		g := &gs[id-1]
 		return Strength(StrengthInput{
 			Ability: g.AbilityA, Force: g.Force,
-			F19: g.F19, F20: g.F20, F29: g.F29, F30: g.F30,
+			F19: g.F19, F20: g.F20, F29: g.Stamina, F30: g.F30,
 			Branch: g.Branch, General: GeneralID(id),
 		}, StrengthOpts{Stage: 1})
 	}

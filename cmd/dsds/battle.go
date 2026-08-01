@@ -109,7 +109,7 @@ func combatants(gs []game.General, prov game.ProvinceID) []*game.Combatant {
 			},
 			Strength: game.StrengthInput{
 				Ability: g.AbilityA, Force: g.Force,
-				F19: g.F19, F20: g.F20, F29: g.F29, F30: g.F30,
+				F19: g.F19, F20: g.F20, F29: g.Stamina, F30: g.F30,
 				Branch: g.Branch, General: id, Faction: game.GeneralID(prov),
 			},
 		})

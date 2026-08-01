@@ -204,7 +204,7 @@ func drawLiveBattle(c *render.Canvas, m *game.Map, tbl *game.ProvinceTable,
 				},
 				Strength: game.StrengthInput{
 					Ability: gs[i].AbilityA, Force: gs[i].Force,
-					F19: gs[i].F19, F20: gs[i].F20, F29: gs[i].F29, F30: gs[i].F30,
+					F19: gs[i].F19, F20: gs[i].F20, F29: gs[i].Stamina, F30: gs[i].F30,
 					Branch: gs[i].Branch, General: id, Faction: game.GeneralID(prov),
 				},
 			})
