@@ -49,7 +49,7 @@ FIELDS = {
         9: ("命令類型 1–6", "docs/re/31 §15/§36", "confirmed"),
         10: ("目標單位 ID", "docs/re/31 §23", "confirmed"),
         12: ("往目標走的下一格（0xFF = 走不到）", "docs/re/31 §12", "confirmed"),
-        13: ("旗標位元組；bit 7 = 本回合已指派目標", "docs/re/31 §31", "confirmed"),
+        13: ("旗標位元組；bit 7 = 本回合已指派目標（bit 5 由值 19 設，語意未解）", "docs/re/31 §31/§40", "confirmed"),
         14: ("效忠的勢力領袖（將領 ID）", "docs/re/31 §37 / combat.go", "confirmed"),
         16: ("bit 0 在場、bit 2 已部署", "docs/re/05", "confirmed"),
         19: ("士兵戰技", "docs/spec/02", "強證據"),
