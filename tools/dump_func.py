@@ -104,10 +104,69 @@ def dump(fn: str, lo: int | None, hi: int | None) -> int:
 
     print(f"\n[dump_func] {fn}：{len(txt)} 行，其中 {hits} 行有已知語意的位址。",
           file=sys.stderr)
-    if hits == 0:
-        print("[dump_func] ⚠️ 零命中不代表這支沒碰已解欄位——"
-              "也可能是位址還沒進 addr.py 的三張表。", file=sys.stderr)
+    docs_hits(lines)
     return 0
+
+
+# 組語裡出現的具名符號：word_64944、byte_6FE7E、sub_3A4CE
+SYM = re.compile(r"\b((?:word|byte|dword|sub|loc|unk)_[0-9A-F]+)\b")
+
+
+def docs_hits(lines: list[str]) -> None:
+    """把這段組語裡的符號拿去 grep `docs/`，**印出誰已經被寫過**。
+
+    為什麼要這個（2026-08-02）：
+
+    `addr.py` 的三張表是**手維護**的，只涵蓋我想到要登記的位址。
+    `byte_6FE7E` 不在表裡，於是 dump 出來一片空白，我就照那片空白
+    在 `docs/re/31` §49 寫下「語意未解（疑似戰鬥種類）」——
+    而 `docs/re/16` 與 `docs/re/19` 早就寫明它是**月份**。
+
+    這是同一類錯誤的第三次（前兩次是 `word_64944`、比率門檻的來源）。
+    三次的共同點都不是「查不到」，是「**沒想到要查**」。
+    紀律已經證明靠不住，所以把查詢做成 dump 的一部分：
+    只要符號在 `docs/` 裡出現過，這裡就會叫出來，不必記得去查。
+
+    跳過 `loc_*`（純跳轉標籤，噪音）與已經在 `addr.py` 裡的位址
+    （那些上面已經逐行標過了）。
+    """
+    syms, order = set(), []
+    for line in lines:
+        for m in SYM.finditer(line):
+            t = m.group(1)
+            if t.startswith("loc_") or t in syms:
+                continue
+            syms.add(t)
+            order.append(t)
+    if not syms:
+        return
+
+    docs = ROOT / "docs"
+    if not docs.is_dir():
+        return
+    args = ["grep", "-rn", "--include=*.md", "-F"]
+    for s in order:
+        args += ["-e", s]
+    r = subprocess.run(args + ["."], cwd=str(docs), capture_output=True, text=True)
+
+    found: dict[str, list[str]] = {}
+    for ln in r.stdout.splitlines():
+        for s in order:
+            if s in ln:
+                found.setdefault(s, []).append(ln.split(":", 1)[0].lstrip("./"))
+    if not found:
+        print("[dump_func] docs/ 裡沒有任何一個符號被提過——這段大概真的是新的。",
+              file=sys.stderr)
+        return
+
+    print("\n[dump_func] ⚠️ 下列符號 **`docs/` 裡已經寫過**，"
+          "下結論前先去讀，不要重推：", file=sys.stderr)
+    for s in order:
+        if s not in found:
+            continue
+        files = sorted(set(found[s]))
+        tail = f"（另 {len(files) - 3} 份）" if len(files) > 3 else ""
+        print(f"  {s:<14} {'  '.join(files[:3])}{tail}", file=sys.stderr)
 
 
 def main() -> int:
