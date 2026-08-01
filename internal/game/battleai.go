@@ -112,8 +112,18 @@ type BattleAIInput struct {
 	// ⭐ **守方主帥親自坐鎮，是電腦改變打法的觸發點。**
 	FoeLeaderOnField bool
 
-	// Sub53619 是 `sub_53619(0)` 的結果，決定值 16 還是 17（§43）。
-	// ⚠️ 未讀。§16 的 5.0 必勝門檻成立後也接它。
+	// Sub53619 是 `sub_53619(side)` 的結果——**三處分流**都靠它（§45）。
+	//
+	//	sub_3A817   == 0 → 11 必勝結算    != 0 → 12／17
+	//	sub_3AA51   == 0 →  1 必勝結算    != 0 →  3 打城市
+	//	sub_3A94E   == 0 → 16             != 0 → 17
+	//
+	// ⭐ **兩處「必勝結算」都要它 == 0**——戰力差五倍還不夠，
+	// 還要這個條件成立才准直接判勝負。
+	//
+	// 原版：掃該方清單取最後一個非 0 的單位，跑 `sub_534FF`
+	// （比對 `+14` 效忠領袖與省份 `+20` 司令），第二個輸出 > 0 就回 0。
+	// ⚠️ 那個輸出是什麼**未讀**，所以語意只到「與勢力歸屬有關」。
 	Sub53619 bool
 
 	// EnableLastSteps 是 `byte_6FFCA & 4`：**啟用後面幾步**。
@@ -148,10 +158,14 @@ func DecideBattleB(in BattleAIInput) BattleDecision {
 		return BattleDecision{Action: ActBDeploy, Step: "sub_3A9F4 兩方比率門檻"}
 	}
 
-	// 第二步 `sub_3AA51`：第一方被壓到第二方的五分之一以下 → 必勝結算。
+	// 第二步 `sub_3AA51`（§45）：第一方被壓到第二方的五分之一以下之後，
+	// 由 `sub_53619(1)` 二選一。
 	if ForceRatioLE(in.SideStrength, in.FoeStrength,
 		AIBattleRatioCollapseNum, AIBattleRatioCollapseDen) {
-		return BattleDecision{Action: ActBDecisive, Step: "sub_3AA51 必勝門檻"}
+		if !in.Sub53619 {
+			return BattleDecision{Action: ActBDecisive, Step: "sub_3AA51 必勝門檻"}
+		}
+		return BattleDecision{Action: ActBTakeCity, Step: "sub_3AA51 改打城市"}
 	}
 
 	// 第三步 `sub_3AABA` → 值 4（§42）：`sub_56D49(0)` 成立就設。
@@ -177,13 +191,23 @@ func DecideBattleB(in BattleAIInput) BattleDecision {
 // 每一步內部「在多個值之間怎麼選」都還沒讀，所以這裡只實作
 // 「哪一步會出手」，選不到細分值時取該步的第一個值。
 func DecideBattleA(in BattleAIInput) BattleDecision {
-	// 第一步 `sub_3A817`：第二方被壓到第一方的五分之一以下 → 必勝結算。
-	//
-	// ⚠️ 原版這一步可能給出 11／12／16／17 四個值之一，
-	// 目前只解出「必勝門檻成立時走 11」這條路徑。
+	// 第一步 `sub_3A817`（§45）：第二方被壓到第一方的五分之一以下之後，
+	// 還要看 `sub_53619` 與 `sub_56D49` 才知道給哪個值。
 	if ForceRatioLE(in.SideStrength, in.FoeStrength,
 		AIBattleRatioCollapseNum, AIBattleRatioCollapseDen) {
-		return BattleDecision{Action: ActADecisive, Step: "sub_3A817 必勝門檻"}
+		if !in.Sub53619 {
+			// 戰力差五倍**還不夠**，還要 `sub_53619 == 0` 才准直接判勝負。
+			// 原版這裡另外設 `byte_6B968 = 1`（語意未解）。
+			return BattleDecision{Action: ActADecisive, Step: "sub_3A817 必勝門檻"}
+		}
+		if !in.FoeLeaderOnField {
+			return BattleDecision{Action: ActAReset, Step: "sub_3A817 守方領袖不在場"}
+		}
+		// ⛔ 原版這裡再問一次 `sub_53619(0)`，但外層已經確定它非 0，
+		// 而 `sub_56D49` 是純查詢無副作用——所以**恆走 17，值 16 走不到**。
+		// 那是原版的死碼，照抄（`CLAUDE.md` §9：原版行為就是規格）。
+		// 值 16 本身不是死碼，`sub_3A94E` 走得到它。
+		return BattleDecision{Action: ActARecompute, Step: "sub_3A817（值 16 是死碼）"}
 	}
 
 	// 第二步 `sub_3A885` → 值 12；第三步 `sub_3A8C8` → 值 19。
@@ -231,11 +255,9 @@ func DecideBattleA(in BattleAIInput) BattleDecision {
 //
 // 補完一支就從這裡移除一筆，並在 `docs/re/31` 補一節。
 var UndecidedBattleSteps = []string{
-	"sub_3A817 在 11／12／16／17 之間怎麼選",
-	"sub_3A8F7 在 14／15／18 之間怎麼選",
-	"sub_3AA51 在 1／3 之間怎麼選",
+	"sub_3A8F7 在 14／15／18 之間怎麼選（分支 A 第四步）",
 	"比率門檻的來源：word_64932/34/36/38 與 sub_3A4CE（§42 挖到第五層停手）",
-	"sub_53619（決定值 16 還是 17）＋ word_6493A（分支 B 值 2 的閘門）",
+	"sub_534FF 的第二個輸出（決定 sub_53619）＋ word_6493A ＋ byte_6B968",
 }
 
 // BattleActionName 回傳行動的中文名稱，給紀錄與測試訊息用。

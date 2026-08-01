@@ -161,3 +161,53 @@ func TestDecideBattleAStep5(t *testing.T) {
 		t.Errorf("前置不成立該落到預設，實際 %s", BattleActionName(got.Action))
 	}
 }
+
+func TestSub53619GatesDecisiveResolution(t *testing.T) {
+	// §45：戰力差五倍**還不夠**，還要 sub_53619 == 0 才准直接判勝負。
+	crushed := BattleAIInput{SideStrength: 20, FoeStrength: 100}
+
+	// 分支 B：Sub53619 為真 → 改打城市，不是必勝結算。
+	in := crushed
+	in.Sub53619 = true
+	if got := DecideBattleB(in); got.Action != ActBTakeCity {
+		t.Errorf("sub_53619 非 0 時該改打城市，實際 %s", BattleActionName(got.Action))
+	}
+	in.Sub53619 = false
+	if got := DecideBattleB(in); got.Action != ActBDecisive {
+		t.Errorf("sub_53619 為 0 才必勝結算，實際 %s", BattleActionName(got.Action))
+	}
+
+	// 分支 A：Sub53619 為真時看守方領袖在不在場。
+	in = crushed
+	in.Sub53619, in.FoeLeaderOnField = true, false
+	if got := DecideBattleA(in); got.Action != ActAReset {
+		t.Errorf("守方領袖不在場該推倒重來，實際 %s", BattleActionName(got.Action))
+	}
+	in.FoeLeaderOnField = true
+	if got := DecideBattleA(in); got.Action != ActARecompute {
+		t.Errorf("領袖在場恆走重算全軍（值 16 是死碼），實際 %s", BattleActionName(got.Action))
+	}
+	in.Sub53619 = false
+	if got := DecideBattleA(in); got.Action != ActADecisive {
+		t.Errorf("sub_53619 為 0 才必勝結算，實際 %s", BattleActionName(got.Action))
+	}
+}
+
+func TestValue16IsDeadCodeInStep1(t *testing.T) {
+	// ⛔ §45：sub_3A817 裡的值 16 走不到——外層已確定 sub_53619 非 0，
+	// 內層又問一次同一個無副作用的函式，結果必然相同。
+	// 這個測試釘住「照抄死碼」這個決定：只要第一步還會回值 16，就是實作偏離原版。
+	for _, leader := range []bool{true, false} {
+		in := BattleAIInput{SideStrength: 20, FoeStrength: 100,
+			Sub53619: true, FoeLeaderOnField: leader}
+		if got := DecideBattleA(in); got.Action == ActAStandbyOnly {
+			t.Errorf("第一步不該回值 16（原版那條路是死碼），FoeLeaderOnField=%v", leader)
+		}
+	}
+	// 但值 16 本身不是死碼——第五步走得到。
+	in := BattleAIInput{SideStrength: 100, FoeStrength: 80,
+		EnableLastSteps: true, FoeLeaderOnField: true, Sub53619: false}
+	if got := DecideBattleA(in); got.Action != ActAStandbyOnly {
+		t.Errorf("第五步該走得到值 16，實際 %s", BattleActionName(got.Action))
+	}
+}
