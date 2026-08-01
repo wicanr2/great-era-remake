@@ -277,7 +277,7 @@ func TestMoveConsumesMovementAllowance(t *testing.T) {
 	u := &CombatUnit{General: 58, Cell: start, Max: 10, Current: 10}
 	occ[start] = u.General
 
-	dst, err := occ.Move(u, DirDown, 3)
+	dst, err := occ.Move(nil, u, DirDown, 3)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -299,7 +299,7 @@ func TestMoveConsumesMovementAllowance(t *testing.T) {
 
 	// 機動力不足要擋下，而且不能動到任何狀態。
 	before := *u
-	if _, err := occ.Move(u, DirDown, 99); err == nil {
+	if _, err := occ.Move(nil, u, DirDown, 99); err == nil {
 		t.Error("機動力不足卻走得動")
 	}
 	if *u != before {
@@ -309,7 +309,7 @@ func TestMoveConsumesMovementAllowance(t *testing.T) {
 	// 目標格有人也要擋。
 	nb, _ := u.Cell.Neighbour(DirUp)
 	occ[nb] = 999
-	if _, err := occ.Move(u, DirUp, 1); err == nil {
+	if _, err := occ.Move(nil, u, DirUp, 1); err == nil {
 		t.Error("目標格有人卻走得進去")
 	}
 
@@ -317,7 +317,58 @@ func TestMoveConsumesMovementAllowance(t *testing.T) {
 	edge, _ := CellAt(0, 0)
 	e := &CombatUnit{General: 1, Cell: edge, Max: 9, Current: 9}
 	occ[edge] = 1
-	if _, err := occ.Move(e, DirUp, 1); err == nil {
+	if _, err := occ.Move(nil, e, DirUp, 1); err == nil {
 		t.Error("走出上邊界卻沒被擋")
+	}
+}
+
+// 長城擋路：只有能穿越的單位過得去。省 11（河北）有 8 格長城。
+func TestMoveBlockedByGreatWall(t *testing.T) {
+	m := loadTestMap(t)
+	bf, err := m.Battlefield(11)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// 找一組「相鄰、其中一格是長城、另一格不是」的格子。
+	var from, wall CellIndex = NoCell, NoCell
+	var dir HexDir
+	for i := 0; i < CellCount && from == NoCell; i++ {
+		c := CellIndex(i)
+		col, row := c.ColRow()
+		if bf.Tiles[row][col].Kind.Blocks() {
+			continue
+		}
+		for d := DirLowerLeft; d <= DirUpperRight; d++ {
+			n, ok := c.Neighbour(d)
+			if !ok {
+				continue
+			}
+			ncol, nrow := n.ColRow()
+			if bf.Tiles[nrow][ncol].Kind.Blocks() {
+				from, wall, dir = c, n, d
+				break
+			}
+		}
+	}
+	if from == NoCell {
+		t.Fatal("河北的戰場上找不到緊鄰長城的格，測試前提不成立")
+	}
+
+	var occ Occupancy
+	u := &CombatUnit{General: 58, Cell: from, Max: 9, Current: 9}
+	occ[from] = u.General
+	if _, err := occ.Move(bf, u, dir, 1); err == nil {
+		t.Errorf("從格 %d 走進長城格 %d 竟然通過", from, wall)
+	}
+	if u.Cell != from || u.Current != 9 {
+		t.Error("被擋下卻改了單位狀態")
+	}
+
+	u.CanCross = true
+	if _, err := occ.Move(bf, u, dir, 1); err != nil {
+		t.Errorf("能穿越的單位仍被擋：%v", err)
+	}
+	if u.Cell != wall {
+		t.Errorf("穿越後的位置 = %d，應為 %d", u.Cell, wall)
 	}
 }

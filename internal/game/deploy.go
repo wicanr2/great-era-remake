@@ -239,13 +239,15 @@ func (o *Occupancy) enemyNeighbours(c CellIndex, enemy func(GeneralID) bool) int
 // 與其呼叫端 `sub_4ABFD` 的三道 gate（`docs/re/07` §7）：
 //
 //  1. 目標格必須六角相鄰且在界內（`sub_510E0`）
-//  2. 目標格必須可進入（`sub_4A583`，規則未解——這裡用「沒人站」代替，
-//     真正的規則解出來之前不要當成完整判斷）
+//  2. 目標格必須可進入（`sub_4A583`）：長城段（地物 12..21）擋路，
+//     除非單位能穿越；另外目標格不能已經有人站
 //  3. 剩餘機動力 `+7` 必須 >= 該步的成本
 //
 // **成本怎麼算未解**，所以由呼叫端傳進來。原版的成本是一張以方向為索引的
 // 表，在移動前算好，推測與目標格的地形有關，但沒有追到填表處。
-func (o *Occupancy) Move(u *CombatUnit, d HexDir, cost uint8) (CellIndex, error) {
+//
+// `bf` 可以傳 nil，那就跳過地形檢查（純狀態轉移測試用）。
+func (o *Occupancy) Move(bf *Battlefield, u *CombatUnit, d HexDir, cost uint8) (CellIndex, error) {
 	if u.General == 0 || !u.Cell.Valid() {
 		return NoCell, fmt.Errorf("game: 單位不在場上，無法移動")
 	}
@@ -255,6 +257,12 @@ func (o *Occupancy) Move(u *CombatUnit, d HexDir, cost uint8) (CellIndex, error)
 	}
 	if o[dst] != 0 {
 		return NoCell, fmt.Errorf("game: 格 %d 已被單位 %d 佔住", dst, o[dst])
+	}
+	if bf != nil && !u.CanCross {
+		col, row := dst.ColRow()
+		if bf.Tiles[row][col].Kind.Blocks() {
+			return NoCell, fmt.Errorf("game: 格 %d 是長城，擋住了", dst)
+		}
 	}
 	if u.Current < cost {
 		return NoCell, fmt.Errorf("game: 剩餘機動力 %d 不足 %d", u.Current, cost)

@@ -75,6 +75,28 @@ func (k TileKind) TileName() string {
 	return ""
 }
 
+// 長城段的地物編號範圍。**這是原版寫死的區間**：`sub_5867E` 判斷
+// 「這一格能不能進」的方式就是 `12 <= 地形碼 <= 21`。
+//
+// 資料也對得上：12..21 只出現在省 7、10、11、12、14、15、16、17、18
+// ——全部是北方省份，正是長城沿線。
+//
+// ⚠️ **22 不在阻隔範圍內**，而它只出現 3 格（省 12 一格、省 17 兩格）。
+// 長城上的通行點是最自然的解釋，但沒有證據，**不定名**。
+const (
+	TileGreatWallFirst TileKind = 12
+	TileGreatWallLast  TileKind = 21
+)
+
+// Blocks 回報這一格是否阻擋通行。
+//
+// 依據 `sub_5867E`（`docs/re/07` §7）。移動時由 `sub_4A583` 呼叫，
+// 而**單位記錄 `+21 == 1` 的單位無視這個限制**——對應原版詞表的
+// 「穿越」與「阻隔」（`2.15`）。
+func (k TileKind) Blocks() bool {
+	return k >= TileGreatWallFirst && k <= TileGreatWallLast
+}
+
 // TileKindMax 是地物編號的上限，也是 NEWTERR.TPC 的圖塊數。
 const TileKindMax TileKind = 22
 

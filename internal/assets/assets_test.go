@@ -388,3 +388,44 @@ func min(a, b int) int {
 	}
 	return b
 }
+
+// 長城阻隔：範圍出自 sub_5867E 的 `12 <= 地形碼 <= 21`。
+// 資料驗證——這些格子只該出現在北方省份。
+func TestGreatWallBlocksOnlyInNorthernProvinces(t *testing.T) {
+	tiles, err := ParseNWMap(gameFile(t, "NWMAP.DAT"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	north := map[int]bool{7: true, 10: true, 11: true, 12: true, 14: true,
+		15: true, 16: true, 17: true, 18: true}
+	total := 0
+	for k, grid := range tiles {
+		n := 0
+		for y := range grid {
+			for _, t := range grid[y] {
+				if t.Kind.Blocks() {
+					n++
+				}
+			}
+		}
+		if n > 0 && !north[k+1] {
+			t.Errorf("省 %d 有 %d 格長城，但它不在長城沿線", k+1, n)
+		}
+		total += n
+	}
+	if total == 0 {
+		t.Fatal("全 39 省一格長城都沒有，範圍一定解錯了")
+	}
+	t.Logf("長城格總數 %d", total)
+
+	// 22 不阻隔——原版的上界是 21，不是 TileKindMax。
+	if TileKindMax.Blocks() {
+		t.Error("地物 22 不該被判為阻隔（sub_5867E 的上界是 21）")
+	}
+	if !TileKind(12).Blocks() || !TileKind(21).Blocks() {
+		t.Error("12 與 21 都該阻隔")
+	}
+	if TilePass.Blocks() {
+		t.Error("關口(11) 不該阻隔")
+	}
+}
