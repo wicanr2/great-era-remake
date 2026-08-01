@@ -429,3 +429,42 @@ func TestMoveBlockedByGreatWall(t *testing.T) {
 		t.Errorf("穿越長城後剩餘機動力 = %d，應為 2", u.Current)
 	}
 }
+
+// 孤立檢查：同方相鄰就不孤立，但站在高山上的友軍不算。
+// 「高山不算」是原版明寫的（sub_53C28 跳過地形 6），不是我們加的。
+func TestIsolatedSkipsMountainNeighbours(t *testing.T) {
+	bf := plainField()
+	var occ Occupancy
+	me, _ := CellAt(6, 6)
+	u := &CombatUnit{General: 58, Cell: me, Attacking: true}
+	occ[me] = u.General
+
+	roster := map[GeneralID]*CombatUnit{58: u}
+	lookup := func(g GeneralID) *CombatUnit { return roster[g] }
+
+	if !occ.Isolated(bf, u, lookup) {
+		t.Error("旁邊沒人卻不算孤立")
+	}
+
+	// 放一個同方的友軍在旁邊 → 不孤立
+	friend, _ := u.Cell.Neighbour(DirDown)
+	occ[friend] = 99
+	roster[99] = &CombatUnit{General: 99, Cell: friend, Attacking: true}
+	if occ.Isolated(bf, u, lookup) {
+		t.Error("旁邊有同方單位卻算孤立")
+	}
+
+	// 同一個友軍改站高山 → 原版不算它，又變孤立
+	fcol, frow := friend.ColRow()
+	bf.Tiles[frow][fcol] = assets.Tile{Kind: assets.TileMountain, Rail: assets.NoRail}
+	if !occ.Isolated(bf, u, lookup) {
+		t.Error("友軍站在高山上，原版不算，應該仍是孤立")
+	}
+
+	// 敵方相鄰不解除孤立
+	bf.Tiles[frow][fcol] = assets.Tile{Kind: assets.TilePlain, Rail: assets.NoRail}
+	roster[99].Attacking = false
+	if !occ.Isolated(bf, u, lookup) {
+		t.Error("旁邊只有敵方，應該算孤立")
+	}
+}

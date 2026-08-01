@@ -310,3 +310,36 @@ func (o *Occupancy) Exhausted(bf *Battlefield, u *CombatUnit) bool {
 	}
 	return true
 }
+
+// Isolated 回報這個單位周圍六格有沒有同一方的單位，語意照 `sub_53C28`。
+//
+// 原版的迴圈：
+//
+//	for dir = 1..6:
+//	    n = 鄰格(單位.+5, dir)
+//	    if 不相鄰:                 continue
+//	    if 地形(n) == 高山:         continue   ← 高山格不算，即使上面站了人
+//	    if 佔用表[n] == 0:          continue
+//	    if 單位[佔用表[n]].+8 == 自己的 +8:  不孤立
+//
+// 孤立時 `sub_53DA9` 會把某個旗標清 0。**那個旗標是什麼未解**，
+// 所以這裡只提供判斷，不套用後果。詞表的「大軍集結」與「協同攻擊」
+// （`4.15` 42、40）是最自然的候選，但沒有證據。
+//
+// `units` 是「將領 ID → 單位」的查表，由呼叫端提供。
+func (o *Occupancy) Isolated(bf *Battlefield, u *CombatUnit, units func(GeneralID) *CombatUnit) bool {
+	for _, n := range u.Cell.Neighbours() {
+		col, row := n.ColRow()
+		if bf.Tiles[row][col].Kind == assets.TileMountain {
+			continue
+		}
+		id := o[n]
+		if id == 0 {
+			continue
+		}
+		if m := units(id); m != nil && m.Attacking == u.Attacking {
+			return false
+		}
+	}
+	return true
+}
