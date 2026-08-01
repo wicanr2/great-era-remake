@@ -6,7 +6,12 @@
 //
 //	tools/go.sh run ./cmd/dsds -game workplace/orig/game
 //
-// 操作：← → 切換省份，F10 離開（CLAUDE.md §9：ESC 只取消／退回，F10 才離開）。
+// 操作（CLAUDE.md §9：**ESC 只取消／退回上一層，F10 才離開**）：
+//
+//	← →      切換省份
+//	Enter    叫出政略指令選單
+//	ESC      關掉選單／取消離開
+//	F10      離開，跳 Y／N 確認並自動存檔；存檔失敗就不離開
 //
 // 需要顯示器。無頭環境請跑 internal/ui/render 的測試，
 // 那一層不依賴 Ebiten，會逐像素比對原版截圖。
@@ -38,22 +43,73 @@ const (
 	fieldX, fieldY = 190, 14
 )
 
+// 配色取自實機截圖的實際像素值（面板的暗紅字與米黃底）。
+var (
+	panelInk   = assets.RGB{R: 0xAE, G: 0x00, B: 0x00}
+	panelPaper = assets.RGB{R: 0xFF, G: 0xFF, B: 0xA2}
+)
+
+// screen 是介面的狀態。ESC 一律退回上一層，不會直接離開。
+type screen int
+
+const (
+	screenMap     screen = iota // 戰場 + 省份面板
+	screenCommand               // 政略指令選單
+	screenQuit                  // 離開確認
+)
+
 type app struct {
 	m        *game.Map
 	tbl      *game.ProvinceTable // 39 省的狀態（存檔或初始檔）
 	generals []game.General      // 該期的將領表
 	fonts    render.PanelFonts   // 面板用的三個字模檔
 	tiles    *render.TileSet     // NEWTERR + RAIL 的圖塊
+	origSave []byte              // 原始存檔內容，寫回時當基底
+	cmdFonts render.CommandFonts
 	current  game.ProvinceID
+	screen   screen
+	savePath string // 離開時自動存檔的目標（不覆蓋原版）
+	saveErr  error  // 存檔失敗就不離開
 	dirty    bool
 	frame    *ebiten.Image
 }
 
 func (a *app) Update() error {
-	if ebiten.IsKeyPressed(ebiten.KeyF10) {
-		return ebiten.Termination
+	// F10 是唯一的離開鍵，而且要先確認（CLAUDE.md §9）。
+	if inpututil.IsKeyJustPressed(ebiten.KeyF10) && a.screen != screenQuit {
+		a.screen, a.dirty = screenQuit, true
+		return nil
 	}
+
+	switch a.screen {
+	case screenQuit:
+		switch {
+		case inpututil.IsKeyJustPressed(ebiten.KeyY):
+			// 存檔失敗就不離開。
+			if err := a.autosave(); err != nil {
+				a.saveErr, a.screen, a.dirty = err, screenMap, true
+				fmt.Fprintln(os.Stderr, "自動存檔失敗，不離開:", err)
+				return nil
+			}
+			return ebiten.Termination
+		case inpututil.IsKeyJustPressed(ebiten.KeyN),
+			inpututil.IsKeyJustPressed(ebiten.KeyEscape):
+			a.screen, a.dirty = screenMap, true
+		}
+		return nil
+
+	case screenCommand:
+		// ESC 只退回上一層。
+		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+			a.screen, a.dirty = screenMap, true
+		}
+		return nil
+	}
+
 	switch {
+	case inpututil.IsKeyJustPressed(ebiten.KeyEnter),
+		inpututil.IsKeyJustPressed(ebiten.KeyKPEnter):
+		a.screen, a.dirty = screenCommand, true
 	case inpututil.IsKeyJustPressed(ebiten.KeyRight):
 		a.current++
 		if a.current > game.ProvinceCount {
@@ -68,6 +124,25 @@ func (a *app) Update() error {
 		a.dirty = true
 	}
 	return nil
+}
+
+// autosave 把當前的省份狀態寫回一份**副本**。
+//
+// CLAUDE.md §9：原版資產唯讀，測試存檔一律寫到明確的輸出目錄，
+// 不覆蓋原版的 SAVE(1).DT1。寫回是「改寫」不是「重建」——
+// 未解區域一個 byte 都不動（internal/game/save.go）。
+func (a *app) autosave() error {
+	if a.savePath == "" || a.origSave == nil {
+		return nil // 沒有存檔來源（用初始檔開的），不寫
+	}
+	out, err := game.WriteProvinces(a.origSave, a.tbl)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(a.savePath), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(a.savePath, out, 0o644)
 }
 
 func (a *app) compose() error {
@@ -99,6 +174,18 @@ func (a *app) compose() error {
 		return err
 	}
 
+	switch a.screen {
+	case screenCommand:
+		if err := c.DrawCommandPage(a.cmdFonts, panelInk, panelPaper,
+			fieldX, fieldY, render.ModeBGIW-fieldX, render.ModeBGIH-fieldY); err != nil {
+			return err
+		}
+	case screenQuit:
+		// 離開確認。用原版詞表的「您確定嗎」（4.15 詞條 0）。
+		c.DrawConfirmBox(a.cmdFonts.W4, panelInk, panelPaper,
+			fieldX+60, fieldY+120)
+	}
+
 	a.frame = ebiten.NewImageFromImage(c.Image())
 	a.dirty = false
 	return nil
@@ -121,15 +208,18 @@ func (a *app) Layout(_, _ int) (int, int) {
 func main() {
 	gameDir := flag.String("game", "workplace/orig/game", "原版素材目錄（唯讀）")
 	start := flag.Int("province", 26, "起始省編號（1-39），預設 26 = 湖北省")
+	// CLAUDE.md §9：原版資產唯讀，存檔一律寫到別的地方。
+	savePath := flag.String("save", "workplace/saves/SAVE(1).DT1",
+		"離開時自動存檔的路徑（**不會**覆蓋原版）")
 	flag.Parse()
 
-	if err := run(*gameDir, game.ProvinceID(*start)); err != nil {
+	if err := run(*gameDir, game.ProvinceID(*start), *savePath); err != nil {
 		fmt.Fprintln(os.Stderr, "錯誤:", err)
 		os.Exit(1)
 	}
 }
 
-func run(dir string, start game.ProvinceID) error {
+func run(dir string, start game.ProvinceID, savePath string) error {
 	if !start.Valid() {
 		return fmt.Errorf("省編號 %d 超出 1..%d", start, game.ProvinceCount)
 	}
@@ -175,8 +265,18 @@ func run(dir string, start game.ProvinceID) error {
 		return err
 	}
 
+	w4, err := read("4.15")
+	if err != nil {
+		return err
+	}
+	w4f, err := assets.ParseGlyphFile(w4)
+	if err != nil {
+		return err
+	}
+	cmdFonts := render.CommandFonts{W2: fonts.W2, W4: w4f}
+
 	// 省份狀態：優先讀存檔，沒有就用第一期的初始檔。
-	tbl, err := loadProvinces(read)
+	tbl, origSave, err := loadProvinces(read)
 	if err != nil {
 		return err
 	}
@@ -208,7 +308,8 @@ func run(dir string, start game.ProvinceID) error {
 	ebiten.SetWindowSize(render.ModeBGIW*scale, render.ModeBGIH*scale)
 	ebiten.SetWindowTitle("大時代的故事")
 	return ebiten.RunGame(&app{
-		m: m, tbl: tbl, generals: generals, fonts: fonts, tiles: ts,
+		m: m, tbl: tbl, generals: generals, fonts: fonts, cmdFonts: cmdFonts,
+		tiles: ts, origSave: origSave, savePath: savePath,
 		current: start, dirty: true,
 	})
 }
@@ -217,13 +318,16 @@ func run(dir string, start game.ProvinceID) error {
 // 第一期的初始檔 TOWN(1).DAT。
 //
 // 兩個檔案是同一個結構，只差 4 bytes 的相位（docs/spec/03 §1）。
-func loadProvinces(read func(string) ([]byte, error)) (*game.ProvinceTable, error) {
+// 第二個回傳值是原始存檔的 bytes，寫回時當基底；用初始檔開的話是 nil。
+func loadProvinces(read func(string) ([]byte, error)) (*game.ProvinceTable, []byte, error) {
 	if b, err := read("SAVE(1).DT1"); err == nil {
-		return game.ParseSaveProvinces(b)
+		t, err := game.ParseSaveProvinces(b)
+		return t, b, err
 	}
 	b, err := read("TOWN(1).DAT")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return game.ParseTownFile(b)
+	t, err := game.ParseTownFile(b)
+	return t, nil, err
 }

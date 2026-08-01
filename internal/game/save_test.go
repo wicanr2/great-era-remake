@@ -102,3 +102,33 @@ func TestDateRoundTrip(t *testing.T) {
 		t.Errorf("讀回來是民國 %d 年 %d 月", back.Date.Year, back.Date.Month)
 	}
 }
+
+// TestAutosaveDoesNotTouchOriginal 模擬離開時的自動存檔：
+// 寫出的是副本，原始 bytes 不變。
+//
+// CLAUDE.md §9：原版資產唯讀，測試存檔一律寫到明確的輸出目錄。
+func TestAutosaveDoesNotTouchOriginal(t *testing.T) {
+	orig := readGame(t, "SAVE(1).DT1")
+	snapshot := make([]byte, len(orig))
+	copy(snapshot, orig)
+
+	tbl, err := ParseSaveProvinces(orig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p, _ := tbl.At(26)
+	p.Gold = 999
+
+	out, err := WriteProvinces(orig, tbl)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if d := DiffBytes(orig, snapshot, 4); len(d) != 0 {
+		t.Fatalf("WriteProvinces 改動了傳入的原始 bytes，offset %v", d)
+	}
+	back, _ := ParseSaveProvinces(out)
+	bp, _ := back.At(26)
+	if bp.Gold != 999 {
+		t.Errorf("副本沒有寫入新值")
+	}
+}

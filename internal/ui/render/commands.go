@@ -94,3 +94,20 @@ func (c *Canvas) DrawCommandMenu(f CommandFonts, fg assets.RGB, x, y int) error 
 	}
 	return nil
 }
+
+// w4Confirm 是 `4.15` 的詞條 0：「您確定嗎」。
+const w4Confirm = 0
+
+// DrawConfirmBox 畫一個離開確認框。
+//
+// 用原版詞表的「您確定嗎」（`4.15` 詞條 0），不是重打的字串。
+// 依 CLAUDE.md §9：ESC 只取消／退回，F10 才離開，離開前要確認並自動存檔。
+func (c *Canvas) DrawConfirmBox(w4 *assets.GlyphFile, fg, bg assets.RGB, x, y int) {
+	const w, h = 4*GlyphAdvance + 40, 60
+	c.fillRect(x, y, w, h, bg)
+	c.strokeRect(x, y, w, h, fg)
+	_ = c.DrawEntry(w4, w4Confirm, 4, fg, x+20, y+12, true)
+	// Y／N 用數字字型畫不出來，這裡用兩個框標示按鍵位置（remake 差異）。
+	c.strokeRect(x+24, y+36, 18, 16, fg)
+	c.strokeRect(x+64, y+36, 18, 16, fg)
+}
