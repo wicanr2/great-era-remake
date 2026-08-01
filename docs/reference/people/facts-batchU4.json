@@ -1,0 +1,832 @@
+{
+  "schema_version": "1",
+  "generated": "2026-08-02",
+  "batch": "batch-U4",
+  "sources": {
+    "S-GPOST": {
+      "tier": "A",
+      "title": "中華民國政府官職資料庫（國立政治大學圖書館）",
+      "url": "https://gpost.lib.nccu.edu.tw/",
+      "note": "取自《政府公報》《國民政府公報》的任免令，逐筆帶日期。查法 view_career.php?name=<姓名>&pagenumber=200。年份為民國紀年，本檔一律換算為西元後記錄。⚠ 解析器只信頁面上的『共有(\\d+)筆』計數（規格 §15.5）；抓不到計數一律當抓取失敗重試，不得當零筆。⚠ 本批 18 個名字全部至少查兩輪（§12.1），零命中的 6 個名字兩輪都是 0 筆。⚠ 以姓名為鍵不是以人為鍵（§9.3）：本批 #366 劉召棠 8 筆、#369 張翼 12 筆、#376 佟毅 2 筆、#417 蔣公權 3 筆均含同名他人，分群結果記於各人 identity.disambiguation。⚠ 該站自帶版權聲明，本檔只取事實（誰在哪一天任什麼職），未複製其敘述文字。",
+      "fetched": "2026-08-02"
+    },
+    "S-WPZH": {
+      "tier": "B",
+      "title": "中文維基百科（有內文引註或已出版書目的條目）",
+      "url": "https://zh.wikipedia.org/",
+      "note": "依 §3.1 第 1 條，維基各條目合併計為一個 Tier B 來源（〈19XX年中国〉系列除外，見 S-WPNB）。取用方式為 MediaWiki API action=parse&prop=wikitext 全文，非搜尋摘要。依 §14.5 逐條目查過引註與書目：〈晉系軍閥〉引黃啟昌《亂世之狐：晉系軍閥全傳》；〈廣州戰役 (1938年)〉引何應欽《日軍侵華八年抗戰史》與國防大學《中國現代軍事史主要戰役表》；〈国民革命军第六十二军〉引張明金、劉立勤《國民黨歷史上的158個軍》與戚厚傑《國民革命軍沿革實錄》；〈第二次龍岡戰鬥〉引國防大學《中國現代軍事史主要戰役表》；〈國民革命軍陸軍第三十四軍〉〈國民革命軍陸軍第八十三軍〉〈國民革命軍第十九軍〉〈国民革命军第二十一军〉〈國民革命軍第六軍〉〈国民革命军第七军〉〈新桂系〉〈桂南会战〉〈上党战役〉〈四渡赤水〉〈国民革命军炮兵〉〈国民革命军第四十六军〉〈國民革命軍第十八軍〉〈國民革命軍北伐〉〈黄埔一期〉均有內文 <ref> 或書目。",
+      "fetched": "2026-08-02"
+    },
+    "S-WPNB": {
+      "tier": "B",
+      "title": "中文維基百科〈19XX年中国〉年表系列（逐條引郭廷以《中華民國史事日誌》並標頁碼）",
+      "url": "https://zh.wikipedia.org/wiki/1933%E5%B9%B4%E4%B8%AD%E5%9B%BD",
+      "note": "依 §13.4（G-06-3）與 S-WPZH 分別計為獨立來源——它是對郭廷以著作的轉引，逐條標 rp 頁碼。本批用到〈1927年中国〉〈1928年中国〉〈1930年中国〉〈1933年中国〉〈1938年中国〉〈1939年中国〉〈1940年中国〉〈1941年中国〉〈1943年中国〉。⭐ 與 S-GPOST 經常同日對上（§12.9），本批 #35 郭思演 的 1933-12-04 即是。",
+      "fetched": "2026-08-02"
+    },
+    "S-WPLIST": {
+      "tier": "C",
+      "title": "中文維基百科的名冊型條目（逐項無獨立引註）",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BF%9D%E5%AE%9A%E9%99%B8%E8%BB%8D%E8%BB%8D%E5%AE%98%E5%AD%B8%E6%A0%A1",
+      "note": "依 §10.3 單獨列級：〈保定陸軍軍官學校〉〈陸軍大學〉〈陆军士官学校 (日本)〉〈抗战胜利勋章〉〈青天白日勳章授勳人員列表〉〈国民革命军集团军序列〉〈1938年國民革命軍戰鬥序列〉〈中華民國南京國民政府時期廣東省職官列表〉〈中華民國南京國民政府時期河南省職官列表〉〈中華民國南京國民政府時期廣西省職官列表〉〈临桂区〉名人欄。這一類逐條羅列、個別項目沒有引註，不符 Tier B 條件，不與 S-WPZH 合併。⭐ 本批 5 筆學歷與 2 筆籍貫（#366 北京、#417 浙江諸暨）全部只出自這一類，是本批唯一的身分欄來源（§16 的『名冊全表反查』）。",
+      "fetched": "2026-08-02"
+    },
+    "S-ROSTER": {
+      "tier": "A",
+      "title": "本專案的原版一手資料（`MAN(N)15` 字模、`MAN(1).DAT` 名冊順序與效忠欄）",
+      "url": "docs/reference/people/03-ingame-affiliation.md",
+      "note": "⚠ 依 §11.6 **僅限 identity 佐證，不作史實陳述，不進正文**。本批用途有二：①字模反查確認原版到底刻了哪個字（`tools/eten.py` 逐 byte 比對倚天字庫，漢明距離 0/240 才算 byte-exact）；②名冊順序——`MAN115` 的排列與維基〈國民革命軍北伐〉的 1926 年戰鬥序列高度平行（#1 蔣中正總司令、#2 何應欽第一軍軍長、#5 王柏齡、#6 譚曙卿、#9 劉峙、#10 馮軼裴、#12 錢大鈞、#14 譚延闓第二軍軍長；#244 夏威、#245 李明瑞、#247 黃旭初、#248 劉日福正好是第七軍第一至第四旅旅長），這個平行關係是本批四筆 identity 推定的旁證。",
+      "fetched": "2026-08-02"
+    },
+    "S-NONE": {
+      "tier": "none",
+      "title": "不計 tier 但查到東西的來源（依 §15.3 仍登錄）",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BD%9F%E6%AF%85",
+      "note": "①維基〈佟毅〉專條存在，但內容是 1963 年生的吉林通化人、第十二屆全國人大代表，與本批 #376 無關——查到它等同『查無專條』（§10.3），但要登錄，否則下一輪重跑會白做一次（§15.3）。②維基〈張翼〉與〈佟毅〉兩個標題都存在，本批 18 人只有這兩個標題非紅連結，且都不是本人。③〈鄺日修〉條目裡的『羅心源』是 1865–1884 年香港聖公會的華人會吏，與 #243 無關。"
+    }
+  },
+  "people": [
+    {
+      "id": 13,
+      "name_ingame": "蔡仲笏",
+      "name_common": "",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["蔡忠笏（可能的通行寫法，見 disambiguation）", "蔡仲芴（異寫，查證用）"],
+        "disambiguation": "「蔡仲笏」三字在 S-GPOST 兩輪各 0 筆、S-WPZH insource 兩輪各 0 筆、異寫「蔡仲芴」0 筆。S-ROSTER 字模反查：`MAN115` 第 13 槽第二字模與倚天「仲」漢明距離 **0/240（byte-exact）**、與「忠」90/240 ——**原版確實刻「仲」**，不是本輪讀錯（手法同 §11.1 #183、§15.6 #297）。另有「蔡忠笏」在 S-GPOST 5 筆、S-WPZH 多處，為北伐時期第一軍炮兵團團長。S-ROSTER 旁證：`MAN115` 第 13 槽夾在第 12 槽錢大鈞（第一軍第二十師師長）與第 14 槽譚延闓（第二軍軍長）之間，正是戰鬥序列裡第一軍炮兵團團長的位置。⚠ 字模只排除『我們讀錯』，不排除『1992 年打錯字』，故仍為推定接合，用待考句處理。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown", "note": "S-GPOST 1939 年的浙江磐安縣縣長任命只說明任職地，不能推定籍貫（§14.6：Tier A 的權威在日期與職稱，不在地名）。" }
+      },
+      "education": [
+        { "year": null, "end_year": null, "institution": "保定陸軍軍官學校", "program": "第三期炮兵科", "src": ["S-WPLIST"], "conf": "low", "note": "〈保定陸軍軍官學校〉第三期炮兵科(127) 名單列劉建緒、周碞、陳焯、張義純、徐祖貽、孔慶桂、呂煥炎、蔡忠笏、項致莊等。⚠ 此筆屬「蔡忠笏」那一群。" }
+      ],
+      "posts": [
+        { "from": "1924", "to": null, "title": "黃埔軍校炮兵營營長兼第二連連長", "org": null, "station": "廣州", "src": ["S-WPZH"], "conf": "medium", "note": "〈国民革命军炮兵〉：1924 年底蔣介石以在校的黃埔二期生為骨幹組建炮兵營，蔡忠笏為營長，下設三個連，陳誠為第一連連長、蔡忠笏自兼第二連連長、羅卓英為第三連連長，全營裝備 1924 年 10 月運抵廣州的山炮與野炮。" },
+        { "from": "1926", "to": null, "title": "國民革命軍第一軍炮兵團團長", "org": "國民革命軍第一軍", "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "〈國民革命軍北伐〉1926 年戰鬥序列，第一軍條下「炮兵團長 蔡忠笏」。⭐ 這是本批唯一落在遊戲期別（北伐時期）之內的一筆。" },
+        { "from": "1928-07-25", "to": null, "title": "國民革命軍陸軍第三師步兵第七旅旅長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1934-11-18", "to": null, "title": "陸軍砲兵第二旅旅長", "org": null, "station": null, "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "⭐ 兩來源對同一事實都有記載（§15.1）：S-GPOST 1934-11-18「任命蔡忠笏陸軍砲兵第二旅旅長」；S-WPZH〈淞沪会战〉的砲兵序列列「砲兵第二旅蔡忠笏第二團」。" },
+        { "from": "1936-02-01", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階。" },
+        { "from": "1939-10-14", "to": "1941-06-10", "title": "浙江磐安縣縣長（署）", "org": null, "station": "浙江磐安", "src": ["S-GPOST"], "conf": "medium", "note": "卸任事由「另有任用」。" }
+      ],
+      "events": [
+        { "when": "1937", "where": "上海", "name": "淞滬會戰", "role": "砲兵第二旅", "outcome": null, "src": ["S-WPZH"], "conf": "low", "note": "條目的砲兵序列只寫「砲兵第二旅蔡忠笏第二團」，未給更多細節。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": "陸軍砲兵第二旅旅長", "src": ["S-GPOST", "S-WPZH"], "conf": "low", "note": "⚠ 此值屬「蔡忠笏」那一群，identity 未定，故 conf 為 low。原 people.json 此欄空白。" },
+      "faction": { "value": "國民革命軍第一軍", "src": ["S-WPZH"], "conf": "low", "note": "同上，identity 未定。原 people.json 此欄空白。" },
+      "verified_by": ["S-GPOST", "S-WPZH", "S-WPLIST", "S-ROSTER"],
+      "confidence": "low",
+      "open_join": true,
+      "conflicts": [
+        {
+          "field": "identity",
+          "statements": [
+            { "src": "S-ROSTER", "says": "MAN115 第 13 槽第二字模與倚天「仲」byte-exact（0/240），與「忠」相距 90/240" },
+            { "src": "S-GPOST", "says": "「蔡仲笏」0 筆（兩輪）；「蔡忠笏」5 筆，1928–1941" }
+          ],
+          "resolved": false,
+          "note": "推定接合：字模證明原版刻的是「仲」，而所有可查的記載都寫「忠」。兵科（炮兵）與時期（北伐第一軍）相合，S-ROSTER 的名冊位置也相合，但沒有任何來源說這兩個寫法是同一人。依 §5.3 第 3 條用待考句、confidence 降 low。"
+        }
+      ],
+      "gaps": [
+        "「蔡仲笏」這個寫法在 S-GPOST 與 S-WPZH 都是零筆，兩輪重跑結果相同。",
+        "生卒年、籍貫、字號全部查無（「蔡忠笏」那一群也一樣）。",
+        "1941 年 6 月免磐安縣長之後的行止查無。",
+        "下一步：《浙江省志·人物志》與磐安縣志應有 1939–41 年縣長的任職紀錄與籍貫；黃埔軍校炮兵營的營級人事在《黃埔軍校史料》裡可望有全名與字號，可用來確認「仲／忠」哪一個是本名。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪確認『蔡仲笏』三字確實查無，但由 S-WPZH 與 S-GPOST 找到寫法一字之差、兵科與時期都相合的「蔡忠笏」，以待考句寫入。"
+    },
+    {
+      "id": 35,
+      "name_ingame": "郭思演",
+      "name_common": "郭思演",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["郭思寅（異寫，查證用，S-GPOST 0 筆）"],
+        "disambiguation": "S-GPOST「郭思演」3 筆落在 1933–1936 年，職務為第九十九師師長、陸軍少將、陸軍中將，官階單調上升無倒序（§10.2），與 S-WPZH／S-WPNB 的記載連貫，未見同名他人混入。繁簡同形，無異寫問題（S-GPOST「郭思寅」0 筆）。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [
+        { "year": 1918, "end_year": 1922, "institution": "保定陸軍軍官學校", "program": "第八期炮兵科", "src": ["S-WPLIST"], "conf": "low", "note": "〈保定陸軍軍官學校〉第八期炮兵科(97) 名單列陳誠、于浚都、羅卓英、宋肯堂、鄒洪、史文桂、郭思演、馬法五、高卓東。⭐ 與 batch09 的 #391 宋肯堂、#396 高卓東 同期同科。入學與畢業年份取自同條目第八期的期別說明。" }
+      ],
+      "posts": [
+        { "from": "1933-12-04", "to": null, "title": "陸軍第九十九師師長", "org": null, "station": null, "src": ["S-GPOST", "S-WPNB"], "conf": "high", "note": "⭐ 日期完全一致：S-GPOST 記 1933-12-04「任命郭思演陸軍第九十九師師長」；S-WPNB〈1933年中国〉12 月 4 日條記「國民政府任郭思演為第九十九師師長」，引郭廷以系統標頁碼 4528。" },
+        { "from": "1935-04-15", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階。" },
+        { "from": "1936-10-05", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階，晉升。⭐ 同日晉升陸軍中將的還有本批 #242 莫希德（§11.3 的同日成批受令判準）。" },
+        { "from": "1938", "to": null, "title": "虎門要塞司令", "org": null, "station": "廣東虎門", "src": ["S-WPZH"], "conf": "medium", "note": "〈廣州戰役 (1938年)〉的守軍序列「虎門要塞 司令 郭思演」。" },
+        { "from": null, "to": null, "title": "國民革命軍第十八軍參謀長", "org": "國民革命軍第十八軍", "station": null, "src": ["S-WPZH"], "conf": "low", "note": "〈國民革命軍第十八軍〉的歷任參謀長列劉紹先、郭思演、郭懺、施北衡，未給起訖年份。⚠ 第十八軍軍長陳誠與參謀長郭懺同為保定第八期炮兵科，與本人同期。" }
+      ],
+      "events": [
+        { "when": "1934-04", "where": "江西龍岡", "name": "第二次龍岡戰鬥", "role": "陸軍第九十九師師長", "outcome": "國軍取得龍岡據點", "src": ["S-WPZH"], "conf": "medium", "note": "1934-04-29 至 05-01。條目的 combatant1 作「中華民國國民革命軍99師郭思演部」、commander1 作郭思演。引國防大學編《中國現代軍事史主要戰役表》。" },
+        { "when": "1935-04", "where": "貴州貴陽", "name": "紅軍主力進逼貴陽（四渡赤水期間）", "role": "陸軍第九十九師師長", "outcome": "貴陽附近守軍僅所部四個團，滇軍孫渡部四日急行軍四百餘里馳援", "src": ["S-WPZH"], "conf": "medium", "note": "1935-04-02。〈四渡赤水〉引《圍追堵截紅軍長征親歷記》（中國文史出版社，1991）頁 15–16。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": "陸軍第九十九師師長", "src": ["S-GPOST", "S-WPNB"], "conf": "high", "note": "原 people.json 此欄空白。虎門要塞司令與第十八軍參謀長兩職的層級不高於師長。" },
+      "faction": { "value": "陸軍第九十九師", "src": ["S-GPOST", "S-WPNB"], "conf": "high", "note": "原 people.json 此欄空白。依 §6.1 原則 4 填機構名，不填派系標籤。" },
+      "verified_by": ["S-GPOST", "S-WPZH", "S-WPNB", "S-WPLIST"],
+      "confidence": "high",
+      "conflicts": [],
+      "gaps": [
+        "生卒年、籍貫、字號完全查無。S-GPOST 只有 3 筆，S-WPZH 只記職務與戰役。",
+        "1936 年晉中將至 1938 年任虎門要塞司令之間、以及 1938 年廣州戰役之後的行止全部查無。第十八軍參謀長的起訖年份亦查無。",
+        "⚠ 遊戲把他放在**北伐時期**名冊（`MAN115` 第 35 槽、所屬省 35、效忠欄蔣中正），但可查證的材料全部在 1933–1938 年，沒有一筆落在 1926–28。這與 §11.7 `G-03-5`（#56 孫長勝）是同一個形狀。",
+        "下一步：《廣東省志·軍事志》的虎門要塞沿革應有歷任司令與任期；保定第八期同期生（陳誠、羅卓英、高卓東）的傳記材料常附同期名錄與籍貫。"
+      ],
+      "editorial_notes": [
+        "S-WPZH 敘述 1934 年江西戰事時用「圍剿」「剿匪」。〈第二次龍岡戰鬥〉是事件的通行名稱，正文只寫事件名，不寫敘述動詞（§4.3 的機構／事件名例外）。"
+      ],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪由 S-GPOST 3 筆任免令與 S-WPNB〈1933年中国〉同日條目建立任職序列，並補上保定第八期炮兵科學歷、兩場戰鬥與虎門要塞司令一職。"
+    },
+    {
+      "id": 36,
+      "name_ingame": "薛仰忠",
+      "name_common": "",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["薛仰中（異寫，查證用）", "薛仰宗（異寫，查證用）", "薛仰鍾（異寫，查證用）"],
+        "disambiguation": "S-ROSTER 字模反查：`MAN115` 第 36 槽第二字模與倚天「仰」**0/240（byte-exact）**、第三字模與「忠」**0/240**、與「宗」58/240、與「中」79/240 ——原版確實刻「薛仰忠」，不是本輪讀錯。S-GPOST「薛仰忠」兩輪各 0 筆、「薛仰中」0 筆、「薛仰鍾」0 筆；S-WPZH insource 兩輪各 0 筆。異寫「薛仰宗」在 S-GPOST 有 7 筆（1932-08-22 陸軍第九十師參謀處處長、1932-09-09 軍事參議院諮議、1934-04-18 免第九十師參謀處處長、1936-03-02 免軍事參議院諮議、1936-03-11 敘陸軍礟兵上校、1944-12-02 署廣東樂昌縣縣長、1947-10-27 辭廣東樂昌縣縣長），S-WPZH 對「薛仰宗」0 筆。⚠ 該群全部落在 1932–1947 年，官階最高只到上校，與遊戲名冊的北伐時期（1926–28）與同區段其他人物（第四軍、第五軍師長級）都對不上，依 §9.3 第 2、4 步與 §12.8 判為**全數排除**。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": null, "src": [], "conf": "unknown" },
+      "faction": { "value": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-ROSTER"],
+      "confidence": "unknown",
+      "conflicts": [],
+      "gaps": [
+        "四種寫法（薛仰忠／薛仰中／薛仰宗／薛仰鍾）在 S-GPOST 各查一次，只有「薛仰宗」有筆數，且已判定為同名他人。",
+        "S-WPZH insource 對「薛仰忠」「薛仰宗」兩輪都是 0 筆；「仰忠」二字單獨搜尋 24 筆全部是廣州的地名與校名（仰忠街、仰忠匯），無人物。",
+        "⚠ 遊戲裡的這個人是誰尚未解決（§12.8）。可用的線索只有 S-ROSTER：`MAN115` 第 36 槽在第 35 槽郭思演與第 37 槽李福林（北伐第五軍軍長）之間，所屬省 35，同區段是第四軍與第五軍的師長級人物。",
+        "依 §3.2，正文寫不出任何一句，confidence 判 unknown，**不寫小傳**。",
+        "下一步：北伐時期第四軍、第五軍的完整編制表（張發奎、李福林兩部）在《廣東文史資料》與《國民革命軍沿革實錄》裡有逐團記載，是最可能出現這個名字的地方；另可試《廣東省志·人物志》的粵軍將領名錄。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪重跑後**維持 unknown**，但把「查過什麼、為什麼排除薛仰宗」寫進骨架，避免下一輪重複同一批查詢（§15.3 的理由）。"
+    },
+    {
+      "id": 42,
+      "name_ingame": "鄧彥善",
+      "name_common": "",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["鄧彥華（可能的通行寫法，見 disambiguation）", "鄧彦善（異寫，查證用）"],
+        "disambiguation": "S-ROSTER 字模反查：`MAN115` 第 42 槽第三字模與倚天「善」**0/240（byte-exact）**、與「華」98/240 ——原版確實刻「善」。S-GPOST「鄧彥善」兩輪各 0 筆、「鄧彦善」0 筆；S-WPZH insource 對「鄧彥善」「邓彦善」兩輪各 0 筆。另有「鄧彥華」在 S-GPOST 9 筆（1923–1939，大本營→國民政府副官長→廣東省政府）、S-WPZH 多處，為北伐時期第六軍第十七師師長。⭐ S-ROSTER 旁證：`MAN115` 第 41 槽程潛、第 42 槽本人、第 43 槽胡謙，正好對應〈國民革命軍北伐〉戰鬥序列的第六軍軍長程潛 → 第十七師師長鄧彥華 → 第十八師師長胡謙，三格連號。⚠ 「善」與「華」字形相距 98/240，不是形近誤植那種錯法；接合的依據是名冊位置與軍職，不是字形。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown", "note": "1929 年起的職務全在廣東，但依 §14.6 不能據以推定籍貫。" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1923-07-21", "to": null, "title": "大本營參軍處上校副官", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "此筆屬「鄧彥華」那一群，下同。" },
+        { "from": "1924-08-23", "to": null, "title": "大本營衛士隊隊長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1924-08-28", "to": null, "title": "大本營參軍", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "與前一筆相隔五天。" },
+        { "from": "1925-09-30", "to": "1926-07-26", "title": "國民政府副官長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "卸任事由「呈請辭職」。" },
+        { "from": "1926-01", "to": null, "title": "國民革命軍第六軍第十七師師長", "org": "國民革命軍第六軍", "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "〈國民革命軍第六軍〉：1926 年 1 月建國湘軍改編成國民革命軍第六軍，下轄第十七師（原攻鄂軍，師長鄧彥華）、第十八師（警衛軍，師長胡謙）、第十九師（潮梅軍，師長楊源濬），軍長程潛。⭐〈國民革命軍北伐〉的戰鬥序列另記第十七師師長為歐陽駒、副師長兼第四十九團團長為鄧彥華，見 conflicts[0]。⭐ 這是唯一落在遊戲期別（北伐時期）之內的一筆。" },
+        { "from": "1927-04-15", "to": null, "title": "廣州市公安局局長", "org": null, "station": "廣州", "src": ["S-WPZH"], "conf": "low", "note": "〈黄埔一期〉敘 1927 年 4 月 15 日廣東當局清黨時「命令廣州市公安局局長鄧彥華配合軍隊」。" },
+        { "from": "1927-12-29", "to": null, "title": "國民革命軍第五軍代軍長", "org": null, "station": "廣州", "src": ["S-WPNB", "S-WPZH"], "conf": "medium", "note": "S-WPNB〈1927年中国〉12 月 29 日條「李福林通電引咎辭職，第五軍軍長由第十六師師長鄧彥華代理」；S-WPZH〈廣州戰鬥 (國軍內戰)〉記李福林下野後「餘留勢力由鄧彥華接統」。⚠ 前者稱他為第十六師師長，與 1926 年的第十七師不合，見 conflicts[0]。" },
+        { "from": "1929-08-12", "to": null, "title": "廣東省政府委員兼廣東省政府建設廳廳長", "org": null, "station": "廣東", "src": ["S-GPOST", "S-WPLIST"], "conf": "medium", "note": "⭐ S-GPOST 記 1929-08-12；S-WPLIST〈中華民國南京國民政府時期廣東省職官列表〉記「鄧彥華 1929年8月任（建設廳長）」，月份相合。⚠ 該職官列表零引註零書目，依 §14.5 只計 Tier C，且很可能與 S-GPOST 同源（皆出自《國民政府公報》），不作互證用。" },
+        { "from": "1930-01-27", "to": null, "title": "廣東治河委員會委員", "org": null, "station": "廣東", "src": ["S-GPOST"], "conf": "medium", "note": null },
+        { "from": "1937-01-25", "to": "1939-02-08", "title": "廣東省第一區行政督察專員", "org": null, "station": "廣東", "src": ["S-GPOST"], "conf": "medium", "note": "卸任事由「免本職」。" }
+      ],
+      "events": [
+        { "when": "1927-04-29", "where": "江蘇鎮江", "name": "第六軍第十七師被繳械", "role": "第十七師", "outcome": "所部被包圍繳械，其後改編歸白崇禧節制", "src": ["S-WPNB"], "conf": "medium", "note": "〈1927年中国〉4 月 29 日條「蔣介石令白崇禧將駐鎮江程潛第六軍第十七師鄧彥華部包圍繳械，後該部改編歸白節制」，引郭廷以系統。" },
+        { "when": "1928-03-19", "where": "廣東海豐", "name": "粵軍攻占海豐城", "role": "所部", "outcome": "攻占海豐城", "src": ["S-WPNB"], "conf": "medium", "note": "〈1928年中国〉3 月 19 日條「粵軍鄧彥華部攻占海豐城」，引郭廷以系統標頁碼 2990–2991。" },
+        { "when": "1930-10-08", "where": "南京", "name": "廣東省財政與桂局會商", "role": "與廣東省政府主席陳銘樞、林雲陔同行", "outcome": null, "src": ["S-WPNB"], "conf": "low", "note": "〈1930年中国〉10 月 8 日條。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": "國民革命軍第五軍代軍長", "src": ["S-WPNB", "S-WPZH"], "conf": "low", "note": "⚠ 此值屬「鄧彥華」那一群，identity 未定。原 people.json 此欄空白。" },
+      "faction": { "value": "國民革命軍第六軍", "src": ["S-WPZH"], "conf": "low", "note": "同上。原 people.json 此欄空白。" },
+      "verified_by": ["S-GPOST", "S-WPZH", "S-WPNB", "S-WPLIST", "S-ROSTER"],
+      "confidence": "low",
+      "open_join": true,
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-WPZH〈國民革命軍第六軍〉", "says": "1926年1月，建國湘軍改編成國民革命軍第六軍，下轄17、18、19師（原攻鄂軍，師長鄧彥華、警衛軍，師長胡謙、潮梅軍，師長楊源濬）" },
+            { "src": "S-WPZH〈國民革命軍北伐〉", "says": "第六軍…第十七師 師長 歐陽駒、副師長 鄧彥華、第四十九團團長 鄧彥華（兼）" },
+            { "src": "S-WPNB〈1927年中国〉", "says": "12月29日…第五軍軍長由第十六師師長鄧彥華代理" }
+          ],
+          "resolved": false,
+          "note": "同一來源（維基，§3.1 第 1 條合併計一個）內部對第十七師師長是誰不一致，加上年表又稱他 1927 年底是第十六師師長。依 §9.4 第 2 列退到三方一致的粒度——正文只寫「在國民革命軍第六軍第十七師任職」，不寫師長或副師長，也不寫第十六師。"
+        },
+        {
+          "field": "identity",
+          "statements": [
+            { "src": "S-ROSTER", "says": "MAN115 第 42 槽第三字模與倚天「善」byte-exact（0/240），與「華」98/240；第 41–43 槽為程潛、本人、胡謙" },
+            { "src": "S-GPOST", "says": "「鄧彥善」0 筆（兩輪）；「鄧彥華」9 筆，1923–1939" }
+          ],
+          "resolved": false,
+          "note": "推定接合。依據是名冊三格連號與第六軍軍職相合，不是字形（兩字相距 98/240）。依 §5.3 第 3 條用待考句、confidence 降 low。"
+        }
+      ],
+      "gaps": [
+        "「鄧彥善」這個寫法在 S-GPOST 與 S-WPZH 都是零筆，兩輪重跑結果相同。",
+        "生卒年、籍貫、字號、學歷全部查無（「鄧彥華」那一群也一樣）。",
+        "1939 年 2 月免廣東省第一區行政督察專員之後的行止查無。",
+        "第十七師師長／副師長的矛盾未解，需要 1926 年第六軍的原始編制表才能定。",
+        "下一步：《廣東省志·人物志》與《廣東文史資料》的粵軍將領條目；程潛第六軍（建國湘軍）的沿革專著可望釐清第十六／十七師的師長更迭。"
+      ],
+      "editorial_notes": [
+        "S-WPZH〈黄埔一期〉敘 1927 年 4 月廣州事件用「清黨」。該詞是事件的通行名稱，但正文只寫職務（廣州市公安局局長）與日期，不寫事件評述。"
+      ],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪確認『鄧彥善』三字查無，另由名冊位置（程潛—本人—胡謙 三格連號對應第六軍軍長與兩位師長）找到「鄧彥華」，以待考句寫入。"
+    },
+    {
+      "id": 242,
+      "name_ingame": "莫希德",
+      "name_common": "莫希德",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["莫希得（異寫，查證用，S-GPOST 0 筆）"],
+        "disambiguation": "S-GPOST「莫希德」3 筆全部落在 1936 年，官階單調上升（少將→師長→中將），與 S-WPZH 的 1931–1941 年記載連貫，未見同名他人混入。繁簡同形。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": "福建省武平縣岩前", "src": ["S-WPZH"], "conf": "low", "note": "〈廣州戰役 (1938年)〉記他 1941 年冬出獄後「回武平岩前老家閒居」。⚠ 「老家」是推定籍貫的間接說法，不是來源直接陳述籍貫，故 conf 為 low。" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1931", "to": null, "title": "第一軍第一師副師長", "org": "廣州國民政府第一軍", "station": "廣東", "src": ["S-WPZH"], "conf": "low", "note": "〈广州国民政府 (1931年)〉的軍事序列「第一军…军长余汉谋…第一师师长李振球、副师长莫希德，第二师师长叶肇」。⚠ 該條目零內文引註，依 §14.5 實質接近 Tier C，正文寫入時不作互證用。⭐ 同序列的李振球、葉肇是 batch07 與 sample 已寫過的人物。" },
+        { "from": "1936-01-29", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階。" },
+        { "from": "1936-08-07", "to": null, "title": "陸軍第一百五十一師師長", "org": null, "station": null, "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "⭐ 兩來源對同一事實都有記載（§15.1）：S-GPOST 1936-08-07「任命莫希德陸軍第一百五十一師師長」；S-WPZH〈国民革命军第六十二军〉記 1937 年 7 月第六十二軍以第一五一、第一五二師編成時「莫希德任第151师师长」。⭐ 1936-08-07 是同日成批任令（§11.3）：batch07 的 #362 張達、#364 李振球、#371 張瑞貴 同日受令，張達正是本人 1937 年的軍長。" },
+        { "from": "1936-10-05", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階，晉升。⭐ 同日晉升陸軍中將的還有本批 #35 郭思演。" },
+        { "from": "1937-07", "to": null, "title": "國民革命軍第六十二軍第一百五十一師師長", "org": "國民革命軍第六十二軍", "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "〈国民革命军第六十二军〉：第六十二軍隸第四路軍，軍長張達；同年 12 月第四路軍改編為第十二集團軍，第六十二軍隸屬不變。" },
+        { "from": "1938-09", "to": "1938-11-15", "title": "國民革命軍第八十三軍軍長兼第一百五十一師師長", "org": "國民革命軍第八十三軍", "station": "廣東惠州", "src": ["S-WPZH"], "conf": "medium", "note": "〈國民革命軍陸軍第八十三軍〉：1938 年 9 月第一五一師由第六十二軍調歸該軍，軍長鄧龍光改由本人接任；1938-11-15 鄧龍光回任。" }
+      ],
+      "events": [
+        { "when": "1938-10", "where": "廣東大亞灣、惠州", "name": "廣州戰役", "role": "第八十三軍軍長兼第一百五十一師師長", "outcome": "10 月 10 日判斷日軍有登陸企圖並上報第四路軍總司令部；12 日日軍在大亞灣平海、稔山、澳頭、霞涌登陸，13 日進攻惠州，14 日所部撤往博羅，惠州陷落", "src": ["S-WPZH"], "conf": "medium", "note": "〈廣州戰役 (1938年)〉引何應欽《日軍侵華八年抗戰史》與國防大學《中國現代軍事史主要戰役表》。所轄兩旅旅長為何聯芳、溫淑海。" },
+        { "when": "1938-11-15", "where": "重慶", "name": "撤職查辦", "role": "第八十三軍軍長", "outcome": "撤職押送重慶查辦；處分由槍決改為判刑，再改為保釋", "src": ["S-WPZH"], "conf": "medium", "note": "來源記蔣介石以其「作戰不力，喪師失地」處分並下手諭。⚠ 「作戰不力，喪師失地」是處分令的評語，屬價值判斷，正文只寫處分事實與經過（§6.1 原則 1）。" }
+      ],
+      "ending": { "when": "1941", "where": "福建武平岩前", "how": "出獄後回原籍閒居", "src": ["S-WPZH"], "conf": "low", "note": "1941 年冬。卒年與卒地查無。" },
+      "highest_post": { "value": "國民革命軍第八十三軍軍長", "src": ["S-WPZH"], "conf": "medium", "note": "原 people.json 此欄空白。" },
+      "faction": { "value": "國民革命軍第六十二軍→第八十三軍", "src": ["S-GPOST", "S-WPZH"], "conf": "medium", "note": "原 people.json 此欄空白。依 §6.1 原則 4 填機構名序列。" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "high",
+      "conflicts": [],
+      "gaps": [
+        "生卒年、字號、學歷完全查無。籍貫只有「回武平岩前老家」這一句間接說法。",
+        "1941 年冬出獄之後的行止與卒年查無。",
+        "1931 年至 1936 年之間的職務查無（S-GPOST 最早一筆是 1936-01-29）。",
+        "⚠ 遊戲把他放在**北伐時期**名冊（`MAN115` 第 242 槽），但可查證的材料全部在 1931–1941 年。與 #35 郭思演同一個形狀。",
+        "下一步：《武平縣志》與《福建省志·人物志》應有本地籍將領條目，是最可能補上生卒年的地方；《廣東文史資料》關於 1938 年大亞灣防務的口述材料常附他的處分經過。"
+      ],
+      "editorial_notes": [
+        "1938 年 11 月的處分令原文含「作戰不力，喪師失地」與槍決手諭，屬評價性陳述。依 §6.1 原則 1 與 §4.3，正文只寫「撤職押送重慶查辦，處分由槍決改為判刑，再改為保釋」這一串可查證的處置事實，不轉述評語。"
+      ],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪由 S-GPOST 3 筆任免令與 S-WPZH 的第六十二軍、第八十三軍沿革與廣州戰役條目建立 1931–1941 年的完整序列，並取得推定籍貫。"
+    },
+    {
+      "id": 243,
+      "name_ingame": "羅心源",
+      "name_common": "羅心源",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["羅心原（異寫，查證用，S-GPOST 0 筆）", "罗心源（簡體，S-WPZH 0 筆）"],
+        "disambiguation": "S-GPOST「羅心源」2 筆，1912-02-08 與 1913-04-02，相隔十四個月，職務同屬陸軍且官階由參謀官到礮兵上校，無倒序，判為同一人。S-WPZH insource「羅心源」1 筆，出現在〈鄺日修〉條目，指 1865–1884 年香港聖公會聖士提反堂的華人會吏羅心源，與本人無關，全數排除（§12.8）。簡體「罗心源」0 筆。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1912-02-08", "to": null, "title": "陸軍第十四旅參謀官", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "任令用「派」。" },
+        { "from": "1913-04-02", "to": null, "title": "陸軍礮兵上校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階，用「授」。" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": "陸軍第十四旅參謀官", "src": ["S-GPOST"], "conf": "low", "note": "⚠ 只有兩個孤立時間點，1913 年之後全部查無，這個值很可能不是他真正的最高職務。原 people.json 此欄空白。" },
+      "faction": { "value": null, "src": [], "conf": "unknown", "note": "1912 年的陸軍第十四旅隸屬何系查無。" },
+      "verified_by": ["S-GPOST"],
+      "confidence": "low",
+      "conflicts": [],
+      "gaps": [
+        "只有 1912 與 1913 兩個孤立時間點，串不成序列（§3.2 的 low 條件）。",
+        "生卒年、籍貫、字號、學歷全部查無。1913 年之後的行止全部查無。",
+        "S-WPZH 兩輪 insource 都只有一筆不相干的同名者。",
+        "⚠ 遊戲把他放在北伐時期名冊、`MAN115` 第 243 槽，鄰近的第 244–252 槽是夏威、李明瑞、伍廷颺、黃旭初、劉日福、韋雲淞、胡宗鐸、鍾祖培、呂煥炎（新桂系）；但他可查的兩筆都在 1912–13 年的北洋陸軍，與該區段對不上。",
+        "下一步：1912–13 年的陸軍第十四旅隸屬與駐地要查《北洋陸軍史料》或《陸軍部檔案》；《政府公報》原件的同期礮兵敘階令可能帶籍貫。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪由 S-GPOST 取得兩筆帶公報日期的任免令，足以寫出兩句，但仍串不成序列。"
+    },
+    {
+      "id": 248,
+      "name_ingame": "劉日福",
+      "name_common": "劉日福",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["劉曰福（異寫，查證用，S-GPOST 0 筆）", "刘日福（簡體）"],
+        "disambiguation": "S-GPOST「劉日福」只有 1 筆（1924-09-03 授陸軍少將），無同名分群問題；異寫「劉曰福」0 筆。⭐ 繁體 insource 0 筆、簡體「刘日福」2 筆——這正是 §15.5 說的「兩邊收字習慣相反」，只查繁體會誤判成查無。S-ROSTER 旁證：`MAN115` 第 244 槽夏威、第 245 槽李明瑞、第 247 槽黃旭初、第 248 槽本人，對應〈國民革命軍北伐〉第七軍第一至第四旅旅長（夏威、李明瑞、劉日福、黃旭初），四人同組。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1924-09-03", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階，用「授」。" },
+        { "from": "1926", "to": null, "title": "國民革命軍第七軍第三旅旅長", "org": "國民革命軍第七軍", "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "〈國民革命軍北伐〉的 1926 年戰鬥序列，第七軍（軍長李宗仁、黨代表黃紹竑）下第三旅旅長劉日福，參謀長林世嘉，第五團團長張國柱、第六團團長龔壽儀。⭐ 這一筆落在遊戲期別（北伐時期）之內。" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": "國民革命軍第七軍第三旅旅長", "src": ["S-WPZH"], "conf": "medium", "note": "原 people.json 此欄空白。" },
+      "faction": { "value": "國民革命軍第七軍", "src": ["S-WPZH"], "conf": "medium", "note": "原 people.json 此欄空白。⚠ S-WPZH〈舊桂系〉的「主要人物」欄也列他的名字（與陸榮廷、陳炳焜、譚浩明、莫榮新等並列），但該欄只是姓名清單，沒有任何說明，不足以斷定他屬舊桂系或新桂系，故 faction 只填 1926 年的機構名。" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "medium",
+      "conflicts": [],
+      "gaps": [
+        "S-GPOST 只有 1 筆、S-WPZH 只有 2 處，且兩者涵蓋的欄位不重疊（一個給敘階、一個給職務）——依 §15.1 是互補不是互證，只能支撐 medium。",
+        "生卒年、籍貫、字號、學歷全部查無。1926 年之後的行止全部查無。",
+        "〈舊桂系〉把他列進主要人物清單，但沒有任何敘述，無法判斷他與舊桂系的關係。",
+        "下一步：《廣西通志·軍事志》與《新桂系史》有第七軍逐旅的沿革；1924 年 9 月那批敘階令的《政府公報》原件可能帶籍貫。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白（連 name_common 都是空的）。本輪由簡體 insource 找到〈國民革命軍北伐〉的第七軍序列，確認他是北伐時期第七軍第三旅旅長——這一筆正好落在遊戲期別之內。"
+    },
+    {
+      "id": 258,
+      "name_ingame": "王錫壽",
+      "name_common": "",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["王錫夀（異寫，查證用，S-GPOST 0 筆）", "王锡寿（簡體，S-WPZH 0 筆）"],
+        "disambiguation": "S-GPOST「王錫壽」2 筆，1913-11-12 與 1920-10-05，同為騎兵，官階由上尉到少校，單調上升無倒序，判為同一人。S-WPZH insource「王錫壽」與「王锡寿」兩輪各 0 筆；「錫壽」二字單獨搜尋 5 筆全部無關（傅錫壽等）。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1913-11-12", "to": null, "title": "陸軍騎兵上尉", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階，用「授」。" },
+        { "from": "1920-10-05", "to": null, "title": "陸軍騎兵少校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階，用「加銜」。" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": "陸軍騎兵少校", "src": ["S-GPOST"], "conf": "low", "note": "⚠ 這是敘階不是職務，而且只到 1920 年；他真正的最高職務查無。原 people.json 此欄空白。" },
+      "faction": { "value": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-GPOST"],
+      "confidence": "low",
+      "conflicts": [],
+      "gaps": [
+        "兩筆都是敘階令，沒有任何一筆是職務任命，因此連「他在哪個部隊」都不知道。",
+        "生卒年、籍貫、字號、學歷全部查無。1920 年之後的行止全部查無。",
+        "⚠ 遊戲把他放在北伐時期名冊、`MAN115` 第 258 槽，鄰近的第 253–257 槽是何鍵、李品仙、劉興、葉琪、周斕（湘軍與桂系）；但他可查的兩筆是 1913 與 1920 年的騎兵敘階，與該區段對不上。",
+        "下一步：《政府公報》原件的騎兵敘階令常帶部隊番號；北洋時期的騎兵單位不多，可從《陸軍騎兵各旅沿革》一類材料反查。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白（連 name_common 都是空的）。本輪由 S-GPOST 取得兩筆敘階令，仍不足以串成序列。"
+    },
+    {
+      "id": 282,
+      "name_ingame": "彭進之",
+      "name_common": "彭進之",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["彭晉之（異寫，查證用，S-GPOST 0 筆）", "彭进之（簡體）"],
+        "disambiguation": "S-GPOST「彭進之」6 筆落在 1934–1938 年，官階單調上升（第一師副師長→少將→河南省保安處處長→中將），無倒序（§10.2），與 S-WPZH／S-WPNB／S-WPLIST 的記載連貫，未見同名他人混入。異寫「彭晉之」0 筆。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [
+        { "year": null, "end_year": null, "institution": "保定陸軍軍官學校", "program": "第四期步兵科", "src": ["S-WPLIST"], "conf": "low", "note": "〈保定陸軍軍官學校〉第四期步兵科(209) 名單列胡宗鐸、朱懷冰、尹呈輔、彭進之、汪之斌、程汝懷、陶鈞等。⭐ 與 batch07 的 #394 汪之斌 同期同科；同期的胡宗鐸、陶鈞、程汝懷正是他早年所屬第十九軍的主官。" }
+      ],
+      "posts": [
+        { "from": null, "to": null, "title": "國民革命軍獨立第二旅旅長", "org": null, "station": null, "src": ["S-WPZH"], "conf": "low", "note": "〈國民革命軍第十九軍〉：第十九軍 1928 年 10 月編併為第十六師（師長胡宗鐸、副師長程汝懷），蔣桂戰爭戰敗後第十六師遭支解，殘部改編為國民革命軍獨立第二旅，中原大戰前夕調入第一軍成為下轄獨立旅，旅長彭進之。條目未給年份。" },
+        { "from": null, "to": null, "title": "國民革命軍第一軍第一師第三旅旅長", "org": "國民革命軍第一軍", "station": null, "src": ["S-WPZH"], "conf": "low", "note": "〈國民革命軍第一軍〉：第一師師長徐庭瑤、胡宗南（都是代理），下轄第一旅旅長胡宗南、第二旅旅長黃杰、第三旅旅長彭進之。條目未給年份。" },
+        { "from": "1934-12-31", "to": "1935-07-30", "title": "陸軍第一師副師長", "org": "陸軍第一師", "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "卸任事由「另有任用」，與下一筆的河南省保安處處長任命相隔二十天。" },
+        { "from": "1935-04-17", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階。" },
+        { "from": "1935-07-10", "to": "1938-03-04", "title": "河南省保安處處長", "org": null, "station": "河南", "src": ["S-GPOST", "S-WPLIST"], "conf": "medium", "note": "⭐ 日期完全一致：S-GPOST 記 1935-07-10 任、1938-03-04 免（事由「另有任用」）；S-WPLIST〈中華民國南京國民政府時期河南省職官列表〉的保安處處長序列作「馮劍飛（1933.3.21任）、彭進之（1935.7.10任）、潘佑強（1938.3.4任）」——**接任者的到任日就是他的免職日**。⚠ 該職官列表零引註零書目（Tier C），且很可能與 S-GPOST 同源，不作互證用。" },
+        { "from": "1938-05-10", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階，晉任。" },
+        { "from": "1938-06-27", "to": null, "title": "第十七軍團副軍團長", "org": null, "station": null, "src": ["S-WPNB"], "conf": "medium", "note": "〈1938年中国〉6 月 27 日條「軍事委員會任命彭進之為第十七軍團副軍團長」，引郭廷以系統標頁碼 5856。" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": "第十七軍團副軍團長", "src": ["S-WPNB"], "conf": "medium", "note": "原 people.json 此欄空白。" },
+      "faction": { "value": "國民革命軍第十九軍→第十六師→國民革命軍第一軍", "src": ["S-WPZH", "S-GPOST"], "conf": "medium", "note": "原 people.json 此欄空白。依 §6.1 原則 4 填機構名序列。" },
+      "verified_by": ["S-GPOST", "S-WPZH", "S-WPNB", "S-WPLIST"],
+      "confidence": "medium",
+      "conflicts": [],
+      "gaps": [
+        "S-GPOST 的 6 筆與 S-WPZH 的 2 筆涵蓋的欄位不重疊（一個給 1934–38 的任免令、一個給更早的旅長職），依 §15.1 是互補不是互證，因此判 medium 而非 high。",
+        "生卒年、籍貫、字號完全查無。",
+        "早年兩個旅長職都沒有年份，第十九軍→第十六師→獨立第二旅→第一軍獨立旅這條線的時間點全部查無。",
+        "1938 年 6 月任第十七軍團副軍團長之後的行止查無。",
+        "下一步：保定第四期同期生（胡宗鐸、陶鈞、程汝懷）的傳記與《國民黨歷史上的158個軍》的第十九軍、第十六師沿革，應能補上 1928–1934 年的年份；第十七軍團的戰鬥序列可望補上 1938 年之後。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪由 S-GPOST 6 筆任免令建立 1934–1938 年的序列，S-WPNB 補上 1938 年第十七軍團副軍團長，S-WPZH 補上更早的兩個旅長職，S-WPLIST 補上保定第四期步兵科學歷。"
+    },
+    {
+      "id": 303,
+      "name_ingame": "鄧宅珊",
+      "name_common": "",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["鄧宅山（異寫，查證用）", "鄧擇珊（異寫，查證用）", "邓宅珊（簡體）"],
+        "disambiguation": "S-ROSTER 字模反查：`MAN215` 第 39 槽第二字模與倚天「宅」**0/240（byte-exact）**、與「寶」106/240、與「澤」91/240 ——原版確實刻「宅」，不是「鄧寶珊」的誤植。S-GPOST「鄧宅珊」兩輪各 0 筆、「鄧宅山」0 筆、「鄧擇珊」0 筆；S-WPZH insource「鄧宅珊」「邓宅珊」兩輪各 0 筆，「宅珊」二字單獨搜尋全站 0 筆。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": null, "src": [], "conf": "unknown" },
+      "faction": { "value": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-ROSTER"],
+      "confidence": "unknown",
+      "conflicts": [],
+      "gaps": [
+        "三種寫法在 S-GPOST 各查一次，全部 0 筆；「鄧宅珊」另查第二輪，仍 0 筆。",
+        "S-WPZH insource 繁簡各兩輪全部 0 筆。「宅珊」二字在全站零命中——這是本批唯一連兩字組合都查不到的名字。",
+        "⚠ **`鄧寶珊` 這條線已被字模排除**：漢明距離 106/240，不是形近誤植那種錯法。",
+        "⚠ 遊戲裡的這個人是誰尚未解決（§12.8）。可用的線索只有 S-ROSTER：`MAN215` 第 39 槽在第 38 槽何柱國與第 40 槽馬占山之間，前後是傅作義、趙承綬、門炳岳，屬綏遠與騎兵集團一帶。",
+        "依 §3.2，正文寫不出任何一句，confidence 判 unknown，**不寫小傳**。",
+        "下一步：抗戰前期綏遠與察哈爾的騎兵各軍、各師編制表（騎兵第二軍何柱國、騎兵第七師門炳岳、東北挺進軍馬占山）在《內蒙古文史資料》與《綏遠通志稿》有逐級記載，是最可能出現這個名字的地方。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪重跑後**維持 unknown**，但用字模排除了「鄧寶珊」這條最直覺的猜測，並把查過的寫法登錄下來（§15.3）。"
+    },
+    {
+      "id": 329,
+      "name_ingame": "周祖晁",
+      "name_common": "",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["周祖晃（可能的通行寫法，見 disambiguation）", "周祖朝（異寫，查證用）"],
+        "disambiguation": "S-ROSTER 字模反查：`MAN215` 第 71 槽第三字模與倚天「晁」**0/240（byte-exact）**、與「晃」61/240、與「曇」93/240 ——原版確實刻「晁」。S-GPOST「周祖晁」兩輪各 0 筆、「周祖朝」0 筆；S-WPZH insource「周祖晁」兩輪各 0 筆。另有「周祖晃」在 S-GPOST 6 筆、S-WPZH 21 處，為新桂系第七軍軍長。⭐ S-ROSTER 旁證：`MAN215` 第 69 槽李品仙、第 70 槽廖磊、第 71 槽本人、第 72 槽韋雲淞，四格連號全部是新桂系第十一與第二十一集團軍的主官，而 1937–38 年第七軍的軍長正是周祖晃、上一級是第二十一集團軍總司令廖磊。⚠ 「晁」與「晃」相距 61/240，字形接近但不是 byte 級誤差；字模只排除『我們讀錯』，不排除『1992 年打錯字』。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": "廣西省臨桂", "src": ["S-WPLIST"], "conf": "low", "note": "〈临桂区〉的名人欄列周祖晃。該欄逐項無引註，依 §10.3 只計 Tier C。" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1930-10", "to": "1937-11-01", "title": "國民革命軍第七軍副軍長", "org": "國民革命軍第七軍", "station": "廣西百色", "src": ["S-WPZH", "S-GPOST"], "conf": "high", "note": "⭐ 兩來源對同一事實都有記載（§15.1）：S-WPZH〈国民革命军第七军〉記 1930 年 10 月廖磊升任軍長、周祖晃任副軍長，軍司令部設於百色；S-GPOST 記 1937-11-01「另有任用周祖晃陸軍第七軍副軍長」，是同一個職務的卸任令。" },
+        { "from": "1936-01-29", "to": null, "title": "陸軍少將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階。" },
+        { "from": "1937-03-13", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階，晉任。" },
+        { "from": "1937-11", "to": "1938", "title": "國民革命軍第七軍軍長", "org": "第二十一集團軍", "station": null, "src": ["S-WPZH", "S-WPLIST"], "conf": "medium", "note": "S-WPZH〈国民革命军第七军〉有「周祖晃時期」一節；S-WPLIST〈1938年國民革命軍戰鬥序列〉記「第21集團軍司令官廖磊，下轄：國民革命軍第七軍軍長周祖晃」。卸任見 events[0]。" },
+        { "from": "1940-05-01", "to": "1942-12", "title": "國民革命軍第四十六軍軍長", "org": null, "station": null, "src": ["S-WPNB", "S-WPZH"], "conf": "high", "note": "⭐ 兩來源對同一事實都有記載：S-WPNB〈1940年中国〉5 月 1 日條「軍事委員會任命周祖晃為第四十六軍軍長」，引郭廷以系統標頁碼 6281–6282；S-WPZH〈国民革命军第四十六军〉的歷任軍長列「周祖晃 1940年5月～1942年12月」。" },
+        { "from": "1949-07-29", "to": null, "title": "桂林綏靖公署副主任", "org": null, "station": "桂林", "src": ["S-GPOST"], "conf": "medium", "note": "任令用「派」。" },
+        { "from": "1949-10-11", "to": null, "title": "廣西省政府委員", "org": null, "station": "廣西", "src": ["S-GPOST"], "conf": "medium", "note": null }
+      ],
+      "events": [
+        { "when": "1938", "where": "安徽宿縣", "name": "徐州會戰後的軍紀處分", "role": "國民革命軍第七軍軍長", "outcome": "因宿縣失守撤職查辦，第七軍軍長由第二十一集團軍參謀長張淦接任", "src": ["S-WPZH"], "conf": "medium", "note": "〈国民革命军第七军〉：同案第七軍第一七一師師長楊俊昌判入獄十年，抗戰勝利後獲釋。" },
+        { "when": "1939-12", "where": "廣西高峰隘", "name": "桂南會戰", "role": "西路軍第一縱隊司令", "outcome": "攻擊高峰隘", "src": ["S-WPZH"], "conf": "medium", "note": "〈桂南会战〉：西路軍總指揮夏威，第一縱隊司令周祖晃攻擊高峰隘，第二縱隊司令韋雲淞在南寧南部蘇圩集結。該條目有 51 處內文引註。" }
+      ],
+      "ending": { "when": "1950-05-09", "where": null, "how": "國民政府免去其陸軍中將兼桂林綏靖公署副主任職", "src": ["S-GPOST"], "conf": "medium", "note": "⚠ 免職令的事由欄原文帶評價性用語，依 §4.3 與 §6.1 原則 2 不轉述，正文只寫免職這件事實與日期。卒年與卒地查無。" }
+      ,
+      "highest_post": { "value": "國民革命軍第四十六軍軍長", "src": ["S-WPNB", "S-WPZH"], "conf": "medium", "note": "⚠ 此值屬「周祖晃」那一群，identity 未定。原 people.json 此欄空白。" },
+      "faction": { "value": "國民革命軍第七軍→第四十六軍", "src": ["S-WPZH", "S-WPNB"], "conf": "medium", "note": "同上。原 people.json 此欄空白。" },
+      "verified_by": ["S-GPOST", "S-WPZH", "S-WPNB", "S-WPLIST", "S-ROSTER"],
+      "confidence": "low",
+      "conflicts": [
+        {
+          "field": "identity",
+          "statements": [
+            { "src": "S-ROSTER", "says": "MAN215 第 71 槽第三字模與倚天「晁」byte-exact（0/240），與「晃」61/240；第 69–72 槽為李品仙、廖磊、本人、韋雲淞" },
+            { "src": "S-GPOST", "says": "「周祖晁」0 筆（兩輪）；「周祖晃」6 筆，1936–1950" }
+          ],
+          "resolved": false,
+          "note": "推定接合。依據是名冊四格連號（全部是新桂系第十一、第二十一集團軍主官）與軍職相合，以及字形接近。依 §5.3 第 3 條用待考句、confidence 降 low——本篇的主敘述整段依賴這個接合，因此不適用 §10.1 的 open_join 例外。"
+        }
+      ],
+      "gaps": [
+        "「周祖晁」這個寫法在 S-GPOST 與 S-WPZH 都是零筆，兩輪重跑結果相同。",
+        "生卒年、字號、學歷全部查無（「周祖晃」那一群也一樣）。籍貫只有〈临桂区〉名人欄這一個 Tier C 來源。",
+        "1938 年撤職查辦到 1939 年 12 月桂南會戰之間的行止查無；1942 年 12 月卸第四十六軍軍長到 1949 年 7 月之間也全部查無。",
+        "1950 年之後的行止與卒年查無。",
+        "下一步：《廣西通志·軍事志》與《新桂系史》有第七軍、第四十六軍逐年的主官更迭；臨桂縣志的人物志應有生卒年。"
+      ],
+      "editorial_notes": [
+        "S-GPOST 1950-05-09 那筆的事由欄是當時官方的政治定性用語，屬 §4.3 的禁用範圍。骨架記錄「免陸軍中將兼桂林綏靖公署副主任」這個處置事實與日期，正文同樣只寫處置，不寫定性。"
+      ],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪確認『周祖晁』三字查無，另由名冊四格連號（李品仙—廖磊—本人—韋雲淞）找到新桂系第七軍軍長「周祖晃」，以待考句寫入。"
+    },
+    {
+      "id": 366,
+      "name_ingame": "劉召棠",
+      "name_common": "劉召棠",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["劉召堂（異寫，查證用，S-GPOST 0 筆）", "刘召棠（簡體）"],
+        "disambiguation": "S-GPOST「劉召棠」8 筆，⚠ **官階倒序**（1925-09-24 授陸軍中將 → 1933-03-09 任陸軍獨立第三旅第六團團長 → 1935-05-07 任陸軍步兵上校），依 §10.2 分為兩群：**前群 1913–1925**（1913-03-02 授陸軍步兵上校並加銜少將、1913-04-23 授陸軍少將、1916-03-21 陝西陸軍第四混成旅參謀長、1925-01-13 鞏縣兵工廠總辦、1925-09-24 授陸軍中將）與**後群 1933–1935**（獨立第三旅第六團團長、陸軍步兵上校）。⚠ §15.2 的但書（整編／編遣時官階倒序不觸發）在此不成立：兩群之間差八年，而且前群是北洋系統（陝西、鞏縣）、後群是晉綏軍系統，不是同一支部隊的縮編。**正文只採後群**，因為只有後群與遊戲名冊的期別（抗日後期）和 S-WPZH 的第十九軍記載相合。⭐ 簡體 insource 3 筆、繁體 1 筆——又一次印證 §15.5。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": "北京", "src": ["S-WPLIST"], "conf": "low", "note": "〈陆军士官学校 (日本)〉步科名單的行內註記「刘召棠（北京 国民政府第十九军军长）」。⭐ 該註記同時給了籍貫與最高職務，而且「第十九軍軍長」與 S-WPZH、S-WPNB 的 1941 年記載相合，是本批僅有的兩個籍貫之一。" }
+      },
+      "education": [
+        { "year": null, "end_year": null, "institution": "日本陸軍士官學校", "program": "步科", "src": ["S-WPLIST"], "conf": "low", "note": "同名單另列楊裕三、吳安伯、宋鶴庚、李源昆、張惟聖等。條目未給期別與年份。" }
+      ],
+      "posts": [
+        { "from": "1933-03-09", "to": null, "title": "陸軍獨立第三旅第六團團長", "org": "陸軍獨立第三旅", "station": null, "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "⭐ 兩來源對同一事實都有記載（§15.1）：S-GPOST 1933-03-09「任命劉召棠陸軍獨立第三旅第六團團長」；S-WPZH〈晉系軍閥〉的編制表記「獨立第3旅（原警備第3旅改編）豐玉璽（傅存懷、章拯宇）5團 趙協中 6團 劉召棠」。〈晉系軍閥〉引黃啟昌《亂世之狐：晉系軍閥全傳》。⚠ 豐玉璽即遊戲名冊 `MAN115` 第 22 槽的「豐玉璽」。" },
+        { "from": "1935-05-07", "to": null, "title": "陸軍步兵上校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階。" },
+        { "from": null, "to": null, "title": "國民革命軍第十九軍第六十八師師長", "org": "國民革命軍第十九軍", "station": null, "src": ["S-WPZH"], "conf": "low", "note": "〈國民革命軍第十九軍〉的第六十八師歷任師長列「孟憲吉（獨8旅旅長）／劉召棠（第203旅旅長）／郭天辛」，未給年份，並註明他原任第二〇三旅旅長。" },
+        { "from": "1941-03-28", "to": null, "title": "國民革命軍第十九軍軍長（代理）", "org": null, "station": null, "src": ["S-WPNB", "S-WPZH"], "conf": "high", "note": "⭐ 兩來源對同一事實都有記載且日期一致：S-WPNB〈1941年中国〉3 月 28 日條「軍事委員會任命劉召棠為第十九軍代理軍長，梁春溥為第二十三軍軍長，于鎮河為第三十三軍軍長，施北衡為第七十五軍軍長，柳際明七十五軍副軍長，孫福麟為第八十三軍代理軍長，張興仁為新編第三軍副軍長」，引郭廷以系統標頁碼 6518；S-WPZH〈國民革命軍第十九軍〉記「1941年3月28日，梁培璜升任第6集團軍副總司令，劉召棠接任軍長，副軍長艾子謙（第203旅參謀長）」。⭐⭐ **這一道同日任令同時任命了本批的 #366 本人與 #372 孫福麟，以及 batch08 的 #368 于鎮河、batch09 的 #390 柳際明**（§11.3 的同日成批受令判準，一次串起四個人）。" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": "國民革命軍第十九軍軍長", "src": ["S-WPNB", "S-WPZH", "S-WPLIST"], "conf": "medium", "note": "原 people.json 此欄空白。〈陆军士官学校 (日本)〉的行內註記也作「國民政府第十九軍軍長」。" },
+      "faction": { "value": "陸軍獨立第三旅→國民革命軍第十九軍", "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "原 people.json 此欄空白。兩者皆屬晉綏軍系統。依 §6.1 原則 4 填機構名序列。" },
+      "verified_by": ["S-GPOST", "S-WPZH", "S-WPNB", "S-WPLIST"],
+      "confidence": "high",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-GPOST（前群）", "says": "1913-03-02 授陸軍步兵上校、加銜陸軍少將；1913-04-23 授陸軍少將；1916-03-21 任命陝西陸軍第四混成旅參謀長；1925-01-13 任命鞏縣兵工廠總辦；1925-09-24 授陸軍中將" },
+            { "src": "S-GPOST（後群）", "says": "1933-03-09 任命陸軍獨立第三旅第六團團長；1935-05-07 任陸軍步兵上校" }
+          ],
+          "resolved": false,
+          "note": "同名多群，本篇只採後群（§9.3 第 4 步）。判準是 §10.2 的官階倒序：中將（1925）→ 團長（1933）→ 上校（1935）。§15.2 的整編但書不適用——兩群分屬北洋與晉綏兩個系統，不是同一支部隊的縮編。⚠ 反面可能性也記下來：1935 年國民政府銓敘時不承認北洋官階，理論上同一人可能被重新敘為上校；但 1933 年的團長任命無法用銓敘解釋，故仍判兩人。"
+        }
+      ],
+      "gaps": [
+        "生卒年、字號完全查無。籍貫「北京」只有 S-WPLIST 一個 Tier C 名冊註記。日本陸軍士官學校的期別與畢業年份查無。",
+        "前群那五筆（1913–1925）若真是同一人，本篇就漏掉了他前半生的完整序列；分群的判準是官階倒序這條啟發式，不是任何來源的陳述。",
+        "1935 年敘上校到 1941 年代理軍長之間，只有第二〇三旅旅長與第六十八師師長兩個沒有年份的職務。",
+        "1941 年 3 月之後的行止與結局全部查無。",
+        "下一步：《山西通志·軍事志》與《晉綏軍史》有第十九軍逐年的主官更迭；日本陸軍士官學校的中國留學生名錄（各期畢業名冊）可望補上期別與生年。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪由簡體 insource 找到〈陆军士官学校 (日本)〉的行內註記（籍貫＋最高職務）、〈晉系軍閥〉的獨立第三旅編制表（與 S-GPOST 1933-03-09 逐字相合）與〈國民革命軍第十九軍〉的沿革，並用官階倒序把 S-GPOST 的 8 筆分成兩群。"
+    },
+    {
+      "id": 369,
+      "name_ingame": "張翼",
+      "name_common": "張翼",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["张翼（簡體）"],
+        "disambiguation": "⚠ S-GPOST「張翼」12 筆跨 1913–1984 年共七十一年，遠超 §9.3 第 1 步的 50 年警訊線，依職務性質分為五群：①1913-03-17 授陸軍礮兵少校；②1923-04-30 授陸軍一等軍醫正（軍醫）；③1935-07-05 任命陸軍步兵少校；④1939-01-23 派江蘇省第四區行政督察專員兼保安司令、1939-04-04 免；⑤1967–1984 國軍退除役官兵輔導委員會桃園工廠與榮民製藥廠的六筆。**五群沒有一群能對上 S-WPZH 的晉綏軍第三十四軍序列**（該序列 1939 年他已是旅長、1942 年是軍長），依 §12.8 判為**全數排除**，confidence 上限 medium。⚠ 遊戲名冊的這一位由 S-WPZH 單獨支撐：`MAN315` 第 21 槽于鎮河、第 22 槽本人、第 23 槽孫楚，前後都是晉綏軍主官（S-ROSTER）。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1939-02", "to": "1941-01", "title": "陸軍第二〇一旅旅長", "org": "國民革命軍陸軍第三十四軍", "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "〈國民革命軍陸軍第三十四軍〉：1939 年 2 月楊澄源升任第八集團軍副總司令、彭毓斌繼任軍長，下轄第二〇一旅（張翼）、第二〇五旅（張敬俊）、第二一八旅（續儒林）；1941 年 1 月王乾元繼任軍長，三個旅改為暫編第四十三、四十四、四十五師。⚠ 番號「第二〇一旅」含「〇」，該字倚天畫不出來（`DESIGN-20` §2.4），正文依 §4.2 一律寫成國字「第二百零一旅」。" },
+        { "from": "1942-08", "to": "1943-12", "title": "國民革命軍陸軍第三十四軍軍長", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "副軍長滑廷壁。1943 年暫編第四十三師改隸第四十三軍、第二十三軍第七十三師改隸該軍；1943 年 12 月高倬之繼任軍長。" },
+        { "from": null, "to": "1948", "title": "國民革命軍陸軍第三十四軍副軍長", "org": null, "station": null, "src": ["S-WPZH"], "conf": "low", "note": "來源只在敘述被俘時提到官銜「中將副軍長」，未給任期。" }
+      ],
+      "events": [
+        { "when": "1948", "where": "山西", "name": "晉中戰役", "role": "國民革命軍陸軍第三十四軍中將副軍長", "outcome": "軍部及第七十三師被殲，本人與少將高級參謀席安仁等被俘，暫編第四十四師師長楊棲鳳陣亡", "src": ["S-WPZH"], "conf": "medium", "note": "來源只寫「抗日戰爭勝利後，晉中戰役中」，未給月份。" }
+      ],
+      "ending": { "when": "1948", "where": "山西", "how": "於晉中戰役中被俘", "src": ["S-WPZH"], "conf": "medium", "note": "被俘之後的去向與卒年查無。" },
+      "highest_post": { "value": "國民革命軍陸軍第三十四軍軍長", "src": ["S-WPZH"], "conf": "medium", "note": "原 people.json 此欄空白。" },
+      "faction": { "value": "國民革命軍陸軍第三十四軍", "src": ["S-WPZH"], "conf": "medium", "note": "原 people.json 此欄空白。" },
+      "verified_by": ["S-WPZH", "S-ROSTER"],
+      "confidence": "medium",
+      "conflicts": [],
+      "gaps": [
+        "S-GPOST 的 12 筆全部排除，本篇的每一句都只靠一個 Tier B 來源（維基〈國民革命軍陸軍第三十四軍〉，該條目有兩處內文引註與四項書目）。",
+        "生卒年、籍貫、字號、學歷全部查無。",
+        "1939 年 2 月之前與 1948 年被俘之後全部查無。第二〇一旅旅長的到任日、副軍長的任期都沒有年份。",
+        "⚠ 「張翼」是常見姓名，S-WPZH insource 繁簡各 236／幾百筆，本輪只能靠「晉綏」「閻錫山」複合條件縮小；若他另有字號，用字號查可能撈到更多。",
+        "下一步：《山西通志·軍事志》的第三十四軍沿革與晉中戰役的被俘將領名冊，是最可能補上生卒年與籍貫的地方。"
+      ],
+      "editorial_notes": [
+        "旅番號「第201旅」在來源裡是阿拉伯數字。依 §4.2 番號一律用國字，寫成「第二百零一旅」，同時解掉「〇」畫不出來的問題（§14.7 `G-07-5`）。"
+      ],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪用 insource 複合條件（張翼＋晉綏／閻錫山）找到〈國民革命軍陸軍第三十四軍〉的三段記載，建立 1939–1948 年的序列；S-GPOST 的 12 筆經分群後全部排除。"
+    },
+    {
+      "id": 372,
+      "name_ingame": "孫福麟",
+      "name_common": "孫福麟",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["孫福林（異寫，查證用）", "孙福麟（簡體）"],
+        "disambiguation": "S-GPOST「孫福麟」3 筆落在 1929–1935 年，官階單調上升（中校科員→上校團長→敘步兵上校），無倒序，與 S-WPZH 的 1933–1945 年記載連貫，未見同名他人混入。異寫「孫福林」在 S-GPOST 另有 1 筆（1923-08-28 授陸軍步兵少校），早六年且無後續，無法接上，判為同名他人。⭐ 簡體 insource 4 筆、繁體 1 筆——再次印證 §15.5。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1929-08-09", "to": null, "title": "國軍編遣委員會遣置部安置處籌置科中校科員", "org": "國軍編遣委員會", "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "1929 年編遣期間的職務。" },
+        { "from": "1933-08-28", "to": null, "title": "陸軍第七十師第二百一十五旅第四百三十團團長", "org": "陸軍第七十師", "station": null, "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "⭐ 兩來源對同一事實都有記載（§15.1）：S-GPOST 1933-08-28「任命孫福麟陸軍第七十師第二百一十五旅第四百三十團團長」；S-WPZH〈晉系軍閥〉的編制表記「215旅 田樹梅(杜坤) 429團 杜坤(盧儀歐) 430團 張雨村(孫福麟)」——番號逐級相合。" },
+        { "from": "1935-05-09", "to": null, "title": "陸軍步兵上校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階。" },
+        { "from": null, "to": "1941-01", "title": "第二百零六旅旅長", "org": "國民革命軍陸軍第八十三軍", "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "〈國民革命軍陸軍第八十三軍〉：第206旅旅長孫福麟，1941 年 1 月改稱暫編第五十師，師長郭維新。到任年份查無。" },
+        { "from": "1941-03-28", "to": null, "title": "國民革命軍陸軍第八十三軍軍長（代理）", "org": null, "station": "山西鄉寧石碣村", "src": ["S-WPNB", "S-WPZH"], "conf": "high", "note": "⭐ 兩來源對同一事實都有記載：S-WPNB〈1941年中国〉3 月 28 日條列本人為第八十三軍代理軍長（同日任令另有劉召棠、于鎮河、施北衡、柳際明等，引郭廷以系統標頁碼 6518）；S-WPZH〈國民革命軍陸軍第八十三軍〉記「1941年3月，孫福麟代理軍長，賈毓芝任副軍長，軍部駐鄉寧石碣村」。⭐⭐ 同日任令串起本批的 #366 劉召棠 與 batch08 的 #368 于鎮河、batch09 的 #390 柳際明。" },
+        { "from": "1945-10-10", "to": null, "title": "受頒抗戰勝利勳章", "org": null, "station": null, "src": ["S-WPLIST"], "conf": "low", "note": "〈抗战胜利勋章〉引國民政府 1945 年 10 月 10 日令的受勳名單，同批另有本批的 #376 佟毅，以及 batch09 的 #390 柳際明、#388 方靖等。該名單逐項無引註，計 Tier C。" }
+      ],
+      "events": [
+        { "when": "1945-09", "where": "山西上黨", "name": "上黨戰役", "role": "國民革命軍陸軍第八十三軍軍長", "outcome": "所部（轄三個師，欠兩個團）被晉冀魯豫野戰軍全殲；第六十六師師長李佩膺、暫編第四十九師師長張宏被俘", "src": ["S-WPZH"], "conf": "medium", "note": "〈上党战役〉的參戰序列列「第八十三軍軍長孫福麟。轄3個師（欠2個團）」，該條目有 15 處內文引註。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown", "note": "1945 年 9 月上黨戰役之後的行止查無；受頒抗戰勝利勳章的 10 月 10 日令是可查到的最後一筆。" },
+      "highest_post": { "value": "國民革命軍陸軍第八十三軍軍長", "src": ["S-WPNB", "S-WPZH"], "conf": "high", "note": "原 people.json 此欄空白。" },
+      "faction": { "value": "陸軍第七十師→國民革命軍陸軍第八十三軍", "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "原 people.json 此欄空白。兩者皆屬晉綏軍系統。" },
+      "verified_by": ["S-GPOST", "S-WPZH", "S-WPNB", "S-WPLIST"],
+      "confidence": "high",
+      "conflicts": [],
+      "gaps": [
+        "生卒年、籍貫、字號、學歷全部查無。",
+        "1935 年敘上校到第二百零六旅旅長之間沒有年份可考；第二百零六旅到任年份查無。",
+        "1945 年 10 月之後的行止與結局全部查無。",
+        "下一步：《山西通志·軍事志》的第八十三軍沿革、上黨戰役的被俘與突圍名冊；晉綏軍團級以上軍官的銓敘檔案可望補上籍貫與生年。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪由 S-GPOST 3 筆任免令與〈晉系軍閥〉編制表逐級相合的 430 團團長一筆建立起點，再由〈1941年中国〉的同日任令與〈國民革命軍陸軍第八十三軍〉沿革接到 1941 年代理軍長，最後由〈上党战役〉接到 1945 年。"
+    },
+    {
+      "id": 376,
+      "name_ingame": "佟毅",
+      "name_common": "佟毅",
+      "identity": {
+        "courtesy": null,
+        "aliases": [],
+        "disambiguation": "⚠ 三層排除。①維基有〈佟毅〉專條，但內容是 1963 年生的吉林通化人、第十二屆全國人大代表，與本人無關，查到它等同查無專條（§10.3），依 §15.3 登為 S-NONE。②S-GPOST「佟毅」2 筆（1923-12-05 晉授陸軍步兵上校、1936-03-13 任陸軍工兵上校）**兵科不同**（步兵／工兵）且相隔十三年，既接不上彼此、也接不上 S-WPZH 的川軍序列（1932 年他還是團長、1937 年才是旅長），依 §9.3 第 2 步判為與本人無關，**全數不採用**。③繁簡同形，無異寫問題。本人的序列全部由 S-WPZH 與 S-WPNB 支撐。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [
+        { "year": null, "end_year": null, "institution": "陸軍大學", "program": null, "src": ["S-WPLIST"], "conf": "low", "note": "〈陸軍大學〉校友名單列「佟毅（第五十軍軍長、第二十三集團軍副總司令）」。條目未給期別與年份；行內註記的兩個職務與 S-WPNB 的兩筆任命相合。" }
+      ],
+      "posts": [
+        { "from": "1932", "to": null, "title": "第二團團長", "org": "長江上游剿匪總指揮部", "station": null, "src": ["S-WPZH"], "conf": "low", "note": "〈豫鄂皖邊區第四次圍剿〉序列：長江上游剿匪總指揮王陵基，轄第一路、第二路、剿匪第五旅、施鶴七屬第二路、第一團（楊勤安）、第二團（佟毅）、第三團（趙元吉）及新編第七旅。⚠ 「剿匪總指揮」是機構名的一部分，依 §4.3 的例外原樣保留，但正文只寫團長一職不寫該機構名，因為來源未給更完整的番號。" },
+        { "from": "1937", "to": null, "title": "第四百三十三旅旅長", "org": "國民革命軍第二十一軍", "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "〈国民革命军第二十一军〉的編制表列「第433旅佟毅」。該軍軍長唐式遵於 1937-09-21 奉命率部出川抗戰。" },
+        { "from": "1939-12-08", "to": null, "title": "國民革命軍陸軍第五十軍軍長", "org": null, "station": null, "src": ["S-WPNB", "S-WPZH", "S-WPLIST"], "conf": "medium", "note": "S-WPNB〈1939年中国〉12 月 8 日條「軍事委員會任命佟毅為第五十軍軍長」，引郭廷以系統標頁碼 6163。⚠ S-WPZH〈國民革命軍陸軍第五十軍〉另記「1942年初副軍長佟毅接任軍長」，年份差兩年，見 conflicts[0]。" },
+        { "from": "1943-09-17", "to": null, "title": "第二十三集團軍副總司令", "org": "第二十三集團軍", "station": null, "src": ["S-WPNB", "S-WPLIST"], "conf": "medium", "note": "S-WPNB〈1943年中国〉9 月 17 日條「軍事委員會任命佟毅為第二十三集團軍副總司令」，引郭廷以系統標頁碼 7208；S-WPLIST〈国民革命军集团军序列〉把他列在唐式遵、郭勛祺、劉雨卿、陳萬仞、李覺、陶廣之後的同一格。" },
+        { "from": "1945-10-10", "to": null, "title": "受頒抗戰勝利勳章", "org": null, "station": null, "src": ["S-WPLIST"], "conf": "low", "note": "與本批 #372 孫福麟 同一道 1945-10-10 令。" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": "第二十三集團軍副總司令", "src": ["S-WPNB", "S-WPLIST"], "conf": "medium", "note": "原 people.json 此欄空白。" },
+      "faction": { "value": "國民革命軍第二十一軍→第五十軍→第二十三集團軍", "src": ["S-WPZH", "S-WPNB"], "conf": "medium", "note": "原 people.json 此欄空白。三者同屬川軍系統（第二十一軍軍長唐式遵、第二十三集團軍總司令亦為唐式遵），但依 §6.1 原則 4 填機構名不填派系標籤。" },
+      "verified_by": ["S-WPZH", "S-WPNB", "S-WPLIST", "S-NONE"],
+      "confidence": "medium",
+      "conflicts": [
+        {
+          "field": "posts",
+          "statements": [
+            { "src": "S-WPNB〈1939年中国〉", "says": "12月8日——軍事委員會任命佟毅為第五十軍軍長" },
+            { "src": "S-WPZH〈國民革命軍陸軍第五十軍〉", "says": "1942年初副軍长佟毅接任军长。1942年9月17日新编第7师师长田钟毅继任军长" }
+          ],
+          "resolved": false,
+          "note": "兩說相差兩年多。依 §12.6（G-02-4）比引註品質：〈1939年中国〉逐條引郭廷以《中華民國史事日誌》並標頁碼，〈國民革命軍陸軍第五十軍〉該段零內文引註——差距可機械判斷，故正文採 1939-12-08。⚠ 但兩說都同意他任過第五十軍軍長，這一點無爭議。"
+        }
+      ],
+      "gaps": [
+        "生卒年、籍貫、字號全部查無。陸軍大學的期別與畢業年份查無。",
+        "S-GPOST 的 2 筆全部排除，本篇沒有任何 Tier A 來源支撐——這是本批中央軍／川軍組唯一一位 gpost 完全落空的。",
+        "第五十軍軍長的起訖與第二十三集團軍副總司令的卸任日都查無；1945 年 10 月之後的行止與結局全部查無。",
+        "1932 年那筆團長職的部隊番號不完整（來源只寫「第2團」）。",
+        "下一步：《四川省志·軍事志》與川軍出川抗戰的專著（第二十一軍、第二十三集團軍沿革）；陸軍大學各期同學錄可望補上期別、籍貫與生年。"
+      ],
+      "editorial_notes": [
+        "S-WPZH〈豫鄂皖邊區第四次圍剿〉的序列名稱含「剿匪總指揮」。依 §4.3，機構名的一部分要原樣保留，但本篇正文只寫「團長」一職（來源給的番號不完整），因此不會出現該詞。"
+      ],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪由〈1939年中国〉與〈1943年中国〉兩條郭廷以年表建立 1939 與 1943 兩個確切日期，並由〈国民革命军第二十一军〉〈豫鄂皖邊區第四次圍剿〉往前接到 1932 年；同名的維基〈佟毅〉專條與 S-GPOST 的 2 筆全部排除。"
+    },
+    {
+      "id": 393,
+      "name_ingame": "趙璧光",
+      "name_common": "",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["趙壁光（異寫，查證用，S-GPOST 0 筆）", "赵璧光（簡體）"],
+        "disambiguation": "S-GPOST「趙璧光」只有 1 筆（1936-12-26 任命陸軍步兵中校），無同名分群問題；異寫「趙壁光」0 筆。⭐ 繁體 insource 兩輪各 0 筆、簡體「赵璧光」1 筆——又一次印證 §15.5（只查繁體會誤判成查無）。⚠ 1936 年的中校與 1948 年的師長之間隔了十二年，接合依據只有姓名相同與同屬國民革命軍，沒有中間任何一筆。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [
+        { "from": "1936-12-26", "to": null, "title": "陸軍步兵中校", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階。" },
+        { "from": "1948", "to": null, "title": "第一百五十師師長", "org": "國民革命軍第四十四軍", "station": null, "src": ["S-WPZH"], "conf": "low", "note": "〈徐州剿匪總司令部〉的戰鬥序列：第七兵團（司令官黃百韜）下第四十四軍（軍長王澤浚），轄第一百五十師（師長趙璧光）與第一百六十二師（師長何葆恆、楊自立）。⚠ 該條目雖有三處內文引註，但引註不涵蓋這份序列名單，依 §14.5 實質接近 Tier C。⚠ 「剿匪總司令部」是機構全名，依 §4.3 的例外原樣保留。" }
+      ],
+      "events": [
+        { "when": "1948-11-21", "where": "江蘇邳縣碾莊", "name": "第七兵團在碾莊覆滅", "role": "第一百五十師師長", "outcome": "所隸第七兵團於 1948-11-21 在邳縣碾莊全軍覆滅", "src": ["S-WPZH"], "conf": "low", "note": "⚠ 來源只記兵團的結局，未記本人的下落。正文只寫他所隸的兵團與番號層級，不寫他個人的去向。" }
+      ],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": "第一百五十師師長", "src": ["S-WPZH"], "conf": "low", "note": "原 people.json 此欄空白。" },
+      "faction": { "value": "國民革命軍第四十四軍", "src": ["S-WPZH"], "conf": "low", "note": "原 people.json 此欄空白。第四十四軍軍長王澤浚出自川軍系統，但依 §6.1 原則 4 只填機構名。" },
+      "verified_by": ["S-GPOST", "S-WPZH"],
+      "confidence": "low",
+      "conflicts": [],
+      "gaps": [
+        "只有 1936 與 1948 兩個孤立時間點，中間十二年全空，串不成序列（§3.2 的 low 條件）。",
+        "兩筆的接合只靠姓名相同，沒有任何來源說他們是同一人。",
+        "生卒年、籍貫、字號、學歷全部查無。1948 年之後的下落查無。",
+        "⚠ 遊戲把他放在**抗日後期**名冊，但兩筆材料一筆在 1936 年（抗戰前）、一筆在 1948 年（抗戰後），沒有一筆落在 1941–45。",
+        "下一步：《四川省志·軍事志》的第四十四軍沿革與淮海戰役的被俘將領名冊；第一百五十師的師長更迭在《國民黨歷史上的158個軍》有逐年記載。"
+      ],
+      "editorial_notes": [
+        "「徐州剿匪總司令部」是機構全名，依 §4.3 的例外必須原樣保留；正文寫成「徐州剿匪總司令部的戰鬥序列」，不作敘述動詞用。"
+      ],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白（連 name_common 都是空的）。本輪由簡體 insource 找到 1948 年徐州剿匪總司令部序列裡的第一百五十師師長一筆，並由 S-GPOST 取得 1936 年的敘階令。"
+    },
+    {
+      "id": 416,
+      "name_ingame": "博郎",
+      "name_common": "",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["博朗（異寫，查證用）"],
+        "disambiguation": "S-ROSTER 字模反查：`MAN315` 第 105 槽三格，第一格與倚天「博」**0/240（byte-exact）**、第二格是**全零字模**（兩字姓名的填充格）、第三格與「郎」**0/240**、與「朗」77/240 ——原版確實刻兩字姓名「博郎」。S-GPOST「博郎」兩輪各 0 筆、「博朗」0 筆。S-WPZH insource「博郎」兩輪各 37 筆，逐筆看過全部是臺南地區的地名、機構名與人名裡「博」「郎」相鄰的巧合（賴清德、國立臺南大學、大台南公車等），無一是人物；維基無〈博郎〉條目。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": null, "src": [], "conf": "unknown" }
+      },
+      "education": [],
+      "posts": [],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": null, "src": [], "conf": "unknown" },
+      "faction": { "value": null, "src": [], "conf": "unknown" },
+      "verified_by": ["S-ROSTER"],
+      "confidence": "unknown",
+      "conflicts": [],
+      "gaps": [
+        "兩種寫法在 S-GPOST 各查一次、「博郎」另查第二輪，全部 0 筆。S-WPZH insource 兩輪的 37 筆全部無關。",
+        "⚠ 遊戲裡的這個人是誰尚未解決（§12.8）。可用的線索只有 S-ROSTER：`MAN315` 第 103 槽史迪威、第 104 槽孫立人、第 105 槽本人、第 106 槽蔣公權——前兩格是中國遠征軍與駐印軍的人物，其中史迪威是名冊裡唯一一位外國人。**「博郎」是兩字姓名，有可能是外國人名的音譯**，但本輪沒有任何來源可以證實，不寫進正文。",
+        "依 §3.2，正文寫不出任何一句，confidence 判 unknown，**不寫小傳**。",
+        "下一步：若音譯假設成立，要查的是 1942–45 年中國戰區與中印緬戰區的盟軍將領名錄（美軍、英軍），比對當時中文報刊的譯名；當年《中央日報》《大公報》的盟軍將領譯名與今日通行譯名差距很大，這是最可能命中的方向。另一條路是查滿蒙姓名——名冊裡另有「長興」這種單一詞的姓名（`MAN115` 第 227 槽）。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白（連 name_common 都是空的）。本輪重跑後**維持 unknown**，但用字模確認了它是兩字姓名（第二格是填充用的全零字模，不是漏字），並登錄了查過的範圍。"
+    },
+    {
+      "id": 417,
+      "name_ingame": "蔣公權",
+      "name_common": "蔣公權",
+      "identity": {
+        "courtesy": null,
+        "aliases": ["蔣公榷（異寫，查證用，S-GPOST 0 筆）", "蒋公权（簡體）"],
+        "disambiguation": "⚠ S-GPOST「蔣公權」3 筆全部是文職（1924-06-26 派中俄會議辦事處總務股辦事員、1926-07-22 任命署財政部秘書、1927-01-12 懇請辭職免財政部秘書），與 S-WPZH／S-WPLIST 記載的炮兵團長身分性質完全不同，依 §9.3 第 2 步（用職務性質分群，軍職與文職混在一起先當成不同人）判為同名他人，**全數不採用**。異寫「蔣公榷」0 筆。⭐ 繁體 insource 兩輪各 0 筆、簡體「蒋公权」2 筆——又一次印證 §15.5。"
+      },
+      "life": {
+        "birth": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "death": { "year": null, "month": null, "day": null, "src": [], "conf": "unknown" },
+        "birthplace": { "value": "浙江省諸暨", "src": ["S-WPLIST"], "conf": "low", "note": "〈陆军士官学校 (日本)〉野戰重炮科名單的行內註記「蒋公权（浙江诸暨 炮兵第四团团长）」。⭐ 該註記同時給了籍貫與職務，是本批僅有的兩個籍貫之一。" }
+      },
+      "education": [
+        { "year": null, "end_year": null, "institution": "日本陸軍士官學校", "program": "野戰重炮科", "src": ["S-WPLIST"], "conf": "low", "note": "同名單另列白茂權、顧葆仁、章澤群、胡屏章、龔震宇、郭肇祥、林日藩、馮洪國等。條目未給期別與年份。" }
+      ],
+      "posts": [
+        { "from": null, "to": null, "title": "獨立炮兵第四團團長", "org": null, "station": null, "src": ["S-WPZH", "S-WPLIST"], "conf": "medium", "note": "⭐ 兩來源對同一事實都有記載（§15.1）：S-WPZH〈国民革命军炮兵〉的炮兵團序列記「独立炮兵第四团：日三八式75毫米野炮 孔庆桂、蒋公权」（歷任團長兩人並列）；S-WPLIST〈陆军士官学校 (日本)〉的行內註記作「炮兵第四团团长」。⚠ 兩者都沒有給年份。前任孔慶桂是保定第三期炮兵科（與 #13 蔡仲笏 那一群的蔡忠笏同期同科）。" }
+      ],
+      "events": [],
+      "ending": { "when": null, "where": null, "how": null, "src": [], "conf": "unknown" },
+      "highest_post": { "value": "獨立炮兵第四團團長", "src": ["S-WPZH", "S-WPLIST"], "conf": "medium", "note": "原 people.json 此欄空白。" },
+      "faction": { "value": "獨立炮兵第四團", "src": ["S-WPZH"], "conf": "medium", "note": "原 people.json 此欄空白。該團裝備日製三八式七五毫米野炮。" },
+      "verified_by": ["S-WPZH", "S-WPLIST"],
+      "confidence": "low",
+      "conflicts": [],
+      "gaps": [
+        "只查到一個職務，而且**沒有任何年份**——連他哪一年任團長都不知道，因此串不成序列（§3.2 的 low 條件）。",
+        "S-GPOST 的 3 筆全部排除（文職，與炮兵團長身分不合），本篇沒有 Tier A 來源支撐。",
+        "生卒年、字號完全查無；籍貫「浙江諸暨」只有 S-WPLIST 一個 Tier C 名冊註記。日本陸軍士官學校的期別與畢業年份查無。",
+        "⚠ 遊戲把他放在**抗日後期**名冊（`MAN315` 第 106 槽，最後一格），但可查的職務沒有年份，無法確認是否落在 1941–45。",
+        "下一步：《國民革命軍炮兵史》與炮兵各團的沿革表可望補上團長任期；諸暨縣志與《浙江省志·人物志》應有本地籍軍官條目；日本陸軍士官學校中國留學生名錄可補期別與生年。"
+      ],
+      "editorial_notes": [],
+      "supersedes": "原 people.json 此筆 confidence=unknown、所有欄位空白。本輪由簡體 insource 找到〈陆军士官学校 (日本)〉與〈国民革命军炮兵〉兩處記載，取得籍貫、學歷與唯一一個職務；S-GPOST 的 3 筆經職務性質分群後全部排除。"
+    }
+  ]
+}
