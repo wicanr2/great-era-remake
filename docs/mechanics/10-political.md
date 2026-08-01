@@ -29,7 +29,7 @@
 |---:|---|---|---|---|
 | 1 | 調動行動 | 整個將領連人帶兵換省，八個模式 | `sub_2E425`、`sub_2E9A1` | confirmed |
 | 2 | 軍事行動 | 攻打，見 `20-military.md` | `sub_2D238` | confirmed |
-| 3 | 運補 | 搬**黃金／糧食／彈藥／燃料**四種到他省 | `sub_2CB6B`、`sub_3231A` | confirmed |
+| 3 | 運補 | **搬運全解**：四種資源各一支函式，**超過上限退回來源省** | `sub_3083A`–`sub_30AD4` | confirmed |
 | 4 | 徵稅 | 公式與忠誠度兩段扣減，見 `40-economy.md` | `sub_2C6C6` | confirmed |
 | 5 | 徵兵 | 四兵種各一支，10 兵 = 1 金 | `sub_29B46` | confirmed |
 | 6 | 查閱 | 換省檢視／查閱將領 | `sub_2BBA2`、`sub_2C351` | confirmed |
