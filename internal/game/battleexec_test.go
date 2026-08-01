@@ -50,8 +50,15 @@ func TestExecuteActionReportsUnimplemented(t *testing.T) {
 	// ⚠️ 沒實作的行動不得靜默跳過——那會讓實作缺口看起來像 AI 的決策結果。
 	sim := mkTracedBattle(t, 20000, 18000)
 	noRoute := func(to, from CellIndex) CellIndex { return NoCell }
-	for _, a := range []BattleAction{ActADecisive, ActAReset, ActADefault,
-		ActADecapitateKeepOne, ActAWeakest, ActBStrikeForce} {
+	// ⚠️ 這份清單是「執行層還缺什麼」的憑證。實作一個就從這裡移除一筆
+	// ——測試會在你忘了移除時紅給你看（2026-08-02 值 12/13/14/15 實作後就發生過）。
+	for _, a := range []BattleAction{
+		ActADecisive,     // 11／1 必勝結算：要接九步結算，不是指派命令
+		ActBStrikeForce,  // 4  打敵方主力周邊
+		ActAStandbyOnly,  // 16 只處理待命與已出發
+		ActARecompute,    // 17 重算全軍
+		ActAWeakest,      // 18 挑最弱（統計段未讀完，先不做）
+	} {
 		got := sim.ExecuteAction(a, sim.Defender, sim.Attacker, noRoute)
 		if got.Implemented {
 			t.Errorf("行動 %s 還沒實作，不該回 Implemented=true", BattleActionName(a))
@@ -170,5 +177,116 @@ func TestExecDeployFillsRing(t *testing.T) {
 	sim.ExecuteAction(ActBDeploy, sim.Defender, sim.Attacker, nil)
 	if sim.Defender[1].NextCell != before {
 		t.Error("已經有下一跳的單位不該被重新指派")
+	}
+}
+
+func TestExecDefaultBranchesByCommand(t *testing.T) {
+	// §32：值 13 依單位**現有的命令**分流，保留狀態。
+	sim := mkTracedBattle(t, 20000, 18000)
+	cities := CityCells(sim.Field)
+	if len(cities) == 0 {
+		t.Skip("這張戰場沒有城市")
+	}
+	route := func(to, from CellIndex) CellIndex { return to }
+
+	// 命令 1 且不在城市上 → 找空城。
+	u := sim.Defender[0]
+	u.Command = BattleCmdGarrison
+	u.NextCell = NoCell
+	sim.ExecuteAction(ActADefault, sim.Defender, sim.Attacker, route)
+	if u.NextCell == NoCell {
+		t.Error("命令 1 該找到城市當去處")
+	}
+	// ⚠️ §32：取的是**最後一個**空城，不是最近的。
+	var lastEmpty CellIndex = NoCell
+	for _, c := range cities {
+		if sim.Occ[c] == 0 {
+			lastEmpty = c
+		}
+	}
+	if lastEmpty != NoCell && u.NextCell != lastEmpty {
+		t.Errorf("原版取最後一個空城 %d，實際 %d", lastEmpty, u.NextCell)
+	}
+
+	// 命令 3 → 壓成 2 並清下一跳。
+	u.Command = BattleCmdSeekTarget
+	u.NextCell = 42
+	sim.ExecuteAction(ActADefault, sim.Defender, sim.Attacker, route)
+	if u.Command != BattleCmdStandby || u.NextCell != NoCell {
+		t.Errorf("命令 3 該被壓成 2 並清下一跳，實際 cmd=%d next=%d", u.Command, u.NextCell)
+	}
+
+	// 命令 4 → 下一跳 = 原地。
+	u.Command = BattleCmdCommitted
+	sim.ExecuteAction(ActADefault, sim.Defender, sim.Attacker, route)
+	if u.NextCell != u.Cell {
+		t.Errorf("命令 4 該原地待命，實際 %d（自己在 %d）", u.NextCell, u.Cell)
+	}
+}
+
+func TestExecDecapitateKeepOneVsKeepAll(t *testing.T) {
+	// §34：15 比 14 保守——這是最容易讀反的一條。
+	route := func(to, from CellIndex) CellIndex { return to }
+
+	mk := func() *BattleSim {
+		s := mkTracedBattle(t, 20000, 18000)
+		// 造三個守方單位，全部是命令 1（駐守中）。
+		m := loadTestMap(t)
+		bf, _ := m.Battlefield(19)
+		var free []CellIndex
+		for i := 0; i < CellCount && len(free) < 2; i++ {
+			c := CellIndex(i)
+			col, row := c.ColRow()
+			if s.Occ[c] == 0 && bf.Owner[row][col] == 0 &&
+				bf.Tiles[row][col].MoveCost() < 255 {
+				free = append(free, c)
+			}
+		}
+		for i, c := range free {
+			u := mkUnit(GeneralID(400+i), 166, Branch1, 9000)
+			u.Cell, u.NextCell = c, NoCell
+			s.Occ[c] = u.General
+			s.Defender = append(s.Defender, u)
+		}
+		for _, u := range s.Defender {
+			u.Command = BattleCmdGarrison
+		}
+		return s
+	}
+
+	// 值 14：只留第一個，其餘全部出擊。
+	s14 := mk()
+	got14 := s14.ExecuteAction(ActADecapitateKeepOne, s14.Defender, s14.Attacker, route)
+	// 值 15：全部駐守的都留下 → 一個都不派。
+	s15 := mk()
+	got15 := s15.ExecuteAction(ActADecapitateKeepAll, s15.Defender, s15.Attacker, route)
+
+	if got14.Assigned <= got15.Assigned {
+		t.Errorf("值 14 該比值 15 派出更多（15 較保守）：14=%d 15=%d",
+			got14.Assigned, got15.Assigned)
+	}
+	if got15.Assigned != 0 {
+		t.Errorf("全部都是命令 1 時，值 15 一個都不該派，實際 %d", got15.Assigned)
+	}
+}
+
+func TestExecResetClearsThenReassigns(t *testing.T) {
+	// §33：值 12 先把單位打回待命，再重新找目標。
+	sim := mkTracedBattle(t, 20000, 18000)
+	route := func(to, from CellIndex) CellIndex { return to }
+	a := sim.Attacker[0]
+	a.Command = BattleCmdGarrison
+	a.AssignTo(999, 5) // 先給一個假目標
+
+	got := sim.ExecuteAction(ActAReset, sim.Attacker, sim.Defender, route)
+	if !got.Implemented {
+		t.Fatal("推倒重來已經實作了")
+	}
+	// 目標該被換成真的守方單位（不是原本那個假的 999）。
+	if a.TargetUnit == 999 {
+		t.Error("值 12 該先重置再重新指派，舊目標不該留著")
+	}
+	if got.Assigned > 0 && a.Command != BattleCmdStandby && !a.Assigned() {
+		t.Error("重置後的單位狀態不一致")
 	}
 }

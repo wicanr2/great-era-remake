@@ -88,6 +88,14 @@ func (s *BattleSim) ExecuteAction(a BattleAction, units, foes []*Combatant,
 		return s.execDeploy(units)
 	case ActAEngageAll:
 		return s.execEngageAll(units, foes, route)
+	case ActAReset:
+		return s.execReset(units, route)
+	case ActADefault:
+		return s.execDefault(units, route)
+	case ActADecapitateKeepOne:
+		return s.execDecapitate(units, foes, route, true)
+	case ActADecapitateKeepAll:
+		return s.execDecapitate(units, foes, route, false)
 	}
 	return BattleExecResult{
 		Note: "行動「" + BattleActionName(a) + "」還沒實作（docs/re/31 §41 有語意，執行層待補）",
@@ -256,4 +264,132 @@ func itoa(n int) string {
 		b[i] = '-'
 	}
 	return string(b[i:])
+}
+
+
+// execReset 是值 12：**推倒重來**（§33）。
+//
+//	先把每個單位打回待命（`sub_3B15E`：+9=2、+12=0xFF、+10=0）
+//	→ 再掃格清單，找第一個「站著守方、而且走得通」的格
+//
+// ⚠️ **不看現有命令**——這是值 12 與值 13 最大的差別（13 依命令分流）。
+func (s *BattleSim) execReset(units []*Combatant,
+	route func(to, from CellIndex) CellIndex) BattleExecResult {
+	n := 0
+	for _, u := range units {
+		if u == nil || !u.Alive() {
+			continue
+		}
+		u.ResetToStandby() // sub_3B15E
+
+		// 掃全場找站著守方的格。原版掃的是 `sub_560D7` 給的清單，
+		// 那一支未讀（§32），這裡用全場掃描近似——**標為差異**。
+		for i := 0; i < CellCount; i++ {
+			c := CellIndex(i)
+			v := s.Occ[c]
+			if v == 0 {
+				continue
+			}
+			t := s.Unit(v)
+			if t == nil || t.Attacking { // 只找守方（+8 == 0）
+				continue
+			}
+			next := route(c, u.Cell)
+			if next == NoCell {
+				continue
+			}
+			u.AssignTo(v, next)
+			n++
+			break
+		}
+	}
+	return BattleExecResult{Assigned: n, Implemented: true,
+		Note: "推倒重來：全體重置後重新找目標"}
+}
+
+// execDefault 是值 13：**預設分流**（§32）。依單位**現有的命令**決定做什麼。
+//
+//	命令 1  站在城市上 → 下一跳 = 原地；否則找空城
+//	命令 2/3 壓成 2，清下一跳
+//	命令 4  下一跳 = 原地
+//
+// ⚠️ 「找空城」原版取的是**最後一個**空城（迴圈不 break，後面覆蓋前面），
+// 不是最近的——與值 3 的「照距離排序取最近」是完全不同的挑法。照抄。
+func (s *BattleSim) execDefault(units []*Combatant,
+	route func(to, from CellIndex) CellIndex) BattleExecResult {
+	cities := CityCells(s.Field)
+	n := 0
+	for _, u := range units {
+		if u == nil || !u.Alive() {
+			continue
+		}
+		switch u.Command {
+		case BattleCmdGarrison: // 命令 1
+			if s.tileOf(u).Kind == assets.TileCity {
+				u.NextCell = u.Cell // 已經到了，原地
+				n++
+				continue
+			}
+			u.NextCell = NoCell
+			for _, c := range cities {
+				if s.Occ[c] == 0 {
+					u.NextCell = c // ⚠️ 不 break：取最後一個空城
+				}
+			}
+			if u.NextCell == NoCell && len(cities) > 0 {
+				u.NextCell = cities[0] // 一個空城都沒有 → 取第一個
+			}
+			n++
+		case BattleCmdStandby, BattleCmdSeekTarget: // 命令 2 / 3
+			u.Command = BattleCmdStandby // 統一壓成 2
+			u.NextCell = NoCell
+			n++
+		case BattleCmdCommitted: // 命令 4
+			u.NextCell = u.Cell
+			n++
+		}
+	}
+	_ = route // 命令 2/3 那條原版還會用 sub_560D7 找格，該支未讀
+	return BattleExecResult{Assigned: n, Implemented: true,
+		Note: "預設分流：依現有命令處理"}
+}
+
+// execDecapitate 是值 14／15：**斬首**（§34）——全軍撲向敵方首位單位。
+//
+//	keepOne = true （值 14）只留**一個**在城市駐守，其餘全部出擊
+//	keepOne = false（值 15）**所有**駐守中的都留下
+//
+// ⚠️ **15 比 14 保守**，與編號直覺相反。原版是同一支函式，
+// 差別只在「第一個命令 1 的單位有沒有設旗標」。
+func (s *BattleSim) execDecapitate(units, foes []*Combatant,
+	route func(to, from CellIndex) CellIndex, keepOne bool) BattleExecResult {
+	lead := firstLiving(foes) // 敵方首位單位（原版 word_64902）
+	if lead == nil {
+		return BattleExecResult{Implemented: true, Note: "敵方沒有在場單位"}
+	}
+
+	kept := false
+	n := 0
+	for _, u := range units {
+		if u == nil || !u.Alive() {
+			continue
+		}
+		if u.Command == BattleCmdGarrison && !kept {
+			if keepOne {
+				kept = true // 值 14：設了旗標，後面的駐守單位就會被派出去
+			}
+			continue // 兩個值都跳過這一個
+		}
+		next := route(lead.Cell, u.Cell)
+		if next == NoCell {
+			continue
+		}
+		u.AssignTo(lead.General, next)
+		n++
+	}
+	mode := "只留一個守城"
+	if !keepOne {
+		mode = "駐守的都留"
+	}
+	return BattleExecResult{Assigned: n, Implemented: true, Note: "斬首（" + mode + "）"}
 }
