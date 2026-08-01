@@ -89,3 +89,33 @@ func AIRecruitInto(branch uint8, force uint16, budget int) (added, spent int) {
 	}
 	return added, AIRecruitGoldFor(branch, added)
 }
+
+// ── 徵新兵的素質代價（`sub_18F5B`，`docs/re/32` §9）─────────────────────
+
+// AIRecruitSkillDiv / AIRecruitF20Div 是徵新兵之後兩個素質欄位的扣減除數。
+//
+//	士兵戰技（+19）−= 戰技 ÷ 5      **−20%**
+//	+20            −= +20  ÷ 4      **−25%**，而且要 +20 ≥ 20 才扣
+//
+// **新兵拉低整體素質**——這是原版對「一次補一大批人」的制衡。
+const (
+	AIRecruitSkillDiv = 5
+	AIRecruitF20Div   = 4
+	// AIRecruitF20Min 是 `+20` 的扣減門檻：低於 20 就不再往下扣。
+	AIRecruitF20Min = 20
+)
+
+// AIRecruitQualityCost 回傳補完兵之後的（士兵戰技, F20）。
+//
+// ⚠️ **砲兵與裝甲不受影響**（原版兩道扣減都排除兵種 4 與 5）。
+// 那兩個兵種的徵兵單價高得多（徵滿 10,000／2,000 金），不掉素質是配套。
+func AIRecruitQualityCost(branch, skill, f20 uint8) (uint8, uint8) {
+	if branch == BranchArtiller || branch == BranchArmour {
+		return skill, f20
+	}
+	if f20 >= AIRecruitF20Min {
+		f20 -= f20 / AIRecruitF20Div
+	}
+	skill -= skill / AIRecruitSkillDiv
+	return skill, f20
+}

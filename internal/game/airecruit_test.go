@@ -90,3 +90,38 @@ func TestAIRecruitInto(t *testing.T) {
 		}
 	})
 }
+
+// 徵新兵會拉低素質，砲兵與裝甲例外。
+func TestAIRecruitQualityCost(t *testing.T) {
+	t.Run("步兵掉戰技與 F20", func(t *testing.T) {
+		skill, f20 := AIRecruitQualityCost(BranchInfantry, 100, 100)
+		if skill != 80 {
+			t.Errorf("戰技 100 → %d，預期 80（−20%%）", skill)
+		}
+		if f20 != 75 {
+			t.Errorf("F20 100 → %d，預期 75（−25%%）", f20)
+		}
+	})
+	t.Run("F20 低於門檻就不扣", func(t *testing.T) {
+		_, f20 := AIRecruitQualityCost(BranchInfantry, 100, AIRecruitF20Min-1)
+		if f20 != AIRecruitF20Min-1 {
+			t.Errorf("F20 %d 低於門檻 %d 不該扣，實際變成 %d",
+				AIRecruitF20Min-1, AIRecruitF20Min, f20)
+		}
+	})
+	t.Run("砲兵與裝甲不掉素質", func(t *testing.T) {
+		for _, b := range []uint8{BranchArtiller, BranchArmour} {
+			skill, f20 := AIRecruitQualityCost(b, 100, 100)
+			if skill != 100 || f20 != 100 {
+				t.Errorf("兵種 %d 掉了素質（%d/%d），原版排除這兩個兵種",
+					b, skill, f20)
+			}
+		}
+	})
+	t.Run("騎兵與步兵一樣會掉", func(t *testing.T) {
+		skill, f20 := AIRecruitQualityCost(BranchCavalry, 100, 100)
+		if skill == 100 || f20 == 100 {
+			t.Error("騎兵不在排除名單裡，應該跟步兵一樣掉素質")
+		}
+	})
+}
