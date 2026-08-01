@@ -26,9 +26,9 @@ func TestTaxStructure(t *testing.T) {
 		if res.Food < TaxFoodBase {
 			t.Fatalf("種子 %d：糧食 %d 低於底 %d", seed, res.Food, TaxFoodBase)
 		}
-		if res.LoyaltyAfter != 41-TaxLoyaltyDrop {
-			t.Fatalf("種子 %d：忠誠度變成 %d，應為 %d",
-				seed, res.LoyaltyAfter, 41-TaxLoyaltyDrop)
+		// 兩段扣：41 − 30 = 11，11 − 11÷5 = 9
+		if res.LoyaltyAfter != 9 {
+			t.Fatalf("種子 %d：忠誠度變成 %d，應為 9", seed, res.LoyaltyAfter)
 		}
 	}
 }
@@ -87,4 +87,48 @@ func TestTaxHitsGoldFloor(t *testing.T) {
 		}
 	}
 	t.Logf("200 個種子裡有 %d 次打到黃金下限 %d", floor, TaxGoldMin)
+}
+
+// 忠誠度是**兩段**扣的：先固定 30，再扣剩餘的五分之一。
+// 兩個實機樣本零誤差（`docs/re/18` §3b）。
+func TestTaxLoyaltyTwoStage(t *testing.T) {
+	cases := []struct{ before, after uint8 }{
+		{41, 9},   // 河南：41−30=11，11÷5=2，11−2=9
+		{79, 40},  // 湖北：79−30=49，49÷5=9，49−9=40
+		{30, 0},   // 正好 30 → 0，第二段對 0 沒作用
+		{29, 0},   // 不足 30 → 0
+		{100, 56}, // 100−30=70，70÷5=14，70−14=56
+	}
+	for _, c := range cases {
+		w := realWorld(t)
+		prov, _ := w.Table.At(19)
+		prov.Loyalty = c.before
+		res, err := w.Tax(19, NewRand(1))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if res.LoyaltyAfter != c.after {
+			t.Errorf("忠誠度 %d 徵稅後是 %d，應為 %d",
+				c.before, res.LoyaltyAfter, c.after)
+		}
+	}
+}
+
+// 徵稅會設「已徵過稅」旗標（`+32` bit 7）。
+func TestTaxSetsTaxedFlag(t *testing.T) {
+	w := realWorld(t)
+	prov, _ := w.Table.At(19)
+	prov.Flags = 0
+	if prov.Taxed() {
+		t.Fatal("徵稅前不該有旗標")
+	}
+	if _, err := w.Tax(19, NewRand(1)); err != nil {
+		t.Fatal(err)
+	}
+	if !prov.Taxed() {
+		t.Error("徵稅後應該設 bit 7")
+	}
+	if prov.Flags&ProvinceFlagActed != 0 {
+		t.Error("徵稅不該動 bit 2（那是回合分流用的）")
+	}
 }

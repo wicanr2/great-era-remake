@@ -61,6 +61,15 @@ const (
 	// 「無主的省一律沒設」也因此成立——無主省兩條路徑都不進。
 	ProvinceFlagActed = 0x04
 
+	// ProvinceFlagTaxed 是 bit 7：**本月已徵過稅** — confirmed。
+	//
+	// `sub_2C6C6`（指令 4 徵稅）的尾段 `or al, 80h`。
+	//
+	// `CONTEXT.md` §5.16 推翻「bit 2 = 已徵過稅」時寫過
+	// 「那個詞條仍然存在，只是對應的旗標在別處，還沒找到」——**在這裡**。
+	// `4.15` 詞條 42「已徵過稅」終於有了歸屬。
+	ProvinceFlagTaxed = 0x80
+
 	// ProvinceFlagInBattle 是 bit 6：**這個省正在打仗**。
 	//
 	// 兩處證據合起來就清楚了：
@@ -309,6 +318,9 @@ func (t *ProvinceTable) FirstAttackable(from ProvinceID) ProvinceID {
 
 // Acted 回報這個省本回合是否已經處理過（見 ProvinceFlagActed）。
 func (p *Province) Acted() bool { return p.Flags&ProvinceFlagActed != 0 }
+
+// Taxed 回報這個省本月是否已徵過稅（見 ProvinceFlagTaxed）。
+func (p *Province) Taxed() bool { return p.Flags&ProvinceFlagTaxed != 0 }
 
 // InBattle 回報這個省是不是正在打仗（bit 6）。
 func (p *Province) InBattle() bool { return p.Flags&ProvinceFlagInBattle != 0 }

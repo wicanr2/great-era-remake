@@ -151,9 +151,17 @@ const (
 	// （`docs/playtest/12` §3）——那不是巧合，是被夾到下限。
 	TaxGoldMax = 6500
 	TaxGoldMin = 1500
-	// TaxLoyaltyDrop 是徵稅的忠誠度代價（`sub ax, 1Eh`），
-	// 不足 30 就歸 0。
+	// TaxLoyaltyDrop 是徵稅的**第一段**忠誠度代價（`sub_303CD` 的
+	// `sub ax, 1Eh`），不足 30 就歸 0。
 	TaxLoyaltyDrop = 30
+	// TaxLoyaltySecondDivisor 是**第二段**：`sub_2C6C6` 尾段再扣一次
+	// 「剩餘忠誠度 ÷ 5」（`mov cx, 5 / div cx / sub [di-6222h], cl`）。
+	//
+	// 兩段合起來對上實機零誤差（`docs/re/18` §3b）：
+	//
+	//	河南 41 → 41−30 = 11 → 11÷5 = 2 → 11−2 = 9   ✓
+	//	湖北 79 → 79−30 = 49 → 49÷5 = 9 → 49−9 = 40  ✓
+	TaxLoyaltySecondDivisor = 5
 	// 資源上限用 `resource.go` 的 `ResourceCap`（同一個 `sub_5A467`）。
 	// TaxRandScale 是丟進 `Random()` 的倍率（Real 常數 `0x83/0/0x2000`）。
 	TaxRandScale = 5
@@ -171,9 +179,10 @@ type TaxResult struct {
 //
 //	黃金 = clamp(Random(Round(Sqrt(人口) × 5)) + 300, 1500, 6500)
 //	糧食 = Random(Round(人口 ÷ 10000 × 5)) + 3000
-//	忠誠度 -= 30（不足 30 歸 0）
+//	忠誠度 -= 30（不足 30 歸 0），然後再 -= 剩餘 ÷ 5
 //
 // 兩筆收入都經 `sub_5A467` 加上去，欄位上限 60,000。
+// 徵稅完成後 `sub_2C6C6` 會設省份 `+32` 的 **bit 7 =「已徵過稅」**。
 //
 // ⚠️ **公式的結構與常數是 confirmed，但代入實機樣本對不上**
 // （`docs/re/18` §4）：三個樣本裡兩個落在下限、一個在中段，
@@ -197,10 +206,15 @@ func (w *AIWorld) Tax(p ProvinceID, rng *Rand) (TaxResult, error) {
 
 	prov.Gold = AddResource(prov.Gold, uint16(gold))
 	prov.Food = AddResource(prov.Food, uint16(food))
+	// 第一段：固定扣 30（`sub_303CD`）。
 	if prov.Loyalty < TaxLoyaltyDrop {
 		prov.Loyalty = 0
 	} else {
 		prov.Loyalty -= TaxLoyaltyDrop
 	}
+	// 第二段：再扣剩餘的五分之一（`sub_2C6C6` 尾段）。
+	prov.Loyalty -= prov.Loyalty / TaxLoyaltySecondDivisor
+	// 標記「本月已徵過稅」。
+	prov.Flags |= ProvinceFlagTaxed
 	return TaxResult{Gold: gold, Food: food, LoyaltyAfter: prov.Loyalty}, nil
 }
