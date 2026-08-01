@@ -345,3 +345,28 @@ func TestStrengthWithRealGenerals(t *testing.T) {
 	}
 	t.Logf("蔣中正戰力 %d", chiang)
 }
+
+// 滿員 = 20000 ÷ 兵種權重——原版明確算的（sub_14761 × sub_349C1）。
+// 這條驗算式，不是驗觀察到的最大值。
+func TestFullStrengthIsTwentyThousandOverWeight(t *testing.T) {
+	const base = 20000
+	for _, c := range []struct {
+		branch uint8
+		weight int
+	}{
+		{BranchInfantry, 1},
+		{BranchArtiller, 10},
+		{BranchArmour, 100},
+		{BranchCavalry, 2},
+	} {
+		if got, want := int(BranchFullStrength(c.branch)), base/c.weight; got != want {
+			t.Errorf("%s 的滿員 = %d，應為 20000/%d = %d",
+				BranchName(c.branch), got, c.weight, want)
+		}
+		// 人力權重（RoutWeight）就是那個除數。
+		if RoutWeight(c.branch) != c.weight {
+			t.Errorf("%s 的人力權重 = %d，應為 %d",
+				BranchName(c.branch), RoutWeight(c.branch), c.weight)
+		}
+	}
+}
