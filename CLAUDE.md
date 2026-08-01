@@ -244,7 +244,34 @@ docker run --rm -v "$PWD/workplace/ida:/work" -v "$PWD/tools:/work/tools" -w /wo
   ida-pro-9.4-ver2 idat -A -S/work/tools/<script>.idc WAR.EXE.i64
 ```
 
-image 來源 `/home/anr2/ida_94_official/dist`（`ida-pro-9.4-ver2`），16-bit DOS loader。
+image 來源 **`/home/anr2/ida_94_official/dist`**，image 名稱 **`ida-pro-9.4-ver2`**，
+16-bit DOS loader。**完整環境說明與踩過的坑見
+`~/.claude/knowledge-base/retro/ida-pro-9.4.md`**（已掛進 `rules/00-rules-index.md`
+的觸發表，「反組譯」這個情境會自動命中）。
+
+### ⭐ 不要 grep `.asm`，要查 `.i64`
+
+`.asm` 是攤平的文字，**沒有交叉參考圖**。想知道「某個全域變數是什麼」，
+grep `.asm` 只能從呼叫端的參數順序反推——那是間接證據，會推錯
+（`word_64944` 就是這樣被推成「第二方代表單位」，後來出現反證退回未解）。
+
+`tools/ida_xref.idc` 直接查 IDA 的 xref 圖：
+
+```sh
+tools/ida.sh raw idat -A "-S/work/tools/ida_xref.idc word_64944" WAR.EXE.i64
+cat workplace/ida/xref-word_64944.txt
+```
+
+三條硬知識（實測 2026-08-01）：
+
+1. **IDAPython 在這個 image 跑不起來，要寫 IDC。** 兩種寫法都試過，無輸出。
+2. **headless 的 `print`／`Message()` 不進 stdout**，腳本一律把結果 `fopen` 寫檔。
+   不寫檔就等於沒跑，而且 exit code 還是 0。
+3. **讀寫判定用 `XrefType()`**（`dr_W=2`／`dr_R=3`／`dr_O=1`），
+   不要比對助憶碼字串（多空格會漏），也不要看 `print_operand(x,0)`
+   （`push` 的第 0 個運算元是來源不是目的，會把 30 個 push 全判成寫）。
+4. **xref 只涵蓋直接參考**。`ptr = &x` → `es:[di] = v` 這種間接寫入抓不到，
+   症狀是「讀 74 處、寫 1 處」——看到寫入數異常少，先看「取位址」那幾筆。
 
 三條配套規則：
 
