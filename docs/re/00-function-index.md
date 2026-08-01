@@ -5,7 +5,7 @@
 **動手讀任何 `sub_` 之前先在這裡 grep 它。**
 `CLAUDE.md` §7.1「動手挖之前先查手上已有的」——這份索引就是為了讓那一條真的做得到。
 
-目前 **392** 個函式在文件裡有紀錄。
+目前 **393** 個函式在文件裡有紀錄。
 
 | 函式 | 目前的結論（摘自文件）| 出處 | 提及次數 |
 |---|---|---|---:|
@@ -230,12 +230,12 @@
 | `sub_3B1B1` | `sub_3B1B1`：把周圍的格依**防禦力**排序 | `docs/re/31-battle-ai-chain.md` | 2 |
 | `sub_3B31D` | **12 種行動的內容**（`sub_3B19C` 已解，見 §9）：`sub_3B31D`／`sub_3C89A`／ | `docs/re/31-battle-ai-chain.md` | 5 |
 | `sub_3B400` | 21. ⭐⭐ `sub_3B492` + `sub_3B400`：**挑最近的敵方城市** | `docs/re/31-battle-ai-chain.md`（另 1 份） | 4 |
-| `sub_3B492` | sub_3B492(狀態, 0, &評分表, &城市清單, 城市數) ; ← **367 行，每個城市算一個 32-bit 分數** | `docs/re/31-battle-ai-chain.md`（另 1 份） | 4 |
+| `sub_3B492` | sub_3B492(狀態, 0, &評分表, &城市清單, 城市數) ; ← **367 行，每個城市算一個 32-bit 分數** | `docs/re/31-battle-ai-chain.md`（另 1 份） | 5 |
 | `sub_3B780` | sub_3B780(狀態, &var_22, 城市清單[i]) ; ← 分數 0 的城市 | `docs/re/31-battle-ai-chain.md` | 1 |
 | `sub_3B8B0` | sub_3B8B0(狀態, 1, u) ; 一個都走不到 | `docs/re/31-battle-ai-chain.md` | 2 |
 | `sub_3B9D8` | if 選中城市 == 0: sub_3B9D8(狀態, 1, 旗標陣列) ; 371 行，未讀 | `docs/re/31-battle-ai-chain.md` | 2 |
 | `sub_3BCED` | 25. `sub_3BCED`：候選清單怎麼來的 — **部分** | `docs/re/31-battle-ai-chain.md` | 4 |
-| `sub_3BF6A` | 剩下三支未讀：`sub_3BF6A`（175，城市空著）、`sub_3B9D8`（371，沒選到城市）、 | `docs/re/31-battle-ai-chain.md` | 3 |
+| `sub_3BF6A` | 剩下三支未讀：`sub_3BF6A`（175，城市空著）、`sub_3B9D8`（371，沒選到城市）、 | `docs/re/31-battle-ai-chain.md` | 4 |
 | `sub_3C0D5` | if u != 0 且 將領[u].+8 == 0: sub_3C0D5(bp) ; ← **城市有守軍** | `docs/re/31-battle-ai-chain.md` | 5 |
 | `sub_3C213` | 22. 目標選定之後：`sub_3C213` 的三向分流 | `docs/re/31-battle-ai-chain.md` | 4 |
 | `sub_3C26A` | ⚠️ 幾支函式**寫不只一個值**（`sub_47EAA` 寫 1 與 3、`sub_3C26A` 寫 3 與 4）， | `docs/re/31-battle-ai-chain.md`（另 1 份） | 11 |
@@ -354,10 +354,11 @@
 | `sub_55BCC` | `sub_55BCC(a, b)` 是兩個判斷的 or： | `docs/re/31-battle-ai-chain.md` | 5 |
 | `sub_55CEC` | `sub_55CEC(unit, cell, n)` 用六鄰位移表數**該格周圍的敵方單位數**， | `docs/mechanics/30-combat.md`（另 2 份） | 13 |
 | `sub_55FBE` | 決策鏈開頭先跑 `sub_55FBE`： | `docs/re/31-battle-ai-chain.md` | 5 |
-| `sub_567B9` | 10. `sub_567B9` = **移動單位** — **confirmed（欄位）** | `docs/re/31-battle-ai-chain.md` | 19 |
+| `sub_567B9` | 10. `sub_567B9` = **移動單位** — **confirmed（欄位）** | `docs/re/31-battle-ai-chain.md` | 22 |
+| `sub_579F4` | 旗標[sub_579F4(mode, u)] = 1 ; 標記「這個單位有任務了」 | `docs/re/31-battle-ai-chain.md` | 3 |
 | `sub_57B15` | sub_57B15(arg_2, arg_4) ; 遠程攻擊 | `docs/re/09-ranged-attack.md` | 2 |
 | `sub_58172` | sub_58172(單位) | `docs/re/07-battlefield-geometry.md` | 1 |
-| `sub_58209` | **`sub_58209` 會改 `+9`，但這個呼叫端不要那個副作用**，只要它做的其他事 | `docs/re/31-battle-ai-chain.md` | 4 |
+| `sub_58209` | 27. ⭐⭐ `sub_58209`（289 行）：照距離排序，逐一試路 | `docs/re/31-battle-ai-chain.md` | 8 |
 | `sub_5867E` | if 單位.+21 != 1 and sub_5867E(格) != 0: | `docs/re/07-battlefield-geometry.md` | 3 |
 | `sub_58854` | ⚠️ 仍未證實：`sub_58854`（494 行，產生格子清單的那支）還沒讀完。 | `docs/formats/05-tpc-tilesets.md`（另 1 份） | 5 |
 | `sub_58D4A` | if (byte_6AA84 & 0C0h) != 0C0h 或 sub_58D4A() == 0 | `docs/re/31-battle-ai-chain.md`（另 1 份） | 8 |
