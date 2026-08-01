@@ -1,0 +1,97 @@
+package game
+
+import "testing"
+
+// TestDecayMatchesOriginal 驗證整數版的衰減與原版的浮點算式等價。
+//
+// 原版：v -= Round(Real(v) / 5.0)。Turbo Pascal 的 Round 是四捨五入
+// （.5 進偶數），但 v/5 的小數只可能是 0/.2/.4/.6/.8，碰不到 .5，
+// 所以 (v+2)/5 完全等價。
+func TestDecayMatchesOriginal(t *testing.T) {
+	// 用浮點重算一遍當對照
+	roundHalfEven := func(x float64) int {
+		i := int(x)
+		frac := x - float64(i)
+		switch {
+		case frac > 0.5:
+			return i + 1
+		case frac < 0.5:
+			return i
+		default:
+			if i%2 == 0 {
+				return i
+			}
+			return i + 1
+		}
+	}
+	for v := 0; v <= 255; v++ {
+		got := Decay(uint8(v))
+		want := uint8(v)
+		if v > DecayThreshold {
+			want = uint8(v - roundHalfEven(float64(v)/5.0))
+		}
+		if got != want {
+			t.Fatalf("Decay(%d) = %d，浮點算式給 %d", v, got, want)
+		}
+	}
+}
+
+// TestDecayThreshold 40 以下不衰減，41 開始衰減。
+func TestDecayThreshold(t *testing.T) {
+	for _, c := range []struct{ in, want uint8 }{
+		{0, 0}, {40, 40}, // 門檻以下原樣
+		{41, 33},  // 41 - Round(8.2)=8
+		{43, 34},  // 43 - Round(8.6)=9
+		{50, 40},  // 50 - 10
+		{100, 80}, // 100 - 20
+		{255, 204},
+	} {
+		if got := Decay(c.in); got != c.want {
+			t.Errorf("Decay(%d) = %d，預期 %d", c.in, got, c.want)
+		}
+	}
+}
+
+// TestDecayConverges 反覆衰減會收斂到門檻，不會無限跑或反彈。
+func TestDecayConverges(t *testing.T) {
+	v := uint8(255)
+	for i := 0; i < 100; i++ {
+		next := Decay(v)
+		if next > v {
+			t.Fatalf("第 %d 次衰減後變大了：%d → %d", i, v, next)
+		}
+		if next == v {
+			if v > DecayThreshold {
+				t.Fatalf("在 %d 卡住了，但門檻是 %d", v, DecayThreshold)
+			}
+			t.Logf("%d 次之後收斂到 %d", i, v)
+			return
+		}
+		v = next
+	}
+	t.Errorf("100 次之後還沒收斂，停在 %d", v)
+}
+
+// TestBeginTurnResets 回合開始時當前值回到最大值（原版的 +7 = +6）。
+func TestBeginTurnResets(t *testing.T) {
+	u := CombatUnit{General: 58, Max: 12, Current: 3, Decaying: 100}
+	u.BeginTurn()
+	if u.Current != 12 || !u.Active {
+		t.Errorf("回合開始後 Current=%d Active=%v，預期 12 / true", u.Current, u.Active)
+	}
+	if u.Decaying != 100 {
+		t.Errorf("BeginTurn 不該動到衰減欄位")
+	}
+	u.EndTurn()
+	if u.Decaying != 80 {
+		t.Errorf("回合結束後衰減欄位是 %d，預期 80", u.Decaying)
+	}
+
+	// 空槽不動
+	empty := CombatUnit{Max: 12, Decaying: 100}
+	empty.BeginTurn()
+	empty.EndTurn()
+	if empty.Active || empty.Current != 0 || empty.Decaying != 100 {
+		t.Errorf("空槽不該被重置或衰減：%+v", empty)
+	}
+}

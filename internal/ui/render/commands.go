@@ -28,29 +28,29 @@ type Command struct {
 
 // 2.15 的後綴詞條。
 const (
-	w2Action   = 16 // 行動
-	w2Activity = 17 // 活動
-	w2Option   = 19 // 選項
+	w2Action    = 16  // 行動
+	w2Activity  = 17  // 活動
+	w2Option    = 19  // 選項
 	w2Ceasefire = 149 // 停火
 )
 
 // StrategyCommands 是十五個政略指令，順序照實機選單。
 var StrategyCommands = []Command{
-	{1, []CommandWord{{false, 0}, {false, w2Action}}},   // 調動行動
-	{2, []CommandWord{{false, 1}, {false, w2Action}}},   // 軍事行動
-	{3, []CommandWord{{false, 2}}},                      // 運補
-	{4, []CommandWord{{false, 3}}},                      // 徵稅
-	{5, []CommandWord{{false, 4}}},                      // 徵兵
-	{6, []CommandWord{{false, 5}}},                      // 查閱
-	{7, []CommandWord{{false, 6}}},                      // 開發
-	{8, []CommandWord{{false, 7}}},                      // 政策
-	{9, []CommandWord{{false, 8}}},                      // 外交
+	{1, []CommandWord{{false, 0}, {false, w2Action}}},     // 調動行動
+	{2, []CommandWord{{false, 1}, {false, w2Action}}},     // 軍事行動
+	{3, []CommandWord{{false, 2}}},                        // 運補
+	{4, []CommandWord{{false, 3}}},                        // 徵稅
+	{5, []CommandWord{{false, 4}}},                        // 徵兵
+	{6, []CommandWord{{false, 5}}},                        // 查閱
+	{7, []CommandWord{{false, 6}}},                        // 開發
+	{8, []CommandWord{{false, 7}}},                        // 政策
+	{9, []CommandWord{{false, 8}}},                        // 外交
 	{10, []CommandWord{{false, 9}, {false, w2Ceasefire}}}, // 談判停火
-	{11, []CommandWord{{false, 10}, {false, w2Action}}}, // 秘密行動
+	{11, []CommandWord{{false, 10}, {false, w2Action}}},   // 秘密行動
 	{12, []CommandWord{{false, 11}, {false, w2Activity}}}, // 商業活動
-	{13, []CommandWord{{false, 12}}},                    // 練兵
-	{14, []CommandWord{{true, 35}}},                     // 慰勞軍民（4.15 四字）
-	{15, []CommandWord{{false, 15}, {false, w2Option}}}, // 其他選項
+	{13, []CommandWord{{false, 12}}},                      // 練兵
+	{14, []CommandWord{{true, 35}}},                       // 慰勞軍民（4.15 四字）
+	{15, []CommandWord{{false, 15}, {false, w2Option}}},   // 其他選項
 }
 
 // CommandFonts 是畫指令選單需要的兩個字模檔。

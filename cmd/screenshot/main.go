@@ -135,4 +135,3 @@ func run(dir, out string, only game.ProvinceID, menu bool) error {
 	}
 	return nil
 }
-

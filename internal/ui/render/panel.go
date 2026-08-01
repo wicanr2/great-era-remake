@@ -19,7 +19,7 @@ import (
 // 面板版面。**座標是 remake 的排版選擇**，不是還原原版的精確數值。
 const (
 	panelX     = 8
-	panelLabel = panelX + 8  // 標籤起點
+	panelLabel = panelX + 8   // 標籤起點
 	panelValue = panelX + 182 // 數值右邊界
 	panelTop   = 8
 	lineH      = 18 // 行高
@@ -59,19 +59,19 @@ var (
 
 // PanelFonts 是畫面板需要的三個字模檔。
 type PanelFonts struct {
-	W2 *assets.GlyphFile // 2.15，二字詞
-	W3 *assets.GlyphFile // 3.15，三字詞（前 39 條是省名）
+	W2  *assets.GlyphFile // 2.15，二字詞
+	W3  *assets.GlyphFile // 3.15，三字詞（前 39 條是省名）
 	Gen *assets.GlyphFile // MAN{期}15，將領姓名（三字）
 }
 
 // PanelData 是面板要顯示的一個省的狀態。
 type PanelData struct {
-	ID        game.ProvinceID
-	Province  *game.Province
-	Force     uint32 // 該省將領的兵力加總
-	Generals  int    // 該省的將領數
-	Year      uint16
-	Month     uint8
+	ID       game.ProvinceID
+	Province *game.Province
+	Force    uint32 // 該省將領的兵力加總
+	Generals int    // 該省的將領數
+	Year     uint16
+	Month    uint8
 }
 
 // DrawStrategyPanel 把政略畫面的左側面板畫到畫布上。
