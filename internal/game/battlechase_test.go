@@ -183,3 +183,78 @@ func TestAttackerNearCityDetectsApproach(t *testing.T) {
 		t.Error("攻方站在城市上該算逼近")
 	}
 }
+
+func TestFallbackToStandbyDefenderHasNoGuards(t *testing.T) {
+	// 第二方（守方）沒有保護：連首位單位都會被打回待命。
+	us := []*Combatant{
+		{CombatUnit: CombatUnit{General: 1, Command: BattleCmdSeekTarget}},
+		{CombatUnit: CombatUnit{General: 2, Command: BattleCmdStandby}},
+		{CombatUnit: CombatUnit{General: 3, Command: BattleCmdStandby}},
+		{CombatUnit: CombatUnit{General: 4, Command: BattleCmdStandby}},
+		{CombatUnit: CombatUnit{General: 5, Command: BattleCmdSeekTarget}},
+	}
+	if !FallbackToStandby(us, us[0], false) {
+		t.Error("守方的首位單位也該被打回待命")
+	}
+	if us[0].Command != BattleCmdStandby {
+		t.Errorf("命令該是待命，實得 %d", us[0].Command)
+	}
+	// 待命人數已滿也照打。
+	if !FallbackToStandby(us, us[4], false) {
+		t.Error("守方沒有待命人數上限")
+	}
+}
+
+func TestFallbackToStandbyAttackerGuardsLeader(t *testing.T) {
+	// ⭐ 第一方（攻方）的首位單位是主帥，永遠不打回。
+	us := []*Combatant{
+		{CombatUnit: CombatUnit{General: 1, Command: BattleCmdSeekTarget}},
+		{CombatUnit: CombatUnit{General: 2, Command: BattleCmdSeekTarget}},
+	}
+	if FallbackToStandby(us, us[0], true) {
+		t.Error("攻方的首位單位不該被打回待命")
+	}
+	if us[0].Command != BattleCmdSeekTarget {
+		t.Error("首位單位的命令不該被改")
+	}
+	if !FallbackToStandby(us, us[1], true) {
+		t.Error("非首位的單位該被打回")
+	}
+}
+
+func TestFallbackToStandbyAttackerCapsStandbyCount(t *testing.T) {
+	// ⭐ index 2..10 已經有 3 個待命就不再多一個（`> 2` 才擋 → 上限 3）。
+	mk := func(n int) []*Combatant {
+		us := []*Combatant{{CombatUnit: CombatUnit{General: 1,
+			Command: BattleCmdSeekTarget}}}
+		for i := 0; i < n; i++ {
+			us = append(us, &Combatant{CombatUnit: CombatUnit{
+				General: GeneralID(2 + i), Command: BattleCmdStandby}})
+		}
+		us = append(us, &Combatant{CombatUnit: CombatUnit{
+			General: 99, Command: BattleCmdSeekTarget}})
+		return us
+	}
+	for _, c := range []struct {
+		standby int
+		want    bool
+	}{{0, true}, {1, true}, {2, true}, {3, false}, {4, false}} {
+		us := mk(c.standby)
+		if got := FallbackToStandby(us, us[len(us)-1], true); got != c.want {
+			t.Errorf("已有 %d 個待命 → 該回 %v，實得 %v", c.standby, c.want, got)
+		}
+	}
+}
+
+func TestFallbackDoesNotTouchNextCell(t *testing.T) {
+	// ⚠️ 原版只設 +9 與 +10，**不動 +12**——與 ResetToStandby 不同。
+	u := &Combatant{CombatUnit: CombatUnit{General: 7,
+		Command: BattleCmdSeekTarget, NextCell: 42, TargetUnit: 9}}
+	FallbackToStandby([]*Combatant{{CombatUnit: CombatUnit{General: 1}}, u}, u, true)
+	if u.NextCell != 42 {
+		t.Errorf("下一跳不該被動，實得 %d", u.NextCell)
+	}
+	if u.TargetUnit != 0 {
+		t.Errorf("目標該被清成 0，實得 %d", u.TargetUnit)
+	}
+}

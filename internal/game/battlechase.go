@@ -31,6 +31,9 @@ const AIChaseFirepowerRatio = 3
 //	                     這個不對稱照抄沒有意義，先不做
 func (s *BattleSim) ChaseAssign(units, foes []*Combatant,
 	route func(to, from CellIndex) CellIndex) int {
+	// 攻方是第一方（§32），收尾的兩道保護只對它生效。
+	isFirstSide := len(units) > 0 && len(s.Attacker) > 0 &&
+		units[0] != nil && s.Attacker[0] != nil && units[0].General == s.Attacker[0].General
 	// 敵方的非零槽位壓成連續清單（原版的第一個迴圈）。
 	var list []*Combatant
 	for _, f := range foes {
@@ -62,6 +65,7 @@ func (s *BattleSim) ChaseAssign(units, foes []*Combatant,
 		if u.Assigned() {
 			continue
 		}
+		assigned := false
 		for j, f := range list {
 			// 火力額度滿了就換下一個敵人——**這一步是重點**。
 			if drawn[j] >= power[j]*AIChaseFirepowerRatio {
@@ -74,7 +78,12 @@ func (s *BattleSim) ChaseAssign(units, foes []*Combatant,
 			u.AssignTo(f.General, next)
 			drawn[j] += s.StrengthOf(u)
 			n++
+			assigned = true
 			break
+		}
+		if !assigned {
+			// 一個目標都走不到 → `sub_3B8B0`（§54）。
+			FallbackToStandby(units, u, isFirstSide)
 		}
 	}
 	return n
@@ -115,4 +124,51 @@ func (s *BattleSim) AttackerFewerThanCities() bool {
 		}
 	}
 	return n < len(CityCells(s.Field))
+}
+
+// AIStandbyCap 是分支 B（第一方／攻方）**同時待命的人數上限**：3。
+//
+// `sub_3B8B0` 掃 index 2..10 數命令 2 的單位，`> 2` 就不再把人打回待命
+// ——所以待命數 0/1/2 時可以再加一個，最多 3 個。
+const AIStandbyCap = 3
+
+// FallbackToStandby 是 `sub_3B8B0`（`docs/re/31` §54）：**一個目標都走不到時的收尾**。
+//
+// 值 3 那條路（打城市／追人）與 `sub_3BF6A` 共用它。兩方的行為**不對稱**：
+//
+//	第二方（守方，side == 0）  直接打回待命，沒有任何保護
+//	第一方（攻方，side != 0）  兩道保護：
+//	                            1. 首位單位（主帥）免疫，永遠不打回
+//	                            2. index 2..10 已經有 3 個以上待命就不再多一個
+//
+// ⚠️ 原版**只設 `+9` 與 `+10`，不動 `+12`**——與 `ResetToStandby`（`sub_3B15E`）
+// 不同，那支會把 `+12` 清成 `0xFF`。兩支不能合併。
+//
+// 回傳是否真的把單位打回待命。
+func FallbackToStandby(units []*Combatant, u *Combatant, isFirstSide bool) bool {
+	if u == nil {
+		return false
+	}
+	demote := func() bool {
+		u.Command = BattleCmdStandby
+		u.TargetUnit = 0
+		return true
+	}
+	if !isFirstSide {
+		return demote()
+	}
+	// 首位單位是主帥，不打回。
+	if len(units) > 0 && units[0] != nil && units[0].General == u.General {
+		return false
+	}
+	n := 0
+	for i := 1; i < len(units); i++ { // 原版從 index 2 起，跳過首位
+		if v := units[i]; v != nil && v.Command == BattleCmdStandby {
+			n++
+		}
+	}
+	if n >= AIStandbyCap {
+		return false
+	}
+	return demote()
 }
