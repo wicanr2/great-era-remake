@@ -250,10 +250,30 @@ func (a *app) updateBattle() error {
 			a.dirty = true
 			return nil
 		}
+		// 回合結束的三件事，順序照原版 `sub_41D20`（§49）：
+		// 先扣補給、再加回合數、再檢查上限。
+		if w := game.TurnUpkeep(&b.supAtk, &b.supDef); w != game.BattleSideNone {
+			b.finished = true
+			if w == game.BattleSideFirst {
+				b.log = "守方補給見底，攻方獲勝"
+			} else {
+				b.log = "攻方補給見底，守方獲勝"
+			}
+			a.dirty = true
+			return nil
+		}
 		b.sim.EndTurn()
 		b.sim.BeginTurn()
 		b.turn++
-		b.log = "換下一回合"
+		// 原版的回合上限是 16（`byte_64900 == 10h`），到了就結束、不判勝負。
+		if b.turn >= game.BattleTurnCap(false) {
+			b.finished = true
+			b.log = "回合用盡，戰鬥結束"
+			a.dirty = true
+			return nil
+		}
+		b.log = fmt.Sprintf("第 %d／%d 回合｜攻方糧食可撐 %d 回合",
+			b.turn, game.BattleTurnCap(false), b.supAtk.TurnsOfFood())
 		a.dirty = true
 	}
 	return nil

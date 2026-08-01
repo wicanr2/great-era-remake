@@ -25,13 +25,12 @@ type BattleOutcome struct {
 	AttackerLoss, DefenderLoss int
 }
 
-// AutoBattleTurnCap 是回合上限。
+// AutoBattleTurnCap 是回合上限，**原版是 16**（`BattleTurnLimit`，§49）。
 //
-// 原版的戰鬥有沒有回合上限還沒解——`docs/re/05` 的戰鬥狀態 469 B
-// 裡沒找到回合計數。這個數字純粹是防止無限迴圈的保險，
-// **不是原版規則**：`+30` 每回合衰減 20% 且有下限（`sub_54826`），
-// 所以拖久了雙方都打不動，戰鬥可能真的不會結束。
-const AutoBattleTurnCap = 200
+// 回合數存在 `byte_64900`（不在 `docs/re/05` 那 469 B 的戰鬥狀態裡，
+// 所以先前找不到）：開戰時 1、每回合末 +1，`sub_41209` 一碰到 16 就
+// 設結束旗標。實際打得到 15 個完整回合。
+const AutoBattleTurnCap = BattleTurnLimit
 
 // AutoResolve 讓雙方自動打完。
 func (s *BattleSim) AutoResolve(maxTurns int) BattleOutcome {
