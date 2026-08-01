@@ -108,3 +108,66 @@ func (c *Canvas) strokeRect(px, py, w, h int, col assets.RGB) {
 		c.setPixel(px+w-1, py+dy, col)
 	}
 }
+
+// 兵種圖示（NEWICON.TPC，18 張 32×17）。
+//
+// 綠紅成對，應該就是敵我兩方（docs/formats/05 §3）：
+//
+//	0/1   鋼盔（步兵）綠／紅
+//	2/3   戰車（裝甲）綠／紅
+//	4/5   馬（騎兵）綠／紅
+//	6-11  飛機，綠，六個朝向
+//	12-17 飛機，紅，六個朝向
+//
+// ⚠️ 圖示編號與遊戲裡的兵種編號**還沒對應起來**——詞表有步兵、砲兵、
+// 騎兵、裝甲兵、游擊隊五個兵種（docs/mechanics/20-military.md §5），
+// 但圖示裡看不到明顯的砲兵。所以這裡只提供「畫第 N 張」，不做語意映射。
+
+// IconW / IconH 是一張兵種圖示的尺寸。
+const IconW, IconH = 32, 17
+
+// IconCount 是 NEWICON.TPC 的圖示數。
+const IconCount = 18
+
+// LoadIcons 解 NEWICON.TPC。
+func LoadIcons(newicon []byte) ([]*assets.Image, error) {
+	ims, err := assets.DecodeBGISet(newicon)
+	if err != nil {
+		return nil, fmt.Errorf("render: NEWICON.TPC: %w", err)
+	}
+	if len(ims) != IconCount {
+		return nil, fmt.Errorf("render: NEWICON.TPC 應有 %d 張，解出 %d 張",
+			IconCount, len(ims))
+	}
+	for i, im := range ims {
+		if im.W != IconW || im.H != IconH {
+			return nil, fmt.Errorf("render: 第 %d 張圖示是 %dx%d，預期 %dx%d",
+				i, im.W, im.H, IconW, IconH)
+		}
+	}
+	return ims, nil
+}
+
+// DrawUnitIcon 把第 idx 張兵種圖示疊到格子 (gx, gy) 上。
+//
+// 圖示比格子矮（17 vs 24），所以垂直置中；索引 0 視為透明，
+// 讓底下的地形透出來。
+func (c *Canvas) DrawUnitIcon(icons []*assets.Image, idx int, pal assets.Palette,
+	originX, originY, gx, gy int) error {
+	if idx < 0 || idx >= len(icons) {
+		return fmt.Errorf("render: 圖示編號 %d 超出 0..%d", idx, len(icons)-1)
+	}
+	im := icons[idx]
+	px := originX + gx*TileW
+	py := originY + gy*TileH + (TileH-IconH)/2
+	for y := 0; y < im.H; y++ {
+		for x := 0; x < im.W; x++ {
+			v := im.Pix[y*im.W+x]
+			if v == 0 || int(v) >= len(pal) {
+				continue
+			}
+			c.setPixel(px+x, py+y, pal[v])
+		}
+	}
+	return nil
+}

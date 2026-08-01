@@ -25,15 +25,16 @@ func main() {
 	out := flag.String("out", "workplace/shots", "輸出目錄")
 	prov := flag.Int("province", 0, "只畫某一省（1-39），0 = 全部")
 	menu := flag.Bool("menu", false, "右側改畫政略指令選單")
+	units := flag.Bool("units", false, "在戰場上疊出參戰單位的圖示")
 	flag.Parse()
 
-	if err := run(*dir, *out, game.ProvinceID(*prov), *menu); err != nil {
+	if err := run(*dir, *out, game.ProvinceID(*prov), *menu, *units); err != nil {
 		fmt.Fprintln(os.Stderr, "錯誤:", err)
 		os.Exit(1)
 	}
 }
 
-func run(dir, out string, only game.ProvinceID, menu bool) error {
+func run(dir, out string, only game.ProvinceID, menu, units bool) error {
 	read := func(name string) ([]byte, error) {
 		return os.ReadFile(filepath.Join(dir, name))
 	}
@@ -59,6 +60,15 @@ func run(dir, out string, only game.ProvinceID, menu bool) error {
 		return err
 	}
 	cmdFonts := render.CommandFonts{W2: fonts.W2, W4: w4}
+
+	icons, err := render.LoadIcons(must("NEWICON.TPC"))
+	if err != nil {
+		return err
+	}
+	battles, err := game.ParseBattleStates(must("MEM_WAR.DAT"))
+	if err != nil {
+		return err
+	}
 	// 用 EGA 預設調色盤——原版戰場配哪個 .RGB 還沒查出來（8 個檔名都不像戰場），
 	// 所以顏色不保證與實機逐像素相同（internal/assets/palette.go 的說明）。
 	ts, err := render.LoadTileSet(must("NEWTERR.TPC"), must("RAIL.TPC"),
@@ -106,6 +116,26 @@ func run(dir, out string, only game.ProvinceID, menu bool) error {
 		}
 		if err := c.DrawStrategyPanel(d, fonts); err != nil {
 			return err
+		}
+		if units {
+			// 把參戰單位擺在戰場上。**位置是 remake 的排版選擇**——
+			// 原版每個單位在哪一格由戰鬥狀態決定，那部分還沒解出來
+			// （200 B 的單位詳細資料，docs/re/05）。
+			st := battles[id-1]
+			for i, gid := range st.Attackers() {
+				_ = gid
+				if err := c.DrawUnitIcon(icons, 0, assets.EGADefaultPalette,
+					190, 14, i, 0); err != nil {
+					return err
+				}
+			}
+			for i, gid := range st.Defenders() {
+				_ = gid
+				if err := c.DrawUnitIcon(icons, 1, assets.EGADefaultPalette,
+					190, 14, i, 13); err != nil {
+					return err
+				}
+			}
 		}
 		if menu {
 			// 指令選單蓋在戰場上，對照實機的「司令，請下命令？」清單。

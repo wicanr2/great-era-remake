@@ -18,7 +18,7 @@
 | M2 執行檔反組譯 | 進行中——五支已盤點，戰鬥模組已定位 |
 | M3 規則規格 | 4 份 READY（地圖、將領、省份、戰場圖塊）+ `docs/mechanics/` 機制文件 |
 | M4 規則層 | 進行中——地圖、將領、省份、戰場 |
-| M5 呈現層 | **政略畫面可運作**——13 個欄位對實機零誤差，戰場用原版圖塊畫出 |
+| M5 呈現層 | **政略畫面 + 互動**——13 個欄位對實機零誤差、15 項指令選單、戰場圖塊與參戰單位 |
 | M6–M7 多語系／發行 | 未開始 |
 
 DOSBox 實測已通，可載入存檔進政略階段。詳細現況見 [`CONTEXT.md`](./CONTEXT.md)。
@@ -26,6 +26,7 @@ DOSBox 實測已通，可載入存檔進政略階段。詳細現況見 [`CONTEXT
 ```sh
 tools/go.sh run ./cmd/dsds -game workplace/orig/game      # 需要顯示器
 tools/go.sh run ./cmd/screenshot -province 26             # 無頭產出政略畫面 PNG
+tools/go.sh run ./cmd/screenshot -province 19 -units      # 加上參戰單位圖示
 tools/go.sh test ./...                                     # 逐像素驗證
 ```
 
