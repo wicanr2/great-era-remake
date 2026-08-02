@@ -76,6 +76,15 @@ tools/go.sh run ./cmd/dsds -eten workplace/eten
 
 字庫檔不進版控；`tools/deny_scan.sh` 會拒絕 `STDFONT`／`SPCFONT` 等檔名。
 
+研究批次的自撰小傳可先做不寫回產品的完整性檢查：
+
+```text
+tools/py.sh tools/gen_authored_bios.py --check
+```
+
+目前會證實 417 筆骨架、387 篇正文、30 筆 `unknown` 與 61 篇待整合。DESIGN-22
+仍為 DRAFT；在權威關係裁決前，這項檢查不會改動本目錄的 `people.json`。
+
 ⚠️ 英文版不是把中文換掉就好：640×350 的版面是照全形字排的，
 換成比例字後字寬、行高、對話框都要重算（`CLAUDE.md` §6）。
 **排版層必須先抽離**，否則英文一定溢出。`internal/ui/textlayout` 已完成第一階段的

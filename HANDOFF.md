@@ -373,3 +373,10 @@ modern icon 進度必須維持誠實標示：`docs/design/10-visual-modernizatio
 `assets/themes/modern` 實作，目前仍只有復古 renderer。白話方面，操作介面已涵蓋
 十五項主選單及多數已接功能與 O0–O2；外交、O3／O4、劇情對話／敘事文本仍未完成，
 不得把「介面白話大部分完成」寫成「全遊戲對話完成」。
+
+人物自傳整合的前置工具已補上：`tools/gen_authored_bios.py --check` 會從所有成對的
+`facts-*.json`／`bios-*.md` 建立記憶體索引，嚴格驗證 417 骨架、387 正文、30 unknown、
+#274「無省長」佔位、姓名／信心度、格數、倚天可畫性、禁用詞與來源 SHA-256；並列出
+精確 61 筆待整合 ID。`--output /tmp/...` 兩次輸出位元組一致。DESIGN-22 仍是 DRAFT，
+所以工具刻意不會改 `docs/reference/people/people.json` 或發行語系檔；下一步是使用者裁決
+是否採「獨立來源索引＋產生器合併」，不能把前置驗證誤報為 61 篇已進遊戲。

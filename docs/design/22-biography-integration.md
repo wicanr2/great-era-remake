@@ -3,6 +3,12 @@
 狀態：**DRAFT（流程提案；尚未解除 DESIGN-21 §9 的寫回禁令）**  
 日期：2026-08-02
 
+2026-08-03 實作進度：`tools/gen_authored_bios.py` 已完成本提案第 2、3 節的
+唯讀／暫存輸出階段。`--check` 會失敗即關閉地驗證 417 筆骨架、387 篇正文、
+30 筆 unknown、#274 佔位排除、姓名／信心度一致、可畫性、格數、禁用詞與來源
+SHA-256；`--output /tmp/...` 連跑兩次可產生位元組相同的索引。**尚未建立版控內的
+`authored-bios.json`，也未接 `gen_people.py` 或寫回產品資料**，所以本文件仍是 DRAFT。
+
 ## 0. 現況與問題
 
 - 417/417 個人物槽位已有唯一事實骨架。
@@ -111,3 +117,10 @@ people.json ──────┴─→ translations/zh-Hant/people.json
 唯一會改變資料權威關係的決定：是否採用本提案的「獨立來源索引＋產生器合併」，
 而不是直接覆寫 `docs/reference/people/people.json`。在裁決前，本文件維持 DRAFT，
 不建立或寫入 `authored-bios.json`。
+
+裁決前可安全執行：
+
+```sh
+tools/py.sh tools/gen_authored_bios.py --check
+tools/py.sh tools/gen_authored_bios.py --output /tmp/authored-bios.json
+```
