@@ -18,11 +18,13 @@ type CommandBudget struct {
 	// commandsFor 是「這個省有幾個指令數」。獨立成欄位是為了可測；
 	// 正常用 `NewCommandBudget` 接 `AIWorld.CommandsFor`。
 	commandsFor func(ProvinceID) int
+	// remainingAfter 套用執行一項後的原版特例；自治省會直接歸零。
+	remainingAfter func(ProvinceID, int) int
 }
 
 // NewCommandBudget 用某個世界的將領分佈建一份指令數帳。
 func NewCommandBudget(w *AIWorld) *CommandBudget {
-	return &CommandBudget{commandsFor: w.CommandsFor}
+	return &CommandBudget{commandsFor: w.CommandsFor, remainingAfter: w.CommandsRemainingAfter}
 }
 
 // NewCommandBudgetFunc 讓呼叫端自己決定上限怎麼算（測試用）。
@@ -48,10 +50,15 @@ func (b *CommandBudget) Remaining(p ProvinceID) int {
 
 // Spend 消耗一個指令數。回 false 表示已經用完，指令不該執行。
 func (b *CommandBudget) Spend(p ProvinceID) bool {
-	if b.Remaining(p) <= 0 {
+	before := b.Remaining(p)
+	if before <= 0 {
 		return false
 	}
-	b.left[p]--
+	if b.remainingAfter != nil {
+		b.left[p] = b.remainingAfter(p, before)
+	} else {
+		b.left[p] = before - 1
+	}
 	return true
 }
 

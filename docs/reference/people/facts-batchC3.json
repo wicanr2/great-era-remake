@@ -383,8 +383,11 @@
         { "from": "1922-02-23", "to": null, "title": "砲兵第十一團第一營營長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "⚠ S-GPOST 原文作「礮兵」。「礮」連 Big5 都編不出（§20.4／G-U1-6），正文正規化為「砲」。" },
         { "from": "1924-02-16", "to": null, "title": "陸軍砲兵第十一團團長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "同上，原文作「礮兵」。" },
         { "from": "1926-04-03", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "敘階，非職務。" },
+        { "from": "1928-03-09", "to": null, "title": "國民政府軍事委員會委員", "org": "國民政府軍事委員會", "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "C2／C3 合併保留的 Tier A 差額。" },
         { "from": "1928-09-24", "to": null, "title": "青海省政府委員兼主席", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
         { "from": "1928-10-08", "to": null, "title": "陸軍第三十一師師長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "⚠ 十年後的台兒莊守城部隊正是第三十一師（師長池峰城），該師與本人的長期隸屬關係由此可見，但兩者之間的沿革本輪未查。" },
+        { "from": "1929-08", "to": "1931-08-10", "title": "甘肅省政府主席", "org": "甘肅省政府", "station": "甘肅", "src": ["S-WPZH"], "conf": "medium", "note": "C2／C3 合併保留的差額。" },
+        { "from": "1930-10-26", "to": "1937-10", "title": "國民革命軍第二十六路軍總指揮", "org": "國民革命軍第二十六路軍", "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "C2／C3 合併保留的差額。" },
         { "from": "1933-08-23", "to": null, "title": "陸軍第四十二軍軍長（兼任）", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": null },
         { "from": "1935-04-04", "to": null, "title": "陸軍中將", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "1935 年的重新敘階。1936-12-16「特加陸軍上將」。" },
         { "from": "1937-08-02", "to": "1939-04", "title": "第二集團軍副總司令兼第一軍團司令", "org": null, "station": null, "src": ["S-WPZH"], "conf": "medium", "note": "S-WPZH infobox past 欄。⚠ 與正文採用的「第二集團軍總司令」有階級差，見 conflicts[0]。" },
@@ -396,8 +399,11 @@
         { "from": "1948-10-30", "to": "1949-02-21", "title": "總統府參軍長", "org": null, "station": null, "src": ["S-GPOST"], "conf": "medium", "note": "1949-02-21 辭職後即日特任戰略顧問委員會戰略顧問。" }
       ],
       "events": [
+        { "when": "1924-10", "where": "北京", "name": "北京政變與國民軍成立", "role": "第一砲兵旅旅長，後任騎兵第二師師長", "outcome": null, "src": ["S-WPZH"], "conf": "medium", "note": "C2／C3 合併保留的差額。" },
+        { "when": "1930", "where": null, "name": "中原大戰", "role": "反蔣聯軍第二方面軍第五路總指揮", "outcome": "10 月所部改編為第二十六路軍", "src": ["S-WPZH"], "conf": "medium", "note": "C2／C3 合併保留的差額。" },
         { "when": "1938-03", "where": "山東台兒莊", "name": "台兒莊戰役", "role": "第二集團軍總司令（左翼兵團），在第五戰區司令長官李宗仁指揮下擔任正面守軍", "outcome": "所部第三十一師（師長池峰城）守台兒莊城；4 月 7 日凌晨與湯恩伯第二十軍團分任左右翼兵團發動反攻", "src": ["S-WPZH"], "conf": "high", "note": "〈台兒莊戰役〉的戰鬥序列表與內文電令兩處相合，引已出版戰史。⚠ 該條目有「敵人藉飛機、重砲、戰車之支持，向孫連仲部猛烈圍攻」等引語與「勝負之數決定於最後五分鐘」的原話——引語屬他人表達，正文一律不取，只寫部署與結果。" },
-        { "when": "1938-05-10", "where": null, "name": "青天白日勳章授勳", "role": null, "outcome": "與湯恩伯同日獲頒", "src": ["S-WPZH"], "conf": "medium", "note": "〈台兒莊戰役〉：1938-05-10 國民政府授予湯恩伯、孫連仲青天白日勳章。" }
+        { "when": "1938-05-10", "where": null, "name": "青天白日勳章授勳", "role": null, "outcome": "與湯恩伯同日獲頒", "src": ["S-WPZH"], "conf": "medium", "note": "〈台兒莊戰役〉：1938-05-10 國民政府授予湯恩伯、孫連仲青天白日勳章。" },
+        { "when": "1945-09", "where": "北平、天津", "name": "日軍受降", "role": "第十一戰區司令長官", "outcome": "負責北平、天津地區日軍受降", "src": ["S-WPZH"], "conf": "medium", "note": "C2／C3 合併保留的差額。" }
       ],
       "ending": { "when": "1990-08-14", "where": null, "how": "卒", "src": ["S-WPZH"], "conf": "medium", "note": "卒地未查得。" },
       "highest_post": { "value": "總統府參軍長", "src": ["S-GPOST"], "conf": "medium", "note": "原 people.json 作「中華民國陸軍二級上將」——那是階級不是職務，且與 S-GPOST 1936-12-16「特加陸軍上將」不完全相符。遊戲期別內的最高職務是第六戰區司令長官。" },
@@ -455,7 +461,12 @@
         { "from": "1945-09-17", "to": "1947-05-10", "title": "國民政府參軍長", "org": null, "station": null, "src": ["S-GPOST", "S-WPZH"], "conf": "high", "note": "⭐ S-GPOST 記 1945-09-17 特任、1947-05-10「另有任用」免；S-WPZH 的 infobox 記其為第 4 任國民政府參軍長。" },
         { "from": "1947-04-19", "to": "1949-03-05", "title": "盟國對日委員會中國代表兼中國駐日代表團團長", "org": null, "station": "日本", "src": ["S-GPOST"], "conf": "medium", "note": "依 §4.7 為期外，未進正文。" }
       ],
-      "events": [],
+      "events": [
+        { "when": "1920", "where": "太原", "name": "山西軍人工藝實習廠（山西兵工廠）設立", "role": "總辦", "outcome": null, "src": ["S-WPZH"], "conf": "medium", "note": "C2／C3 合併保留的差額。" },
+        { "when": "1927-07", "where": "京綏鐵路沿線", "name": "第二期北伐", "role": "第一軍團軍團長", "outcome": "1928 年攻取保定、北京、天津", "src": ["S-WPZH"], "conf": "medium", "note": "番號與 Tier A 的「北方第一軍」並列，見 conflicts。" },
+        { "when": "1933", "where": "長城沿線", "name": "長城作戰", "role": "華北第二軍團司令", "outcome": null, "src": ["S-WPZH"], "conf": "medium", "note": "C2／C3 合併保留的差額。" },
+        { "when": "1939", "where": "湖南", "name": "第一次、第二次長沙作戰", "role": "第九戰區副司令長官", "outcome": null, "src": ["S-WPZH"], "conf": "medium", "note": "C2／C3 合併保留的差額。" }
+      ],
       "ending": { "when": "1978-05-15", "where": "東京", "how": "卒", "src": ["S-WPZH"], "conf": "medium", "note": "S-WPZH 記遺骨送回中國，安放於八寶山革命公墓。" },
       "highest_post": { "value": "國民政府參軍長", "src": ["S-GPOST"], "conf": "medium", "note": "原 people.json 作「第六戰區司令長官」。兩者都對，參軍長是最高的一項；但遊戲期別（北伐時期、抗戰前期）內的最高職務確實是第六戰區司令長官。" },
       "faction": { "value": "奉天講武堂→晉軍（山西陸軍第一混成旅）→國民革命軍北方第一軍→河北／山西／河南省政府→第六戰區→國民政府參軍處", "src": ["S-GPOST", "S-WPZH"], "conf": "medium", "note": "原值「晉系→國民革命軍」的「晉系」是派系標籤。⚠ S-ROSTER 顯示遊戲把他掛在馮玉祥（省 18）下，與 S-WPZH 記的「在陸軍第二十鎮時期與馮玉祥結為盟兄弟」相合——但那是遊戲作者的編排，不寫進正文。" },

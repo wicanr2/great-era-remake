@@ -18,8 +18,6 @@ import "fmt"
 // 步兵 ×10、騎兵 ×2、砲兵 ÷5、裝甲 ÷10。
 // 其餘三個兵種請用 `airecruit.go` 的 `AIRecruitSoldiers`。
 //
-// 兩側的匯率**是否相同未驗**——只有步兵那一項在兩邊都對得上。
-//
 // 實機兩個樣本：
 //
 //	湖北 黃金 4,150 → 徵兵上限 (0-41,500)
@@ -28,20 +26,68 @@ import "fmt"
 // 加上輸入 1,000 兵時畫面顯示「共須黃金 100」——**10 兵 = 1 金**。
 const RecruitSoldiersPerGold = 10
 
-// RecruitLimit 是這個省這次最多能徵幾個兵。
+// RecruitAffordableLimit 回傳該兵種由黃金決定的徵兵上限。
 //
-// 原版把它直接印在提示裡：「司令，欲徵多少步兵？ (0-41500)」。
-func (w *AIWorld) RecruitLimit(p ProvinceID) int {
+// 四條玩家徵兵函式已逐條確認：步兵 `sub_260C7`、砲兵 `sub_271F8`、
+// 裝甲兵 `sub_28259`、騎兵 `sub_29494`。玩家側匯率為：
+// 步兵 10 人／金、騎兵 5 人／金、砲兵 1 人／金、裝甲兵 1 人／10 金。
+// 注意電腦側騎兵是 2 人／金；這是原版兩條路徑的實際差異。
+func RecruitAffordableLimit(branch uint8, gold int) int {
+	switch branch {
+	case BranchInfantry:
+		return gold * 10
+	case BranchCavalry:
+		return gold * 5
+	case BranchArtiller:
+		return gold
+	case BranchArmour:
+		return gold / 10
+	default:
+		return 0
+	}
+}
+
+// RecruitLimit 是這個省這次最多能徵幾個指定兵種的兵。
+// 原版取「黃金可負擔量」與「該兵種所有可用部隊的缺額」兩者較小值。
+func (w *AIWorld) RecruitLimit(p ProvinceID, branch uint8) int {
 	prov, err := w.Table.At(p)
 	if err != nil {
 		return 0
 	}
-	return int(prov.Gold) * RecruitSoldiersPerGold
+	full := int(BranchFullStrength(branch))
+	if full == 0 {
+		return 0
+	}
+	room := 0
+	for _, i := range w.RosterOf(p).ids {
+		if i >= len(w.Strengths) || w.Strengths[i].Branch != branch {
+			continue
+		}
+		if gap := full - int(w.Strengths[i].Force); gap > 0 {
+			room += gap
+		}
+	}
+	affordable := RecruitAffordableLimit(branch, int(prov.Gold))
+	if room < affordable {
+		return room
+	}
+	return affordable
 }
 
-// RecruitCost 是徵 n 個兵要花多少黃金。
-func RecruitCost(n int) int {
-	return n / RecruitSoldiersPerGold
+// RecruitCost 是徵 n 個指定兵種的兵要花多少黃金。
+func RecruitCost(branch uint8, n int) int {
+	switch branch {
+	case BranchInfantry:
+		return n / 10
+	case BranchCavalry:
+		return n / 5
+	case BranchArtiller:
+		return n
+	case BranchArmour:
+		return n * 10
+	default:
+		return 0
+	}
 }
 
 // RecruitBranchOrder 是徵兵子選單的四個兵種，**照畫面順序**：
@@ -76,7 +122,7 @@ func (w *AIWorld) Recruit(p ProvinceID, branch uint8, n int) (int, error) {
 	if n <= 0 {
 		return 0, nil
 	}
-	if limit := w.RecruitLimit(p); n > limit {
+	if limit := w.RecruitLimit(p, branch); n > limit {
 		return 0, fmt.Errorf("game: 省 %d 最多徵 %d 人，要求 %d", p, limit, n)
 	}
 	full := int(BranchFullStrength(branch))
@@ -109,7 +155,7 @@ func (w *AIWorld) Recruit(p ProvinceID, branch uint8, n int) (int, error) {
 		added += take
 	}
 	if added > 0 {
-		cost := RecruitCost(added)
+		cost := RecruitCost(branch, added)
 		if int(prov.Gold) < cost {
 			cost = int(prov.Gold)
 		}
@@ -132,7 +178,7 @@ func (w *AIWorld) RecruitToFull(p ProvinceID, branch uint8) int {
 			}
 		}
 	}
-	if limit := w.RecruitLimit(p); need > limit {
+	if limit := w.RecruitLimit(p, branch); need > limit {
 		need = limit
 	}
 	added, err := w.Recruit(p, branch, need)
@@ -476,4 +522,25 @@ func ComfortGeneral(stamina, morale, loyalty, ability uint8) (uint8, uint8, uint
 		loyalty = uint8(l)
 	}
 	return stamina, morale, loyalty
+}
+
+// ApplyComfortGenerals 套用慰勞的三項將領效果，並同步 AIWorld 使用的
+// StrengthInput 鏡像。AbilityA 是帶兵能力；AbilityB 是將領忠誠度。
+// 回傳實際更新的有效索引數；越界索引會被忽略。
+func ApplyComfortGenerals(gens []General, strengths []StrengthInput, indices []int) int {
+	n := 0
+	for _, i := range indices {
+		if i < 0 || i >= len(gens) {
+			continue
+		}
+		g := &gens[i]
+		g.Stamina, g.F30, g.AbilityB = ComfortGeneral(
+			g.Stamina, g.F30, g.AbilityB, g.AbilityA)
+		if i < len(strengths) {
+			strengths[i].F29 = g.Stamina
+			strengths[i].F30 = g.F30
+		}
+		n++
+	}
+	return n
 }

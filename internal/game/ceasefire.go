@@ -42,6 +42,22 @@ const (
 	CeasefireStateAddr = 0xBCA5
 )
 
+// ParseCeasefireStates 從 `.DT1` 讀出 `ds:BCA5h` 的 39-byte 逐省表。
+// 存檔區塊從省 1 開始，規則層保留第 0 格當無效哨兵。
+func ParseCeasefireStates(save []byte) ([ProvinceCount + 1]uint8, error) {
+	var states [ProvinceCount + 1]uint8
+	b, err := SaveBlockByGlobal("byte_6FE56")
+	if err != nil {
+		return states, err
+	}
+	if len(save) < b.Offset+b.Size {
+		return states, fmt.Errorf("game: .DT1 停火狀態表需要 %d bytes，只有 %d",
+			b.Offset+b.Size, len(save))
+	}
+	copy(states[1:], save[b.Offset:b.Offset+b.Size])
+	return states, nil
+}
+
 // CeasefireResult 記錄一次停火談判的結果。
 type CeasefireResult struct {
 	Agreed bool

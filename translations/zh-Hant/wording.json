@@ -1,0 +1,192 @@
+{
+  "entries": {
+    "common.confirm": {
+      "original": "司令，您確定嗎？",
+      "plain": "確定要執行嗎？"
+    },
+    "common.cancel": {
+      "original": "取消",
+      "plain": "取消"
+    },
+    "settings.title": {
+      "original": "顯示設定",
+      "plain": "顯示設定"
+    },
+    "settings.wording": {
+      "original": "顯示用語",
+      "plain": "顯示用語"
+    },
+    "settings.wording.original": {
+      "original": "原典用語",
+      "plain": "原典用語"
+    },
+    "settings.wording.plain": {
+      "original": "現代白話",
+      "plain": "現代白話"
+    },
+    "other.save": { "original": "儲存遊戲", "plain": "儲存進度" },
+    "other.load": { "original": "載入遊戲", "plain": "載入進度" },
+    "other.save.confirm": { "original": "您確定嗎？", "plain": "確定要儲存目前進度嗎？" },
+    "other.load.confirm": { "original": "您確定嗎？", "plain": "確定要載入進度嗎？未儲存的變更會遺失。" },
+    "other.sound": { "original": "音效開關", "plain": "音效" },
+    "other.command_art": { "original": "指令圖畫", "plain": "指令插圖" },
+    "other.music": { "original": "音樂開關", "plain": "背景音樂" },
+    "other.message_time": { "original": "訊息時間", "plain": "訊息顯示時間" },
+    "other.message_time.prompt": { "original": "訊息時間（1-10）", "plain": "訊息要顯示多久？（1-10 級）" },
+    "other.spectate": { "original": "觀戰", "plain": "觀看電腦戰鬥" },
+    "other.quit": { "original": "結束遊戲", "plain": "儲存並離開" },
+    "other.display": { "original": "顯示設定", "plain": "顯示設定" },
+    "other.unavailable": { "original": "尚未完成", "plain": "尚未完成" },
+    "policy.title": {
+      "original": "政策",
+      "plain": "政策"
+    },
+    "policy.autonomy": {
+      "original": "授權自治",
+      "plain": "設定省份自治"
+    },
+    "policy.production": {
+      "original": "產能分配",
+      "plain": "調整資源產能"
+    },
+    "policy.production.unavailable": {
+      "original": "產能分配可調整鐵、煤、油、糧",
+      "plain": "可將黃金產能分配給鐵、煤、油、糧"
+    },
+    "autonomy.title": {
+      "original": "授權自治",
+      "plain": "設定省份自治"
+    },
+    "autonomy.normal": {
+      "original": "正常",
+      "plain": "中央管理"
+    },
+    "autonomy.enabled": {
+      "original": "自治",
+      "plain": "自治中"
+    },
+    "autonomy.prompt": {
+      "original": "輸入省份編號；ESC 完成",
+      "plain": "輸入省份編號；ESC 完成"
+    },
+    "production.title": { "original": "本省產能", "plain": "資源產能分配" },
+    "production.gold": { "original": "黃金", "plain": "黃金（剩餘）" },
+    "production.iron": { "original": "鐵礦", "plain": "鐵礦" },
+    "production.coal": { "original": "煤礦", "plain": "煤礦" },
+    "production.oil": { "original": "石油", "plain": "石油" },
+    "production.food": { "original": "糧食", "plain": "糧食" },
+    "production.select": { "original": "司令，欲調整何項？", "plain": "要調整哪項產能？" },
+    "production.value": { "original": "司令，欲調整為多少？", "plain": "要調整為多少百分比？" },
+    "recruit.action": { "original": "徵兵", "plain": "招募新兵" },
+    "recruit.reorganize": { "original": "重新整編", "plain": "重新分配現有兵力" },
+    "recruit.infantry": { "original": "步兵", "plain": "步兵" },
+    "recruit.armour": { "original": "裝甲兵", "plain": "裝甲兵" },
+    "recruit.artillery": { "original": "砲兵", "plain": "砲兵" },
+    "recruit.cavalry": { "original": "騎兵", "plain": "騎兵" },
+    "recruit.amount": { "original": "司令，欲徵多少", "plain": "要招募多少" },
+    "recruit.limit": { "original": "可徵上限", "plain": "最多可招募" },
+    "recruit.cost": { "original": "所需", "plain": "這次需要" },
+    "recruit.gold": { "original": "黃金", "plain": "黃金" },
+    "recruit.confirm": { "original": "您確定嗎？", "plain": "確定要執行嗎？（Y/N）" },
+    "recruit.remaining": { "original": "剩餘兵力", "plain": "尚未分配的兵力" },
+    "recruit.general": { "original": "司令", "plain": "將領" },
+    "recruit.force": { "original": "兵力", "plain": "兵力" },
+    "command.01": { "original": "調動行動", "plain": "調動部隊" },
+    "command.02": { "original": "軍事行動", "plain": "進行軍事行動" },
+    "command.03": { "original": "運補", "plain": "運送補給" },
+    "command.04": { "original": "徵稅", "plain": "徵收稅款" },
+    "command.05": { "original": "徵兵", "plain": "招募士兵" },
+    "command.06": { "original": "查閱", "plain": "查看資料" },
+    "command.07": { "original": "開發", "plain": "建設與開發" },
+    "command.08": { "original": "政策", "plain": "設定省份政策" },
+    "command.09": { "original": "外交", "plain": "處理外交" },
+    "command.10": { "original": "談判停火", "plain": "談判停火" },
+    "command.11": { "original": "秘密行動", "plain": "進行秘密行動" },
+    "command.12": { "original": "商業活動", "plain": "買賣物資" },
+    "command.13": { "original": "練兵", "plain": "訓練部隊" },
+    "command.14": { "original": "慰勞軍民", "plain": "慰勞軍人與民眾" },
+    "command.15": { "original": "其他選項", "plain": "其他設定" },
+    "develop.reclaim": { "original": "墾地", "plain": "開墾土地" },
+    "develop.arsenal": { "original": "建兵工廠", "plain": "建造兵工廠" },
+    "develop.mine": { "original": "挖金礦", "plain": "開採金礦" },
+    "train.confirm": { "original": "司令，欲練兵嗎？", "plain": "確定要訓練本省部隊嗎？" },
+    "covert.guerrilla": { "original": "游擊隊", "plain": "派遣游擊隊" },
+    "covert.student": { "original": "鼓動學潮", "plain": "鼓動學生發起抗議" },
+    "covert.student.target": { "original": "司令，欲鼓動何省學潮？", "plain": "要在哪個省鼓動學生抗議？" },
+    "view.other": { "original": "查閱他省", "plain": "查看其他省份" },
+    "view.owned": { "original": "查閱所屬各省", "plain": "查看所屬省份" },
+    "view.generals": { "original": "查閱將領", "plain": "查看本省將領" },
+    "view.province_names": { "original": "查閱省名", "plain": "查看省份編號" },
+    "view.select_prompt": { "original": "查閱他省", "plain": "輸入要查看的省份編號" },
+    "view.choice.overview": { "original": "概況", "plain": "查看省份資料" },
+    "view.choice.generals": { "original": "查閱將領", "plain": "查看該省將領" },
+    "view.owned.title": { "original": "所屬各省概況", "plain": "所屬省份概況" },
+    "view.names.title": { "original": "查閱省名", "plain": "省份編號對照表" },
+    "trade.import": { "original": "進口", "plain": "買入物資" },
+    "trade.export": { "original": "出口", "plain": "賣出物資" },
+    "trade.food": { "original": "糧食", "plain": "糧食" },
+    "trade.ammo": { "original": "彈藥", "plain": "彈藥" },
+    "trade.fuel": { "original": "燃料", "plain": "燃料" },
+    "trade.coal": { "original": "煤礦", "plain": "煤礦" },
+    "trade.iron": { "original": "鐵礦", "plain": "鐵礦" },
+    "trade.buy_amount": { "original": "司令，欲購買多少", "plain": "要買入多少" },
+    "trade.sell_amount": { "original": "司令，欲拋售多少", "plain": "要賣出多少" },
+    "supply.target": { "original": "司令，欲運補何省？", "plain": "要把補給運到哪個省？" },
+    "supply.gold": { "original": "司令，欲運補多少黃金？", "plain": "要運送多少黃金？" },
+    "supply.food": { "original": "司令，欲運補多少糧食？", "plain": "要運送多少糧食？" },
+    "supply.ammo": { "original": "司令，欲運補多少彈藥？", "plain": "要運送多少彈藥？" },
+    "supply.fuel": { "original": "司令，欲運補多少燃料？", "plain": "要運送多少燃料？" },
+    "transfer.mode": {
+      "original": "司令，欲如何調動？",
+      "plain": "要怎麼調動？"
+    },
+    "transfer.mode.partial": {
+      "original": "部份調動",
+      "plain": "選擇部分將領"
+    },
+    "transfer.mode.all": {
+      "original": "全部調動",
+      "plain": "調動全部可用將領"
+    },
+    "transfer.target": {
+      "original": "司令，欲調動至何省？",
+      "plain": "要調往哪個省？"
+    },
+    "transfer.select.partial": {
+      "original": "司令，欲調動何將？",
+      "plain": "要調動哪位將領？"
+    },
+    "transfer.select.all": {
+      "original": "司令，欲何將留守？",
+      "plain": "哪些將領要留下？"
+    },
+    "transfer.selection.confirm": {
+      "original": "確認選取",
+      "plain": "確認這份名單"
+    },
+    "transfer.resource.gold": {
+      "original": "司令，欲調動多少黃金？",
+      "plain": "要一起運送多少黃金？"
+    },
+    "transfer.resource.food": {
+      "original": "司令，欲調動多少糧食？",
+      "plain": "要一起運送多少糧食？"
+    },
+    "transfer.resource.ammo": {
+      "original": "司令，欲調動多少彈藥？",
+      "plain": "要一起運送多少彈藥？"
+    },
+    "transfer.resource.fuel": {
+      "original": "司令，欲調動多少燃料？",
+      "plain": "要一起運送多少燃料？"
+    },
+    "biography.unavailable": {
+      "original": "查無可靠傳記記載",
+      "plain": "目前找不到足以確認的生平資料"
+    },
+    "biography.page": {
+      "original": "人物自傳",
+      "plain": "人物生平"
+    }
+  }
+}

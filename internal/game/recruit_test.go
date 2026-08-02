@@ -7,31 +7,38 @@ import "testing"
 //	湖北 黃金 4,150 → 上限 (0-41,500)
 //	河南 黃金 5,950 → 上限 (0-59,500)
 //	輸入 1,000 兵   → 「共須黃金 100」
-func TestRecruitLimitMatchesScreen(t *testing.T) {
-	w := realWorld(t)
+func TestRecruitAffordableLimitMatchesOriginal(t *testing.T) {
 	cases := []struct {
-		prov  ProvinceID
-		gold  uint16
-		limit int
+		branch uint8
+		gold   int
+		limit  int
 	}{
-		{26, 4150, 41500}, // 湖北
-		{19, 5950, 59500}, // 河南
+		{BranchInfantry, 4150, 41500},
+		{BranchInfantry, 5950, 59500},
+		{BranchCavalry, 100, 500},
+		{BranchArtiller, 100, 100},
+		{BranchArmour, 100, 10},
 	}
 	for _, c := range cases {
-		prov, err := w.Table.At(c.prov)
-		if err != nil {
-			t.Fatal(err)
-		}
-		// 存檔裡的黃金與實機那一刻不同（實機跑了一個月），
-		// 所以直接把畫面上的值塞進去再算。
-		prov.Gold = c.gold
-		if got := w.RecruitLimit(c.prov); got != c.limit {
-			t.Errorf("省 %d 黃金 %d 的徵兵上限算出 %d，實機是 %d",
-				c.prov, c.gold, got, c.limit)
+		if got := RecruitAffordableLimit(c.branch, c.gold); got != c.limit {
+			t.Errorf("兵種 %d、黃金 %d 的負擔上限算出 %d，原版是 %d",
+				c.branch, c.gold, got, c.limit)
 		}
 	}
-	if got := RecruitCost(1000); got != 100 {
-		t.Errorf("徵 1000 兵要 %d 金，實機顯示 100", got)
+	costs := []struct {
+		branch  uint8
+		n, cost int
+	}{
+		{BranchInfantry, 1000, 100},
+		{BranchCavalry, 1000, 200},
+		{BranchArtiller, 1000, 1000},
+		{BranchArmour, 100, 1000},
+	}
+	for _, c := range costs {
+		if got := RecruitCost(c.branch, c.n); got != c.cost {
+			t.Errorf("兵種 %d 徵 %d 人成本算出 %d，原版是 %d",
+				c.branch, c.n, got, c.cost)
+		}
 	}
 }
 
@@ -63,7 +70,7 @@ func TestRecruitFillsToBranchCap(t *testing.T) {
 			t.Errorf("將領 %d 補過頭：%d > 滿員 %d", i, s.Force, full)
 		}
 	}
-	t.Logf("湖北補了 %d 人，花 %d 金", added, RecruitCost(added))
+	t.Logf("湖北補了 %d 人，花 %d 金", added, RecruitCost(BranchInfantry, added))
 }
 
 // 超過上限要擋下來，不能默默截斷。
@@ -72,10 +79,11 @@ func TestRecruitRejectsOverLimit(t *testing.T) {
 	p := ProvinceID(26)
 	prov, _ := w.Table.At(p)
 	prov.Gold = 10 // 上限 100
-	if _, err := w.Recruit(p, BranchInfantry, 101); err == nil {
+	limit := w.RecruitLimit(p, BranchInfantry)
+	if _, err := w.Recruit(p, BranchInfantry, limit+1); err == nil {
 		t.Error("徵 101 人（上限 100）應該被擋下")
 	}
-	if _, err := w.Recruit(p, BranchInfantry, 100); err != nil {
+	if _, err := w.Recruit(p, BranchInfantry, limit); err != nil {
 		t.Errorf("徵 100 人（正好上限）不該失敗：%v", err)
 	}
 }

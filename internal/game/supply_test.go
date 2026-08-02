@@ -150,3 +150,38 @@ func TestSupplyZero(t *testing.T) {
 		t.Error("搬 0 不該動欄位")
 	}
 }
+
+func TestSupplyTargetsMatchOriginalFilters(t *testing.T) {
+	w := realWorld(t)
+	src, _ := w.Table.At(1)
+	src.Commander = 7
+	src.Neighbours = []ProvinceID{4, 2, 3, 5} // 順序必須保留
+
+	p2, _ := w.Table.At(2)
+	p2.Commander = 7
+	p3, _ := w.Table.At(3)
+	p3.Commander, p3.Flags = 7, ProvinceFlagInBattle
+	p4, _ := w.Table.At(4)
+	p4.Commander = 7
+	p5, _ := w.Table.At(5)
+	p5.Commander = 8
+
+	got, err := w.SupplyTargets(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []ProvinceID{4, 2}
+	if len(got) != len(want) || got[0] != want[0] || got[1] != want[1] {
+		t.Errorf("候選 = %v，預期 %v（同司令、未交戰、保留鄰接順序）", got, want)
+	}
+}
+
+func TestSupplyTargetsUnownedSourceHasNone(t *testing.T) {
+	w := realWorld(t)
+	src, _ := w.Table.At(1)
+	src.Commander = 0
+	got, err := w.SupplyTargets(1)
+	if err != nil || len(got) != 0 {
+		t.Errorf("無主省候選 = %v, err=%v，預期空", got, err)
+	}
+}

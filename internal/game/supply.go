@@ -52,6 +52,34 @@ func supplyField(p *Province, g SupplyGood) *uint16 {
 	return nil
 }
 
+// SupplyTargets 回傳原版會列在「欲運補物資至何省？」後面的候選省。
+//
+// `sub_2CB6B+6F..+106` 依來源省的八格鄰接表順序掃描，只收：
+//
+//   - 有效省編號；
+//   - 司令與來源省相同；
+//   - `+32` bit 6 未設（不在交戰中）。
+//
+// 不排序，因為原版直接沿用鄰接表順序。
+func (w *AIWorld) SupplyTargets(from ProvinceID) ([]ProvinceID, error) {
+	src, err := w.Table.At(from)
+	if err != nil {
+		return nil, err
+	}
+	if src.Commander == 0 {
+		return nil, nil
+	}
+	var out []ProvinceID
+	for _, id := range src.Neighbours {
+		dst, err := w.Table.At(id)
+		if err != nil || dst.Commander != src.Commander || dst.InBattle() {
+			continue
+		}
+		out = append(out, id)
+	}
+	return out, nil
+}
+
 // Supply 把 amount 單位的資源從 from 搬到 to，回傳**實際搬走的量**。
 //
 // 語意逐行照 `sub_3083A`：

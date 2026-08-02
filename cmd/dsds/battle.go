@@ -9,6 +9,7 @@ import (
 
 	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/game"
+	"github.com/wicanr2/great-era-remake/internal/ui/actions"
 	"github.com/wicanr2/great-era-remake/internal/ui/render"
 )
 
@@ -197,10 +198,11 @@ func (a *app) updateBattle() error {
 
 	// 1–6：往六個方向走一格。
 	for i, k := range dirKeys {
-		if !inpututil.IsKeyJustPressed(k) {
+		d := game.HexDir(i + 1)
+		pointerDir, pointerMove := actions.BattleMoveDirection(a.pointerAction)
+		if !inpututil.IsKeyJustPressed(k) && !(pointerMove && pointerDir == int(d)) {
 			continue
 		}
-		d := game.HexDir(i + 1)
 		if _, err := b.sim.Move(u.General, d); err != nil {
 			b.log = err.Error()
 		} else {
@@ -211,7 +213,8 @@ func (a *app) updateBattle() error {
 	}
 
 	// Enter：對相鄰的敵人發動攻擊。
-	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
+	if a.pointerAction == actions.BattleAttack ||
+		inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 		inpututil.IsKeyJustPressed(ebiten.KeyKPEnter) {
 		target := b.adjacentEnemy(u)
 		if target == nil {

@@ -1,4 +1,4 @@
-# 徵兵的成本與上限：10 兵 = 1 黃金
+# 徵兵的成本與上限：四兵種匯率
 
 日期：2026-08-01
 路徑：政略指令 **5 徵兵** → 1 徵兵 → 1 徵步兵 → 輸入數量
@@ -33,7 +33,7 @@
 
 ---
 
-## 2. ✅ 10 兵 = 1 黃金 — confirmed（兩個樣本 + 一次計算）
+## 2. ✅ 步兵 10 人 = 1 黃金 — confirmed（兩個樣本 + 一次計算）
 
 | 省 | 黃金 | 畫面的上限 | 比值 |
 |---|---:|---|---:|
@@ -53,7 +53,22 @@
 
 ### 對照反組譯
 
-`sub_28259`（徵兵執行，630 行）末尾：
+### 2026-08-02 反組譯勘誤：不能把步兵匯率套到所有兵種
+
+四支玩家側函式的整數乘除與省份扣金已逐條讀過：
+
+| 兵種 | 玩家函式 | 黃金決定的上限 | 輸入後成本 |
+|---|---|---:|---:|
+| 步兵 | `sub_260C7` | 黃金 × 10 | 人數 ÷ 10 |
+| 裝甲兵 | `sub_28259` | 黃金 ÷ 10 | 人數 × 10 |
+| 砲兵 | `sub_271F8` | 黃金 ÷ 1 | 人數 × 1 |
+| 騎兵 | `sub_29494` | 黃金 × 5 | 人數 ÷ 5 |
+
+以上均是**已證實**：同一支函式中可直接連起讀取省份黃金、乘除、顯示成本，
+以及尾端扣除黃金的資料流。玩家騎兵的 5 人／金與電腦側 `sub_18AED` 的
+2 人／金不同，兩條路徑不可合併成一張共用匯率表。
+
+`sub_28259`（裝甲兵徵兵）末尾：
 
 ```asm
 mov     ax, [di+7A8Eh]          ; 將領 +17 兵力
@@ -63,8 +78,7 @@ mov     [di+7A8Eh], cx          ; 寫回兵力
 sub     [di-6235h], cx          ; 省份 +0 黃金 -= cx
 ```
 
-減黃金的動作對得上，`cx` 的算法（÷10）在中間那段 Real 運算裡，
-**還沒逐行讀**——但實機已經把答案印在畫面上了。
+減黃金的動作對得上；現在中間的整數乘除也已逐行確認。
 
 ---
 
@@ -94,8 +108,9 @@ mov     ax, [di+7A8Bh]              ; +14 勢力
 ```go
 const RecruitSoldiersPerGold = 10
 
-func (w *AIWorld) RecruitLimit(p ProvinceID) int      // 黃金 × 10
-func RecruitCost(n int) int                           // n ÷ 10
+func RecruitAffordableLimit(branch, gold) int         // 兵種別匯率
+func (w *AIWorld) RecruitLimit(p, branch) int          // min(黃金上限, 部隊缺額)
+func RecruitCost(branch, n int) int                    // 兵種別成本
 func (w *AIWorld) Recruit(p, branch, n) (int, error)  // 補到滿為止
 func (w *AIWorld) RecruitToFull(p, branch) int        // ← remake 的便利函式
 ```

@@ -8,8 +8,8 @@ func TestAISortieStopThreshold(t *testing.T) {
 		{0, 0},
 		{2, 5},
 		{4, 10},
-		{1, 3},   // 2.5 → Round 3（半數進位）
-		{3, 8},   // 7.5 → Round 8
+		{1, 3}, // 2.5 → Round 3（半數進位）
+		{3, 8}, // 7.5 → Round 8
 		{100, 250},
 	}
 	for _, c := range cases {
@@ -135,7 +135,7 @@ func TestSortieGate(t *testing.T) {
 	base := SortieGateInput{
 		Approved: true, Count: 3,
 		PlanStrength: 100, TargetStrength: 100, // 100 < 200 → 第一關不過
-		TotalForce: 0,                          // 家底也不夠
+		TotalForce: 0, // 家底也不夠
 	}
 	if SortieGate(base) {
 		t.Error("三條放行條件都不成立，不該出兵")

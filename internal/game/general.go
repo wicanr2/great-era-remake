@@ -34,8 +34,8 @@ const (
 	//
 	// 這也說明它是**遊戲中累積**的量，開局一律 0。累積規則未解。
 	genOffExperience = 3
-	genOffProvince   = 4 // u8，所屬省編號（1-based），0 = 無所屬
-	genOffForce    = 17 // u16 little-endian
+	genOffProvince   = 4  // u8，所屬省編號（1-based），0 = 無所屬
+	genOffForce      = 17 // u16 little-endian
 
 	// 番號四欄，全部是 `FAN(1).15` 的**槽位索引（1-based）**，0 = 沒有。
 	// 名字來自實機「查閱將領」的「番號」列（`docs/playtest/08`），
@@ -50,9 +50,9 @@ const (
 	// genOffF19 是**士兵戰技**、genOffF20 是**武裝程度**——
 	// 兩個都由實機「查閱將領」畫面逐格定名（`docs/playtest/08` §2），
 	// 名字保留 `F` 前綴只是因為戰力公式那邊沿用了舊名。
-	genOffF19 = 19 // 士兵戰技（10..226）
-	genOffF20 = 20 // 武裝程度，只有 5 個等級值 {10,15,40,50,100}
-	genOffBranch      = 21 // 兵種，值域 {1, 4, 5, 6}
+	genOffF19    = 19 // 士兵戰技（10..226）
+	genOffF20    = 20 // 武裝程度，只有 5 個等級值 {10,15,40,50,100}
+	genOffBranch = 21 // 兵種，值域 {1, 4, 5, 6}
 	// genOffStamina 是**體力**（0..100）。
 	//
 	// 證據是畫面文字（`docs/re/27`）：`sub_241D0`（墾地）與 `sub_24535`（挖金礦）
@@ -63,8 +63,8 @@ const (
 	genOffStamina = 29
 	// genOffF30 是**士氣**（`docs/playtest/08` §4：存檔 65/59/36/47/25
 	// 與畫面的「士氣」列逐格相同）。它同時是每回合衰減 20% 的那一格。
-	genOffF30 = 30
-	genOffRange   = 31 // 遠程攻擊的參數，第一期 274 筆全是 1
+	genOffF30   = 30
+	genOffRange = 31 // 遠程攻擊的參數，第一期 274 筆全是 1
 )
 
 // 兵種。**這四個名字是有證據的**（`docs/spec/02` §4）：
@@ -121,9 +121,9 @@ func BranchName(branch uint8) string {
 
 // General 是一位將領。
 //
-// 33 bytes 裡目前解出五個欄位，**其餘 30 個 byte 原樣保留在 Raw**——
-// 存檔寫回是「改寫」不是「重建」，未解區域一個 byte 都不能動
-// （CLAUDE.md §9）。
+// 33 bytes 裡已解欄位包含三項能力、經驗、所屬省、兵力、戰技、武裝、兵種、
+// 番號四欄、體力、士氣與射程；其餘 byte 原樣保留在 Raw。存檔寫回是「改寫」
+// 不是「重建」，未解區域一個 byte 都不能動（CLAUDE.md §9）。
 type General struct {
 	// 三個能力值，**名字全部來自實機「查閱將領」畫面**
 	// （`docs/playtest/08` §2，五個將領逐格對照）：
@@ -210,19 +210,26 @@ func ParseGeneral(rec []byte) (General, error) {
 
 // Bytes 產生寫回用的 33 bytes：以原始 bytes 為基底，只蓋已解欄位。
 //
-// 這是 CLAUDE.md §9 要求的「改寫而非重建」——未解的 27 個 byte 原樣帶過去，
+// 這是 CLAUDE.md §9 要求的「改寫而非重建」——未解 byte 原樣帶過去，
 // 驗收標準是 byte-for-byte round-trip。
 func (g *General) Bytes() [GeneralRecordSize]byte {
 	out := g.Raw
 	out[genOffAbilityA] = g.AbilityA
 	out[genOffAbilityB] = g.AbilityB
 	out[genOffAbilityC] = g.AbilityC
+	out[genOffExperience] = g.Experience
 	out[genOffProvince] = byte(g.Province)
 	binary.LittleEndian.PutUint16(out[genOffForce:], g.Force)
+	out[genOffF19] = g.F19
+	out[genOffF20] = g.F20
+	out[genOffBranch] = g.Branch
 	out[genOffTitlePrefix] = g.TitlePrefix
 	out[genOffTitleNumber] = g.TitleNumber
 	out[genOffTitleSuffix] = g.TitleSuffix
 	out[genOffFactionName] = g.FactionName
+	out[genOffStamina] = g.Stamina
+	out[genOffF30] = g.F30
+	out[genOffRange] = g.Range
 	return out
 }
 

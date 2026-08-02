@@ -143,6 +143,26 @@ func TestCovertInsufficientFunds(t *testing.T) {
 	}
 }
 
+// 原版兩個秘密行動都會先擋下正在戰爭的目標，而且不扣錢。
+func TestCovertRejectsTargetInBattle(t *testing.T) {
+	for _, run := range []func(*AIWorld) error{
+		func(w *AIWorld) error { _, err := w.SendGuerrillas(1, 2, 100, NewRand(1)); return err },
+		func(w *AIWorld) error { _, err := w.IncitStudentProtest(1, 2, nil, NewRand(1)); return err },
+	} {
+		w := realWorld(t)
+		src, _ := w.Table.At(1)
+		dst, _ := w.Table.At(2)
+		src.Gold = 5000
+		dst.Flags |= ProvinceFlagInBattle
+		if err := run(w); err == nil {
+			t.Error("目標省正在戰爭時應拒絕秘密行動")
+		}
+		if src.Gold != 5000 {
+			t.Errorf("被拒絕後黃金變成 %d，不應扣款", src.Gold)
+		}
+	}
+}
+
 // 學潮成敗都扣 1500。
 func TestStudentProtestAlwaysCosts(t *testing.T) {
 	for seed := uint32(1); seed < 6; seed++ {
@@ -211,10 +231,10 @@ func TestStudentProtestRounding(t *testing.T) {
 	cases := []struct{ in, want uint8 }{
 		{100, 80},
 		{50, 40},
-		{9, 7},  // 7.2 → 7
-		{7, 6},  // 5.6 → 6（Trunc 會是 5）
-		{3, 2},  // 2.4 → 2
-		{1, 1},  // 0.8 → 1（Trunc 會是 0）
+		{9, 7}, // 7.2 → 7
+		{7, 6}, // 5.6 → 6（Trunc 會是 5）
+		{3, 2}, // 2.4 → 2
+		{1, 1}, // 0.8 → 1（Trunc 會是 0）
 		{0, 0},
 	}
 	for _, c := range cases {

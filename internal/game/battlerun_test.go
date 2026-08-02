@@ -153,7 +153,6 @@ func TestStepByOrderClearsNextCell(t *testing.T) {
 	}
 }
 
-
 func TestChainRunDecisiveResolution(t *testing.T) {
 	// ⭐ §16：戰力差五倍時原版不再逐格打，直接判勝負。
 	// 守方 2500×3 對攻方 20000×3，五倍門檻成立。

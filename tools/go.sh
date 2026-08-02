@@ -15,6 +15,15 @@ CACHE="$ROOT/workplace/.gocache"
 # mount 整個 /go/pkg（不只 pkg/mod），否則 sumdb 寫不進去、go get 會失敗
 mkdir -p "$CACHE/pkg" "$CACHE/build"
 
+expected="$(id -u):$(id -g)"
+for path in "$CACHE" "$CACHE/pkg" "$CACHE/build"; do
+  owner="$(stat -c '%u:%g' "$path")"
+  if [[ "$owner" != "$expected" ]]; then
+    echo "[go.sh] 拒絕寫入非目前使用者擁有的快取：$path（$owner，預期 $expected）" >&2
+    exit 1
+  fi
+done
+
 # Ebiten 走 CGO，需要 X11/OpenGL 標頭檔，官方 golang image 沒有 → 自建一份
 if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
   echo "[go.sh] 建 image $IMAGE（含 X11/OpenGL 開發套件）…" >&2
@@ -22,6 +31,8 @@ if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
 fi
 
 exec docker run --rm -i \
+  --network none \
+  --memory 2g --cpus 2 --pids-limit 512 \
   -v "$ROOT:/work" \
   -v "$CACHE/pkg:/go/pkg" \
   -v "$CACHE/build:/.cache/go-build" \

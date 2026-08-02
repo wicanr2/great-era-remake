@@ -23,8 +23,8 @@ const (
 	// GuerrillaSuccessMax 是成功的上界（含）。
 	GuerrillaSuccessMax = 3
 	// StudentRollRange / StudentSuccessMax 是學潮的對應值。
-	StudentRollRange   = 10
-	StudentSuccessMax  = 1
+	StudentRollRange  = 10
+	StudentSuccessMax = 1
 	// StudentProtestCost 是鼓動學潮的固定成本（`sub word ptr [di-6235h], 5DCh`）。
 	//
 	// **不論成功失敗都先扣**——那一行在成敗判定之前。
@@ -107,6 +107,9 @@ func (w *AIWorld) SendGuerrillas(from, target ProvinceID, cost int, rng *Rand) (
 	if err != nil {
 		return CovertResult{}, err
 	}
+	if dst.InBattle() {
+		return CovertResult{}, fmt.Errorf("game: 目標省目前正在戰爭")
+	}
 	if cost < 0 {
 		return CovertResult{}, fmt.Errorf("game: 成本不能為負（%d）", cost)
 	}
@@ -158,6 +161,9 @@ func (w *AIWorld) IncitStudentProtest(from, target ProvinceID, gens []General,
 	dst, err := w.Table.At(target)
 	if err != nil {
 		return CovertResult{}, err
+	}
+	if dst.InBattle() {
+		return CovertResult{}, fmt.Errorf("game: 目標省目前正在戰爭")
 	}
 	if int(src.Gold) < StudentProtestCost {
 		return CovertResult{}, fmt.Errorf("game: 資金不足（有 %d，要 %d）",

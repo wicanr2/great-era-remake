@@ -5,9 +5,9 @@ import "testing"
 // 核貸門檻的三個區間：必過、機率、必拒。
 func TestLoanThresholds(t *testing.T) {
 	cases := []struct {
-		amount            int
-		always, never     bool
-		name              string
+		amount        int
+		always, never bool
+		name          string
 	}{
 		{500, true, false, "借 500"},
 		{1999, true, false, "借 1999（units=3，9+3=12 剛好不超過）"},

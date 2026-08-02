@@ -2,7 +2,7 @@ package game
 
 import "fmt"
 
-// 授權自治（政略指令 15「其他選項」底下的一項），出自 `sub_22E25`（720 行）
+// 授權自治（政略指令 8「政策」的第一項），出自 `sub_22E25`（720 行）
 // 與 `sub_23FF6`（選單，211 行）。
 //
 // 畫面上的話：「司令不在本省／司令無其他省份須授權自治／司令〈某〉？」
@@ -44,6 +44,75 @@ func (w *AIWorld) ToggleAutonomy(p ProvinceID) (bool, error) {
 	}
 	prov.Flags ^= ProvinceFlagAutonomous
 	return prov.Autonomous(), nil
+}
+
+// AutonomyTargets 回報玩家在當前省可切換自治的其他省份。
+//
+// 條件直接照 `sub_22E25` 的 IDA 資料流：
+//
+//   - 當前省的司令（勢力領袖）本人必須就在當前省；
+//   - 目標省的司令必須是同一人；
+//   - 排除領袖本人所在省；
+//   - `ds:BCA5h + 省編號` 的狀態必須為 0。
+//
+// 候選照省編號遞增，與原版 1..39 掃描順序一致。
+func (w *AIWorld) AutonomyTargets(current ProvinceID) ([]ProvinceID, error) {
+	prov, err := w.Table.At(current)
+	if err != nil {
+		return nil, err
+	}
+	leader := prov.Commander
+	if leader == 0 {
+		return nil, fmt.Errorf("game: 省 %d 沒有司令", current)
+	}
+	leaderProvince := ProvinceID(0)
+	for i := range w.Units {
+		if w.Units[i].General == leader {
+			leaderProvince = w.Units[i].Province
+			break
+		}
+	}
+	if leaderProvince != current {
+		return nil, fmt.Errorf("game: 司令不在本省")
+	}
+
+	owned := 0
+	for p := ProvinceID(1); p <= ProvinceCount; p++ {
+		q, err := w.Table.At(p)
+		if err == nil && q.Commander == leader {
+			owned++
+		}
+	}
+	if owned <= 1 {
+		return nil, fmt.Errorf("game: 司令無其他省份須授權自治")
+	}
+
+	var out []ProvinceID
+	for p := ProvinceID(1); p <= ProvinceCount; p++ {
+		q, err := w.Table.At(p)
+		if err != nil || q.Commander != leader || p == leaderProvince {
+			continue
+		}
+		if w.CeasefireState[p] != 0 {
+			continue
+		}
+		out = append(out, p)
+	}
+	return out, nil
+}
+
+// TogglePlayerAutonomy 只允許切換 AutonomyTargets 列出的省份。
+func (w *AIWorld) TogglePlayerAutonomy(current, target ProvinceID) (bool, error) {
+	targets, err := w.AutonomyTargets(current)
+	if err != nil {
+		return false, err
+	}
+	for _, p := range targets {
+		if p == target {
+			return w.ToggleAutonomy(target)
+		}
+	}
+	return false, fmt.Errorf("game: 省 %d 不是可授權自治的目標", target)
 }
 
 // CommandsRemainingAfter 算某省執行完一個指令之後還剩幾個指令數。

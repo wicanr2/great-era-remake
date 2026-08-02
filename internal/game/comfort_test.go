@@ -29,6 +29,33 @@ func TestComfortGeneral(t *testing.T) {
 	}
 }
 
+func TestApplyComfortGeneralsUpdatesAllEffectsAndStrengthMirror(t *testing.T) {
+	gens := []General{
+		{AbilityA: 90, AbilityB: 85, Stamina: 95, F30: 70},
+		{AbilityA: 40, AbilityB: 100, Stamina: 100, F30: MoraleMax},
+	}
+	strengths := []StrengthInput{
+		{F29: gens[0].Stamina, F30: gens[0].F30},
+		{F29: gens[1].Stamina, F30: gens[1].F30},
+	}
+
+	if got := ApplyComfortGenerals(gens, strengths, []int{-1, 0, 99, 1}); got != 2 {
+		t.Fatalf("有效慰勞人數 = %d，預期 2", got)
+	}
+	if g := gens[0]; g.Stamina != 100 || g.F30 != 80 || g.AbilityB != 100 {
+		t.Errorf("第一位慰勞結果 = 體力 %d／士氣 %d／忠誠 %d，預期 100／80／100",
+			g.Stamina, g.F30, g.AbilityB)
+	}
+	if g := gens[1]; g.Stamina != 100 || g.F30 != 80 || g.AbilityB != 100 {
+		t.Errorf("已達上限者不該越界：%+v", g)
+	}
+	for i := range gens {
+		if strengths[i].F29 != gens[i].Stamina || strengths[i].F30 != gens[i].F30 {
+			t.Errorf("第 %d 位 AI 戰力鏡像未同步：%+v vs %+v", i, strengths[i], gens[i])
+		}
+	}
+}
+
 // 士氣上限是 80 不是 100——實機五個將領全部低於 80（`docs/playtest/08`）。
 func TestMoraleCapIsEighty(t *testing.T) {
 	if MoraleMax != 80 {

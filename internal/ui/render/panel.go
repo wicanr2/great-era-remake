@@ -27,6 +27,8 @@ const (
 
 // 2.15 的詞條編號。
 const (
+	w1Count    = 27 // 數
+	w2Command  = 18 // 指令
 	w2Sikrei   = 21 // 司令
 	w2Gold     = 22 // 黃金
 	w2Food     = 23 // 糧食
@@ -57,8 +59,9 @@ var (
 	panelBG    = assets.RGB{R: 0xFF, G: 0xFF, B: 0xA2} // 面板底色的米黃
 )
 
-// PanelFonts 是畫面板需要的三個字模檔。
+// PanelFonts 是畫面板需要的四個字模檔。
 type PanelFonts struct {
+	W1  *assets.GlyphFile // 1.15，單字詞（「數」）
 	W2  *assets.GlyphFile // 2.15，二字詞
 	W3  *assets.GlyphFile // 3.15，三字詞（前 39 條是省名）
 	Gen *assets.GlyphFile // MAN{期}15，將領姓名（三字）
@@ -72,6 +75,7 @@ type PanelData struct {
 	Generals int    // 該省的將領數
 	Year     uint16
 	Month    uint8
+	Commands int // 本省本月剩餘指令數
 }
 
 // DrawStrategyPanel 把政略畫面的左側面板畫到畫布上。
@@ -161,14 +165,32 @@ func (c *Canvas) DrawStrategyPanel(d PanelData, f PanelFonts) error {
 		return err
 	}
 	c.DrawNumber(uint32(p.Loyalty), panelFG, panelValue, y)
+	y += lineH
+
+	// 原版右下角的「指令數」。`sub_10193` 由 `2.15` 詞條 18「指令」與
+	// `1.15` 詞條 27「數」拼成（`docs/re/27`）。
+	if err := c.DrawEntry(f.W2, w2Command, 2, panelFG, panelLabel, y, true); err != nil {
+		return err
+	}
+	if err := c.DrawEntry(f.W1, w1Count, 1, panelFG, panelLabel+40, y, true); err != nil {
+		return err
+	}
+	remaining := d.Commands
+	if remaining < 0 {
+		remaining = 0
+	}
+	c.DrawNumber(uint32(remaining), panelFG, panelValue, y)
 
 	return nil
 }
 
 // LoadPanelFonts 讀進面板需要的字模檔。
-func LoadPanelFonts(w2, w3, gen []byte) (PanelFonts, error) {
+func LoadPanelFonts(w1, w2, w3, gen []byte) (PanelFonts, error) {
 	var f PanelFonts
 	var err error
+	if f.W1, err = assets.ParseGlyphFile(w1); err != nil {
+		return f, fmt.Errorf("render: 1.15: %w", err)
+	}
 	if f.W2, err = assets.ParseGlyphFile(w2); err != nil {
 		return f, fmt.Errorf("render: 2.15: %w", err)
 	}

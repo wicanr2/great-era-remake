@@ -1,0 +1,1976 @@
+{
+  "periods": {
+    "1": [
+      {
+        "slot": 1,
+        "person": 1
+      },
+      {
+        "slot": 2,
+        "person": 2
+      },
+      {
+        "slot": 3,
+        "person": 3
+      },
+      {
+        "slot": 4,
+        "person": 4
+      },
+      {
+        "slot": 5,
+        "person": 5
+      },
+      {
+        "slot": 6,
+        "person": 6
+      },
+      {
+        "slot": 7,
+        "person": 7
+      },
+      {
+        "slot": 8,
+        "person": 8
+      },
+      {
+        "slot": 9,
+        "person": 9
+      },
+      {
+        "slot": 10,
+        "person": 10
+      },
+      {
+        "slot": 11,
+        "person": 11
+      },
+      {
+        "slot": 12,
+        "person": 12
+      },
+      {
+        "slot": 13,
+        "person": 13
+      },
+      {
+        "slot": 14,
+        "person": 14
+      },
+      {
+        "slot": 15,
+        "person": 15
+      },
+      {
+        "slot": 16,
+        "person": 16
+      },
+      {
+        "slot": 17,
+        "person": 17
+      },
+      {
+        "slot": 18,
+        "person": 18
+      },
+      {
+        "slot": 19,
+        "person": 19
+      },
+      {
+        "slot": 20,
+        "person": 20
+      },
+      {
+        "slot": 21,
+        "person": 21
+      },
+      {
+        "slot": 22,
+        "person": 22
+      },
+      {
+        "slot": 23,
+        "person": 23
+      },
+      {
+        "slot": 24,
+        "person": 24
+      },
+      {
+        "slot": 25,
+        "person": 25
+      },
+      {
+        "slot": 26,
+        "person": 26
+      },
+      {
+        "slot": 27,
+        "person": 27
+      },
+      {
+        "slot": 28,
+        "person": 28
+      },
+      {
+        "slot": 29,
+        "person": 29
+      },
+      {
+        "slot": 30,
+        "person": 30
+      },
+      {
+        "slot": 31,
+        "person": 31
+      },
+      {
+        "slot": 32,
+        "person": 32
+      },
+      {
+        "slot": 33,
+        "person": 33
+      },
+      {
+        "slot": 34,
+        "person": 34
+      },
+      {
+        "slot": 35,
+        "person": 35
+      },
+      {
+        "slot": 36,
+        "person": 36
+      },
+      {
+        "slot": 37,
+        "person": 37
+      },
+      {
+        "slot": 38,
+        "person": 38
+      },
+      {
+        "slot": 39,
+        "person": 39
+      },
+      {
+        "slot": 40,
+        "person": 40
+      },
+      {
+        "slot": 41,
+        "person": 41
+      },
+      {
+        "slot": 42,
+        "person": 42
+      },
+      {
+        "slot": 43,
+        "person": 43
+      },
+      {
+        "slot": 44,
+        "person": 44
+      },
+      {
+        "slot": 45,
+        "person": 45
+      },
+      {
+        "slot": 46,
+        "person": 46
+      },
+      {
+        "slot": 47,
+        "person": 47
+      },
+      {
+        "slot": 48,
+        "person": 48
+      },
+      {
+        "slot": 49,
+        "person": 49
+      },
+      {
+        "slot": 50,
+        "person": 50
+      },
+      {
+        "slot": 51,
+        "person": 51
+      },
+      {
+        "slot": 52,
+        "person": 52
+      },
+      {
+        "slot": 53,
+        "person": 53
+      },
+      {
+        "slot": 54,
+        "person": 54
+      },
+      {
+        "slot": 55,
+        "person": 55
+      },
+      {
+        "slot": 56,
+        "person": 56
+      },
+      {
+        "slot": 57,
+        "person": 57
+      },
+      {
+        "slot": 58,
+        "person": 58
+      },
+      {
+        "slot": 59,
+        "person": 59
+      },
+      {
+        "slot": 60,
+        "person": 60
+      },
+      {
+        "slot": 61,
+        "person": 61
+      },
+      {
+        "slot": 62,
+        "person": 62
+      },
+      {
+        "slot": 63,
+        "person": 63
+      },
+      {
+        "slot": 64,
+        "person": 64
+      },
+      {
+        "slot": 65,
+        "person": 65
+      },
+      {
+        "slot": 66,
+        "person": 66
+      },
+      {
+        "slot": 67,
+        "person": 67
+      },
+      {
+        "slot": 68,
+        "person": 68
+      },
+      {
+        "slot": 69,
+        "person": 69
+      },
+      {
+        "slot": 70,
+        "person": 70
+      },
+      {
+        "slot": 71,
+        "person": 71
+      },
+      {
+        "slot": 72,
+        "person": 72
+      },
+      {
+        "slot": 73,
+        "person": 73
+      },
+      {
+        "slot": 74,
+        "person": 74
+      },
+      {
+        "slot": 75,
+        "person": 75
+      },
+      {
+        "slot": 76,
+        "person": 76
+      },
+      {
+        "slot": 77,
+        "person": 77
+      },
+      {
+        "slot": 78,
+        "person": 78
+      },
+      {
+        "slot": 79,
+        "person": 79
+      },
+      {
+        "slot": 80,
+        "person": 80
+      },
+      {
+        "slot": 81,
+        "person": 81
+      },
+      {
+        "slot": 82,
+        "person": 82
+      },
+      {
+        "slot": 83,
+        "person": 83
+      },
+      {
+        "slot": 84,
+        "person": 84
+      },
+      {
+        "slot": 85,
+        "person": 85
+      },
+      {
+        "slot": 86,
+        "person": 86
+      },
+      {
+        "slot": 87,
+        "person": 87
+      },
+      {
+        "slot": 88,
+        "person": 88
+      },
+      {
+        "slot": 89,
+        "person": 89
+      },
+      {
+        "slot": 90,
+        "person": 90
+      },
+      {
+        "slot": 91,
+        "person": 91
+      },
+      {
+        "slot": 92,
+        "person": 92
+      },
+      {
+        "slot": 93,
+        "person": 93
+      },
+      {
+        "slot": 94,
+        "person": 94
+      },
+      {
+        "slot": 95,
+        "person": 95
+      },
+      {
+        "slot": 96,
+        "person": 96
+      },
+      {
+        "slot": 97,
+        "person": 97
+      },
+      {
+        "slot": 98,
+        "person": 98
+      },
+      {
+        "slot": 99,
+        "person": 99
+      },
+      {
+        "slot": 100,
+        "person": 100
+      },
+      {
+        "slot": 101,
+        "person": 101
+      },
+      {
+        "slot": 102,
+        "person": 102
+      },
+      {
+        "slot": 103,
+        "person": 103
+      },
+      {
+        "slot": 104,
+        "person": 104
+      },
+      {
+        "slot": 105,
+        "person": 105
+      },
+      {
+        "slot": 106,
+        "person": 106
+      },
+      {
+        "slot": 107,
+        "person": 107
+      },
+      {
+        "slot": 108,
+        "person": 108
+      },
+      {
+        "slot": 109,
+        "person": 109
+      },
+      {
+        "slot": 110,
+        "person": 110
+      },
+      {
+        "slot": 111,
+        "person": 111
+      },
+      {
+        "slot": 112,
+        "person": 112
+      },
+      {
+        "slot": 113,
+        "person": 113
+      },
+      {
+        "slot": 114,
+        "person": 114
+      },
+      {
+        "slot": 115,
+        "person": 115
+      },
+      {
+        "slot": 116,
+        "person": 116
+      },
+      {
+        "slot": 117,
+        "person": 117
+      },
+      {
+        "slot": 118,
+        "person": 118
+      },
+      {
+        "slot": 119,
+        "person": 119
+      },
+      {
+        "slot": 120,
+        "person": 120
+      },
+      {
+        "slot": 121,
+        "person": 121
+      },
+      {
+        "slot": 122,
+        "person": 122
+      },
+      {
+        "slot": 123,
+        "person": 123
+      },
+      {
+        "slot": 124,
+        "person": 124
+      },
+      {
+        "slot": 125,
+        "person": 125
+      },
+      {
+        "slot": 126,
+        "person": 126
+      },
+      {
+        "slot": 127,
+        "person": 127
+      },
+      {
+        "slot": 128,
+        "person": 128
+      },
+      {
+        "slot": 129,
+        "person": 129
+      },
+      {
+        "slot": 130,
+        "person": 130
+      },
+      {
+        "slot": 131,
+        "person": 131
+      },
+      {
+        "slot": 132,
+        "person": 132
+      },
+      {
+        "slot": 133,
+        "person": 133
+      },
+      {
+        "slot": 134,
+        "person": 134
+      },
+      {
+        "slot": 135,
+        "person": 135
+      },
+      {
+        "slot": 136,
+        "person": 136
+      },
+      {
+        "slot": 137,
+        "person": 137
+      },
+      {
+        "slot": 138,
+        "person": 138
+      },
+      {
+        "slot": 139,
+        "person": 139
+      },
+      {
+        "slot": 140,
+        "person": 140
+      },
+      {
+        "slot": 141,
+        "person": 141
+      },
+      {
+        "slot": 142,
+        "person": 142
+      },
+      {
+        "slot": 143,
+        "person": 143
+      },
+      {
+        "slot": 144,
+        "person": 144
+      },
+      {
+        "slot": 145,
+        "person": 145
+      },
+      {
+        "slot": 146,
+        "person": 146
+      },
+      {
+        "slot": 147,
+        "person": 147
+      },
+      {
+        "slot": 148,
+        "person": 148
+      },
+      {
+        "slot": 149,
+        "person": 149
+      },
+      {
+        "slot": 150,
+        "person": 150
+      },
+      {
+        "slot": 151,
+        "person": 151
+      },
+      {
+        "slot": 152,
+        "person": 152
+      },
+      {
+        "slot": 153,
+        "person": 153
+      },
+      {
+        "slot": 154,
+        "person": 154
+      },
+      {
+        "slot": 155,
+        "person": 155
+      },
+      {
+        "slot": 156,
+        "person": 156
+      },
+      {
+        "slot": 157,
+        "person": 157
+      },
+      {
+        "slot": 158,
+        "person": 158
+      },
+      {
+        "slot": 159,
+        "person": 159
+      },
+      {
+        "slot": 160,
+        "person": 160
+      },
+      {
+        "slot": 161,
+        "person": 161
+      },
+      {
+        "slot": 162,
+        "person": 162
+      },
+      {
+        "slot": 163,
+        "person": 163
+      },
+      {
+        "slot": 164,
+        "person": 164
+      },
+      {
+        "slot": 165,
+        "person": 165
+      },
+      {
+        "slot": 166,
+        "person": 166
+      },
+      {
+        "slot": 167,
+        "person": 167
+      },
+      {
+        "slot": 168,
+        "person": 168
+      },
+      {
+        "slot": 169,
+        "person": 169
+      },
+      {
+        "slot": 170,
+        "person": 170
+      },
+      {
+        "slot": 171,
+        "person": 171
+      },
+      {
+        "slot": 172,
+        "person": 172
+      },
+      {
+        "slot": 173,
+        "person": 173
+      },
+      {
+        "slot": 174,
+        "person": 174
+      },
+      {
+        "slot": 175,
+        "person": 175
+      },
+      {
+        "slot": 176,
+        "person": 176
+      },
+      {
+        "slot": 177,
+        "person": 177
+      },
+      {
+        "slot": 178,
+        "person": 178
+      },
+      {
+        "slot": 179,
+        "person": 179
+      },
+      {
+        "slot": 180,
+        "person": 180
+      },
+      {
+        "slot": 181,
+        "person": 181
+      },
+      {
+        "slot": 182,
+        "person": 182
+      },
+      {
+        "slot": 183,
+        "person": 183
+      },
+      {
+        "slot": 184,
+        "person": 184
+      },
+      {
+        "slot": 185,
+        "person": 185
+      },
+      {
+        "slot": 186,
+        "person": 186
+      },
+      {
+        "slot": 187,
+        "person": 187
+      },
+      {
+        "slot": 188,
+        "person": 188
+      },
+      {
+        "slot": 189,
+        "person": 189
+      },
+      {
+        "slot": 190,
+        "person": 190
+      },
+      {
+        "slot": 191,
+        "person": 191
+      },
+      {
+        "slot": 192,
+        "person": 192
+      },
+      {
+        "slot": 193,
+        "person": 193
+      },
+      {
+        "slot": 194,
+        "person": 194
+      },
+      {
+        "slot": 195,
+        "person": 195
+      },
+      {
+        "slot": 196,
+        "person": 196
+      },
+      {
+        "slot": 197,
+        "person": 197
+      },
+      {
+        "slot": 198,
+        "person": 198
+      },
+      {
+        "slot": 199,
+        "person": 199
+      },
+      {
+        "slot": 200,
+        "person": 200
+      },
+      {
+        "slot": 201,
+        "person": 201
+      },
+      {
+        "slot": 202,
+        "person": 202
+      },
+      {
+        "slot": 203,
+        "person": 203
+      },
+      {
+        "slot": 204,
+        "person": 204
+      },
+      {
+        "slot": 205,
+        "person": 205
+      },
+      {
+        "slot": 206,
+        "person": 206
+      },
+      {
+        "slot": 207,
+        "person": 207
+      },
+      {
+        "slot": 208,
+        "person": 208
+      },
+      {
+        "slot": 209,
+        "person": 209
+      },
+      {
+        "slot": 210,
+        "person": 210
+      },
+      {
+        "slot": 211,
+        "person": 211
+      },
+      {
+        "slot": 212,
+        "person": 212
+      },
+      {
+        "slot": 213,
+        "person": 213
+      },
+      {
+        "slot": 214,
+        "person": 214
+      },
+      {
+        "slot": 215,
+        "person": 215
+      },
+      {
+        "slot": 216,
+        "person": 216
+      },
+      {
+        "slot": 217,
+        "person": 217
+      },
+      {
+        "slot": 218,
+        "person": 218
+      },
+      {
+        "slot": 219,
+        "person": 219
+      },
+      {
+        "slot": 220,
+        "person": 220
+      },
+      {
+        "slot": 221,
+        "person": 221
+      },
+      {
+        "slot": 222,
+        "person": 222
+      },
+      {
+        "slot": 223,
+        "person": 223
+      },
+      {
+        "slot": 224,
+        "person": 224
+      },
+      {
+        "slot": 225,
+        "person": 225
+      },
+      {
+        "slot": 226,
+        "person": 226
+      },
+      {
+        "slot": 227,
+        "person": 227
+      },
+      {
+        "slot": 228,
+        "person": 228
+      },
+      {
+        "slot": 229,
+        "person": 229
+      },
+      {
+        "slot": 230,
+        "person": 230
+      },
+      {
+        "slot": 231,
+        "person": 231
+      },
+      {
+        "slot": 232,
+        "person": 232
+      },
+      {
+        "slot": 233,
+        "person": 233
+      },
+      {
+        "slot": 234,
+        "person": 234
+      },
+      {
+        "slot": 235,
+        "person": 235
+      },
+      {
+        "slot": 236,
+        "person": 236
+      },
+      {
+        "slot": 237,
+        "person": 237
+      },
+      {
+        "slot": 238,
+        "person": 238
+      },
+      {
+        "slot": 239,
+        "person": 239
+      },
+      {
+        "slot": 240,
+        "person": 240
+      },
+      {
+        "slot": 241,
+        "person": 241
+      },
+      {
+        "slot": 242,
+        "person": 242
+      },
+      {
+        "slot": 243,
+        "person": 243
+      },
+      {
+        "slot": 244,
+        "person": 244
+      },
+      {
+        "slot": 245,
+        "person": 245
+      },
+      {
+        "slot": 246,
+        "person": 246
+      },
+      {
+        "slot": 247,
+        "person": 247
+      },
+      {
+        "slot": 248,
+        "person": 248
+      },
+      {
+        "slot": 249,
+        "person": 249
+      },
+      {
+        "slot": 250,
+        "person": 250
+      },
+      {
+        "slot": 251,
+        "person": 251
+      },
+      {
+        "slot": 252,
+        "person": 252
+      },
+      {
+        "slot": 253,
+        "person": 253
+      },
+      {
+        "slot": 254,
+        "person": 254
+      },
+      {
+        "slot": 255,
+        "person": 255
+      },
+      {
+        "slot": 256,
+        "person": 256
+      },
+      {
+        "slot": 257,
+        "person": 257
+      },
+      {
+        "slot": 258,
+        "person": 258
+      },
+      {
+        "slot": 259,
+        "person": 259
+      },
+      {
+        "slot": 260,
+        "person": 260
+      },
+      {
+        "slot": 261,
+        "person": 261
+      },
+      {
+        "slot": 262,
+        "person": 262
+      },
+      {
+        "slot": 263,
+        "person": 263
+      },
+      {
+        "slot": 264,
+        "person": 264
+      },
+      {
+        "slot": 265,
+        "person": 265
+      },
+      {
+        "slot": 266,
+        "person": 266
+      },
+      {
+        "slot": 267,
+        "person": 267
+      },
+      {
+        "slot": 268,
+        "person": 268
+      },
+      {
+        "slot": 269,
+        "person": 269
+      },
+      {
+        "slot": 270,
+        "person": 270
+      },
+      {
+        "slot": 271,
+        "person": 271
+      },
+      {
+        "slot": 272,
+        "person": 272
+      },
+      {
+        "slot": 273,
+        "person": 273
+      },
+      {
+        "slot": 274,
+        "person": 274
+      }
+    ],
+    "2": [
+      {
+        "slot": 1,
+        "person": 1
+      },
+      {
+        "slot": 2,
+        "person": 2
+      },
+      {
+        "slot": 3,
+        "person": 275
+      },
+      {
+        "slot": 4,
+        "person": 41
+      },
+      {
+        "slot": 5,
+        "person": 276
+      },
+      {
+        "slot": 6,
+        "person": 191
+      },
+      {
+        "slot": 7,
+        "person": 277
+      },
+      {
+        "slot": 8,
+        "person": 18
+      },
+      {
+        "slot": 9,
+        "person": 21
+      },
+      {
+        "slot": 10,
+        "person": 278
+      },
+      {
+        "slot": 11,
+        "person": 49
+      },
+      {
+        "slot": 12,
+        "person": 279
+      },
+      {
+        "slot": 13,
+        "person": 280
+      },
+      {
+        "slot": 14,
+        "person": 281
+      },
+      {
+        "slot": 15,
+        "person": 52
+      },
+      {
+        "slot": 16,
+        "person": 282
+      },
+      {
+        "slot": 17,
+        "person": 283
+      },
+      {
+        "slot": 18,
+        "person": 284
+      },
+      {
+        "slot": 19,
+        "person": 285
+      },
+      {
+        "slot": 20,
+        "person": 286
+      },
+      {
+        "slot": 21,
+        "person": 287
+      },
+      {
+        "slot": 22,
+        "person": 288
+      },
+      {
+        "slot": 23,
+        "person": 289
+      },
+      {
+        "slot": 24,
+        "person": 290
+      },
+      {
+        "slot": 25,
+        "person": 291
+      },
+      {
+        "slot": 26,
+        "person": 292
+      },
+      {
+        "slot": 27,
+        "person": 293
+      },
+      {
+        "slot": 28,
+        "person": 294
+      },
+      {
+        "slot": 29,
+        "person": 295
+      },
+      {
+        "slot": 30,
+        "person": 48
+      },
+      {
+        "slot": 31,
+        "person": 269
+      },
+      {
+        "slot": 32,
+        "person": 296
+      },
+      {
+        "slot": 33,
+        "person": 297
+      },
+      {
+        "slot": 34,
+        "person": 298
+      },
+      {
+        "slot": 35,
+        "person": 299
+      },
+      {
+        "slot": 36,
+        "person": 300
+      },
+      {
+        "slot": 37,
+        "person": 301
+      },
+      {
+        "slot": 38,
+        "person": 302
+      },
+      {
+        "slot": 39,
+        "person": 303
+      },
+      {
+        "slot": 40,
+        "person": 304
+      },
+      {
+        "slot": 41,
+        "person": 305
+      },
+      {
+        "slot": 42,
+        "person": 306
+      },
+      {
+        "slot": 43,
+        "person": 53
+      },
+      {
+        "slot": 44,
+        "person": 307
+      },
+      {
+        "slot": 45,
+        "person": 308
+      },
+      {
+        "slot": 46,
+        "person": 309
+      },
+      {
+        "slot": 47,
+        "person": 3
+      },
+      {
+        "slot": 48,
+        "person": 261
+      },
+      {
+        "slot": 49,
+        "person": 310
+      },
+      {
+        "slot": 50,
+        "person": 311
+      },
+      {
+        "slot": 51,
+        "person": 312
+      },
+      {
+        "slot": 52,
+        "person": 313
+      },
+      {
+        "slot": 53,
+        "person": 314
+      },
+      {
+        "slot": 54,
+        "person": 315
+      },
+      {
+        "slot": 55,
+        "person": 316
+      },
+      {
+        "slot": 56,
+        "person": 317
+      },
+      {
+        "slot": 57,
+        "person": 318
+      },
+      {
+        "slot": 58,
+        "person": 319
+      },
+      {
+        "slot": 59,
+        "person": 320
+      },
+      {
+        "slot": 60,
+        "person": 321
+      },
+      {
+        "slot": 61,
+        "person": 322
+      },
+      {
+        "slot": 62,
+        "person": 323
+      },
+      {
+        "slot": 63,
+        "person": 324
+      },
+      {
+        "slot": 64,
+        "person": 325
+      },
+      {
+        "slot": 65,
+        "person": 326
+      },
+      {
+        "slot": 66,
+        "person": 244
+      },
+      {
+        "slot": 67,
+        "person": 65
+      },
+      {
+        "slot": 68,
+        "person": 327
+      },
+      {
+        "slot": 69,
+        "person": 254
+      },
+      {
+        "slot": 70,
+        "person": 328
+      },
+      {
+        "slot": 71,
+        "person": 329
+      },
+      {
+        "slot": 72,
+        "person": 249
+      },
+      {
+        "slot": 73,
+        "person": 159
+      },
+      {
+        "slot": 74,
+        "person": 330
+      },
+      {
+        "slot": 75,
+        "person": 331
+      },
+      {
+        "slot": 76,
+        "person": 332
+      },
+      {
+        "slot": 77,
+        "person": 158
+      },
+      {
+        "slot": 78,
+        "person": 333
+      },
+      {
+        "slot": 79,
+        "person": 16
+      },
+      {
+        "slot": 80,
+        "person": 334
+      },
+      {
+        "slot": 81,
+        "person": 335
+      },
+      {
+        "slot": 82,
+        "person": 203
+      },
+      {
+        "slot": 83,
+        "person": 336
+      },
+      {
+        "slot": 84,
+        "person": 337
+      },
+      {
+        "slot": 85,
+        "person": 338
+      },
+      {
+        "slot": 86,
+        "person": 339
+      },
+      {
+        "slot": 87,
+        "person": 340
+      },
+      {
+        "slot": 88,
+        "person": 341
+      },
+      {
+        "slot": 89,
+        "person": 44
+      },
+      {
+        "slot": 90,
+        "person": 342
+      },
+      {
+        "slot": 91,
+        "person": 343
+      },
+      {
+        "slot": 92,
+        "person": 344
+      },
+      {
+        "slot": 93,
+        "person": 345
+      },
+      {
+        "slot": 94,
+        "person": 346
+      },
+      {
+        "slot": 95,
+        "person": 347
+      },
+      {
+        "slot": 96,
+        "person": 348
+      },
+      {
+        "slot": 97,
+        "person": 349
+      },
+      {
+        "slot": 98,
+        "person": 350
+      },
+      {
+        "slot": 99,
+        "person": 351
+      },
+      {
+        "slot": 100,
+        "person": 352
+      },
+      {
+        "slot": 101,
+        "person": 353
+      },
+      {
+        "slot": 102,
+        "person": 354
+      },
+      {
+        "slot": 103,
+        "person": 33
+      },
+      {
+        "slot": 104,
+        "person": 355
+      },
+      {
+        "slot": 105,
+        "person": 335
+      },
+      {
+        "slot": 106,
+        "person": 356
+      }
+    ],
+    "3": [
+      {
+        "slot": 1,
+        "person": 1
+      },
+      {
+        "slot": 2,
+        "person": 2
+      },
+      {
+        "slot": 3,
+        "person": 357
+      },
+      {
+        "slot": 4,
+        "person": 348
+      },
+      {
+        "slot": 5,
+        "person": 358
+      },
+      {
+        "slot": 6,
+        "person": 308
+      },
+      {
+        "slot": 7,
+        "person": 309
+      },
+      {
+        "slot": 8,
+        "person": 48
+      },
+      {
+        "slot": 9,
+        "person": 359
+      },
+      {
+        "slot": 10,
+        "person": 360
+      },
+      {
+        "slot": 11,
+        "person": 361
+      },
+      {
+        "slot": 12,
+        "person": 362
+      },
+      {
+        "slot": 13,
+        "person": 269
+      },
+      {
+        "slot": 14,
+        "person": 363
+      },
+      {
+        "slot": 15,
+        "person": 364
+      },
+      {
+        "slot": 16,
+        "person": 290
+      },
+      {
+        "slot": 17,
+        "person": 365
+      },
+      {
+        "slot": 18,
+        "person": 366
+      },
+      {
+        "slot": 19,
+        "person": 367
+      },
+      {
+        "slot": 20,
+        "person": 301
+      },
+      {
+        "slot": 21,
+        "person": 368
+      },
+      {
+        "slot": 22,
+        "person": 369
+      },
+      {
+        "slot": 23,
+        "person": 53
+      },
+      {
+        "slot": 24,
+        "person": 370
+      },
+      {
+        "slot": 25,
+        "person": 371
+      },
+      {
+        "slot": 26,
+        "person": 296
+      },
+      {
+        "slot": 27,
+        "person": 372
+      },
+      {
+        "slot": 28,
+        "person": 373
+      },
+      {
+        "slot": 29,
+        "person": 306
+      },
+      {
+        "slot": 30,
+        "person": 261
+      },
+      {
+        "slot": 31,
+        "person": 312
+      },
+      {
+        "slot": 32,
+        "person": 374
+      },
+      {
+        "slot": 33,
+        "person": 375
+      },
+      {
+        "slot": 34,
+        "person": 319
+      },
+      {
+        "slot": 35,
+        "person": 311
+      },
+      {
+        "slot": 36,
+        "person": 376
+      },
+      {
+        "slot": 37,
+        "person": 377
+      },
+      {
+        "slot": 38,
+        "person": 294
+      },
+      {
+        "slot": 39,
+        "person": 378
+      },
+      {
+        "slot": 40,
+        "person": 379
+      },
+      {
+        "slot": 41,
+        "person": 380
+      },
+      {
+        "slot": 42,
+        "person": 33
+      },
+      {
+        "slot": 43,
+        "person": 244
+      },
+      {
+        "slot": 44,
+        "person": 381
+      },
+      {
+        "slot": 45,
+        "person": 382
+      },
+      {
+        "slot": 46,
+        "person": 208
+      },
+      {
+        "slot": 47,
+        "person": 52
+      },
+      {
+        "slot": 48,
+        "person": 280
+      },
+      {
+        "slot": 49,
+        "person": 254
+      },
+      {
+        "slot": 50,
+        "person": 383
+      },
+      {
+        "slot": 51,
+        "person": 384
+      },
+      {
+        "slot": 52,
+        "person": 385
+      },
+      {
+        "slot": 53,
+        "person": 386
+      },
+      {
+        "slot": 54,
+        "person": 330
+      },
+      {
+        "slot": 55,
+        "person": 387
+      },
+      {
+        "slot": 56,
+        "person": 16
+      },
+      {
+        "slot": 57,
+        "person": 285
+      },
+      {
+        "slot": 58,
+        "person": 388
+      },
+      {
+        "slot": 59,
+        "person": 389
+      },
+      {
+        "slot": 60,
+        "person": 341
+      },
+      {
+        "slot": 61,
+        "person": 390
+      },
+      {
+        "slot": 62,
+        "person": 391
+      },
+      {
+        "slot": 63,
+        "person": 392
+      },
+      {
+        "slot": 64,
+        "person": 393
+      },
+      {
+        "slot": 65,
+        "person": 394
+      },
+      {
+        "slot": 66,
+        "person": 277
+      },
+      {
+        "slot": 67,
+        "person": 395
+      },
+      {
+        "slot": 68,
+        "person": 396
+      },
+      {
+        "slot": 69,
+        "person": 322
+      },
+      {
+        "slot": 70,
+        "person": 397
+      },
+      {
+        "slot": 71,
+        "person": 324
+      },
+      {
+        "slot": 72,
+        "person": 398
+      },
+      {
+        "slot": 73,
+        "person": 326
+      },
+      {
+        "slot": 74,
+        "person": 399
+      },
+      {
+        "slot": 75,
+        "person": 400
+      },
+      {
+        "slot": 76,
+        "person": 350
+      },
+      {
+        "slot": 77,
+        "person": 401
+      },
+      {
+        "slot": 78,
+        "person": 402
+      },
+      {
+        "slot": 79,
+        "person": 403
+      },
+      {
+        "slot": 80,
+        "person": 304
+      },
+      {
+        "slot": 81,
+        "person": 300
+      },
+      {
+        "slot": 82,
+        "person": 404
+      },
+      {
+        "slot": 83,
+        "person": 44
+      },
+      {
+        "slot": 84,
+        "person": 405
+      },
+      {
+        "slot": 85,
+        "person": 345
+      },
+      {
+        "slot": 86,
+        "person": 352
+      },
+      {
+        "slot": 87,
+        "person": 289
+      },
+      {
+        "slot": 88,
+        "person": 281
+      },
+      {
+        "slot": 89,
+        "person": 338
+      },
+      {
+        "slot": 90,
+        "person": 336
+      },
+      {
+        "slot": 91,
+        "person": 272
+      },
+      {
+        "slot": 92,
+        "person": 339
+      },
+      {
+        "slot": 93,
+        "person": 406
+      },
+      {
+        "slot": 94,
+        "person": 351
+      },
+      {
+        "slot": 95,
+        "person": 407
+      },
+      {
+        "slot": 96,
+        "person": 408
+      },
+      {
+        "slot": 97,
+        "person": 409
+      },
+      {
+        "slot": 98,
+        "person": 410
+      },
+      {
+        "slot": 99,
+        "person": 347
+      },
+      {
+        "slot": 100,
+        "person": 411
+      },
+      {
+        "slot": 101,
+        "person": 412
+      },
+      {
+        "slot": 102,
+        "person": 413
+      },
+      {
+        "slot": 103,
+        "person": 414
+      },
+      {
+        "slot": 104,
+        "person": 415
+      },
+      {
+        "slot": 105,
+        "person": 416
+      },
+      {
+        "slot": 106,
+        "person": 417
+      }
+    ]
+  },
+  "excluded": [
+    {
+      "period": 1,
+      "slot": 274,
+      "person": 274,
+      "reason": "placeholder-no-governor"
+    }
+  ],
+  "same_person": [
+    [
+      4,
+      290
+    ],
+    [
+      50,
+      289
+    ],
+    [
+      99,
+      399
+    ]
+  ]
+}

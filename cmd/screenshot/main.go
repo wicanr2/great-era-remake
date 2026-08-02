@@ -52,7 +52,7 @@ func run(dir, out string, only game.ProvinceID, menu, units, battle bool) error 
 	if err != nil {
 		return err
 	}
-	fonts, err := render.LoadPanelFonts(must("2.15"), must("3.15"), must("MAN115"))
+	fonts, err := render.LoadPanelFonts(must("1.15"), must("2.15"), must("3.15"), must("MAN115"))
 	if err != nil {
 		return err
 	}
@@ -112,6 +112,7 @@ func run(dir, out string, only game.ProvinceID, menu, units, battle bool) error 
 			Force:    game.ForceOf(generals, id),
 			Generals: game.CountOf(generals, id),
 		}
+		d.Commands = d.Generals/8 + 1
 		if tbl.Date != nil {
 			d.Year, d.Month = tbl.Date.Year, tbl.Date.Month
 		}

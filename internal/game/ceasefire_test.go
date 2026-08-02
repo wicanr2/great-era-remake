@@ -2,6 +2,26 @@ package game
 
 import "testing"
 
+func TestParseCeasefireStatesIsOneBasedAndChecksLength(t *testing.T) {
+	b, err := SaveBlockByGlobal("byte_6FE56")
+	if err != nil {
+		t.Fatal(err)
+	}
+	save := make([]byte, b.Offset+b.Size)
+	save[b.Offset], save[b.Offset+b.Size-1] = 1, 9
+	states, err := ParseCeasefireStates(save)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if states[0] != 0 || states[1] != 1 || states[ProvinceCount] != 9 {
+		t.Fatalf("停火表 1-based 映射錯誤：0=%d 1=%d 39=%d",
+			states[0], states[1], states[ProvinceCount])
+	}
+	if _, err := ParseCeasefireStates(save[:len(save)-1]); err == nil {
+		t.Fatal("過短存檔應該報錯")
+	}
+}
+
 // 兩檔門檻的機率：佔上風 70%、劣勢 20%。
 func TestCeasefireRates(t *testing.T) {
 	cases := []struct {

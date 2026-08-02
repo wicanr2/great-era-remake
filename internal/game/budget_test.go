@@ -48,6 +48,22 @@ func TestCommandBudgetReset(t *testing.T) {
 	}
 }
 
+func TestCommandBudgetAutonomousProvinceStopsAfterOneCommand(t *testing.T) {
+	w := realWorld(t)
+	p, _ := w.Table.At(1)
+	p.Flags |= ProvinceFlagAutonomous
+	b := NewCommandBudget(w)
+	if before := b.Remaining(1); before <= 0 {
+		t.Fatalf("自治省開始時應至少有一個指令，得到 %d", before)
+	}
+	if !b.Spend(1) {
+		t.Fatal("自治省的第一個指令應可執行")
+	}
+	if got := b.Remaining(1); got != 0 {
+		t.Fatalf("自治省執行一項後應歸零，得到 %d", got)
+	}
+}
+
 // 接上真實世界時，上限就是「將領數 ÷ 8 + 1」。
 func TestCommandBudgetUsesRealFormula(t *testing.T) {
 	w := realWorld(t)

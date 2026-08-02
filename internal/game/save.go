@@ -7,8 +7,7 @@ import "fmt"
 // CLAUDE.md §9 的硬規則：**「改寫」不是「重建」**——從原始 bytes 出發，
 // 只蓋已解欄位，未解區域一個 byte 都不動。驗收標準是 byte-for-byte round-trip。
 //
-// 這一層只處理 `.DT1` 的前段（4 B 檔頭 + 39 省 × 37 B）。
-// 1447 之後的 13,236 bytes 語意未解，原樣保留。
+// 已解的省份區與將領區可以寫回；其餘區塊仍原樣保留。
 
 // WriteProvinces 把省份表寫回一份 .DT1 的副本。
 //
@@ -31,6 +30,28 @@ func WriteProvinces(orig []byte, t *ProvinceTable) ([]byte, error) {
 	for i := range t.Province {
 		rec := t.Province[i].Bytes()
 		copy(out[SaveArrayOffset+i*ProvinceRecordSize:], rec[:])
+	}
+	return out, nil
+}
+
+// WriteSave 把目前已解且會在遊戲中改變的 `.DT1` 狀態寫回副本：
+// 日期／省份與將領。未解區塊及未解將領 byte 一律保留原樣。
+//
+// generals 可以只包含該劇本實際使用的筆數；函式只覆蓋傳入的範圍，
+// 不碰後面的殘留槽位。
+func WriteSave(orig []byte, t *ProvinceTable, generals []General) ([]byte, error) {
+	out, err := WriteProvinces(orig, t)
+	if err != nil {
+		return nil, err
+	}
+	need := SaveGeneralsOffset + len(generals)*GeneralRecordSize
+	if len(out) < need {
+		return nil, fmt.Errorf("game: .DT1 需要 %d bytes 才能寫 %d 位將領，只有 %d",
+			need, len(generals), len(out))
+	}
+	for i := range generals {
+		rec := generals[i].Bytes()
+		copy(out[SaveGeneralsOffset+i*GeneralRecordSize:], rec[:])
 	}
 	return out, nil
 }

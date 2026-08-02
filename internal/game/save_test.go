@@ -132,3 +132,50 @@ func TestAutosaveDoesNotTouchOriginal(t *testing.T) {
 		t.Errorf("副本沒有寫入新值")
 	}
 }
+
+func TestWriteSavePersistsGeneralStateAndPreservesUnknownBytes(t *testing.T) {
+	orig := readGame(t, "SAVE(1).DT1")
+	tbl, err := ParseSaveProvinces(orig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	gens, err := ParseSaveGenerals(orig, 274)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const i = 57 // 湖北第一位將領（吳佩孚），有實機欄位錨點。
+	gens[i].Experience = 31
+	gens[i].AbilityB = 87
+	gens[i].Force = 12345
+	gens[i].Stamina = 76
+	gens[i].F30 = 68
+	out, err := WriteSave(orig, tbl, gens)
+	if err != nil {
+		t.Fatal(err)
+	}
+	back, err := ParseSaveGenerals(out, 274)
+	if err != nil {
+		t.Fatal(err)
+	}
+	g := back[i]
+	if g.Experience != 31 || g.AbilityB != 87 || g.Force != 12345 ||
+		g.Stamina != 76 || g.F30 != 68 {
+		t.Fatalf("將領狀態沒有完整寫回：%+v", g)
+	}
+
+	base := SaveGeneralsOffset + i*GeneralRecordSize
+	allowed := map[int]bool{
+		base + genOffExperience: true,
+		base + genOffAbilityB:   true,
+		base + genOffForce:      true,
+		base + genOffForce + 1:  true,
+		base + genOffStamina:    true,
+		base + genOffF30:        true,
+	}
+	for _, off := range DiffBytes(orig, out, 0) {
+		if !allowed[off] {
+			t.Errorf("WriteSave 動到未授權 offset %d", off)
+		}
+	}
+}

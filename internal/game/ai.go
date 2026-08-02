@@ -48,6 +48,9 @@ const (
 type AIWorld struct {
 	Table *ProvinceTable
 	Map   *Map
+	// CeasefireState 是 `.DT1` 的 `ds:BCA5h` 逐省狀態表（1-based）。
+	// 值大於 0 的省份不能在政策畫面切換自治（`sub_22E25`）。
+	CeasefireState [ProvinceCount + 1]uint8
 	// Units 是全部將領的執行期狀態。
 	Units []CombatUnit
 	// Strengths 與 Units 一一對應，用來算戰力。

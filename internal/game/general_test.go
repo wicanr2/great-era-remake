@@ -1,6 +1,7 @@
 package game
 
 import (
+	"encoding/binary"
 	"os"
 	"path/filepath"
 	"testing"
@@ -36,6 +37,40 @@ func TestGeneralRoundTrip(t *testing.T) {
 		}
 	}
 	t.Logf("%d 位將領 byte-for-byte round-trip 通過", len(gs))
+}
+
+// TestGeneralBytesWritesEveryDecodedField 防止「畫面值已更新，但離開時存檔漏寫」。
+// 這些欄位都有明確解析語意，因此 Bytes 必須逐一覆蓋 Raw 的對應 byte。
+func TestGeneralBytesWritesEveryDecodedField(t *testing.T) {
+	g := General{
+		AbilityA: 11, AbilityB: 22, AbilityC: 33, Experience: 44,
+		Province: 5, Force: 0x1234, F19: 66, F20: 77, Branch: BranchCavalry,
+		TitlePrefix: 8, TitleNumber: 9, TitleSuffix: 10, FactionName: 11,
+		Stamina: 88, F30: 79, Range: 3,
+	}
+	for i := range g.Raw {
+		g.Raw[i] = 0xCC
+	}
+	out := g.Bytes()
+	wantByte := map[int]byte{
+		genOffAbilityA: 11, genOffAbilityB: 22, genOffAbilityC: 33,
+		genOffExperience: 44, genOffProvince: 5,
+		genOffF19: 66, genOffF20: 77, genOffBranch: BranchCavalry,
+		genOffTitlePrefix: 8, genOffTitleNumber: 9, genOffTitleSuffix: 10,
+		genOffFactionName: 11, genOffStamina: 88, genOffF30: 79, genOffRange: 3,
+	}
+	for off, want := range wantByte {
+		if out[off] != want {
+			t.Errorf("offset +%d = %d，預期 %d", off, out[off], want)
+		}
+	}
+	if got := binary.LittleEndian.Uint16(out[genOffForce:]); got != 0x1234 {
+		t.Errorf("兵力寫回 = %#x，預期 0x1234", got)
+	}
+	// 挑一個未解欄位，必須保留原始 byte。
+	if out[6] != 0xCC {
+		t.Errorf("未解 offset +6 被改成 %#x，預期保留 0xCC", out[6])
+	}
 }
 
 // TestManDatStructure 驗證 MAN(1).DAT 是 274 × 33，且蔣中正三項全 100。

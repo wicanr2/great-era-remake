@@ -13,7 +13,7 @@ import (
 // 只比標籤不比數字：數字字模是自己畫的（`smalldigits.go` 標了 remake 差異），
 // 逐像素一定不同。標籤走的是原版字模，**必須零差異**。
 func TestBattlePanelLabelsMatchOriginal(t *testing.T) {
-	fonts, err := LoadPanelFonts(readFile(t, gameDir, "2.15"),
+	fonts, err := LoadPanelFonts(readFile(t, gameDir, "1.15"), readFile(t, gameDir, "2.15"),
 		readFile(t, gameDir, "3.15"), readFile(t, gameDir, "MAN115"))
 	if err != nil {
 		t.Fatal(err)

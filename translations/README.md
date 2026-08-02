@@ -12,6 +12,10 @@
 translations/
   glossary.md              譯名表，唯一真相（品質閘要檢查譯名漂移）
   zh-Hant/glyphtext.json   繁中母本 ← 從原版字模還原出來的，不是重寫的
+  zh-Hant/wording.json     原典／現代白話的穩定語意鍵
+  zh-Hant/people.json      可發行人物資料 ← tools/gen_people.py
+  zh-Hant/people-unmapped.md  人物文字正規化帳本
+  shared/roster-slots.json 三期將領槽位 → 人物 id（不隨語系改變）
 ```
 
 ## `glyphtext.json` 的來源與格式
@@ -64,9 +68,18 @@ translations/
 2. `raw` 欄位對非中文語系沒有意義，可以直接等於 `text`。
 3. 跑起來：`tools/go.sh run ./cmd/dsds -locale translations/en`
 
+繁中自傳另需使用者提供的倚天完整字庫：
+
+```text
+tools/go.sh run ./cmd/dsds -eten workplace/eten
+```
+
+字庫檔不進版控；`tools/deny_scan.sh` 會拒絕 `STDFONT`／`SPCFONT` 等檔名。
+
 ⚠️ 英文版不是把中文換掉就好：640×350 的版面是照全形字排的，
 換成比例字後字寬、行高、對話框都要重算（`CLAUDE.md` §6）。
-**排版層必須先抽離**，否則英文一定溢出。那一層還沒做。
+**排版層必須先抽離**，否則英文一定溢出。`internal/ui/textlayout` 已完成第一階段的
+繁中半格量測、標點禁則與分頁；比例向量字、英文斷詞與畫面接線仍未完成。
 
 ⚠️ 譯名一律走 `glossary.md`。人名有 22 筆遊戲寫法與通行寫法不同
 （閰錫山／閻錫山…），**繁中母本保留原版寫法**，英日文版才用通行寫法
