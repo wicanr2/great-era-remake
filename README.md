@@ -43,6 +43,8 @@
 
 完整的切換架構與差異契約見
 [`docs/design/10-visual-modernization.md`](./docs/design/10-visual-modernization.md)。
+高解析度 Modern／Android 的 1280×720 設計畫布、safe-area、觸控 48 dp 與目前 gate 見
+[`docs/design/33-high-resolution-modern-android.md`](./docs/design/33-high-resolution-modern-android.md)。
 
 ## 目前進度
 
@@ -52,35 +54,105 @@
 | M1 文本還原鏈 | **詞表層完成**；敘事文本已找到（是畫成圖的，不是字模序列）|
 | M2 執行檔反組譯 | 進行中——五支已盤點，戰鬥模組已定位 |
 | M3 規則規格 | 4 份 READY（地圖、將領、省份、戰場圖塊）+ `docs/mechanics/` 機制文件 |
-| M4 規則層 | 進行中——地圖、將領、省份、戰場 |
-| M5 呈現層 | **政略畫面 + 互動**——13 個欄位對實機零誤差、15 項指令選單、戰場圖塊、參戰單位與人物自傳頁 |
-| M6–M7 多語系／發行 | 未開始 |
-| 現代圖示／modern UI | **設計完成、資產與主題載入器未實作**；目前展示圖仍是原版點陣素材，不能稱為 modern UI |
-| 原典／現代白話 | **操作介面大部分已接通**；外交與其他選項 O3／O4 尚缺，劇情對話／敘事文本尚未進入逐句白話化 |
-| 滑鼠／Android 觸控 | M0–M1 已涵蓋選單、長清單與數字鍵盤；M2 已接戰鬥相鄰格移動／攻擊，Android 封裝與實機驗證待續 |
+| M4 規則層 | 進行中——地圖、將領、省份、戰場、戰損鏡像與世界層結算已接；原版全流程仍未宣告 |
+| M5 呈現層 | **政略／戰鬥 + Modern UI 垂直鏈**——15 項指令選單、戰場圖塊、參戰單位、攻擊目標標號、人物自傳頁、modern 資訊卡／戰鬥外殼／十勢力色帶、新聞畫廊；外交已接選單／貸款 M0／信用度零 gate M1／貸款與外援結果成本 M1／外援與償債 M1／停火 M1，第一期援助代碼已接、國家名稱仍是假說 |
+| M6–M7 多語系／發行 | `translations/en`／`translations/ja` 已交付 UI／面板／敘事語意鍵與 39 省名；英／日 387 篇人物自傳 machine-draft overlay 會明示來源；Windows／macOS／Linux 候選包已產生，但正式人審譯稿、Android 與三平台實機驗收仍待補 |
+| 現代圖示／Modern UI | **Modern + high 的 H1-a 地圖／資訊卡、H1-b 指令／設定／自傳／敘事、H1-c 戰鬥 HUD 與 H2 一般流程已接通**；設計畫布固定 1280×720，`retro` 仍為 640×350；`-theme`／`F2` 切換圖形、`-resolution`／`F3` 切換解析度，滑鼠／觸控共用同一 Action |
+| Modern 音訊 | **runtime 接線與純 Go fallback 已接通**——`audio=modern` 優先讀取有 provenance 的 manifest／Ogg，缺檔安全改用原創 procedural cue；八條 cue／八類 FX 有離線 WAV 技術預覽，正式 Ogg、清權、人耳／真機 QA 仍未完成 |
+| 原典／現代白話 | **操作介面與敘事入口已接通**；外交貸款 M0、信用度零 gate、貸款／外援結果成本、外援／償債 M1、停火 M1 已加入；`NEWSDATA.DAT` 17 張來源圖像可由 `N`／滑鼠／觸控開啟，#0／#9 有 caption，其餘 source-image fallback |
+| 滑鼠／Android 觸控 | M0–M1 涵蓋選單、長清單與數字鍵盤；M2 已接戰鬥相鄰格移動／攻擊，Android 封裝與實機驗證待續 |
 
 DOSBox 實測已通，可載入存檔進政略階段。詳細現況見 [`CONTEXT.md`](./CONTEXT.md)。
 
 ```sh
 tools/go.sh run ./cmd/dsds -game workplace/orig/game      # 需要顯示器
-tools/go.sh run ./cmd/dsds -wording plain                 # 現代白話操作介面（未涵蓋劇情敘事）
+tools/go.sh run ./cmd/dsds -game workplace/orig/game -theme modern # 現代地形／鐵路（P1）
+tools/go.sh run ./cmd/dsds -game workplace/orig/game -resolution original # 原版 640×350 邏輯畫布（桌面預設 2 倍視窗）
+tools/go.sh run ./cmd/dsds -game workplace/orig/game -theme modern -resolution high # 1280×720 Modern 高解析畫布
+tools/go.sh run ./cmd/dsds -game workplace/orig/game -audio retro # 情境純 Go OPL2 風格 BGM（需自備 MUS/TIM；SCENE 必要）
+tools/go.sh run ./cmd/dsds -game workplace/orig/game -audio modern -modern-audio assets/music/modern # Ogg 優先；缺檔使用純 Go Modern fallback
+tools/go.sh run ./cmd/modern_audio -out /tmp/great-era-modern-audio -report /tmp/great-era-modern-audio/report.json # 重生 cue／SFX 與技術 QA
+tools/go.sh run ./cmd/dsds -game workplace/orig/game -audio off   # 無音訊裝置／CI 路徑
+tools/go.sh run ./cmd/dsds -wording plain                 # 現代白話操作介面與已證實敘事 caption
+tools/py.sh tools/gen_locale_packs.py                     # 重產英／日語系包（含人物來源標記）
+tools/go.sh run ./cmd/dsds -locale translations/en       # 英文 UI／地名
+tools/go.sh run ./cmd/dsds -locale translations/ja       # 日文漢字優先 UI／地名
 tools/go.sh run ./cmd/screenshot -province 26             # 無頭產出政略畫面 PNG
+tools/go.sh run ./cmd/screenshot -province 26 -theme modern -eten workplace/eten # Modern 資訊卡／地形對照
+tools/go.sh run ./cmd/screenshot -province 26 -theme modern -resolution high -eten workplace/eten # H1-a 1280×720 預覽
+tools/go.sh run ./cmd/screenshot -province 26 -theme modern -resolution high -battle -eten workplace/eten # H1-c 1280×720 戰鬥預覽
 tools/go.sh run ./cmd/screenshot -province 26 -menu        # 換成 15 項指令選單
 tools/go.sh run ./cmd/screenshot -province 19 -units      # 加上參戰單位圖示
 tools/go.sh test ./...                                     # 逐像素驗證
 ```
 
-在「查閱將領」清單或詳細資料頁按 `B` 可開啟人物自傳；左右鍵切換人物，
-`Space`／`PgUp`／`PgDn` 翻頁，`ESC` 或 `B` 返回。這是重製版新增的唯讀文化保存功能，
-不改變遊戲狀態；目前 326 位有自撰生平，其餘人物會明示「查無可靠傳記記載」。
+## 不含原版遊戲資料的三平台 release 候選包
 
-在政略指令選單按 `O` 可開啟 remake「顯示設定」，於遊戲中切換原典用語／現代白話。
+要建立只含 clean-room 引擎、Modern atlas、語系、授權／操作說明的 Windows、macOS
+與 Linux 發行候選包：
+
+```sh
+tools/package.sh 0.1.0-release dist-all windows-amd64,darwin-arm64,linux-appimage
+```
+
+輸出是 Windows amd64 ZIP、macOS arm64 `.app` ZIP 與 Linux x86_64 AppImage，另附全域
+`SHA256SUMS-<版本>.txt`；每個包均有 `RELEASE-MANIFEST.txt`。`workplace/orig`、原版
+資料／音樂／美術、倚天字型與任何 `.MUS`／`.TIM`／`.DAT`／`.OGG`／`.WAV` 衍生物都不會
+進包。玩家仍須自行準備合法的 `-game` 資料目錄與 `-eten` 字庫；這是「引擎與 Modern
+外殼」包，不是重新散布原版遊戲。Windows／macOS 實機 smoke、macOS 簽署、公證與公開
+發行仍分列為後續 gate；完整格式、驗證與限制見
+[`docs/release/README.md`](./docs/release/README.md)。
+
+2026-08-11 已重建 `0.1.0-release` 的三個候選包，並驗證 Windows／macOS ZIP 的入口與
+CRC、Linux AppImage 的解包 payload 與素材拒絕規則。它們可供持有合法遊戲資料的測試者
+下載試跑；尚未取代 Windows／macOS 真機 smoke、macOS 簽署／公證或跨發行版 Linux
+驗收。實際檔名、雜湊與 gate 見 [`docs/release/README.md`](./docs/release/README.md)。
+
+政略地圖右上可按 `N`，或用滑鼠／觸控點擊「新聞／史事」開啟 `NEWSDATA.DAT` 畫廊；
+17 張來源圖像每頁四張，`Space`／`PageUp`／`PageDown` 翻頁，`Esc`／`N` 返回。
+目前 #0／#9 有可追溯 caption，其餘 15 張保留原圖並顯示 source-image fallback，
+不把未知點陣字猜成敘事文本。完整契約見
+[`docs/spec/31-narrative-gallery-m1.md`](./docs/spec/31-narrative-gallery-m1.md)。
+
+在「查閱將領」清單或詳細資料頁按 `B` 可開啟人物自傳；詳細頁也有可用滑鼠／觸控點擊的
+「人物自傳／人物生平」按鈕。左右鍵切換人物，`Space`／`PgUp`／`PgDn` 翻頁，
+`ESC` 或 `B` 返回。這是重製版新增的唯讀文化保存功能，
+不改變遊戲狀態；目前 486 個期別槽位中 485 個可接合、1 個「無省長」明確排除；387 位
+有自撰生平（其中新增 61 篇由 `translations/zh-Hant/people-authored.json` 的可重生
+overlay 接入），沒有可靠正文的人物會明示「查無可靠傳記記載」。
+英／日語系的人物姓名仍保留遊戲歷史寫法；目前沒有可追溯的完整英／日譯稿，頁面會顯示
+「繁中原文」來源提示，不把自動代換冒充傳記翻譯。
+
+戰鬥畫面目前五項操作都可進入：`1` 移動、`2` 攻擊後按 `1..6` 選相鄰目標、`3` 撤退
+（僅已閉合的 18 ← 19 樣本）、`4` 駐軍（選中單位前往第一個可達城市）、`5` 查閱；
+滑鼠／觸控可點戰鬥命令、相鄰格與攻擊目標，攻擊子狀態會在敵軍格顯示穩定的 `1..6` 標號。六種攻擊選項目前共用已確認的 `Engage`
+近身公式，這是明列的 remake 差異；戰鬥結束會把已解欄位非破壞性寫入
+`-save` 同目錄的 `.DT2` 與 `MEM_WAR.DAT` 副本，立即撤退不寫回。完整邊界見
+[`docs/spec/25-battle-state-writeback-m1.md`](./docs/spec/25-battle-state-writeback-m1.md) 與
+[`docs/spec/27-battle-settlement-biography-m2.md`](./docs/spec/27-battle-settlement-biography-m2.md)。
+
+`-audio retro` 會先播放 `SCENE`，進入戰鬥時依序嘗試 `BATTLE1`／`BATTLE2`／`BT02`，
+其他畫面嘗試 `STRATEGY`；其餘 `MAINTHEM`、`WALL`、`FINAL` 配對可一併提供，缺檔時
+沿用目前曲目。情境切換使用 bounded 18 frame（約 300 ms）交叉淡入淡出；這是 remake
+聽感選擇，不宣稱原版 OPL2 register parity。`audio=modern` 的純 Go Ogg loader、manifest
+雜湊／授權、循環 reader 與 procedural fallback 已接；`cmd/modern_audio -report` 會對八條
+cue／八類效果音輸出峰值、RMS、mono、首尾差與 SHA-256；儲存庫不放入未清權音檔，缺 manifest
+時使用同一份原創純 Go cue。執行期契約見 [`docs/spec/32-modern-ogg-runtime-m1.md`](./docs/spec/32-modern-ogg-runtime-m1.md)，
+音樂內容方向見 [`docs/design/32-modern-music-direction.md`](./docs/design/32-modern-music-direction.md)。
+目前另有 `modern_campaign` 豪情 cue 的本機預覽草稿；它只留在 ignored
+`workplace/promo/modern_audio/`，尚未清權，不會冒充正式發行音樂。
+
+在政略指令選單按 `O` 可開啟 remake「顯示設定」，於遊戲中切換原典用語／現代白話，
+以及原版圖形／現代圖形；鍵盤可按 `1`／`2` 選用語、`3`／`4` 選圖形，滑鼠／觸控
+命中同一組選項。`F2` 是主題切換快捷鍵；`F3` 在原版 640×350 與高解析 1280×720
+畫布間切換，兩者都不改變規則或存檔。也可以從指令 15 → 顯示設定 → 解析度切換進入，
+因此沒有實體鍵盤的 Android 路徑仍可使用同一個偏好設定。
 選擇會寫入 `$XDG_CONFIG_HOME/dsds/prefs.json`（未設定 XDG 時使用平台設定目錄），
 不寫入遊戲存檔；`-wording` 可在單次啟動時優先覆寫偏好。
 十五項政略主選單、調動、運補、徵兵／重新整編、查閱、發展、政策／自治／產能、
-商業、練兵、秘密行動、人物自傳及其他選項 O0–O2 已接上雙用語。外交、媒體選項
-O3／O4，以及劇情對話／敘事文本仍待逐項處理；這裡的「現代白話」目前主要指操作介面，
-不能宣稱全遊戲對話已完成。
+商業、練兵、秘密行動、人物自傳、外交選單／貸款 M0／信用度零 gate／貸款與外援結果成本／外援與償債 M1／停火 M1 及其他選項 O0–O2
+已接上雙用語；媒體選項 O3／O4 與未解新聞模板仍保留 source-image fallback。這裡的「現代白話」
+已涵蓋可玩的操作／面板與 #0／#9 敘事 caption，但不能宣稱全遊戲人物／劇情已有正式人審譯稿。
 
 在政略指令選單按 `8` 進入原版「政策」：第一項「授權自治」已可操作，
 能在同一項指令內切換多個合法省份；第二項「產能分配」也已完成，可調整鐵礦、煤礦、
@@ -96,13 +168,40 @@ O3／O4，以及劇情對話／敘事文本仍待逐項處理；這裡的「現�
 
 ![湖北省的六角格地圖與部隊圖示](docs/images/province-26.png)
 
-> 兩張都是 `cmd/screenshot` 在無頭環境合成的，沒有經過 DOSBox。
+Modern 高解析度對照（1280×720）：
+
+高解析人物自傳成果：`docs/images/high-modern-biography-058-01.png`
+
+![Modern 高解析度湖北地圖與資訊卡](docs/images/high-modern-province-26.png)
+
+![Modern 高解析度政略指令卡](docs/images/high-modern-menu-26.png)
+
+![Modern 高解析度戰鬥 HUD](docs/images/high-modern-battle-26.png)
+
+![Modern 高解析人物自傳](docs/images/high-modern-biography-058-01.png)
+
+> 以上成果圖都是 `cmd/screenshot` 在無頭環境合成的，沒有經過 DOSBox。
 > 畫面上的中文字模與地形、部隊圖示都來自 1992 年的原版檔案——
 > 這是文化資產保存的成果展示，本專案不散布原版的執行檔或資料檔本身
 > （見[授權與素材](#授權與素材)）。
 
-> 2026-08-03 已用目前 renderer 重產。這兩張刻意展示復古圖形路徑；現代圖示仍在
-> 設計階段，尚無可誠實展示的遊戲內 modern 截圖。
+> 2026-08-03 已用目前 renderer 重產。前兩張刻意展示復古圖形路徑；後兩張是
+> `cmd/screenshot -theme modern -resolution high` 產生的 Modern 1280×720 展示證據。
+> Modern 高解析度地圖／指令／戰鬥玩家路徑與可再散布 `GEMF` 比例字型 atlas 已接通；人物自傳改用
+> GEMF 像素字距換行，英／日 387 篇 machine-draft overlay 的 glyph coverage 與最長
+> 自傳首／末頁已由測試鎖定，逐篇人審／長文截圖、Android
+> 實機與正式音檔仍是發行 gate。字型來源與 hash 見
+> [`docs/licenses/modern-font-atlas.md`](docs/licenses/modern-font-atlas.md)。
+
+人物自傳首頁／末頁也可由同一份 `PeopleDB` 重生高解析成果圖：
+
+```sh
+tools/go.sh run ./cmd/screenshot -game workplace/orig/game -province 26 \
+  -theme modern -resolution high -biography -out /tmp/high-biography
+```
+
+這個展示入口只讀既有人物資料並呼叫 `DrawModernBiographySurface`，不另造人物文字或
+規則路徑；`docs/images/high-modern-biography-058-01.png` 是湖北 #26 司令的首頁成果。
 
 政略畫面的 13 個欄位**全部與 DOSBox 實機截圖一致**：
 
@@ -198,7 +297,18 @@ tools/            docker 包裝腳本與逆向工具
 
 所有建置與工具一律走 docker，不裝進系統環境。
 
+重製引擎與規則層本身是純 Go，`cmd/`／`internal/` 沒有 `import "C"` 或 `#cgo`。
+目前 Ebiten v2.8.8 的 Linux／macOS 桌面 GLFW backend 仍有自己的 cgo 需求；Windows
+amd64 已可用 `CGO_ENABLED=0`，完整目標矩陣與限制見 [`docs/release/README.md`](./docs/release/README.md)。
+可用 `tools/check_no_cgo.sh` 重跑前述「本專案原始碼不引入 cgo」檢查；它刻意不掃
+Ebiten module cache，避免把外部 backend 的實作誤報成遊戲程式碼。
+
 ## 授權與素材
+
+程式碼、文件、逆向筆記、譯文與工具採 **RRSAL-1.0**（復古重製 source-available 授權條款，
+SPDX `LicenseRef-RRSAL-1.0`）：非商業用途免費（含修改與再散布）；實況、影片、報導與平台分潤
+明示允許，但要署名；商業用途需事先書面授權（wicanr2@gmail.com，歡迎來談）。這不是開放原始碼
+授權，對外稱 source-available。條款全文、不涵蓋的原版素材與第三方元件見 [`LICENSE`](LICENSE)。
 
 本專案**不散布原版執行檔、資料檔、美術或音樂，也不散布倚天字型**。
 公開產出只有引擎程式碼、逆向筆記與翻譯文本，玩家需自備合法原版。
