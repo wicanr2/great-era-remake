@@ -108,3 +108,49 @@ func TestTraceDecisionsDoesNotChangeOutcome(t *testing.T) {
 		t.Errorf("回合序號從 1 起，實際 %d", trace[0].Turn)
 	}
 }
+
+func TestDefaultPostStageOpenMatchesOriginalGate(t *testing.T) {
+	tests := []struct {
+		name string
+		g    BattleChainGates
+		turn int
+		want bool
+	}{
+		{
+			name: "bit7 before turn five stays closed",
+			g:    BattleChainGates{DefaultPostBit7: true},
+			turn: 4,
+		},
+		{
+			name: "bit7 opens at turn five",
+			g:    BattleChainGates{DefaultPostBit7: true},
+			turn: 5,
+			want: true,
+		},
+		{
+			name: "nonzero arg_A opens regardless of turn",
+			g:    BattleChainGates{DefaultPostArgA: 1},
+			turn: 1,
+			want: true,
+		},
+		{
+			name: "zero arg_A does not open by itself",
+			g:    BattleChainGates{DefaultPostArgA: 0},
+			turn: 99,
+		},
+		{
+			name: "explicit caller override",
+			g:    BattleChainGates{EnableDefaultPostStage: true},
+			turn: 1,
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.g.DefaultPostStageOpen(tt.turn); got != tt.want {
+				t.Fatalf("DefaultPostStageOpen(%d) = %v，want %v，gate=%+v",
+					tt.turn, got, tt.want, tt.g)
+			}
+		})
+	}
+}

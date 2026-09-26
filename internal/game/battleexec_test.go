@@ -1,6 +1,276 @@
 package game
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/wicanr2/great-era-remake/internal/assets"
+)
+
+// newFallbackSim 建一個只含城市與佔用表的最小戰場，讓後備測試不依賴
+// 政略資料或部署順序；六角幾何仍由正式的 Adjacent/WithinTwoSteps 提供。
+func newFallbackSim(city CellIndex, current, occupant *Combatant) *BattleSim {
+	bf := &Battlefield{}
+	col, row := city.ColRow()
+	bf.Tiles[row][col] = assets.Tile{Kind: assets.TileCity, Rail: assets.NoRail}
+	s := &BattleSim{Field: bf, byID: make(map[GeneralID]*Combatant)}
+	s.byID[current.General] = current
+	s.byID[occupant.General] = occupant
+	s.Occ[city] = occupant.General
+	return s
+}
+
+func firstNonAdjacentCell(from CellIndex) CellIndex {
+	for i := 0; i < CellCount; i++ {
+		c := CellIndex(i)
+		if c != from && !Adjacent(c, from) {
+			return c
+		}
+	}
+	return NoCell
+}
+
+func firstTwoStepNonAdjacentCell(from CellIndex) CellIndex {
+	for i := 0; i < CellCount; i++ {
+		c := CellIndex(i)
+		if WithinTwoSteps(c, from) && !Adjacent(c, from) {
+			return c
+		}
+	}
+	return NoCell
+}
+
+func TestAssignCityFallbackDirectAdjacentAttacker(t *testing.T) {
+	center, err := CellAt(6, 6)
+	if err != nil {
+		t.Fatal(err)
+	}
+	city, ok := center.Neighbour(DirDown)
+	if !ok {
+		t.Fatal("中心格應有下方鄰格")
+	}
+	u := mkUnit(1, 10, Branch1, 1000)
+	u.Cell = center
+	v := mkUnit(2, 20, Branch1, 1000)
+	v.Cell, v.Attacking = city, true
+	s := newFallbackSim(city, u, v)
+
+	if !s.assignCityFallback(u, []CellIndex{city}, nil) {
+		t.Fatal("相鄰攻方城市應走直接後備分支")
+	}
+	if u.TargetUnit != v.General || u.NextCell != u.Cell {
+		t.Errorf("直接攻方分支應寫目標與原地下一跳，得到 target=%d next=%d",
+			u.TargetUnit, u.NextCell)
+	}
+	if u.Assigned() {
+		t.Error("直接攻方分支不應立 +13 bit 7")
+	}
+}
+
+func TestAssignCityFallbackDirectDefenderPreservesTarget(t *testing.T) {
+	center, err := CellAt(6, 6)
+	if err != nil {
+		t.Fatal(err)
+	}
+	city, ok := center.Neighbour(DirDown)
+	if !ok {
+		t.Fatal("中心格應有下方鄰格")
+	}
+	u := mkUnit(1, 10, Branch1, 1000)
+	u.Cell, u.TargetUnit, u.Flags13 = center, 99, 0x20
+	v := mkUnit(2, 10, Branch1, 1000)
+	v.Cell, v.Attacking = city, false
+	s := newFallbackSim(city, u, v)
+
+	if !s.assignCityFallback(u, []CellIndex{city}, nil) {
+		t.Fatal("相鄰守方城市應走直接後備分支")
+	}
+	if u.TargetUnit != 99 {
+		t.Errorf("直接守方分支不清 +10，得到 target=%d", u.TargetUnit)
+	}
+	if u.NextCell != u.Cell || !u.Assigned() || u.Flags13&0x20 == 0 {
+		t.Errorf("直接守方分支欄位錯誤：target=%d next=%d flags=%02x",
+			u.TargetUnit, u.NextCell, u.Flags13)
+	}
+}
+
+func TestAssignCityFallbackScansFriendlyCity(t *testing.T) {
+	center, err := CellAt(6, 6)
+	if err != nil {
+		t.Fatal(err)
+	}
+	city := firstNonAdjacentCell(center)
+	if city == NoCell {
+		t.Fatal("找不到非相鄰城市格")
+	}
+	u := mkUnit(1, 10, Branch1, 1000)
+	u.Cell, u.Flags13 = center, 0x20
+	v := mkUnit(2, 10, Branch1, 1000)
+	v.Cell, v.Attacking = city, false
+	s := newFallbackSim(city, u, v)
+
+	if !s.assignCityFallback(u, []CellIndex{city}, func(to, from CellIndex) CellIndex {
+		return to
+	}) {
+		t.Fatal("同勢力佔用城市應可由後備掃描指派")
+	}
+	if u.TargetUnit != v.General || u.NextCell != city || u.Assigned() {
+		t.Errorf("掃描分支欄位錯誤：target=%d next=%d flags=%02x",
+			u.TargetUnit, u.NextCell, u.Flags13)
+	}
+}
+
+func TestExecDefaultUsesCityFallbackAfterRouteFailure(t *testing.T) {
+	center, err := CellAt(6, 6)
+	if err != nil {
+		t.Fatal(err)
+	}
+	city := firstTwoStepNonAdjacentCell(center)
+	if city == NoCell {
+		t.Fatal("找不到兩格內且不相鄰的城市格")
+	}
+	u := mkUnit(1, 10, Branch1, 1000)
+	u.Cell, u.Command = center, BattleCmdSeekTarget
+	v := mkUnit(2, 10, Branch1, 1000)
+	v.Cell, v.Attacking = city, false
+	s := newFallbackSim(city, u, v)
+	s.Defender = []*Combatant{u}
+
+	calls := 0
+	got := s.ExecuteAction(ActADefault, s.Defender, nil,
+		func(to, from CellIndex) CellIndex {
+			calls++
+			if calls == 1 {
+				return NoCell // 先讓 sub_3D57B 的直接路徑失敗
+			}
+			return to // 再讓 sub_3D261 的同勢力掃描成功
+		})
+	if !got.Implemented {
+		t.Fatal("預設分流應已實作")
+	}
+	if u.Command != BattleCmdStandby || u.TargetUnit != v.General ||
+		u.NextCell != city || u.Assigned() {
+		t.Errorf("兩格內城市應直接指派：cmd=%d target=%d next=%d flags=%02x",
+			u.Command, u.TargetUnit, u.NextCell, u.Flags13)
+	}
+}
+
+func newDefaultPostSim(units ...*Combatant) *BattleSim {
+	s := &BattleSim{Field: &Battlefield{}, byID: make(map[GeneralID]*Combatant)}
+	for _, u := range units {
+		if u == nil {
+			continue
+		}
+		s.byID[u.General] = u
+		if u.Cell.Valid() {
+			s.Occ[u.Cell] = u.General
+		}
+	}
+	return s
+}
+
+func markDefaultPostCity(s *BattleSim, c CellIndex) {
+	col, row := c.ColRow()
+	s.Field.Tiles[row][col] = assets.Tile{Kind: assets.TileCity, Rail: assets.NoRail}
+}
+
+func TestExecDefaultPostBlocksCommandsWithEnemyAdjacent(t *testing.T) {
+	center, err := CellAt(6, 6)
+	if err != nil {
+		t.Fatal(err)
+	}
+	city, ok := center.Neighbour(DirDown)
+	if !ok {
+		t.Fatal("中心格應有下方鄰格")
+	}
+	enemyCell, ok := center.Neighbour(DirUpperLeft)
+	if !ok {
+		t.Fatal("中心格應有左上鄰格")
+	}
+	u := mkUnit(1, 10, Branch1, 1000)
+	u.Cell, u.Command = center, BattleCmdCommitted
+	v := mkUnit(2, 20, Branch1, 1000)
+	v.Cell = enemyCell
+	s := newDefaultPostSim(u, v)
+	markDefaultPostCity(s, city)
+
+	got := s.execDefaultPost([]*Combatant{u}, []CellIndex{city}, nil,
+		make([]bool, CellCount))
+	if !got.Implemented || got.Assigned != 0 {
+		t.Fatalf("敵鄰應跳過命令 4：%+v", got)
+	}
+	if u.Command != BattleCmdCommitted || u.NextCell != NoCell {
+		t.Errorf("敵鄰跳過不應改欄位：cmd=%d next=%d", u.Command, u.NextCell)
+	}
+}
+
+func TestExecDefaultPostUsesCityOrderAndReservation(t *testing.T) {
+	center, err := CellAt(6, 6)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cityA, ok := center.Neighbour(DirDown)
+	if !ok {
+		t.Fatal("中心格應有下方鄰格")
+	}
+	cityB, ok := center.Neighbour(DirUpperRight)
+	if !ok {
+		t.Fatal("中心格應有右上鄰格")
+	}
+	// 兩個我方單位不能互相被當成敵鄰；它們的位置也不占城市格。
+	u1 := mkUnit(1, 10, Branch1, 1000)
+	u1.Cell, u1.Command = center, BattleCmdCommitted
+	u2 := mkUnit(2, 10, Branch1, 1000)
+	u2.Cell, u2.Command = firstNonAdjacentCell(center), BattleCmdUnknown5
+	if u2.Cell == NoCell || u2.Cell == cityA || u2.Cell == cityB {
+		t.Fatal("找不到第二個有效單位格")
+	}
+	s := newDefaultPostSim(u1, u2)
+	markDefaultPostCity(s, cityA)
+	markDefaultPostCity(s, cityB)
+	reserved := make([]bool, CellCount)
+	got := s.execDefaultPost([]*Combatant{u1, u2}, []CellIndex{cityB, cityA}, nil, reserved)
+	if !got.Implemented || got.Assigned != 2 {
+		t.Fatalf("兩個空城應依序分派：%+v", got)
+	}
+	if u1.NextCell != cityB || u2.NextCell != cityA {
+		t.Errorf("城市清單順序或預約表錯誤：u1=%d u2=%d", u1.NextCell, u2.NextCell)
+	}
+	if !reserved[cityA] || !reserved[cityB] {
+		t.Error("兩座被選城市都應標記預約")
+	}
+	if u1.Assigned() || u2.Assigned() {
+		t.Error("空城分支不應臆加 +13 bit 7")
+	}
+}
+
+func TestExecDefaultPostDemotesAndUsesFallback(t *testing.T) {
+	center, err := CellAt(6, 6)
+	if err != nil {
+		t.Fatal(err)
+	}
+	city := firstNonAdjacentCell(center)
+	if city == NoCell {
+		t.Fatal("找不到非相鄰城市格")
+	}
+	u := mkUnit(1, 10, Branch1, 1000)
+	u.Cell, u.Command, u.Flags13 = center, BattleCmdUnknown5, 0x20
+	v := mkUnit(2, 10, Branch1, 1000)
+	v.Cell = city
+	s := newDefaultPostSim(u, v)
+	markDefaultPostCity(s, city)
+
+	got := s.execDefaultPost([]*Combatant{u}, []CellIndex{city},
+		func(to, from CellIndex) CellIndex { return to }, make([]bool, CellCount))
+	if !got.Implemented || got.Assigned != 1 {
+		t.Fatalf("找不到空城時應走後備：%+v", got)
+	}
+	if u.Command != BattleCmdStandby || u.TargetUnit != v.General || u.NextCell != city {
+		t.Errorf("後備欄位錯誤：cmd=%d target=%d next=%d", u.Command, u.TargetUnit, u.NextCell)
+	}
+	if u.Assigned() || u.Flags13&0x20 == 0 {
+		t.Errorf("後備不應立 bit 7 且要保留未知位元：flags=%02x", u.Flags13)
+	}
+}
 
 func TestCityCellsFindsCities(t *testing.T) {
 	m := loadTestMap(t)
@@ -50,9 +320,7 @@ func TestExecuteActionReportsUnimplemented(t *testing.T) {
 	// ⚠️ 沒實作的行動不得靜默跳過——那會讓實作缺口看起來像 AI 的決策結果。
 	sim := mkTracedBattle(t, 20000, 18000)
 	noRoute := func(to, from CellIndex) CellIndex { return NoCell }
-	// ⚠️ 這份清單是「執行層還缺什麼」的憑證。實作一個就從這裡移除一筆
-	// ——測試會在你忘了移除時紅給你看（2026-08-02 值 12/13/14/15 實作後就發生過）。
-	// ⭐ 13 種行動**全部實作完了**。這個測試改成守住反面：
+	// ⭐ 13 種行動**全部實作完了**。這個測試只守住反面：
 	// 未知的行動編號必須回 Implemented=false，不得靜默當成沒事。
 	for _, a := range []BattleAction{0, 5, 20, 99} {
 		got := sim.ExecuteAction(a, sim.Defender, sim.Attacker, noRoute)

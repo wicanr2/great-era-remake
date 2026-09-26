@@ -18,7 +18,8 @@ type SaveBlock struct {
 	Offset, Size int
 	// Shape 是已知的拆法（如「39 × 37」），空字串表示還沒拆開。
 	Shape string
-	// Known 表示這一塊的語意已解——只有已解的區域可以被寫回覆蓋。
+	// Known 表示整塊已解、可以安全整片覆蓋；只知道部分欄位或含未初始化
+	// 殘留的區塊仍為 false，應使用逐欄位的非破壞性 writer。
 	Known bool
 	// Note 是一句話說明。
 	Note string
@@ -35,7 +36,7 @@ var SaveBlocks = []SaveBlock{
 	{"byte_6DFA0", 4, 1443, "39 × 37", true, "省份記錄（docs/spec/03）"},
 	{"byte_6F532", 1447, 2340, "39 × 60", false,
 		"⭐ 每省的戰爭記錄表（ds:0B346h，1-based 省編號）。" +
-			"表的身分已解，但 +0/+2/+38 三個欄位的語意仍未知，所以不可整片寫回"},
+			"+0/+2 已由 sub_3964E 證實是兩方勢力領袖 ID；其餘欄位仍未知，所以不可整片寫回"},
 	{"byte_6EFAA", 3787, 1416, "24 × 59", false,
 		"⭐ 勢力表：24 槽 × 59 B（internal/game/factiontable.go）。" +
 			"領袖 ID 與 24×24 外交矩陣已解，+2 與 +35..+58 未解，" +
@@ -49,16 +50,26 @@ var SaveBlocks = []SaveBlock{
 			"但空槽是乾淨的 0——要問「有幾個勢力」問這一份"},
 	{"byte_6EE98", 14332, 274, "274 × 1", false,
 		"⭐ 將領 ID → 勢力編號 的反查表（ds:0ACE7h，1-based）。" +
-			"只有九位領袖那幾格是真的，其餘 265 格是殘留"},
-	{"byte_6FF96", 14606, 40, "", false, "未解"},
-	{"byte_6FF8C", 14646, 10, "", false, "未解"},
-	{"word_70026", 14656, 20, "10 × u16", false, "未解"},
+			"只有目前領袖那幾格有 confirmed 寫回契約，其餘 265 格是殘留；" +
+			"WriteFactionOfGeneralLeaders 只碰領袖格"},
+	{"byte_6FF96", 14620, 40, "10 × u32", true,
+		"外交帳本外債：`sub_595D4`／`sub_59CBF` 以 28h bytes 整塊寫入／讀回；" +
+			"runtime 原始運算元 `[di-421Eh]`／`[di-421Ch]` 保留，slot 1..10 little-endian u32"},
+	{"byte_6FF8C", 14610, 10, "10 × u8", true,
+		"外交帳本信用度：`sub_595D4`／`sub_59CBF` 以 0Ah bytes 整塊寫入／讀回；" +
+			"runtime 原始運算元 `[di-4225h]` 保留，slot 1..10 u8"},
+	{"word_70026", 14662, 20, "10 × u16", false,
+		"⭐ 十大勢力的執行期領袖清單（`sub_5C7FE` 查詢；`sub_35005`／`sub_3512B` 更新）。" +
+			"結構與角色已證實，但內容由劇本初始化／覆滅流程產生；尚未閉合寫回時機，" +
+			"所以仍不可由通用存檔寫入器覆蓋"},
 }
 
-// SaveTrailingBytes 是十個區塊之後**沒被涵蓋**的尾巴。
+// SaveTrailingBytes 是現有命名相容值：七個未被十個 `$basg` 區塊涵蓋的
+// runtime byte。它們不是連續位於檔案末端，而是夾在區塊 7、8、9、10 之間
+// （`0x390E..0x3911`、`0x3944..0x3945`、`0x395A`）。
 //
-// 4 + 十個區塊 = 14,676，而檔案是 14,683。這 7 bytes 由別的方式讀寫，未追。
-// ⚠️ 寫回時一個 byte 都不要動。
+// 4 + 十個區塊 = 14,676，而檔案是 14,683。這 7 bytes 由原版以單 byte
+// 指令讀寫；目前仍保留，不可由通用寫入器覆蓋。
 const SaveTrailingBytes = SaveFileSize - 14676
 
 // SaveBlockByGlobal 依全域變數名取區塊。
@@ -86,7 +97,8 @@ func SaveBlockAt(offset int) (SaveBlock, bool) {
 // SaveWritable 回答某個位置能不能被寫回覆蓋。
 //
 // `CLAUDE.md` §9：**存檔寫回是「改寫」不是「重建」**，未解區域一個 byte
-// 都不動。檔頭與尾巴都算不可寫——檔頭的第 4 個 byte 仍未解。
+// 都不動。檔頭與七個未映射 runtime byte 都算不可寫——檔頭的第 4 個 byte
+// 仍未解。
 func SaveWritable(offset int) bool {
 	b, ok := SaveBlockAt(offset)
 	return ok && b.Known

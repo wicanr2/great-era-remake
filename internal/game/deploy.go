@@ -164,6 +164,14 @@ func Adjacent(a, b CellIndex) bool {
 // **每個鄰省恰好 10 格，39 省零例外**，正好對上戰鬥記錄的 10 個部隊槽。
 const DeployZoneSize = 10
 
+// DefenderDeployFlag 是原版自動守方部署使用的 NWMAP 高位旗標。
+//
+// `sub_4166E`（IDA linear `0x4166E–0x417CF`）逐格讀
+// `word[0x796 + cell*2] & 4000h`，從 0 遞增到 195；它不是 WARPOS
+// 的來源省分區，也不是「Owner == 0」的腹地判斷。其餘 NWMAP 高位旗標
+// 仍未定名，不能在這裡順手合併。
+const DefenderDeployFlag uint16 = 0x4000
+
 // DeployZone 回傳 defender 省的戰場上屬於 from 省的那些格，
 // 順序照原版的掃描方向（cell 195 → 0）。
 //
@@ -188,6 +196,31 @@ func (m *Map) DeployZone(defender, from ProvinceID) ([]CellIndex, error) {
 	}
 	if len(out) == 0 {
 		return nil, fmt.Errorf("game: 省 %d 的戰場沒有屬於省 %d 的進場區", defender, from)
+	}
+	return out, nil
+}
+
+// DefenderDeployZone 回傳原版自動守方部署的候選格，順序照
+// `sub_4166E` 的 cell 0 → 195 掃描。
+//
+// `sub_4180D+0x419A5` 在自動守方分支呼叫 `sub_4166E`；守方先就位，
+// 之後才由 `sub_41513` 放攻方。因此這裡只描述候選來源，不把玩家手動
+// `sub_42566` 的互動部署混進來。
+func (m *Map) DefenderDeployZone(province ProvinceID) ([]CellIndex, error) {
+	bf, err := m.Battlefield(province)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]CellIndex, 0, DeployZoneSize)
+	for i := 0; i < CellCount; i++ {
+		c := CellIndex(i)
+		col, row := c.ColRow()
+		if bf.Tiles[row][col].Flags&DefenderDeployFlag != 0 {
+			out = append(out, c)
+		}
+	}
+	if len(out) == 0 {
+		return nil, fmt.Errorf("game: 省 %d 沒有 NWMAP 0x4000 守方進場格", province)
 	}
 	return out, nil
 }

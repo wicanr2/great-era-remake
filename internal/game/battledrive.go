@@ -4,13 +4,10 @@ package game
 //
 // ⚠️ **這一層只做「決定」，不做「執行」。**
 //
-// 13 種行動的語意都解出來了（`docs/re/31` §41），但真正實作出來的只有
-// 少數幾種（值 3 的挑城市在 `battlecity.go`、值 2 的佈防規則在 §30）。
-// 在全部補齊之前，**不要拿決策鏈去取代 `AutoResolve`**——那會用一個
-// 「只會選、不會做」的 AI 換掉一個能把戰鬥跑完的近似版，是退步。
-//
-// 所以這一層的用途是**觀測**：讓決策鏈在真實戰鬥狀態上跑，
-// 看它每回合選什麼，跟原版的預期對照。等行動都實作完再換掉推進器。
+// 13 種行動的語意與執行 handler 都已接上（`docs/re/31` §41），
+// 但部分原版特殊模式、候選排序與 gate 的呼叫時機仍未完全閉合。
+// 因此這一層可以驅動決策鏈做可重現的 remake 行為，卻不能把測試通過
+// 宣稱成原版逐回合等價；未閉合差異由 `BattleChainGates` 與各 handler 註記保留。
 
 // BattleTurnDecision 是某一回合兩條鏈各自的決定。
 type BattleTurnDecision struct {
@@ -43,6 +40,32 @@ type BattleChainGates struct {
 	Sub53619 bool
 	// EnableLastSteps 是 `byte_6FFCA & 4`，這個**有解**（難度／階段旗標）。
 	EnableLastSteps bool
+	// EnableDefaultPostStage 是值 13 尾端的 sub_3D411 gate。原版條件是
+	// `(byte_6AA85 & 80h 且 byte_64900 >= 5) 或 byte_6B89E != 0`；前半的
+	// bit 7／回合門檻與 `arg_A` 的直接 callsite 值均已讀出。這個欄位保留給
+	// 已掌握完整外部 gate 的呼叫端作明確覆寫；打開時 AutoResolveByChain
+	// 會為該回合建立窄範圍的城市預約表。
+	EnableDefaultPostStage bool
+	// DefaultPostBit7 是原版 `byte_6AA85 & 80h` 的結果。它不是
+	// `EnableLastSteps`（`byte_6FFCA & 4`），兩者位址與用途不同。
+	DefaultPostBit7 bool
+	// DefaultPostArgA 是 sub_39B6E 的第 4 個 word 參數 `arg_A`，以原始
+	// byte 保留，不替它命名成玩家、電腦或其他模式。IDA direct callsite
+	// 已證實：sub_3562B+0x357D4 傳 1，其餘三個直接 callsite 傳 0。
+	DefaultPostArgA byte
+}
+
+// DefaultPostStageOpen 對應 sub_3D57B 尾端的原始 gate：
+//
+//	(byte_6AA85 & 80h && byte_64900 >= 5) || byte_6B89E != 0
+//
+// `explicit` 是保留給已掌握完整外部狀態的呼叫端之相容覆寫；它不會
+// 改寫 `DefaultPostArgA` 的原始值。回合編號採原版 1-based。
+func (g BattleChainGates) DefaultPostStageOpen(turn int) bool {
+	if g.EnableDefaultPostStage {
+		return true
+	}
+	return (g.DefaultPostBit7 && turn >= 5) || g.DefaultPostArgA != 0
 }
 
 // SideStrength 回傳某一方所有存活單位的攻擊力總和。

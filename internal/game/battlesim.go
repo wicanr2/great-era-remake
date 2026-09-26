@@ -34,6 +34,12 @@ type BattleSim struct {
 	From ProvinceID
 	// At 是戰場所在的省（守方的省，`byte_6FFC4`）。
 	At ProvinceID
+	// AtCommander 是戰場所在省的司令（省份記錄 `+20`，`word_64944`）。
+	//
+	// 原版值 4（`sub_3CA09`）傳 `mode=1` 給 `sub_3BCED`；除了中心兩圈的
+	// 守方候選，還會把這個司令無條件追加進候選，只要司令在場上。建立
+	// `BattleSim` 的呼叫端負責從省份表填入；0 表示尚未提供這項脈絡。
+	AtCommander GeneralID
 
 	byID map[GeneralID]*Combatant
 }
@@ -182,33 +188,24 @@ func (s *BattleSim) StrengthOf(u *Combatant) int {
 // 這也讓「任一方是兵種 4 時 F 不受損失」變得合理：
 // **遠程攻擊者不吃反擊**。
 func (s *BattleSim) Engage(attacker, target *Combatant) (lossAttacker, lossTarget int, err error) {
-	a, b := attacker, target
-	if a == nil || b == nil {
-		return 0, 0, fmt.Errorf("game: 交戰雙方不得為 nil")
+	result, err := s.EngageWithEffects(attacker, target)
+	if err != nil {
+		return 0, 0, err
 	}
-	if !Adjacent(a.Cell, b.Cell) {
-		return 0, 0, fmt.Errorf("game: 格 %d 與 %d 不相鄰，打不到", a.Cell, b.Cell)
-	}
-	ta, tb := s.tileOf(a), s.tileOf(b)
+	return result.LossAttacker, result.LossTarget, nil
+}
 
-	// 施加於對方的攻擊值。
-	atkOnB := AttackValue(s.StrengthOf(a), ta, a.Branch(), tb, b.Branch())
-	atkOnA := AttackValue(s.StrengthOf(b), tb, b.Branch(), ta, a.Branch())
-
-	// 攻擊者是 F、目標是 E（見上）。
-	if Lopsided(atkOnA, atkOnB) {
-		// 一面倒：損失由「打在自己身上的攻擊值」決定。
-		lossTarget, lossAttacker = CasualtiesRout(atkOnB, atkOnA,
-			b.Force(), a.Force(), b.Branch(), a.Branch())
-	} else {
-		// 勢均力敵：pct 用「各自打出去的攻擊值」之比。
-		// E = target、F = attacker，所以 atkByE 是目標打出去的那個。
-		lossTarget, lossAttacker = CasualtiesEven(atkOnA, atkOnB,
-			b.Force(), a.Force(), b.Branch(), a.Branch())
+// battleLosses 將已算出的「F 打 E」與「E 打 F」攻擊值送進原版兩條
+// 戰損分支。回傳順序是 (F 損失, E 損失)，與 Engage 的公開契約一致。
+func battleLosses(attacker, target *Combatant, atkOnTarget, atkOnAttacker int) (lossAttacker, lossTarget int) {
+	if Lopsided(atkOnAttacker, atkOnTarget) {
+		lossTarget, lossAttacker = CasualtiesRout(atkOnTarget, atkOnAttacker,
+			target.Force(), attacker.Force(), target.Branch(), attacker.Branch())
+		return lossAttacker, lossTarget
 	}
-	a.applyLoss(lossAttacker)
-	b.applyLoss(lossTarget)
-	return lossAttacker, lossTarget, nil
+	lossTarget, lossAttacker = CasualtiesEven(atkOnAttacker, atkOnTarget,
+		target.Force(), attacker.Force(), target.Branch(), attacker.Branch())
+	return lossAttacker, lossTarget
 }
 
 func (s *BattleSim) tileOf(u *Combatant) assets.Tile {
@@ -218,6 +215,84 @@ func (s *BattleSim) tileOf(u *Combatant) assets.Tile {
 
 // Force 是這個單位當下的兵力（執行期記錄的 `+17`）。
 func (u *Combatant) Force() uint16 { return u.Strength.Force }
+
+// SyncForcesToGenerals 把戰場副本裡已確認的兵力（執行期 +17）同步回
+// 將領記錄的 Force 欄位。
+//
+// 這是「戰損結果回到 remake 世界狀態」的窄入口：只寫已證實的兵力欄位，
+// 不把戰場格、命令、補給或 `.DT2` 的未知區域順手當成已解。呼叫端傳入的
+// slice 會原地更新，後續以 `General.Bytes`／`WriteSave` 寫回時仍會保留
+// 每筆 Raw 的未解 bytes。
+//
+// GeneralID 是完整 MAN 槽位的 1-based 編號；無法對應或同一槽位重複出現在
+// 兩方時回錯，避免把錯誤資料靜默寫進存檔。
+func (s *BattleSim) SyncForcesToGenerals(generals []General) (int, error) {
+	if s == nil {
+		return 0, fmt.Errorf("game: nil 戰鬥不能同步兵力")
+	}
+	seen := make(map[GeneralID]struct{}, len(s.Attacker)+len(s.Defender))
+	updated := 0
+	for _, u := range s.all() {
+		if u == nil || u.General == 0 {
+			continue
+		}
+		if _, ok := seen[u.General]; ok {
+			return updated, fmt.Errorf("game: 將領 %d 同時出現在戰鬥兩方", u.General)
+		}
+		seen[u.General] = struct{}{}
+		i := int(u.General) - 1
+		if i < 0 || i >= len(generals) {
+			return updated, fmt.Errorf("game: 戰鬥將領 %d 超出 %d 個將領槽位", u.General, len(generals))
+		}
+		force := u.Force()
+		if generals[i].Force == force {
+			continue
+		}
+		generals[i].Force = force
+		updated++
+	}
+	return updated, nil
+}
+
+// SyncBattleStatsToGenerals 把戰場副本中已閉合的將領欄位同步回策略層。
+//
+// 除了 Force 之外，協同／衝鋒／遠程 handler 已證實會改動經驗、體力與士氣；
+// 這支只覆寫對應的已解欄位，Raw 及 `.DT2` 其他 bytes 仍交給既有 writer 保留。
+func (s *BattleSim) SyncBattleStatsToGenerals(generals []General) (int, error) {
+	if s == nil {
+		return 0, fmt.Errorf("game: nil 戰鬥不能同步戰鬥欄位")
+	}
+	seen := make(map[GeneralID]struct{}, len(s.Attacker)+len(s.Defender))
+	updated := 0
+	for _, u := range s.all() {
+		if u == nil || u.General == 0 {
+			continue
+		}
+		if _, ok := seen[u.General]; ok {
+			return updated, fmt.Errorf("game: 將領 %d 同時出現在戰鬥兩方", u.General)
+		}
+		seen[u.General] = struct{}{}
+		i := int(u.General) - 1
+		if i < 0 || i >= len(generals) {
+			return updated, fmt.Errorf("game: 戰鬥將領 %d 超出 %d 個將領槽位", u.General, len(generals))
+		}
+		g := &generals[i]
+		before := *g
+		g.Force = u.Strength.Force
+		// 舊呼叫端／測試 fixture 可能只建立 Force。只有規則層已
+		// 完整帶入自身 General ID 時，才把其餘戰鬥欄位視為可同步，
+		// 避免 Go 零值覆蓋存檔裡的已解資料。
+		if u.Strength.General == u.General && u.General != 0 {
+			g.AbilityA = u.Strength.Ability
+			g.F19, g.F20, g.Stamina, g.F30 = u.Strength.F19, u.Strength.F20, u.Strength.F29, u.Strength.F30
+			g.Experience = u.Experience
+		}
+		if *g != before {
+			updated++
+		}
+	}
+	return updated, nil
+}
 
 // Branch 是兵種（`+21`）。
 func (u *Combatant) Branch() uint8 { return u.Strength.Branch }

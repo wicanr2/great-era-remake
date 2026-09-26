@@ -56,6 +56,10 @@ type CombatUnit struct {
 	// `sub_15018` 會檢查它的 bit 0。
 	Active bool
 
+	// Deployed 對應執行期記錄 +16 的 bit 2。策略存檔能保留「已部署」
+	// 狀態，即使尚未建立具體的戰場 Cell；戰鬥呈現仍以 Cell 為幾何來源。
+	Deployed bool
+
 	// Cell 是所在的戰場格，對應 +5。NoCell（0xFF）表示不在場上。
 	Cell CellIndex
 
@@ -74,6 +78,11 @@ type CombatUnit struct {
 	//
 	// `sub_55CEC` 判敵我就是比這個欄位——不同勢力領袖就是敵人。
 	Faction GeneralID
+
+	// Experience 對應將領記錄的 +3。戰鬥 helper `sub_5A3B2` 會累加
+	// 經驗，達 100 時提升 +0（Ability），再把經驗歸零；把它帶進戰場
+	// 副本，才能在戰鬥後沿同一條 writer 同步回 `General`。
+	Experience uint8
 
 	// Province 對應 `+4`：這個將領所屬的省，**與 `MAN(N).DAT` 的 `+4`
 	// 是同一個欄位**（`docs/spec/02`）。執行期記錄不是另起爐灶的佈局，
@@ -112,7 +121,7 @@ type CombatUnit struct {
 	// 常數與語意見 `battleforce.go` 的 `BattleCmd*`（`docs/re/31` §15）。
 	Command uint8
 
-	// NextCell 對應 `+12`：**朝目標走的下一格**。`NoCell`（0xFF）表示沒有。
+	// NextCell 對應 `+12`：原版 AI 指派的目標格／下一跳候選。`NoCell`（0xFF）表示沒有。
 	//
 	// ⚠️ **Go 的零值是 0，而 0 是合法的格編號**（左上角那一格）。
 	// 原版用 0xFF 當哨兵，直接用零值會讓「還沒指派」被讀成「要走到格 0」。
@@ -122,6 +131,9 @@ type CombatUnit struct {
 	// `sub_47EAA` 設命令 1 時一併寫它（值來自 `sub_47B6D`）；
 	// `sub_3DED9` 發現命令 3 卻沒有它就把命令降回 2；
 	// `sub_3B492` 拿它比對城市格來剔除「已經有人去了」的城市。
+	// ⚠️ 新的 IDA stack 參數證據顯示 `sub_567B9` 建的是**目標格**六鄰候選，
+	// 不足以單獨證明每次回傳都與目前格相鄰；remake 的 `StepByOrder` 仍只執行
+	// 已確認可相鄰的路徑，完整 `+12` 消費端尚待正常玩家 oracle。
 	NextCell CellIndex
 
 	// TargetUnit 對應 `+10`：**目標單位的 ID**。0 表示沒有目標單位

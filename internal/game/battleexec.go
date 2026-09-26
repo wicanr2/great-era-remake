@@ -7,9 +7,9 @@ import "github.com/wicanr2/great-era-remake/internal/assets"
 // 決策層在 `battleai.go`（選什麼）、接線在 `battledrive.go`（在真實狀態上跑），
 // 這一層是「選完之後做什麼」。
 //
-// ⚠️ **13 種行動只實作了一部分**，見 `ExecuteAction` 的回傳值。
-// 沒實作的不會靜默跳過，會明確回報——`AutoResolve` 那套推進行為
-// 在全部補齊之前仍然是主力（`battledrive.go` 的說明）。
+// 13 種已知行動都有執行處理；未知的行動編號不會靜默跳過，會由
+// `ExecuteAction` 回報 `Implemented=false`。各行動仍保留原版未閉合的
+// 特殊模式／呼叫時機註記，不能把「有 handler」誤讀成逐指令完全等價。
 
 // CityCells 掃出戰場上所有的城市格（`sub_55FBE`，`docs/re/31` §5）。
 //
@@ -379,13 +379,45 @@ func (s *BattleSim) execDefault(units []*Combatant,
 		case BattleCmdStandby, BattleCmdSeekTarget: // 命令 2 / 3
 			u.Command = BattleCmdStandby // 統一壓成 2
 			u.NextCell = NoCell
+			// `sub_3D57B` 先取 `sub_560D7(2, currentCell)` 的第一個
+			// 兩格內城市，再檢查佔用者與相鄰條件。候選城市無效時，
+			// 原版直接結束這個單位；只有尋路回 0xFF 才呼叫
+			// `sub_3D261`（§62），不能把後備套到所有失敗情形。
+			city := NoCell
+			for _, c := range cities {
+				if WithinTwoSteps(c, u.Cell) {
+					city = c
+					break
+				}
+			}
+			if city == NoCell {
+				n++
+				continue
+			}
+			id := s.Occ[city]
+			v := s.Unit(id)
+			if id == 0 || v == nil || v.Attacking || Adjacent(city, u.Cell) {
+				n++
+				continue
+			}
+			next := NoCell
+			if route != nil {
+				next = route(city, u.Cell)
+			}
+			if next == NoCell {
+				s.assignCityFallback(u, cities, route)
+				n++
+				continue
+			}
+			u.TargetUnit = id
+			u.NextCell = next
+			u.Flags13 |= UnitAssignedBit
 			n++
 		case BattleCmdCommitted: // 命令 4
 			u.NextCell = u.Cell
 			n++
 		}
 	}
-	_ = route // 命令 2/3 那條原版還會用 sub_560D7 找格，該支未讀
 	return BattleExecResult{Assigned: n, Implemented: true,
 		Note: "預設分流：依現有命令處理"}
 }
@@ -463,14 +495,22 @@ func (s *BattleSim) execStrikeForce(units, foes []*Combatant,
 	for i := 0; i < CellCount; i++ {
 		c := CellIndex(i)
 		v := s.Occ[c]
-		if v == 0 || !foeSet[v] || !WithinTwoSteps(c, center.Cell) {
+		// `sub_55632` 的 mode 0 清單不含中心格（36 格是三圈候選扣掉
+		// 中心）；中心上的代表單位不是「主力周邊」的候選。原本直接
+		// 用 WithinTwoSteps 會因為同格回圈成立，把中心誤列進來。
+		if v == 0 || c == center.Cell || !foeSet[v] || !WithinTwoSteps(c, center.Cell) {
 			continue
 		}
 		pool = append(pool, v)
 	}
-	// ⚠️ **`sub_3BCED` 的 `mode == 1` 還沒接**：那個模式會把「當前交戰省的司令」
-	// 無條件加進候選（只要他在場上，不管離中心多遠，§57）。
-	// 哪些呼叫端用 mode 1 尚未查——§23／§24 兩支確定是 mode 0。
+	// 值 4 的呼叫端（`sub_3CA09`）傳 mode 1：司令不受兩圈距離限制，
+	// 只要仍在場上就追加。原版追加發生在兩圈掃描之後，因此即使司令
+	// 同時落在兩圈內，也保留一次額外的候選槽位；這裡照該順序保留。
+	if s.AtCommander != 0 && foeSet[s.AtCommander] {
+		if commander := s.Unit(s.AtCommander); commander != nil && commander.Cell.Valid() {
+			pool = append(pool, s.AtCommander)
+		}
+	}
 	if len(pool) == 0 {
 		return BattleExecResult{Implemented: true, Note: "主力周邊沒有單位"}
 	}

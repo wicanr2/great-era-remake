@@ -5,8 +5,9 @@ import "fmt"
 // 把政略層與戰鬥層接起來：電腦決定攻打之後，真的打一場。
 //
 // 原版的流程是政略階段選「攻打」→ 進戰鬥模組（`docs/re/06` 的三個 gate）
-// → 打完回到政略。這裡做同一件事，差別是戰場上的行動決策用
-// `AutoResolve` 的簡化策略（見那份檔案的警告）。
+// → 打完回到政略。這裡沿用 `AutoResolveByChain` 的 13 行動決策鏈，
+// 讓策略層與玩家戰鬥共用同一條 AI／效果／結算垂直鏈；未知 gate 仍以
+// `BattleChainGates` 的明確輸入表示，不把測試 fixture 的零值冒充原版狀態。
 
 // ResolveAttack 讓 from 省的部隊打 at 省，跑完整場戰鬥並把結果寫回世界。
 //
@@ -72,7 +73,24 @@ func (w *AIWorld) ResolveAttack(from, at ProvinceID) (BattleOutcome, error) {
 	if err != nil {
 		return BattleOutcome{}, err
 	}
-	out := sim.AutoResolve(AutoBattleTurnCap)
+	sim.AtCommander = dst.Commander
+	attackerSupply := BattleSupply{
+		Gold: int(src.Gold), Food: int(src.Food), Ammo: int(src.Ammo), Fuel: int(src.Fuel),
+		Troops: TroopTotal(atk),
+	}
+	defenderSupply := BattleSupply{
+		Gold: int(dst.Gold), Food: int(dst.Food), Ammo: int(dst.Ammo), Fuel: int(dst.Fuel),
+		Troops: TroopTotal(def),
+	}
+	gates := BattleChainGates{
+		Sub53619:        !HasBattleSupport(w.Table, at, dst.Commander, w.Units),
+		RatioSelf:       defenderSupply.RatioGate(1),
+		RatioFoe:        attackerSupply.RatioGate(1),
+		Deploy:          attackerSupply.Ammo == 0,
+		EnableLastSteps: w.EnableExtra,
+	}
+	stats := sim.AutoResolveByChain(AutoBattleTurnCap, gates, dst.Commander)
+	out := stats.BattleOutcome
 
 	// 兵力寫回世界。
 	w.writeBack(atk, atkIdx)
@@ -132,6 +150,20 @@ func (w *AIWorld) combatants(p ProvinceID, faction GeneralID) ([]*Combatant, []i
 // `CLAUDE.md` §9：不准為了讓行為看起來合理而編規則。
 func (w *AIWorld) writeBack(us []*Combatant, idx []int) {
 	for k, u := range us {
-		w.Strengths[idx[k]].Force = u.Strength.Force
+		if u == nil || k >= len(idx) || idx[k] < 0 || idx[k] >= len(w.Strengths) {
+			continue
+		}
+		i := idx[k]
+		w.Strengths[i].Force = u.Strength.Force
+		if u.Strength.General == u.General && u.General != 0 {
+			w.Strengths[i].Ability = u.Strength.Ability
+			w.Strengths[i].F19 = u.Strength.F19
+			w.Strengths[i].F20 = u.Strength.F20
+			w.Strengths[i].F29 = u.Strength.F29
+			w.Strengths[i].F30 = u.Strength.F30
+			if i < len(w.Units) {
+				w.Units[i].Experience = u.Experience
+			}
+		}
 	}
 }

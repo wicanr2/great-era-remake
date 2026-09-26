@@ -36,17 +36,22 @@ const (
 //
 //	sub  [di-4225h], dl      ; di = 索引，dl = 額度 ÷ 500
 //
-// `-4225h` 當 16-bit 是 `0xBDDB`。索引來自 `ss:[di-6]`——
-// ⚠️ **那個索引是什麼還沒解**（形狀像列強編號 0–3，但沒有證據）。
-//
-// 記著這個位址是為了以後動態驗證：`docs/playtest/13` 的實機流程
-// 可以開貸款畫面看「目前信用度」的顯示值，與這張表對照。
+// `-4225h` 當 16-bit 是 `0xBDDB`；`sub_215F0` 已確認它使用
+// `word_70026` 反查出的 1..10 勢力索引，index 0 只在 remake 保留為哨兵。
+// 目前仍未知的是這張 runtime 表如何與存檔同步，以及畫面「目前信用度」
+// 是否另經 `ds:ACE7h` 的司令／分期表轉譯；不要把後者當成帳本本身。
 const CreditTableAddr = 0xBDDB
 
 // LoanResult 記錄一次貸款申請的結果。
 type LoanResult struct {
 	// Approved 是核准與否。
 	Approved bool
+	// CreditBlocked 對應 `sub_2164A` 開頭信用度表為 0 的早期分支。
+	// 這個分支不擲貸款亂數、不改省份或帳本，與擲骰後的「各國均拒絕」不同。
+	CreditBlocked bool
+	// CommandCompleted 對應 `byte_6FE81`：額度送出後即立旗標，隨機拒絕
+	// 仍會由主迴圈扣一個指令；信用度零的早期 gate 不立旗標。
+	CommandCompleted bool
 	// Roll 是擲出的亂數，Units 是 `額度 ÷ 500`。
 	Roll  int
 	Units int
@@ -60,6 +65,8 @@ type LoanResult struct {
 //
 // 判定與效果照 `sub_2164A`：
 //
+// 信用度 == 0 → 無法貸款，什麼都不做（不消耗 Random）
+//
 //	units = amount ÷ 500
 //	roll  = Random(10)
 //	若 roll + units > 12 → 拒絕，什麼都不做
@@ -67,16 +74,18 @@ type LoanResult struct {
 //
 // `credit` 是當前的信用度，回傳扣完的值。
 //
-// ⚠️ **原版還有兩段這裡沒實作的邏輯**：
+// ⚠️ **原版還有一段不屬於這個純公式入口的顯示邏輯**：
 //
 //   - 開頭用司令 ID 查一張 byte 表（`ds:ACE7h` 起），值等於 10 時
 //     把 `var_6` 設成 99／100；分期不是 1 時設 99。
 //     `var_6` **在核貸判定裡沒有被讀**，看起來是拿去顯示的
 //     （可能就是畫面上的「目前信用度」），但沒追到用它的地方。
-//   - 信用度本身會不會擋住貸款——畫面有「無法貸款」的訊息，
-//     但那條分支的條件還沒對上。
+//   - 核准後的 32-bit 外債累加由 `DiplomacyLedger.RequestLoan` 接上，
+//     不在這個傳入信用度的純函式中隱藏改動。
 //
-// 這兩段沒解之前，**本函式只實作核貸判定與入帳**。
+// `sub_2164A` 的信用度為 0 gate 已由 IDA 線性位址 2164A 的
+// `cmp byte ptr [di-4225h], 0`／`loc_21718` 閉合；這個函式現在保留該
+// fail-closed 分支，再進入核貸判定與入帳。
 func (w *AIWorld) RequestLoan(p ProvinceID, amount int, credit uint8, rng *Rand) (LoanResult, uint8, error) {
 	prov, err := w.Table.At(p)
 	if err != nil {
@@ -87,6 +96,13 @@ func (w *AIWorld) RequestLoan(p ProvinceID, amount int, credit uint8, rng *Rand)
 	}
 
 	res := LoanResult{Units: amount / LoanUnit}
+	if credit == 0 {
+		res.CreditBlocked = true
+		return res, credit, nil
+	}
+	// `sub_2164A` 在輸入額度完成後、Random 前立 byte_6FE81；
+	// 不論稍後核准或隨機拒絕，主迴圈都會把這次指令算作完成。
+	res.CommandCompleted = true
 	res.Roll = rng.Int(LoanRollRange)
 	if res.Roll+res.Units > LoanRejectAbove {
 		return res, credit, nil // 各國均拒絕提供貸款

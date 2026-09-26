@@ -24,6 +24,122 @@ func TestBattleStateRoundTrip(t *testing.T) {
 	}
 }
 
+func TestWriteBattleStatesRoundTrip(t *testing.T) {
+	for _, name := range []string{"MEM_WAR.DAT", "SAVE(1).DT2", "SAVE(2).DT2"} {
+		orig := readGame(t, name)
+		states, err := ParseBattleStates(orig)
+		if err != nil {
+			t.Fatalf("%s: 解析失敗：%v", name, err)
+		}
+		out, err := WriteBattleStates(orig, states)
+		if err != nil {
+			t.Fatalf("%s: 寫回失敗：%v", name, err)
+		}
+		if len(out) != len(orig) {
+			t.Fatalf("%s: 長度改變 %d → %d", name, len(orig), len(out))
+		}
+		if d := DiffBytes(orig, out, 8); len(d) != 0 {
+			t.Fatalf("%s: 不改欄位卻有差異：%v", name, d)
+		}
+	}
+}
+
+func TestWriteBattleStatesTouchesOnlyParsedUnit(t *testing.T) {
+	orig := readGame(t, "SAVE(1).DT2")
+	states, err := ParseBattleStates(orig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	const province = 17 // 陝西省，1-based 省號 18 的記錄 index
+	const unit = 7
+	states[province].UnitsA[unit] = 0xBEEF
+	out, err := WriteBattleStates(orig, states)
+	if err != nil {
+		t.Fatal(err)
+	}
+	base := province*BattleStateSize + bsOffDetailA + unit*2
+	d := DiffBytes(orig, out, 8)
+	if len(d) != 2 || d[0] != base || d[1] != base+1 {
+		t.Fatalf("改單一已解析 u16 應只動 %d、%d，實際：%v", base, base+1, d)
+	}
+	back, err := ParseBattleStates(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := back[province].UnitsA[unit]; got != 0xBEEF {
+		t.Fatalf("寫回後單位值為 %#x，預期 %#x", got, uint16(0xBEEF))
+	}
+}
+
+func TestWriteBattleStatesRejectsWrongLength(t *testing.T) {
+	var states [ProvinceCount]BattleState
+	if _, err := WriteBattleStates(make([]byte, ProvinceCount*BattleStateSize-1), states); err == nil {
+		t.Fatal("少一個 byte 的戰鬥狀態檔應拒絕寫回")
+	}
+	if _, err := WriteBattleStates(make([]byte, ProvinceCount*BattleStateSize+1), states); err == nil {
+		t.Fatal("多一個 byte 的戰鬥狀態檔應拒絕寫回")
+	}
+}
+
+func TestApplyRemakeSnapshotPreservesUnknownBytes(t *testing.T) {
+	var b BattleState
+	for i := range b.Raw {
+		b.Raw[i] = byte((i*37 + 11) & 0xff)
+	}
+	// SlotsA/B 的 20 bytes 元素語意仍然未知；把它們設成非零哨兵，確認寫回不猜。
+	copy(b.SlotsA[:], b.Raw[bsOffSlotsA:bsOffSlotsA+BattleSlots])
+	copy(b.SlotsB[:], b.Raw[bsOffSlotsB:bsOffSlotsB+BattleSlots])
+	before := b.Raw
+	if err := b.ApplyRemakeSnapshot(19, BattleResources{Gold: 10, Food: 20, Ammo: 30, Fuel: 40},
+		[]GeneralID{7, 9}, []GeneralID{12}); err != nil {
+		t.Fatal(err)
+	}
+	out := b.Bytes()
+	for i := range out {
+		if (i >= bsOffHeader && i < bsOffHeader+8) ||
+			(i >= bsOffRosterA && i < bsOffRosterA+BattleSlots*2) ||
+			(i >= bsOffRosterB && i < bsOffRosterB+BattleSlots*2) ||
+			(i >= bsOffDetailA && i < bsOffDetailA+BattleUnitArea) ||
+			(i >= bsOffDetailB && i < bsOffDetailB+BattleUnitArea) || i == bsOffTrailing {
+			continue
+		}
+		if out[i] != before[i] {
+			t.Fatalf("未知 byte %#x 被改寫：%#x -> %#x", i, before[i], out[i])
+		}
+	}
+	got, err := ParseBattleState(out[:])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Header != [4]uint16{10, 20, 30, 40} || got.RosterA[0] != 7 || got.RosterA[1] != 9 ||
+		got.RosterB[0] != 12 || got.UnitsA[0] != 7 || got.UnitsA[1] != 9 ||
+		got.UnitsB[0] != 12 || got.Trailing != 19 {
+		t.Fatalf("remake snapshot 欄位錯誤：%+v", got)
+	}
+}
+
+func TestApplyRemakeSnapshotRejectsInvalidInput(t *testing.T) {
+	cases := []struct {
+		name string
+		from ProvinceID
+		atk  []GeneralID
+		def  []GeneralID
+	}{
+		{name: "bad province", from: 0},
+		{name: "zero attacker", from: 1, atk: []GeneralID{0}},
+		{name: "duplicate defender", from: 1, def: []GeneralID{3, 3}},
+		{name: "too many", from: 1, atk: []GeneralID{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			var b BattleState
+			if err := b.ApplyRemakeSnapshot(tc.from, BattleResources{}, tc.atk, tc.def); err == nil {
+				t.Fatal("預期非法輸入被拒絕")
+			}
+		})
+	}
+}
+
 // TestMemWarResidue 記錄 MEM_WAR.DAT 裡的未初始化殘料。
 //
 // 31 個省的兩個 200 B 單位區是乾淨的 0，**但有 8 個省不是**。
@@ -97,6 +213,37 @@ func TestBattleSlotsUseEmptyMarker(t *testing.T) {
 	if maxV != 190 {
 		t.Errorf("非 0xFF 槽的最大值應為 190，實得 %d", maxV)
 	}
+}
+
+// TestUnitIDProjectionPreservesOrderAndOnlyDropsZero 驗證 +68/+268 的已證實
+// runtime 將領清單投影：0 是空槽，非零值保留原始順序，不在 parser 層做值域
+// 清洗。這點很重要，因為初始 MEM_WAR.DAT 有未初始化殘料。
+func TestUnitIDProjectionPreservesOrderAndOnlyDropsZero(t *testing.T) {
+	var b BattleState
+	b.UnitsA[0] = 58
+	b.UnitsA[2] = 0xBEEF // 故意超出第一期將領數，投影仍不得擅自丟掉
+	b.UnitsA[5] = 166
+	b.UnitsB[1] = 127
+	b.UnitsB[4] = 162
+
+	if got, want := b.AttackerUnitIDs(), []GeneralID{58, 0xBEEF, 166}; !equalGeneralIDs(got, want) {
+		t.Fatalf("攻方 unit ID 清單 = %v，預期 %v", got, want)
+	}
+	if got, want := b.DefenderUnitIDs(), []GeneralID{127, 162}; !equalGeneralIDs(got, want) {
+		t.Fatalf("守方 unit ID 清單 = %v，預期 %v", got, want)
+	}
+}
+
+func equalGeneralIDs(a, b []GeneralID) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // TestRosterIsAttackerDefender 驗證 +28/+48 是攻守雙方的參戰單位。

@@ -75,6 +75,39 @@ func TestDeployZoneIsAlwaysTenCells(t *testing.T) {
 	t.Logf("檢查 %d 組（省, 鄰省）進場區", checked)
 }
 
+// `sub_4166E` 的守方自動部署不看 WARPOS 腹地，而是掃 NWMAP 的 0x4000。
+// 這裡逐省驗證候選來源與 0 → 195 的原版順序，避免日後又退回 Owner==0 的猜法。
+func TestDefenderDeployZoneUsesNWMAP4000(t *testing.T) {
+	m := loadTestMap(t)
+	checked := 0
+	for p := ProvinceID(1); p <= ProvinceCount; p++ {
+		zone, err := m.DefenderDeployZone(p)
+		if err != nil {
+			t.Fatalf("省 %d: %v", p, err)
+		}
+		if len(zone) == 0 {
+			t.Fatalf("省 %d 沒有守方候選", p)
+		}
+		for i, c := range zone {
+			if i > 0 && c <= zone[i-1] {
+				t.Fatalf("省 %d 守方候選未按 0→195：%v", p, zone)
+			}
+			col, row := c.ColRow()
+			bf, err := m.Battlefield(p)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if bf.Tiles[row][col].Flags&DefenderDeployFlag == 0 {
+				t.Fatalf("省 %d 格 %d 沒有 0x4000 旗標", p, c)
+			}
+		}
+		checked++
+	}
+	if checked != ProvinceCount {
+		t.Fatalf("只驗到 %d 個省", checked)
+	}
+}
+
 // 掃描方向是 195 → 0。方向錯了部署落點就錯，所以要驗第一格。
 func TestDeployScanOrderMatchesOriginal(t *testing.T) {
 	m := loadTestMap(t)

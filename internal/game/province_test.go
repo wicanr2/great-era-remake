@@ -404,21 +404,37 @@ func TestReinforcementSources(t *testing.T) {
 	}
 	t.Logf("湖北的增援來源 = %v（司令 %d）", got, hubei.Commander)
 
-	// 無主的省不該有任何增援來源——原版遇到司令 0 就停止掃描。
-	for id := ProvinceID(1); id <= ProvinceCount; id++ {
-		p, err := tbl.At(id)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if p.Commander != 0 {
-			continue
-		}
-		src, err := tbl.ReinforcementSources(id, 0, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if len(src) != 0 {
-			t.Errorf("無主省 %d 竟有增援來源 %v", id, src)
+}
+
+// sub_534FF 的實際分支：鄰省司令為 0 時跳過勢力比對，繼續通過旗標與
+// 可用將領數門檻；只有非零且不同勢力才被排除。原本文件／實作曾誤寫成
+// 遇無主省就 break，這個最小表格固定 IDA 的控制流，並同時守住第 8 格也會掃描。
+func TestReinforcementSourcesKeepsScanningPastUnownedNeighbour(t *testing.T) {
+	var tbl ProvinceTable
+	tbl.Province[0].Commander = 10
+	for i, id := range []ProvinceID{2, 3, 4, 5, 6, 7, 8, 9} {
+		tbl.Province[0].Raw[provOffNeighbour+i] = byte(id)
+	}
+	// 第一個鄰省無主；第二個同勢力；第三個異勢力；第八個同勢力且應被收下。
+	tbl.Province[2-1].Commander = 0
+	tbl.Province[3-1].Commander = 10
+	tbl.Province[4-1].Commander = 11
+	for id := ProvinceID(5); id <= 8; id++ {
+		tbl.Province[id-1].Commander = 11
+	}
+	tbl.Province[9-1].Commander = 10
+
+	got, err := tbl.ReinforcementSources(1, 10, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []ProvinceID{2, 3, 9}
+	if len(got) != len(want) {
+		t.Fatalf("無主省後仍應繼續掃描且第 8 格也要納入：得到 %v，想要 %v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("來源順序／門檻錯：得到 %v，想要 %v", got, want)
 		}
 	}
 }

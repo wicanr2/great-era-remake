@@ -52,8 +52,10 @@ func (p *Province) MergeResourcesAfterBattle(a, b BattleResources) {
 // BattleResources 是一方在戰鬥中帶著的資源。
 //
 // 對應 `.DT2` 記錄開頭的四個 u16（`docs/re/05` §2）——載入後被搬到
-// `word_64932`／`word_64936`／`word_6493A`／`word_6493E`，
-// 而每個變數後面緊接著另一方的同名欄位（所以目標位址間隔是 4 不是 2）。
+// `word_64932`／`word_64936`／`word_6493A`／`word_6493E`，代表記錄中的
+// 第一方資源快照。另一方的 `word_64934`／`word_64938`／`word_6493C`／
+// `word_64940` 是相鄰的執行期欄位；目前證據顯示它們在 DT2 寫回分支直接
+// 更新省份記錄，而不是再佔用這 469 bytes 的開頭。
 type BattleResources struct {
 	Gold, Food, Ammo, Fuel uint16
 }

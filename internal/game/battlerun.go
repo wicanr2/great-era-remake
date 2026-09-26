@@ -22,11 +22,10 @@ type BattleRunStats struct {
 	BattleOutcome
 	// Decisions 是每回合兩條鏈各選了什麼。
 	Decisions []BattleTurnDecision
-	// Unimplemented 記錄「決策鏈選了但執行層還沒實作」的次數。
+	// Unimplemented 記錄執行層遇到未知行動編號的次數。
 	//
-	// ⭐ **這個數字是驗收指標**：它大於 0 就表示這場戰鬥裡，
-	// 電腦有幾回合其實什麼都沒做。不看它就會把「AI 很被動」
-	// 誤讀成原版行為，而不是實作缺口。
+	// 已知 13 種行動都有 handler；若這個數字大於 0，表示決策資料
+	// 落在未知值域，不能把該場結果拿來做原版行為對照。
 	Unimplemented int
 	// Moves / Engagements 是實際移動與交戰的次數。
 	Moves, Engagements int
@@ -95,7 +94,7 @@ func (s *BattleSim) EngageIfAdjacent(u *Combatant) bool {
 	if !Adjacent(u.Cell, t.Cell) {
 		return false
 	}
-	if _, _, err := s.Engage(u, t); err != nil {
+	if _, err := s.ResolveBattleAttack(u, t); err != nil {
 		return false
 	}
 	return true
@@ -111,38 +110,16 @@ func (s *BattleSim) EngageIfAdjacent(u *Combatant) bool {
 //	gates           那三個還沒解出來源的判斷（`BattleChainGates`）
 //	defenderLeader  當前交戰省的司令（§44 的 `sub_56D49` 要用）
 //
-// ⚠️ 回傳的 `Unimplemented` 大於 0 時，**這場戰鬥的結果不能拿來對照原版**
-// ——有回合是因為執行層缺口而空轉的。
+// ⚠️ 回傳的 `Unimplemented` 大於 0 時，**這場戰鬥的結果不能拿來對照原版**；
+// 這代表決策資料出現未知行動，而不是已知 handler 尚未接線。
 func (s *BattleSim) AutoResolveByChain(maxTurns int, gates BattleChainGates,
 	defenderLeader GeneralID) BattleRunStats {
 	if maxTurns <= 0 {
 		maxTurns = AutoBattleTurnCap
 	}
-	// 尋路：沿用戰場的移動成本，回下一跳。
+	// 尋路：使用已確認的 AI 矩陣權重，回下一跳。
 	route := func(to, from CellIndex) CellIndex {
-		if !to.Valid() || !from.Valid() {
-			return NoCell
-		}
-		if Adjacent(from, to) {
-			return to
-		}
-		// 貪心一步：往「離目標最近而且走得上去」的鄰格。
-		// ⚠️ 原版的 `sub_567B9` 是真正的尋路（331 行，§10），
-		// 這裡是近似——**標為 remake 差異**，補完之前不要拿來做行為驗收。
-		best, bestD := NoCell, 1<<30
-		for _, n := range from.Neighbours() {
-			if s.Occ[n] != 0 {
-				continue
-			}
-			col, row := n.ColRow()
-			if s.Field.Tiles[row][col].MoveCost() >= 255 {
-				continue
-			}
-			if d := CellManhattan(n, to); d < bestD {
-				best, bestD = n, d
-			}
-		}
-		return best
+		return s.RouteNextCell(to, from)
 	}
 
 	before := func(us []*Combatant) int {
@@ -166,6 +143,16 @@ func (s *BattleSim) AutoResolveByChain(maxTurns int, gates BattleChainGates,
 		// ⚠️ 那個對應仍未驗（§2 的 `byte_64901`），見 `DecideTurn` 的說明。
 		rb := s.ExecuteAction(d.B.Action, s.Attacker, s.Defender, route)
 		ra := s.ExecuteAction(d.A.Action, s.Defender, s.Attacker, route)
+		if gates.DefaultPostStageOpen(turn) && d.A.Action == ActADefault {
+			// 原版 sub_3D411 讀的是呼叫鏈共用的 byte[65BAh + 格]。
+			// 其清除／前置寫入時機仍未解，故只有明確啟用時才用一張
+			// 回合內空表，不把它當成預約表生命週期的原版等價行為。
+			post := s.execDefaultPost(s.Defender, CityCells(s.Field), route,
+				make([]bool, CellCount))
+			if !post.Implemented {
+				st.Unimplemented++
+			}
+		}
 		if !rb.Implemented {
 			st.Unimplemented++
 		}

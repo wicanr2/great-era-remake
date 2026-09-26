@@ -41,6 +41,9 @@ func TestLoanSmallAlwaysApproved(t *testing.T) {
 			t.Fatalf("種子 %d：借 1500 被拒（骰 %d + units %d）",
 				seed, res.Roll, res.Units)
 		}
+		if !res.CommandCompleted {
+			t.Fatalf("種子 %d：核准貸款應標記指令已完成", seed)
+		}
 		if prov.Gold != 1500 {
 			t.Errorf("種子 %d：黃金 %d，預期 1500", seed, prov.Gold)
 		}
@@ -67,6 +70,9 @@ func TestLoanLargeAlwaysRejected(t *testing.T) {
 		}
 		if res.Approved {
 			t.Fatalf("種子 %d：借 10000 竟然過了", seed)
+		}
+		if !res.CommandCompleted {
+			t.Fatalf("種子 %d：隨機拒絕仍應標記指令已完成", seed)
 		}
 		if prov.Gold != 100 || credit != 50 {
 			t.Errorf("種子 %d：被拒卻動到黃金(%d)或信用度(%d)",
@@ -111,6 +117,28 @@ func TestLoanCreditFloor(t *testing.T) {
 	}
 	if credit != 0 {
 		t.Errorf("信用度 2 扣 3 之後是 %d，應該夾到 0", credit)
+	}
+}
+
+func TestLoanCreditZeroBlocksBeforeRandomAndMutation(t *testing.T) {
+	w := realWorld(t)
+	prov, _ := w.Table.At(1)
+	prov.Gold = 123
+	rng := NewRand(4242)
+	seed := rng.Seed()
+
+	res, credit, err := w.RequestLoan(1, 1500, 0, rng)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !res.CreditBlocked || res.Approved || res.CommandCompleted || res.Roll != 0 {
+		t.Fatalf("信用度為 0 應走早期 gate：%+v", res)
+	}
+	if credit != 0 || prov.Gold != 123 {
+		t.Fatalf("信用 gate 不應改信用／黃金：credit=%d gold=%d", credit, prov.Gold)
+	}
+	if rng.Seed() != seed {
+		t.Fatalf("信用 gate 不應消耗貸款亂數：before=%d after=%d", seed, rng.Seed())
 	}
 }
 

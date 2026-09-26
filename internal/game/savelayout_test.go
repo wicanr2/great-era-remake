@@ -2,26 +2,51 @@ package game
 
 import "testing"
 
-// 十個區塊要首尾相接、不重疊、不留洞，而且加起來對得上檔案大小。
-func TestSaveBlocksAreContiguous(t *testing.T) {
-	want := SaveHeaderSize
-	total := 0
+// 十個 `$basg` 區塊不重疊，且位移必須對上 IDA 的原始 record offset。
+// 區塊 8／9／10 之間夾著七個由單 byte 指令讀寫的 runtime 欄位，不能假設
+// 所有區塊首尾相接。
+func TestSaveBlocksMatchRawOffsets(t *testing.T) {
+	want := map[string]struct{ offset, size int }{
+		"byte_6DFA0": {4, 1443},
+		"byte_6F532": {1447, 2340},
+		"byte_6EFAA": {3787, 1416},
+		"byte_6BC4E": {5203, 9042},
+		"byte_6FE56": {14245, 39},
+		"byte_6EE68": {14284, 48},
+		"byte_6EE98": {14332, 274},
+		"byte_6FF8C": {14610, 10},
+		"byte_6FF96": {14620, 40},
+		"word_70026": {14662, 20},
+	}
+	var ranges []SaveBlock
 	for _, b := range SaveBlocks {
-		if b.Offset != want {
-			t.Errorf("%s 該從 %d 開始，實得 %d", b.Global, want, b.Offset)
+		w, ok := want[b.Global]
+		if !ok {
+			t.Errorf("未預期的 SaveBlock %q", b.Global)
+			continue
+		}
+		if b.Offset != w.offset || b.Size != w.size {
+			t.Errorf("%s 位移／大小 = %d/%d，預期 %d/%d", b.Global,
+				b.Offset, b.Size, w.offset, w.size)
 		}
 		if b.Size <= 0 {
 			t.Errorf("%s 大小 %d 不合理", b.Global, b.Size)
 		}
-		want = b.Offset + b.Size
-		total += b.Size
+		ranges = append(ranges, b)
 	}
-	if got := SaveHeaderSize + total + SaveTrailingBytes; got != SaveFileSize {
-		t.Errorf("檔頭 %d + 區塊 %d + 尾巴 %d = %d，檔案是 %d",
-			SaveHeaderSize, total, SaveTrailingBytes, got, SaveFileSize)
+	for i := 0; i < len(ranges); i++ {
+		for j := i + 1; j < len(ranges); j++ {
+			left, right := ranges[i], ranges[j]
+			if left.Offset > right.Offset {
+				left, right = right, left
+			}
+			if left.Offset+left.Size > right.Offset {
+				t.Errorf("區塊 %s／%s 重疊", left.Global, right.Global)
+			}
+		}
 	}
 	if SaveTrailingBytes != 7 {
-		t.Errorf("尾巴該是 7 bytes，實得 %d", SaveTrailingBytes)
+		t.Errorf("未映射 runtime bytes 該是 7，實得 %d", SaveTrailingBytes)
 	}
 }
 
@@ -111,7 +136,7 @@ func TestSaveWritableOnlyForKnownBlocks(t *testing.T) {
 		}
 	}
 	// 檔頭與尾巴都不在任何區塊裡。
-	for _, off := range []int{0, 3, 14676, SaveFileSize - 1} {
+	for _, off := range []int{0, 3, 14606, 14609, 14660, 14661, 14682} {
 		if _, ok := SaveBlockAt(off); ok {
 			t.Errorf("offset %d 不該落在任何 $basg 區塊", off)
 		}

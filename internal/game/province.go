@@ -378,11 +378,11 @@ func (t *ProvinceTable) AvailableGenerals(p ProvinceID, units []CombatUnit) (int
 // ReinforcementSources 收集可以對 defender 省提供增援的鄰省，
 // 語意照 `sub_534FF`（`docs/re/07` §9）：
 //
-//	for k = 1..7:                       ← 鄰省表有 8 格，原版只掃 7 格
+//	for k = 1..8:                       ← 鄰省表的 8 格全部掃描
 //	    省 = 鄰省表[k]
 //	    if 省 == 0 或 255:               continue   ← 填充／海洋境外
-//	    if 省.司令 == 0:                 停止掃描    ← 無主省直接收工
-//	    if 省.司令 != 單位.效忠勢力:      continue
+//	    if 省.司令 != 0 且 != 單位.效忠勢力: continue
+//	                                      ← 司令為 0 時沿用後續門檻
 //	    if 省.+32 & 40h:                 continue   ← 那個省正在打仗
 //	    if 該省可用將領數 >= 100:         continue
 //	    收下
@@ -396,9 +396,9 @@ func (t *ProvinceTable) ReinforcementSources(defender ProvinceID, faction Genera
 		return nil, err
 	}
 	var out []ProvinceID
-	// 讀 Raw 而不是 Neighbours——原版對**原始排列**敏感（遇到無主省就
-	// 停止掃描），而 Neighbours 已經濾掉填充與 SeaBorder，順序不一樣。
-	for k := 0; k < 7; k++ { // 原版只掃 7 格，第 8 格不看
+	// 讀 Raw 而不是 Neighbours——原版對**原始排列**敏感（掃完整 8 格），
+	// 而 Neighbours 已經濾掉填充與 SeaBorder，順序不一樣。
+	for k := 0; k < provNeighbourLen; k++ { // 原版掃完整 8 格
 		b := prov.Raw[provOffNeighbour+k]
 		if b == 0 || b == SeaBorder {
 			continue
@@ -408,10 +408,9 @@ func (t *ProvinceTable) ReinforcementSources(defender ProvinceID, faction Genera
 		if err != nil {
 			continue
 		}
-		if np.Commander == 0 {
-			break // 原版遇到無主省就結束掃描，不是 continue
-		}
-		if np.Commander != faction {
+		// IDA `sub_534FF` 在司令為 0 時直接跳到旗標／可用將領數
+		// 門檻；它不會在此處終止掃描，也不會做勢力比對。
+		if np.Commander != 0 && np.Commander != faction {
 			continue
 		}
 		if np.Flags&ProvinceFlagInBattle != 0 {

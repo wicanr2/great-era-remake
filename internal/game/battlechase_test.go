@@ -297,3 +297,47 @@ func TestStrikeForcePoolExcludesOwnUnits(t *testing.T) {
 		}
 	}
 }
+
+func TestStrikeForceModeOneAddsRemoteCommanderAndSkipsCenter(t *testing.T) {
+	// §29／§57：值 4 的 mode 1 清單不含中心格，但會在兩圈候選之後
+	// 無條件追加仍在場上的當前省司令。
+	sim := mkNoCityBattle(t, 1, 2, 5000)
+	center := sim.Defender[0]
+	commander := sim.Defender[1]
+	sim.AtCommander = commander.General
+
+	// 把司令搬到離中心超過兩步的位置；中心仍留在場上，但不應成為
+	// 「主力周邊」候選。直接維護 occupancy，等價於戰鬥中的換位。
+	far := NoCell
+	for i := 0; i < CellCount; i++ {
+		c := CellIndex(i)
+		if c == center.Cell || sim.Occ[c] != 0 || WithinTwoSteps(c, center.Cell) {
+			continue
+		}
+		col, row := c.ColRow()
+		if sim.Field.Tiles[row][col].MoveCost() >= 255 {
+			continue
+		}
+		far = c
+		break
+	}
+	if far == NoCell {
+		t.Skip("戰場找不到離中心超過兩步的可站格")
+	}
+	sim.Occ[commander.Cell] = 0
+	commander.Cell = far
+	sim.Occ[far] = commander.General
+
+	attacker := sim.Attacker[0]
+	attacker.Command = BattleCmdSeekTarget
+	attacker.ClearAssignment()
+	r := sim.ExecuteAction(ActBStrikeForce, sim.Attacker, sim.Defender,
+		func(to, from CellIndex) CellIndex { return to })
+	if !r.Implemented || r.Assigned != 1 {
+		t.Fatalf("遠端司令仍應是唯一候選：%+v", r)
+	}
+	if attacker.TargetUnit != commander.General {
+		t.Errorf("mode 1 應追加遠端司令 %d，實際目標 %d（中心 %d 不應列入）",
+			commander.General, attacker.TargetUnit, center.General)
+	}
+}

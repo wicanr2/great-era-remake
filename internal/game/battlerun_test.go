@@ -68,6 +68,9 @@ func TestAutoResolveByChainRuns(t *testing.T) {
 	t.Logf("回合 %d／移動 %d／交戰 %d／未實作 %d／攻方損 %d 守方損 %d",
 		st.Turns, st.Moves, st.Engagements, st.Unimplemented,
 		st.AttackerLoss, st.DefenderLoss)
+	if st.Unimplemented != 0 {
+		t.Fatalf("AI chain 仍有未接行動 %d，不能宣稱 13 種執行鏈已閉合", st.Unimplemented)
+	}
 
 	// 決策鏈選出的行動要落在已知的 13 種裡。
 	for _, d := range st.Decisions {
@@ -84,6 +87,15 @@ func TestChainRunActuallyMovesAndFights(t *testing.T) {
 	// 決策鏈驅動的推進器必須真的讓單位動起來、真的打起來——
 	// 否則它只是一個很貴的空轉迴圈。
 	sim := mkMultiBattle(t, 3, 3, 5000)
+	// 新接回的值 13 後備會讓命令 2 的守方重新尋找同勢力城市；這個
+	// 回歸測試要隔離「攻方追城市並交戰」的推進器，所以讓守方明確保持
+	// 命令 4（原版已出發／固守分支），避免 fixture 自己把城市上的守軍
+	// 派去追另一個守軍而離開戰場目標。
+	for _, u := range sim.Defender {
+		u.Command = BattleCmdCommitted
+		u.NextCell = NoCell
+		u.TargetUnit = 0
+	}
 	st := sim.AutoResolveByChain(60, BattleChainGates{}, 201)
 
 	// ⚠️ **不要求整場不觸發必勝結算**——打到後來一方被打殘，

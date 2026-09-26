@@ -80,7 +80,7 @@ func (s *BattleSim) advance(side, foes []*Combatant) bool {
 			continue
 		}
 		if Adjacent(u.Cell, target.Cell) {
-			if _, _, err := s.Engage(u, target); err == nil {
+			if _, err := s.ResolveBattleAttack(u, target); err == nil {
 				acted = true
 			}
 			continue

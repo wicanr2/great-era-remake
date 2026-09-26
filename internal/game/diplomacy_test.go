@@ -2,18 +2,18 @@ package game
 
 import "testing"
 
-// 外援成功率 70%。
-func TestAidSuccessRate(t *testing.T) {
+// 外援核准率 30%：0..6 會走原版拒絕文字，7..9 才進入資源寫入。
+func TestAidApprovalRate(t *testing.T) {
 	rng := NewRand(555)
 	const n = 20000
 	ok := 0
 	for i := 0; i < n; i++ {
-		if rng.Int(AidRollRange) <= AidSuccessMax {
+		if rng.Int(AidRollRange) >= AidApprovalMin {
 			ok++
 		}
 	}
-	if rate := float64(ok) / n; rate < 0.67 || rate > 0.73 {
-		t.Errorf("外援成功率 %.3f，原版是 7/10", rate)
+	if rate := float64(ok) / n; rate < 0.27 || rate > 0.33 {
+		t.Errorf("外援核准率 %.3f，原版是 3/10", rate)
 	}
 }
 
@@ -27,15 +27,72 @@ func TestAidDivisor(t *testing.T) {
 	}
 }
 
-// 張作霖在民國 17 年 2–6 月一律拿不到援助，但其他時候可以。
-func TestAidHistoricalEmbargo(t *testing.T) {
+func TestAidDonorCode(t *testing.T) {
+	for _, tc := range []struct {
+		stage, faction, roll int
+		want                 int
+	}{
+		{1, 10, 0, 100}, {1, 10, 1, 99}, {1, 10, 6, 100}, {1, 10, 7, 99},
+		{1, 1, 0, 142}, {1, 5, 9, 100},
+		{1, 4, 5, 99}, {1, 4, 6, 100}, {1, 4, 7, 146},
+		{1, 3, 0, 101}, {1, 2, 9, 101},
+		{1, 0, 5, 5}, {1, 0, 6, 99}, {1, 0, 7, 100},
+		{1, 0, 8, 101}, {1, 0, 9, 141},
+		{2, 1, 0, 99}, {3, 10, 9, 99},
+	} {
+		if got := AidDonorCode(uint8(tc.stage), tc.faction, tc.roll); got != tc.want {
+			t.Errorf("stage=%d faction=%d roll=%d：代碼 %d，預期 %d",
+				tc.stage, tc.faction, tc.roll, got, tc.want)
+		}
+	}
+}
+
+func TestRequestAidForFactionUsesSameRoll(t *testing.T) {
+	findSeed := func(want int) uint32 {
+		for seed := uint32(1); seed < 1000; seed++ {
+			if NewRand(seed).Int(AidRollRange) == want {
+				return seed
+			}
+		}
+		t.Fatalf("找不到 roll=%d 的固定種子", want)
+		return 0
+	}
+
+	w := realWorld(t)
+	prov, err := w.Table.At(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	prov.Commander = 1 // 避免命中日期／司令特殊核准
+	base := [4]int{}
+	approved, err := w.RequestAidForFaction(1, GameState{Stage: 1, Year: 15, Month: 8}, 0,
+		base, NewRand(findSeed(7)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if approved.Roll != 7 || !approved.Approved || approved.Donor != 100 || approved.Divisor != 3 {
+		t.Fatalf("roll=7 的 default 第一期待援助代碼錯誤：%+v", approved)
+	}
+
+	refused, err := w.RequestAidForFaction(1, GameState{Stage: 1, Year: 15, Month: 8}, 0,
+		base, NewRand(findSeed(6)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if refused.Roll != 6 || refused.Approved || refused.Donor != 99 || refused.Divisor != 1 {
+		t.Fatalf("roll=6 的 default 第一期待援助代碼錯誤：%+v", refused)
+	}
+}
+
+// 張作霖在民國 17 年 2–6 月命中特殊核准分支；其他日期仍依原版拒絕骰。
+func TestAidSpecialOverride(t *testing.T) {
 	setup := func(t *testing.T) (*AIWorld, *Province) {
 		w := realWorld(t)
 		prov, err := w.Table.At(1)
 		if err != nil {
 			t.Fatal(err)
 		}
-		prov.Commander = AidEmbargoLeader
+		prov.Commander = AidSpecialLeader
 		prov.Gold = 0
 		return w, prov
 	}
@@ -44,44 +101,45 @@ func TestAidHistoricalEmbargo(t *testing.T) {
 	for _, month := range []uint8{2, 4, 6} {
 		found := false
 		for seed := uint32(1); seed < 30; seed++ {
-			w, prov := setup(t)
-			st := GameState{Year: AidEmbargoYear, Month: month}
+			w, _ := setup(t)
+			st := GameState{Year: AidSpecialYear, Month: month}
 			res, err := w.RequestAid(1, st, 99, base, NewRand(seed))
 			if err != nil {
 				t.Fatal(err)
 			}
-			if res.Roll > AidSuccessMax {
-				continue // 這顆種子本來就被拒，不算數
+			if res.Roll > AidRefusalMax {
+				continue // 這顆種子本來就會核准，不算特殊分支
 			}
 			found = true
-			if !res.Embargoed || res.Approved {
-				t.Errorf("民國 17 年 %d 月：張作霖應被禁運，卻 approved=%v",
-					month, res.Approved)
+			if !res.SpecialOverride || !res.Approved {
+				t.Errorf("民國 17 年 %d 月：張作霖特殊分支應核准，override=%v approved=%v",
+					month, res.SpecialOverride, res.Approved)
 			}
-			if prov.Gold != 0 {
-				t.Errorf("被禁運卻拿到 %d 黃金", prov.Gold)
+			if !res.CommandCompleted {
+				t.Errorf("民國 17 年 %d 月：特殊分支仍應完成援助指令", month)
 			}
 			break
 		}
 		if !found {
-			t.Errorf("%d 月：30 顆種子都擲出拒絕，測不到禁運", month)
+			t.Errorf("%d 月：30 顆種子都未落在拒絕骰，測不到特殊分支", month)
 		}
 	}
 
-	// 17 年 1 月與 7 月不在禁運區間。
+	// 17 年 1 月與 7 月不在特殊日期區間。
 	for _, month := range []uint8{1, 7} {
 		for seed := uint32(1); seed < 30; seed++ {
 			w, _ := setup(t)
-			st := GameState{Year: AidEmbargoYear, Month: month}
+			st := GameState{Year: AidSpecialYear, Month: month}
 			res, err := w.RequestAid(1, st, 99, base, NewRand(seed))
 			if err != nil {
 				t.Fatal(err)
 			}
-			if res.Roll > AidSuccessMax {
+			if res.Roll > AidRefusalMax {
 				continue
 			}
-			if res.Embargoed {
-				t.Errorf("%d 月不該禁運", month)
+			if res.SpecialOverride || res.Approved {
+				t.Errorf("%d 月不該套用特殊核准，override=%v approved=%v",
+					month, res.SpecialOverride, res.Approved)
 			}
 			break
 		}
@@ -95,13 +153,51 @@ func TestAidHistoricalEmbargo(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if res.Roll > AidSuccessMax {
+		if res.Roll > AidRefusalMax {
 			continue
 		}
-		if res.Embargoed {
-			t.Error("民國 18 年不該禁運")
+		if res.SpecialOverride || res.Approved {
+			t.Error("民國 18 年不該套用特殊核准")
 		}
 		break
+	}
+}
+
+// 原版在第一次援助亂數前就立完成旗標；隨機拒絕與特殊核准都會消耗指令，
+// 但進入規則函式前的驗證錯誤不會產生 AidResult。
+func TestAidCommandCompletedOnRefusal(t *testing.T) {
+	foundRefusal := false
+	for seed := uint32(1); seed < 40; seed++ {
+		w := realWorld(t)
+		prov, err := w.Table.At(1)
+		if err != nil {
+			t.Fatal(err)
+		}
+		prov.Commander = 1
+		beforeResources := [4]uint16{prov.Gold, prov.Food, prov.Ammo, prov.Fuel}
+		res, err := w.RequestAid(1, GameState{Year: 15, Month: 8}, AidDonorGenerous,
+			[4]int{}, NewRand(seed))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !res.CommandCompleted {
+			t.Errorf("種子 %d：援助結果未標記指令完成", seed)
+		}
+		if res.Roll <= AidRefusalMax {
+			foundRefusal = true
+			if res.Approved || res.SpecialOverride {
+				t.Errorf("種子 %d：隨機拒絕卻 approved=%v override=%v", seed,
+					res.Approved, res.SpecialOverride)
+			}
+			afterResources := [4]uint16{prov.Gold, prov.Food, prov.Ammo, prov.Fuel}
+			if afterResources != beforeResources {
+				t.Errorf("種子 %d：援助拒絕不應改動省份", seed)
+			}
+			break
+		}
+	}
+	if !foundRefusal {
+		t.Fatal("40 顆固定種子都未找到援助隨機拒絕")
 	}
 }
 

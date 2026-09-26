@@ -1,6 +1,9 @@
 package game
 
-import "fmt"
+import (
+	"encoding/binary"
+	"fmt"
+)
 
 // 勢力表：`SAVE(N).DT1` 的第 3 個 `$basg` 區塊（`byte_6EFAA`，1416 B）。
 //
@@ -115,6 +118,38 @@ func ParseFactionTable(data []byte) (FactionTable, error) {
 	return t, nil
 }
 
+// WriteFactionTable 把勢力表中已證實的欄位寫回 .DT1 副本。
+//
+// +0 的領袖 ID、+3..+10 的 0xFF 哨兵，以及 +11..+34 的關係矩陣已有
+// 讀寫端證據；+2 與 +35..+58 仍屬未知／殘留，故一律沿用 orig，不以
+// FactionSlot 的零值重建。這是「從原始 bytes 改寫」而不是整塊重建。
+func WriteFactionTable(orig []byte, table FactionTable) ([]byte, error) {
+	blk, err := SaveBlockByGlobal("byte_6EFAA")
+	if err != nil {
+		return nil, err
+	}
+	if blk.Size != FactionSlotCount*FactionSlotSize {
+		return nil, fmt.Errorf("game: 勢力表大小 %d，不是 %d × %d",
+			blk.Size, FactionSlotCount, FactionSlotSize)
+	}
+	if len(orig) < blk.Offset+blk.Size {
+		return nil, fmt.Errorf("game: .DT1 只有 %d bytes，放不下勢力表（需要 %d）",
+			len(orig), blk.Offset+blk.Size)
+	}
+	out := append([]byte(nil), orig...)
+	for i := range table {
+		row := out[blk.Offset+i*FactionSlotSize : blk.Offset+(i+1)*FactionSlotSize]
+		binary.LittleEndian.PutUint16(row[facOffLeader:], uint16(table[i].Leader))
+		// 這八個 sentinel 在所有已取樣槽位都明確初始化為 0xFF；
+		// 它們不是 Go struct 的未知 trailing，因此可安全重寫。
+		for j := facOffSentinels; j < facOffRelation; j++ {
+			row[j] = FactionSentinel
+		}
+		copy(row[facOffRelation:facOffTrailing], table[i].Relations[:])
+	}
+	return out, nil
+}
+
 // Initialized 回答這個槽有沒有被初始化過。
 //
 // 判準是對角線為 0。這原本是**從資料歸納**的啟發式，現在有了獨立佐證：
@@ -212,10 +247,115 @@ func ParseFactionLeaders(data []byte) (FactionLeaders, error) {
 	return out, nil
 }
 
+// WriteFactionLeaders 把區塊 6 的 24 個 u16 領袖槽寫回副本。
+// 空槽的 0 也是已證實的資料；其它 .DT1 bytes 原樣保留。
+func WriteFactionLeaders(orig []byte, leaders FactionLeaders) ([]byte, error) {
+	blk, err := SaveBlockByGlobal("byte_6EE68")
+	if err != nil {
+		return nil, err
+	}
+	if blk.Size != FactionSlotCount*2 {
+		return nil, fmt.Errorf("game: 勢力領袖表大小 %d，不是 %d 個 u16", blk.Size, FactionSlotCount)
+	}
+	if len(orig) < blk.Offset+blk.Size {
+		return nil, fmt.Errorf("game: .DT1 只有 %d bytes，放不下勢力領袖表（需要 %d）",
+			len(orig), blk.Offset+blk.Size)
+	}
+	out := append([]byte(nil), orig...)
+	for i, id := range leaders {
+		binary.LittleEndian.PutUint16(out[blk.Offset+i*2:], uint16(id))
+	}
+	return out, nil
+}
+
 // Count 是有勢力的槽數。
 func (f FactionLeaders) Count() int {
 	n := 0
 	for _, id := range f {
+		if id != 0 {
+			n++
+		}
+	}
+	return n
+}
+
+// MajorPowerLeaderSlots 是原版執行期「十大勢力」查詢表的槽數。
+// `word_70026` 這個全域只配置 10 個 u16；它不是區塊 6 的 24 槽勢力領袖表。
+const MajorPowerLeaderSlots = 10
+
+// MajorPowerLeaders 是 `.DT1` 區塊 10（`word_70026`，20 B）——
+// 原版以 10 個 u16 的執行期清單判定「是不是十大勢力領袖」，並在勢力消滅／
+// 繼任流程中移除已失效的領袖（`sub_35005`、`sub_3512B`、`sub_353C4`）。
+//
+// 這份表的**角色與結構已證實**；實際內容由劇本初始化流程產生，不能把單一
+// `.DT1` 快照裡的殘留值當成靜態十大勢力名冊。載入器因此只保留原始 u16，
+// 不擅自驗證值域或把它替換成 `FactionLeaders`。
+type MajorPowerLeaders [MajorPowerLeaderSlots]GeneralID
+
+// ParseMajorPowerLeaders 解出 `.DT1` 區塊 10 的 10 個 u16。
+func ParseMajorPowerLeaders(data []byte) (MajorPowerLeaders, error) {
+	var out MajorPowerLeaders
+	blk, err := SaveBlockByGlobal("word_70026")
+	if err != nil {
+		return out, err
+	}
+	if blk.Size != MajorPowerLeaderSlots*2 {
+		return out, fmt.Errorf("game: 區塊 10 大小 %d，不是 %d 個 u16", blk.Size, MajorPowerLeaderSlots)
+	}
+	if len(data) < blk.Offset+blk.Size {
+		return out, fmt.Errorf("game: .DT1 只有 %d bytes，放不下十大勢力清單（需要 %d）",
+			len(data), blk.Offset+blk.Size)
+	}
+	b := data[blk.Offset : blk.Offset+blk.Size]
+	for i := range out {
+		out[i] = GeneralID(b[i*2]) | GeneralID(b[i*2+1])<<8
+	}
+	return out, nil
+}
+
+// WriteMajorPowerLeaders 把已從原版 runtime 快照載入的區塊 10 寫回副本。
+//
+// 區塊的讀寫位移與 20-byte 形狀已由 `sub_595D4`／`sub_59CBF` confirmed；
+// 但清單何時由劇本流程生成仍未知，因此只提供明確的逐欄 writer，
+// 不把它標成 SaveBlock.Known，也不在沒有 runtime 快照時自行產生名冊。
+func WriteMajorPowerLeaders(orig []byte, leaders MajorPowerLeaders) ([]byte, error) {
+	blk, err := SaveBlockByGlobal("word_70026")
+	if err != nil {
+		return nil, err
+	}
+	if blk.Size != MajorPowerLeaderSlots*2 {
+		return nil, fmt.Errorf("game: 區塊 10 大小 %d，不是 %d 個 u16", blk.Size, MajorPowerLeaderSlots)
+	}
+	if len(orig) < blk.Offset+blk.Size {
+		return nil, fmt.Errorf("game: .DT1 只有 %d bytes，放不下十大勢力清單（需要 %d）",
+			len(orig), blk.Offset+blk.Size)
+	}
+	out := append([]byte(nil), orig...)
+	for i, id := range leaders {
+		off := blk.Offset + i*2
+		out[off] = byte(id)
+		out[off+1] = byte(id >> 8)
+	}
+	return out, nil
+}
+
+// Contains 判定清單是否含指定的非零領袖 ID。零是空槽，不算勢力。
+func (m MajorPowerLeaders) Contains(id GeneralID) bool {
+	if id == 0 {
+		return false
+	}
+	for _, got := range m {
+		if got == id {
+			return true
+		}
+	}
+	return false
+}
+
+// Count 回傳十大勢力清單裡的非零槽數。
+func (m MajorPowerLeaders) Count() int {
+	n := 0
+	for _, id := range m {
 		if id != 0 {
 			n++
 		}
@@ -255,6 +395,44 @@ func ParseFactionOfGeneral(data []byte) (FactionOfGeneral, error) {
 			len(data), blk.Offset+blk.Size)
 	}
 	copy(out[:], data[blk.Offset:blk.Offset+blk.Size])
+	return out, nil
+}
+
+// WriteFactionOfGeneralLeaders 只寫回區塊 7 中「已證實是領袖反查值」的格子。
+//
+// 兩份存檔交叉比對已確認：區塊 7 的大部分是未初始化殘留，但目前勢力領袖
+// 的 1-based 將領 ID 格子是真實的「將領 → 勢力槽」反查值。這個窄 writer
+// 由區塊 6 的領袖表產生已證實值；已覆滅勢力的舊格與其餘殘留一律保留，
+// 不因 Go 陣列零值而清空。重複領袖 ID 或超出 274 筆將領範圍時 fail-closed。
+func WriteFactionOfGeneralLeaders(orig []byte, leaders FactionLeaders) ([]byte, error) {
+	blk, err := SaveBlockByGlobal("byte_6EE98")
+	if err != nil {
+		return nil, err
+	}
+	if blk.Size != SaveGeneralCount {
+		return nil, fmt.Errorf("game: 勢力反查表大小 %d，不是 %d 筆", blk.Size, SaveGeneralCount)
+	}
+	if len(orig) < blk.Offset+blk.Size {
+		return nil, fmt.Errorf("game: .DT1 只有 %d bytes，放不下勢力反查表（需要 %d）",
+			len(orig), blk.Offset+blk.Size)
+	}
+	out := append([]byte(nil), orig...)
+	seen := map[GeneralID]bool{}
+	for slot, id := range leaders {
+		if id == 0 {
+			continue
+		}
+		if int(id) > SaveGeneralCount {
+			return nil, fmt.Errorf("game: 勢力 %d 領袖 %d 超出 %d 筆將領表",
+				slot+1, id, SaveGeneralCount)
+		}
+		if seen[id] {
+			return nil, fmt.Errorf("game: 領袖 %d 同時出現在多個勢力槽", id)
+		}
+		seen[id] = true
+		// id 是 1-based 將領編號；區塊 7 以 0-based byte index 存放。
+		out[blk.Offset+int(id)-1] = byte(slot + 1)
+	}
 	return out, nil
 }
 

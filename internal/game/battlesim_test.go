@@ -237,3 +237,59 @@ func TestDeployOverflowIsReported(t *testing.T) {
 		t.Error("超過每方 10 個部隊卻沒被擋")
 	}
 }
+
+func TestSyncForcesToGeneralsUpdatesOnlyConfirmedForce(t *testing.T) {
+	s := &BattleSim{
+		Attacker: []*Combatant{mkUnit(2, 58, Branch1, 1234)},
+		Defender: []*Combatant{mkUnit(4, 166, Branch1, 0)},
+	}
+	generals := make([]General, 5)
+	for i := range generals {
+		for j := range generals[i].Raw {
+			generals[i].Raw[j] = byte(0xA0 + i + j)
+		}
+		generals[i].Force = uint16(900 + i)
+	}
+	beforeRaw := make([][GeneralRecordSize]byte, len(generals))
+	for i := range generals {
+		beforeRaw[i] = generals[i].Raw
+	}
+
+	updated, err := s.SyncForcesToGenerals(generals)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if updated != 2 {
+		t.Fatalf("更新筆數 = %d，應為 2", updated)
+	}
+	if generals[1].Force != 1234 || generals[3].Force != 0 {
+		t.Fatalf("兵力沒有按 1-based 將領槽位同步：%d／%d", generals[1].Force, generals[3].Force)
+	}
+	for i := range generals {
+		if generals[i].Raw != beforeRaw[i] {
+			t.Fatalf("同步兵力不應改動將領 %d 的 Raw", i+1)
+		}
+	}
+
+	updated, err = s.SyncForcesToGenerals(generals)
+	if err != nil || updated != 0 {
+		t.Fatalf("重複同步應為 no-op，得到 updated=%d err=%v", updated, err)
+	}
+}
+
+func TestSyncForcesToGeneralsRejectsInvalidOrDuplicateIDs(t *testing.T) {
+	for name, sim := range map[string]*BattleSim{
+		"invalid": {Attacker: []*Combatant{mkUnit(3, 1, Branch1, 1)}},
+		"duplicate": {
+			Attacker: []*Combatant{mkUnit(1, 1, Branch1, 1)},
+			Defender: []*Combatant{mkUnit(1, 2, Branch1, 2)},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			generals := make([]General, 2)
+			if _, err := sim.SyncForcesToGenerals(generals); err == nil {
+				t.Fatalf("%s 應拒絕錯誤將領資料", name)
+			}
+		})
+	}
+}

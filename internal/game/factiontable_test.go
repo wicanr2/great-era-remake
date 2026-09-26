@@ -2,6 +2,7 @@ package game
 
 import (
 	"bytes"
+	"encoding/binary"
 	"testing"
 )
 
@@ -188,6 +189,101 @@ func TestFactionLeadersBlockAgreesWithSlots(t *testing.T) {
 	}
 }
 
+// 區塊 10 是另一份 10 槽執行期清單，不可誤當成區塊 6 的 24 槽領袖表。
+func TestMajorPowerLeaderBlockShapeAndParse(t *testing.T) {
+	blk, err := SaveBlockByGlobal("word_70026")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if blk.Size != MajorPowerLeaderSlots*2 {
+		t.Fatalf("區塊 10 應是 %d 個 u16（%d bytes），實得 %d", MajorPowerLeaderSlots, MajorPowerLeaderSlots*2, blk.Size)
+	}
+	data := make([]byte, SaveFileSize)
+	want := [MajorPowerLeaderSlots]GeneralID{166, 0, 58, 0, 1, 98, 146, 157, 156, 4}
+	for i, id := range want {
+		binary.LittleEndian.PutUint16(data[blk.Offset+i*2:], uint16(id))
+	}
+	got, err := ParseMajorPowerLeaders(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != MajorPowerLeaders(want) {
+		t.Fatalf("區塊 10 解析錯誤：%v，預期 %v", got, want)
+	}
+	if got.Count() != 8 {
+		t.Fatalf("零槽不應計入勢力，實得 %d", got.Count())
+	}
+	for _, id := range []GeneralID{166, 58, 1, 4} {
+		if !got.Contains(id) {
+			t.Errorf("清單應含領袖 %d", id)
+		}
+	}
+	for _, id := range []GeneralID{0, 3, 999} {
+		if got.Contains(id) {
+			t.Errorf("清單不應含 %d", id)
+		}
+	}
+}
+
+func TestMajorPowerLeaderParseRejectsShortSave(t *testing.T) {
+	blk, err := SaveBlockByGlobal("word_70026")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ParseMajorPowerLeaders(make([]byte, blk.Offset+blk.Size-1)); err == nil {
+		t.Fatal("少一個 byte 的 .DT1 應拒絕解析區塊 10")
+	}
+}
+
+func TestMajorPowerLeaderSnapshotsUseRawBlock10Offset(t *testing.T) {
+	for _, tc := range []struct {
+		file string
+		want GeneralID
+	}{
+		{file: "SAVE(1).DT1", want: 58},
+		{file: "SAVE(2).DT1", want: 166},
+	} {
+		got, err := ParseMajorPowerLeaders(readGame(t, tc.file))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got[0] != tc.want || got.Count() != 1 {
+			t.Fatalf("%s 區塊 10 = %v，預期首槽 %d 且只有一個非零槽", tc.file, got, tc.want)
+		}
+	}
+}
+
+func TestWriteMajorPowerLeadersOnlyChangesBlock10(t *testing.T) {
+	orig := readGame(t, "SAVE(1).DT1")
+	leaders, err := ParseMajorPowerLeaders(orig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	leaders[0], leaders[1] = 166, 58
+	out, err := WriteMajorPowerLeaders(orig, leaders)
+	if err != nil {
+		t.Fatal(err)
+	}
+	blk, err := SaveBlockByGlobal("word_70026")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := range orig {
+		if i < blk.Offset || i >= blk.Offset+blk.Size {
+			if out[i] != orig[i] {
+				t.Fatalf("區塊 10 writer 改到未授權 offset %d", i)
+			}
+		}
+	}
+	back, err := ParseMajorPowerLeaders(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if back != leaders {
+		t.Fatalf("區塊 10 寫回後不一致：%v vs %v", back, leaders)
+	}
+}
+
 // 區塊 7 的反查表：九位領袖各自指回自己的槽（1-based）。
 func TestFactionOfGeneralPointsLeadersToTheirSlot(t *testing.T) {
 	data := readGame(t, "SAVE(1).DT1")
@@ -248,5 +344,57 @@ func TestFactionOfGeneralIsMostlyGarbage(t *testing.T) {
 	}
 	if same < 9 {
 		t.Errorf("至少九位領袖該相同，實得 %d", same)
+	}
+}
+
+func TestWriteFactionOfGeneralLeadersOnlyTouchesConfirmedLeaderCells(t *testing.T) {
+	orig := readGame(t, "SAVE(1).DT1")
+	leaders, err := ParseFactionLeaders(orig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := WriteFactionOfGeneralLeaders(orig, leaders)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// 未修改的領袖快照必須完整 round-trip；這也確認 writer 沒有把殘留清零。
+	if diff := DiffBytes(orig, out, 8); len(diff) != 0 {
+		t.Fatalf("未修改領袖反查快照卻有差異：%v", diff)
+	}
+
+	// 只改一個已證實的領袖格，其他 273 格（與整份存檔）都要保留。
+	leaders[0] = 167 // 原槽 1 的測試用替代將領 ID，仍在 1..274
+	out, err = WriteFactionOfGeneralLeaders(orig, leaders)
+	if err != nil {
+		t.Fatal(err)
+	}
+	blk, err := SaveBlockByGlobal("byte_6EE98")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := blk.Offset + 166 // 167 是 1-based
+	for _, off := range DiffBytes(orig, out, 0) {
+		if off != want {
+			t.Fatalf("領袖反查 writer 改到未授權 offset %d（預期 %d）", off, want)
+		}
+	}
+	if out[want] != 1 {
+		t.Fatalf("領袖槽 1 的反查值 = %d，預期 1", out[want])
+	}
+}
+
+func TestWriteFactionOfGeneralLeadersRejectsDuplicateOrOutOfRange(t *testing.T) {
+	orig := readGame(t, "SAVE(1).DT1")
+	leaders, err := ParseFactionLeaders(orig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	leaders[1] = leaders[0]
+	if _, err := WriteFactionOfGeneralLeaders(orig, leaders); err == nil {
+		t.Fatal("重複領袖 ID 應 fail-closed")
+	}
+	leaders[1] = SaveGeneralCount + 1
+	if _, err := WriteFactionOfGeneralLeaders(orig, leaders); err == nil {
+		t.Fatal("超出將領表的領袖 ID 應 fail-closed")
 	}
 }
