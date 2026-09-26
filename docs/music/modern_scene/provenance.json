@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "cue": "modern_scene",
+  "motif_id": "dsds-modern-scene-m01",
+  "status": "draft-not-for-release",
+  "created": "2026-08-11",
+  "author": {
+    "role": "Codex 協作編曲草稿",
+    "named_natural_person": false,
+    "human_review": "pending"
+  },
+  "composition": {
+    "method": "original_midi_sketch",
+    "derivation": "none",
+    "source_material_read_by_generator": [],
+    "technical_references": [
+      "1992 DOS AdLib／OPL2 的有限聲部與清楚音域分工",
+      "民國初年軍政／都市敘事的閱讀情境",
+      "modern_scene 的 8 小節循環播放契約"
+    ],
+    "excluded_material": [
+      "原版 .MUS／.TIM／PCM 與分析用 MIDI",
+      "原版 SCENE 的音高、旋律、和聲、低音、節奏與段落",
+      "國歌、軍歌、黨歌、傳統曲牌及其他可辨識既有歌曲"
+    ]
+  },
+  "generator": {
+    "script": "tools/music/modern_scene_draft.py",
+    "input": "docs/music/modern_scene/score.json",
+    "runtime": "Python 標準函式庫；Docker；無網路",
+    "output": "docs/music/modern_scene/modern_scene_draft.mid",
+    "sha256": "38d4e862d01befdc2ba14dbbe73117c42bcd03589df9574390947db267589099",
+    "deterministic_rebuild": "passed"
+  },
+  "preview_render": {
+    "renderer": "FluidSynth 2.3.1",
+    "soundfont": "FluidR3_GM.sf2（只在隔離容器內使用，不隨儲存庫分發）",
+    "soundfont_terms_reference": "https://member.keymusician.com/Member/FluidR3_GM/",
+    "output": "workplace/promo/modern_audio/modern_scene_norm.ogg",
+    "sha256": "172de6e3e940bb7f2d0488a9414235d7cb4fe6634a0c6a9f31d31ed768f86427",
+    "sample_rate": 48000,
+    "channels": 2,
+    "duration_seconds": 23.621333,
+    "status": "preview-only-not-release-cleared"
+  },
+  "rights": {
+    "license": "preview-only-not-release-cleared",
+    "distribution": "禁止進入發行包；預覽渲染使用的 SoundFont 不隨儲存庫分發",
+    "third_party_samples": [],
+    "ai_generation": false
+  },
+  "qa": {
+    "score_and_midi_structure": "passed",
+    "hash_rebuild": "passed",
+    "agent_machine_validation": "passed",
+    "human_listening": "not performed; user accepted agent-only validation",
+    "melody_similarity_review": "structural-only; not legal clearance",
+    "loop_waveform": "passed for full-stream repetition; seam delta 0 samples",
+    "three_loop_listen": "agent decode passed; not human listening",
+    "mono_compatibility": "agent decode passed",
+    "loudness_true_peak": "passed; -18.1 LUFS integrated / -5.9 dBFS true peak in video",
+    "device_listening": "not performed; Xvfb／ffprobe only"
+  }
+}

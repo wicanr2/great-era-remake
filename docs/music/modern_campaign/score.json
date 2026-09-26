@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "cue": "modern_campaign",
+  "status": "draft-not-for-release",
+  "motif_id": "dsds-modern-campaign-m01",
+  "tempo_bpm": 112,
+  "time_signature": [4, 4],
+  "ppqn": 96,
+  "bars": 24,
+  "motif": {
+    "pitches": [62, 67, 65, 70, 69, 74],
+    "durations": [48, 48, 96, 48, 48, 96],
+    "intervals_semitones": [5, -2, 5, -1, 5]
+  },
+  "loop": {
+    "start_bar": 1,
+    "length_ticks": 9216,
+    "tail": "A7sus4 unresolved; bar-aligned loop"
+  },
+  "sections": [
+    {"bars": [1, 4], "name": "遠景", "density": "low"},
+    {"bars": [5, 8], "name": "集結", "density": "medium"},
+    {"bars": [9, 12], "name": "行動", "density": "high"},
+    {"bars": [13, 14], "name": "真空", "density": "void"},
+    {"bars": [15, 20], "name": "豪情", "density": "full"},
+    {"bars": [21, 24], "name": "回望", "density": "medium"}
+  ],
+  "rights": {
+    "source_material": "none; original note events only",
+    "status": "not-cleared-draft",
+    "intended_use": "local review and trailer prototype only"
+  }
+}

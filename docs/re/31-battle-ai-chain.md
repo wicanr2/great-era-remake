@@ -1467,8 +1467,8 @@ if (byte_6AA85 & 80h 且 byte_64900 ≥ 5) 或 byte_6B89E != 0:
 不是最近的。與分支 B 值 3 的「照距離排序取最近」（§21）**完全不同的挑法**。
 這是原版行為，照抄。
 
-⚠️ `sub_560D7`（第二方找目標格用的）與 `sub_3D261`（走不到時的後備）
-都未讀。`sub_3D411` 也未讀。
+⚠️ `sub_560D7` 的 mode 1／2 與 `sub_3D261` 的主要欄位寫入已在 §62 讀出；
+`sub_3D411` 的命令 4／5 後處理仍未接入 Go，`byte[65BA]` 預約表也未解。
 
 
 ## 33. `sub_3CBD9`（327 行）：決策值 A=12 —— **重置後重新找目標**
@@ -1752,7 +1752,8 @@ for i = 1..10:
 兩段各 100 行以上**還沒讀完**。所以「挑最弱的打」是**依排序方向與派工結構推出來的形狀**，
 不是直接讀到的結論。要 confirm 得把兩段統計讀完。
 
-⚠️ `sub_3D261`（191 行，走不到時的後備）在值 13／14／15／18 都出現，仍未讀。
+⚠️ `sub_3D261`（191 行，走不到時的後備）已在 §62 讀出值 13／後處理共用的
+主要寫入；值 14／15／18 的完整呼叫時機與 `sub_3D411` 整合仍未閉合。
 
 ## 39. 分支 A 的分派表補完
 
@@ -2157,8 +2158,7 @@ sub_534FF(out_清單, out_數量, unit):
     for i = 1..8:                                ; 掃**當前交戰省**的鄰省（+22..+29）
         鄰 = byte[省份[byte_6FFC4] + 21 + i]
         if 鄰 == 0 或 鄰 == 0FFh:      跳過
-        if 省份[鄰].+20 == 0:          跳過      ; 無主省
-        if 省份[鄰].+20 != 領袖:       跳過      ; ← **不是我方的省**
+        if 省份[鄰].+20 != 0 且 != 領袖: 跳過     ; 司令為 0 時沿用後續門檻
         if 省份[鄰].+32 & 40h:         跳過      ; ← bit 6（新發現）
         if sub_5A881(鄰) >= 100:       跳過      ; ← 某個值的上限
 
@@ -2166,7 +2166,9 @@ sub_534FF(out_清單, out_數量, unit):
         out_清單[*out_數量 - 1] = 鄰
 ```
 
-> ⭐⭐⭐ **`sub_534FF` 找的是「當前交戰省的鄰省裡，屬於我方而且可用的省」。**
+> ⭐⭐⭐ **`sub_534FF` 找的是「當前交戰省的鄰省裡，司令為 0 或屬於我方、而且
+> 通過旗標／可用將領數門檻的省」。**「屬於我方」只是非零司令分支的比較條件，
+> 不能把無主省先行排除。
 
 而 `sub_53619(side)` 回 `out_數量 > 0 ? 0 : 1`（§45），所以：
 
@@ -2514,6 +2516,11 @@ MAN(3).DAT  TOWN(3).DAT  FAN(3).15   ←  == 3
 
 
 ## 51. ⛔ 第四次「已經有答案卻推錯」——這次連程式碼都重抄了一份
+
+> **歷史勘誤：本節關於「無主省停止掃描」與「原版只掃前 7 格」的句子，已被
+> §60 的 IDA 原始分支推翻。**
+> 本節仍保留，作為當時錯誤如何進入 `ReinforcementSources` 的可追溯記錄；目前
+> 規則請以 §60 與 `internal/game/province.go` 為準。
 
 §47 解 `sub_53619` 時，順手把 `sub_534FF`（找可用鄰省）也「解」了一遍，
 記下兩條未解：「`+32` bit 6 語意未解」「`sub_5A881` 那支未讀」，
@@ -2973,3 +2980,579 @@ sub_3BCED 的後段排序
 sub_56A57 那個索引不一致（§52）
 戰報多印的那段文字是什麼（§56）
 ```
+
+## 58. ⭐⭐⭐ 戰場成本矩陣的讀端：`sub_5778B` 是加權尋路
+
+這一節把早期「只知道 `sub_4FCCC` 配置 196×196 bytes」的 worklist 閉合。證據來自
+同一份 `WAR.EXE`（SHA-256
+`11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`），以 IDA Pro
+`9.4.0.260610` 匯出的 `.i64` 函式與交叉參照；位址是 IDA 線性位址，未把它和
+遊戲 `ds:` 偏移混用。
+
+### `sub_4FCCC`：矩陣內容 — **confirmed**
+
+建立矩陣前暫時改寫每格的尋路權重：
+
+| 條件 | `byte_9E2` 建矩陣時 | 建完恢復 |
+|---|---:|---:|
+| 河海（`sub_50151 == 3`）| 30 | 12 |
+| 沙漠（`sub_50151 == 7`）| 100 | 4 |
+| 有鐵路（`sub_4FEF0 != 0`）| 1 | 2 |
+
+接著對每個來源 `i`、目的 `j` 寫入 `dword_6A454[i×196+j]`：
+
+```text
+0       若 i == j
+80      若相鄰且 word[62A8 + j×2] 有單位
+9E2[j]  若相鄰且 byte[91E + j] != 0xFF
+0xFF    其他情況
+```
+
+這證實尋路權重與玩家實際移動成本是兩張表；`0xFF` 是矩陣的不可達哨兵。
+
+### `sub_5778B`／`sub_5770F`：讀矩陣 — **confirmed（形狀與資料流）**
+
+`sub_57648` 先以第二參數為來源，把矩陣那一列放入距離陣列並記錄前驅；
+`sub_5770F` 每輪掃 0..195 的未訪問節點，挑距離嚴格較小者；`sub_5778B` 再以
+矩陣列做鬆弛，最後沿前驅回填 `byte_6430` 路徑，並以 `sub_510E0` 驗證相鄰性。
+這是 Dijkstra 形狀的全圖尋路，不是只比較兩格曼哈頓距離。
+
+`sub_567B9` 本身仍有額外行為：它先清除起點佔用，掃目標周圍六格，排除已佔用／
+已預約格，依 `sub_56461`、`sub_56548`、`sub_566B6` 排序；只有特定模式會經
+`sub_562BF` 呼叫 `sub_573A5`／`sub_5778B` 比較完整路徑。因此「矩陣讀端已解」不等於
+「所有 `sub_567B9` 候選排序都已等價」，這個差異保留在 worklist。
+
+### Go 端切片與限制
+
+`internal/game/battlepath.go` 以相同的已確認權重做確定性 Dijkstra，`RouteNextCell`
+回傳命令 `+12` 的第一跳，並已接到 `AutoResolveByChain` 與互動守方 AI；中間佔用格
+不回傳成下一跳，目標佔用格仍保留 80 的成本。`battlepath_test.go` 固定驗證鐵路／
+河海／沙漠權重、低權重繞路、佔用格與長城 `CanCross` gate。
+
+這是可重現的 remake 實作切片，不宣稱已通過原版逐格 oracle。下一步仍需用正常玩家
+戰鬥取得多個 `+12` 序列，才能核對候選排序、特殊模式與原版 `sub_5770F` 的細節。
+
+### 未讀清單更新
+
+```
+sub_3BCED 的後段排序
+sub_56A57 那個索引不一致（§52）
+戰報多印的那段文字是什麼（§56）
+sub_567B9 的候選排序、特殊模式與原版 oracle 對照
+```
+
+## 59. 2026-08-09 玩家「駐軍」分支的確認鍵與執行期寫入 — **部分 confirmed**
+
+證據來源：同一份 `WAR.EXE`（SHA-256
+`11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`），IDA Pro
+`9.4.0.260610` 的 `.i64` 函式匯出；以下位址均為 IDA 線性位址。
+
+`sub_4D3F6` 在 `4D4CD–4D4D7` 將主選單輸入 `'4'` 直接交給
+`sub_4C33B(arg_0)`；`arg_0` 沿同一函式呼叫鏈傳入目前戰場單位的 1-based 執行期
+將領 ID。`sub_4C33B` 的控制流如下：
+
+```text
+繪製駐軍畫面
+→ 顯示 `(Y/N)`
+→ READKEY
+→ 只接受 `0`、`Y`、`y`
+→ byte_6AA8A = 1
+→ sub_55C29(arg_0)
+```
+
+因此「駐軍分支有一個明確的確認鍵」是 **confirmed**；它不是按下 `4` 就立即
+改寫狀態。`sub_4C33B` 的 `(Y/N)` 與部署的 `sub_42056` 共用同一組
+`0/Y/y` 接受慣例，但兩者寫入端不同。
+
+`sub_55C29` 以 `0x7A7D + 0x21 × arg_0` 定位執行期 33-byte 將領記錄，並執行：
+
+| 偏移 | 目前可證實的操作 | 語意等級 |
+|---:|---|---|
+| `+1D` | `< 0x28` 加 3；否則 `< 0x3C` 加 2；否則 `< 0x5A` 加 1；最高封頂 `0x5A` | confirmed（操作），欄位語意 unknown |
+| `+07` | 先依 `byte_6FE88`／`+0E` 分支加 3 或 2，最高封頂 `0x0F` | confirmed（操作），欄位語意 unknown |
+| `+1E` | `< 0x28` 加 2；否則 `< 0x50` 加 1，最高封頂 `0x50` | confirmed（操作），欄位語意 unknown |
+
+`byte_6AA8A` 的長期角色、三個欄位在戰鬥中的玩家可見名稱，以及呼叫後是否
+立即結束目前單位／回合，仍未由正常玩家畫面與 `.DT2` 寫回樣本閉合。故 remake
+目前只保留駐軍提示與 ESC 回退；不得把 `sub_55C29` 的三組加法直接映射成
+未證實的 Go 欄位或宣稱已完成駐軍規則。
+
+### 未讀清單更新
+
+```text
+sub_55C29 三個執行期欄位的玩家可見語意與回合效果
+byte_6AA8A 的清除／讀取端及其與回合結束的關係
+```
+
+## 60. 2026-08-09 `sub_534FF` 無主省分支勘誤 — **confirmed（IDA Pro 9.4）**
+
+重新匯出 `WAR.EXE.i64` 的 `sub_534FF` 後，前版 §47／§51 的「遇無主省停止掃描」
+被原始控制流推翻。`53588–535CC` 的實際分支是：
+
+```text
+司令 == 0       → 直接到 535CC，繼續檢查 +32 bit 6 與 sub_5A881 < 100
+司令 != 0 且 != +14 → 5360A，排除這個鄰省
+司令 == +14     → 535CC，繼續檢查後收下
+```
+
+外層仍由 `53547` 回跳，`var_3 = 1` 遞增到 `8`，所以掃鄰省表的全部 8 格；`0`／`0xFF`
+填充仍在更早的 `5354A–53588` 被排除。這不是依單一存檔推測，而是同一份
+`WAR.EXE`（SHA-256
+`11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`）、IDA Pro
+`9.4.0.260610` 的線性位址／分支證據。
+
+因此 `ProvinceTable.ReinforcementSources` 現改為「非零且不同勢力才排除」，無主省
+通過後續門檻時保留，並掃描完整 8 格；`TestReinforcementSourcesKeepsScanningPastUnownedNeighbour`
+固定「無主省後繼續」與「第 8 格納入」。§51 的歷史誤讀仍保留作勘誤索引，不得再
+當作目前規則依據。
+
+## 61. 2026-08-09 值 4 的 mode 1 候選已接回 remake — **部分 confirmed**
+
+本輪重新對照同一份 `WAR.EXE`（SHA-256
+`11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`），IDA Pro
+`9.4.0.260610`；以下均為 IDA linear address。這次不是重新猜 `sub_55632(mode=0)`
+的排序，而是把已經有直接控制流證據的兩個條件接回唯一執行入口。
+
+### 原版控制流
+
+`sub_3BCED`（`0x3BCED`）先呼叫 `sub_55632`，逐格篩選 `sub_55BCC`（一步／兩步）、
+佔用表與守方 `+8 == 0`。`0x3BDCF–0x3BE02` 顯示：
+
+```text
+候選清單掃描 1..36                         ; 中心格不在這段清單
+mode == 1 且 將領[word_64944].+5 != 0xFF  → 追加 word_64944
+```
+
+值 4 的 `sub_3CA09`（`0x3CA09`）在呼叫點 `0x3CA9C` 將
+`將領[word_64944].+5` 作為中心、把 `mode=1` 傳給 `sub_3BCED`，接著只處理第一方
+命令 3／4 的單位。故「當前交戰省司令仍在場就算候選，即使離中心超過兩格」是
+**confirmed**；`sub_55632(mode=0)` 的原版順序與 `sub_567B9(mode=1)` 的完整候選
+排序仍是 **unknown**。
+
+### Go 端切片
+
+`BattleSim.AtCommander` 明確保存省份記錄 `+20`（`word_64944`），由
+`cmd/dsds/startBattle` 從省份表填入，不能從守方部隊順序猜。`execStrikeForce` 現在：
+
+1. 從兩步候選排除中心格，避免 `WithinTwoSteps(c,c)` 的幾何便利性把主力自己列入；
+2. 在候選掃描後追加仍在 `foes` 且 `Cell != 0xFF` 的 `AtCommander`，保留原版追加
+   的順序（若已在兩圈內也不去重）；
+3. 不改動未知的 mode 0 候選排序，也不宣稱值 4 的完整玩家路徑已等價。
+
+`TestStrikeForceModeOneAddsRemoteCommanderAndSkipsCenter` 固定「遠端司令仍可被選到」
+與「中心不自打」；`TestStrikeForcePoolExcludesOwnUnits` 繼續守住陣營過濾。
+
+### 未讀清單更新
+
+```text
+sub_55CEC 的其餘呼叫端（部署／移動候選／戰鬥 AI 的 ZOC 條件）仍需逐一對照
+sub_55632(mode=0) 的輸出順序
+sub_567B9(mode=1) 的完整候選排序與特殊模式
+```
+
+## 62. 2026-08-09 `sub_3D261` 的城市後備分支 — **confirmed（IDA；Go 部分接入）**
+
+本節使用同一份 `WAR.EXE`（SHA-256
+`11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`），IDA Pro
+`9.4.0.260610` 的 `.i64` 函式邊界與資料流；以下數值都是 IDA 線性位址，不是
+遊戲 `ds:` 偏移。
+
+### `sub_560D7` 的兩種城市查詢
+
+`sub_560D7`（`0x560D7–0x56193`）先由 `sub_55FBE` 建立最多 10 格的城市清單，
+再依 `arg_0` 分流：
+
+```text
+mode 1：依清單順序呼叫 sub_510E0(city, current)，回第一個相鄰城市
+mode 2：依清單順序呼叫 sub_55BCC(city, current)，回第一個兩格內城市
+```
+
+`sub_510E0`（`0x510E0–0x51233`）是六角一步鄰接，`sub_55BCC` 是一步或兩步；
+Go 的 `Adjacent`／`WithinTwoSteps` 對應這兩個已證實的幾何查詢。`WithinTwoSteps`
+保留原版 `a == b` 會成立的性質，但值 13 後續仍會另外以 `sub_510E0` 排除相鄰格。
+
+### `sub_3D261` 的欄位寫入
+
+`sub_3D261`（`0x3D261–0x3D40B`）的 `arg_2` 是 20 bytes 城市清單、`arg_6` 是
+城市數、`arg_8` 是目前單位 ID。控制流先呼叫 `sub_560D7(mode=1, +5)`：
+
+```text
+第一個相鄰城市有佔用者：
+  佔用者 +8 != 0（攻方） → current +12 = current +5；current +10 = 佔用者 ID
+                              （不立 current +13 bit 7）
+  佔用者 +8 == 0（守方） → current +12 = current +5；current +13 |= 80h
+                              （不清舊 current +10）
+
+沒有可直接處理的相鄰城市：
+  current +10 = 0
+  依複製城市清單順序掃描佔用格
+  若佔用者 +14 == current +14：
+      current +10 = 佔用者 ID
+      current +12 = sub_567B9(0, city, current +5)
+      +12 != 0FFh 才結束；失敗時保留最後候選的 +10／+12
+```
+
+這裡的「同勢力」只是在 `+14` 相等的資料流上成立；不把它命名成增援或守城等
+尚未由玩家畫面確認的高階語意。`+10`、`+12`、`+13` 的不對稱是原始寫入契約，
+不能用會自動立旗的 `AssignTo` 取代。
+
+### 已確認的呼叫點與 Go 接入範圍
+
+`sub_3D57B`（值 13）在 `0x3D7A0` 呼叫 `sub_3D261`，但只有
+`sub_560D7(mode=2)` 找到**非相鄰、由守方佔用**的城市且 `sub_567B9` 回 `0FFh`
+時才到這個 callpoint；城市不存在、空著、由攻方佔用或已相鄰時，原版直接跳過。
+`sub_3D411` 在 `0x3D543` 也呼叫同一支，處理命令 4／5 找不到空城市的後備；這條
+後處理的欄位窄接入見 §63。原版 gate 與預約表的清除時機仍未完全閉合。
+
+`internal/game/battlefallback.go` 現在以 `assignCityFallback` 接入上述欄位寫入，
+`internal/game/battleexec.go` 的值 13 命令 2／3 只在直接路徑失敗時呼叫它。測試
+`TestAssignCityFallbackDirectAdjacentAttacker`、
+`TestAssignCityFallbackDirectDefenderPreservesTarget`、
+`TestAssignCityFallbackScansFriendlyCity` 與
+`TestExecDefaultUsesCityFallbackAfterRouteFailure` 固定直接分支、旗標／舊目標保留、
+同勢力清單順序與 callpoint 門檻。這是**部分接入**，不宣稱 `sub_3D411` 或完整
+`sub_567B9` 候選排序已等價。
+
+### 未讀清單更新
+
+```text
+sub_3D411 的完整 gate、byte[65BA] 預約表生命週期與 `sub_567B9(mode=0)` 排序仍未閉合；
+Go 只在顯式 gate 下接入已證實的命令 4／5 分支（§63）
+sub_567B9(mode=0) 的候選排序與失敗時的所有欄位殘留仍需 oracle
+```
+
+## 63. `sub_3D411` 的命令 4／5 後處理 — **confirmed（IDA）；Go 顯式 gate 窄接入**
+
+本節使用同一份 `WAR.EXE`（SHA-256
+`11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`），IDA Pro
+`9.4.0.260610`；以下均為 IDA 線性位址，不是遊戲 `ds:` 偏移。
+
+### 原版控制流
+
+`sub_3D411`（`0x3D411–0x3D575`，由 `sub_3D57B` 尾端 `0x3D543` 呼叫）先接收
+複製的城市清單與數量，再依第二方 runtime 清單 `word[764h + i×2]` 掃描 1..10。
+只有命令 `+9 == 4` 或 `+9 == 5` 進入後處理；其他命令不碰。
+
+每個候選單位先呼叫 `sub_55CEC(arg_0=1, current +5, unitID)`。該支的
+`0x55CEC–0x55EF8` mode 1 以六角方向表 `word[625Ah + parity×12 + dir×2]`
+掃六格相鄰佔用格，逐一比較佔用者與目前單位的 `+14`；只要有一個不同勢力就跳過
+這個單位。這是「有敵人在身邊就不做城市分派」，不是 `Attacking (+8)` 的替代判斷。
+
+沒有敵鄰時，`sub_3D411` 依收到的城市清單順序挑第一個同時滿足下列條件的格：
+
+```text
+word[62A8h + city×2] == 0       ; 城市目前沒有 runtime 佔用者
+byte[65BAh + city] == 0         ; 本回合預約表沒有被占用
+```
+
+找到後只寫目前單位 `+12 = city`，並把 `byte[65BAh + city]` 設為 1；不清 `+10`，
+也不自動立 `+13` bit 7。這個「城市格預約」與 §52 追人分支只在 fallback 路徑
+寫表的形狀一致，但完整清除／共享時機仍未知。
+
+城市清單沒有可用格時，原版把目前命令 `+9` 改成 2，並在 `0x3D543` 呼叫
+`sub_3D261`。Go 的 `assignCityFallback` 沿 §62 的已證實欄位契約處理這個 callpoint；
+因此直接相鄰攻方不立 bit 7、直接相鄰守方不清舊 `+10`、同勢力掃描失敗保留最後
+候選的行為不被 `AssignTo` 覆蓋。
+
+### gate 與未解欄位
+
+`sub_3D57B` 在 `0x3D807` 的尾端條件是：
+
+```text
+(byte_6AA85 & 80h 且 byte_64900 >= 5) 或 byte_6B89E != 0
+    → sub_3D411
+```
+
+`byte_6AA85` 的 bit 7 已由 `sub_3A988`（`word[796h + i×2] & 2000h` 任一成立）
+確認；`byte_64900` 是回合數。`byte_6B89E` 只有一個寫入端：
+`sub_39B6E` `0x39CBB–0x39CBE` 把 `arg_A` 寫入。新增的 IDA direct code xref
+與四個 callsite 參數追查已確認：`sub_3562B+0x357D4` 傳 `arg_A=1`；
+`PROGRAM+0x110D3`、`sub_2D812+0x2D9F3`、`sub_368A8+0x36977` 傳 `arg_A=0`。
+這只閉合原始 byte 的來源值，不替參數命名成玩家／電腦模式，也不推導預約表生命週期。
+`sub_3A9C9` 另會以當前交戰省司令在場條件設 `byte_6AA85` bit 6，但 `sub_3D411`
+gate 不讀 bit 6。
+
+Go 端新增 `BattleChainGates.EnableDefaultPostStage`，只有呼叫端明確掌握完整 gate
+時才會在 `AutoResolveByChain` 的分支 A 值 13 後呼叫 `execDefaultPost`。預設值是
+false；顯式開啟時使用回合內 `[]bool` 對應城市預約表，並以 fail-closed 的
+`enemyAdjacentCount` 處理 Occupancy 與 runtime 表不一致。這是可測的部分接入，
+不是對 `byte_6B89E` 或預約表生命週期的猜測。
+
+### 證據與實作對照
+
+| 項目 | 證據 | Go 對應 | 等級 |
+|---|---|---|---|
+| 命令 4／5 篩選 | `sub_3D411` `0x3D411–0x3D575` | `execDefaultPost` | confirmed |
+| 六格敵鄰計數 | `sub_55CEC` mode 1 `0x55CEC–0x55EF8` | `enemyAdjacentCount` | confirmed |
+| 空城＋預約表 | `sub_3D411` 城市迴圈 | `reserved []bool` | confirmed（生命週期 unknown） |
+| 無空城後備 | `sub_3D411` `0x3D543` → `sub_3D261` | `assignCityFallback` | confirmed／部分接入 |
+| 呼叫 gate | `sub_3D57B` `0x3D807`、`sub_39B6E` `0x39CBB`；四個 direct callsite | `DefaultPostStageOpen`／`DefaultPostArgA` | gate 公式與 `arg_A` 值 confirmed；參數高階語意與預約生命週期 unknown |
+
+測試 `TestExecDefaultPostBlocksCommandsWithEnemyAdjacent`、
+`TestExecDefaultPostUsesCityOrderAndReservation` 與
+`TestExecDefaultPostDemotesAndUsesFallback` 固定敵鄰跳過、清單順序／預約表及
+命令降級／後備欄位契約。尚未取得正常玩家路徑的後處理 `.DT2` 差分，因此不能宣稱
+值 13 全流程或 `sub_567B9` 排序已等價。
+
+## 64. `sub_567B9` 候選排序的新增位址證據 — **部分 confirmed；暫不擴大接入**
+
+本節同樣以 `WAR.EXE` SHA-256
+`11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`、IDA Pro
+`9.4.0.260610` 讀取；以下為 IDA 線性位址。這輪只補足候選清單的資料流，沒有把
+尚未取得正常玩家 oracle 的排序硬改進 `RouteNextCell`。
+
+### 六格候選的可證實前置
+
+`sub_567B9`（`0x567B9` 起）在目標／起點不是 `0xFF` 時，先暫時清除起點的
+`word[62A8h + current×2]` 與 `byte[91Eh + current]`，若目前單位原本有
+`+12 != 0xFF`，也會清掉舊下一跳在 `byte[65BAh + next]` 的預約。之後
+`sub_5619C`（`0x5619C–0x562BE`）掃目前格六個合法鄰格：
+
+```text
+若鄰格是地物 3 且沒有鐵路 → 水域計數 +1
+水域計數 >= 4 且單位兵種 +21 是 1 或 5 → 成本上限 13
+其他情形 → 成本上限 12
+```
+
+主迴圈只把「幾何合法、格佔用為 0、`byte[65BAh+格] == 0`、
+`byte[91Eh+格] <= 成本上限`」的六格鄰居放進暫存清單。這些是欄位／分支操作的
+**confirmed**；成本表當下代表真實移動成本或尋路權重，仍要和呼叫前的建表時機對照。
+
+### 排序層的三個資料流
+
+1. `sub_56461`（`0x56461–0x56547`）以 `sub_503BB(候選格, 目前單位)` 的值
+   做降冪選擇排序；`sub_503BB` 的地形 × 兵種防禦表已有 `docs/re/08` 證據。
+2. `sub_56548`（`0x56548–0x566B5`）以目標格 `arg_2` 的矩形曼哈頓距離做升冪
+   排序；交換前還呼叫 `sub_58FD9`，該候選的排除語意未解。
+3. `sub_566B6`（`0x566B6–0x56728`）依 `byte_6FFCA` 與區域暫存的兩個排序結果
+   選一個結果；只有候選分數相等／特定旗標時才走另一條，不能把前兩種排序
+   直接串成單一「先防禦、再距離」規則。
+
+`sub_581C0`（`0x581C0–0x58208`）把當前戰場省編號
+`0Fh、14h、1Ah、1Dh、21h、22h` 標成特殊集合；`sub_562BF`
+（`0x562BF–0x56460`）在距離與候選數門檻成立時，另以 `sub_573A5`／`sub_5704A`
+計算候選值後排序。這兩支的高階名稱與數值意義仍是 **unknown**。
+
+### 全路徑特殊分支
+
+`sub_56729`（`0x56729–0x567B8`）在 `byte_6FFCA & 4`、模式與特殊集合條件成立，
+且單位不是兵種 4 時呼叫 `sub_5778B` 的矩陣尋路，再以 `sub_5704A(3)` 的結果
+和執行期 `+7` 機動力比較；足夠時才把回傳格寫進 `byte[65BA]`。這確認了：
+**完整 196×196 Dijkstra 不是每一個 `sub_567B9` 呼叫都會走**，它是條件式的
+特殊路徑／預約分支。
+
+### Remake 邊界
+
+目前 Go 的 `RouteNextCell` 已對齊 `sub_5778B` 讀端的加權 Dijkstra，但尚未對齊
+上述六格候選的三層排序、`sub_58FD9` 排除與 `sub_562BF`／`sub_56729` 特殊分支。
+在沒有正常玩家的多條 `+12` 序列與 `.DT2` 差分前，維持現有路由切片並把這些
+候選排序標為未接入，避免用推測改變所有 AI 的移動。
+
+## 65. `byte_6B89E` 的 `arg_A` callsite 值已閉合 — **confirmed（值）；語意仍未知**
+
+本節以同一份 `WAR.EXE`（SHA-256
+`11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`）、IDA Pro
+`9.4.0.260610` 匯出；位址均為 IDA linear address。先讀函式索引後使用
+`tools/ida_func_xref.idc` 取得 `sub_39B6E` 的四個 direct code xref，再用
+`ida_function_export.idc` 保存 `sub_2D812`、`sub_3562B`、`sub_368A8` 的原始指令。
+
+`sub_39B6E` 的參數形狀是 `arg_0`、兩個 far pointer（`arg_2`／`arg_6`）與
+`arg_A`；Borland Pascal 的由右至左 push 順序由 `retf 0Ch` 與既有
+`sub_42566` far-pointer callsite 交叉確認。四個直接 callsite 的最後一個
+`arg_A` push 值如下：
+
+| callsite | `arg_A` | 證據 |
+|---|---:|---|
+| `PROGRAM+0x110D3` | 0 | `WAR.EXE.asm` callsite；IDA xref 目標 `sub_39B6E` |
+| `sub_2D812+0x2D9F3` | 0 | `function-sub_2D812.txt` |
+| `sub_3562B+0x357D4` | 1 | `function-sub_3562B.txt` |
+| `sub_368A8+0x36977` | 0 | `function-sub_368A8.txt` |
+
+因此 `sub_3D57B+0x3D807` 的第二項 gate `byte_6B89E != 0` 已可在呼叫端以
+原始 `arg_A` 值重現；不能再把「`arg_A` 的值完全未解」當成現況。仍未證實
+`arg_A=1` 的高階模式名稱、`byte[65BAh+格]` 的跨呼叫生命週期，以及
+`sub_567B9` 的候選排序，所以 Go 不把它命名成「電腦模式」或自動替所有戰鬥開啟。
+
+`internal/game.BattleChainGates` 現以 `DefaultPostArgA` 保留此原始 byte，
+`DefaultPostBit7` 保留 `byte_6AA85 & 80h`，`DefaultPostStageOpen(turn)` 實作
+`(bit7 && turn >= 5) || arg_A != 0`；`EnableDefaultPostStage` 只是已掌握完整
+外部狀態時的相容覆寫。`TestDefaultPostStageOpenMatchesOriginalGate` 固定回合 4／5、
+`arg_A=0/1` 與明確覆寫，未改變預設 fail-closed 的互動路徑。
+
+## 66. `sub_567B9` 三個候選排序原語已閉合；完整接合仍 fail-closed
+
+本節以同一份 `WAR.EXE`（SHA-256
+`11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`）及 IDA Pro
+`9.4.0.260610` 重建；下列數字全部是 IDA linear address。這輪用
+`tools/ida_function_export.idc` 匯出原始函式，再以
+`tools/ida_func_xref.idc` 確認三個排序器都只由 `sub_567B9` 呼叫（`5698A`、
+`569A1`、`569A5`）。原始名稱、位址與相對運算元均保留。
+
+### `sub_58FD9`：只排除無鐵路河海 — **confirmed**
+
+`0x58FE7–0x5900F` 先把同一個格編號傳給 `sub_50151`，只有回傳地物碼 `3` 才
+繼續呼叫 `sub_4FEF0`；後者回傳 0 才回傳 1。也就是：
+
+```text
+sub_58FD9(cell) = (sub_50151(cell) == 3) && (sub_4FEF0(cell) == 0)
+```
+
+這裡的 3 已由 `sub_50151`／`NEWMAP` 詞表對上「河海」，而鐵路查詢的優先序由
+`sub_4FEF0` 直接呼叫證實；因此河海上的鐵路格（鐵橋）不能與無鐵路河海混同。
+Go 的 `IsUnrailedWaterTile` 只接受已解出的 `assets.Tile`，不把未知 raw 值轉成
+河海。
+
+### `sub_56461`：防禦值降冪選擇排序 — **confirmed**
+
+`0x56461–0x56545` 讀候選數 `[arg_0-29h]` 與清單 `[arg_0-31h+i]`。外層固定
+目前項，內層比較後項；後項的 `sub_503BB(候選格, [arg_0-38h])` **嚴格大於**
+目前項時交換，所以值降冪、相等不換。後項為 `0xFF` 會跳過；主函式建立的
+候選數只會計入通過前置 gate 的格，故清單正常不含哨兵。
+
+### `sub_56548`：目標格矩形曼哈頓距離升冪，但無鐵路河海不前移 — **confirmed**
+
+`0x56548–0x566B3` 以 `[arg_0+0Ah]` 為目標，將每一格拆成 `/14` 的列／欄並取
+絕對值和。後項距離嚴格較小時，先呼叫 `sub_58FD9`；若回傳非零就跳過交換，
+否則交換。這是有條件的巢狀選擇排序，不可用一個宣稱全序的 `sort.Slice` 比較器
+取代；相等距離也不換。
+
+### `sub_566B6`：兩份排序結果的保守選擇 — **confirmed；暫不命名 stack slot**
+
+`0x566B6–0x56726` 先比較 `[arg_0-36h]` 與 `[arg_0-30h]`；相同即回
+`[arg_0-30h]`。不同時，若 `[arg_0-3Bh] != 0` 回 `[arg_0-36h]`；否則比較
+兩格的 `sub_503BB` 值，值不同回 `[arg_0-30h]`，值相同回 `[arg_0-36h]`。
+主函式在 `0x5698D–0x569A0` 之間做 6-byte 區域 copy，但尚不能把這兩個 stack
+slot 誠實命名成「防禦排序」或「距離排序」，所以本節只保存原始偏移契約。
+
+### Go 對照與界線
+
+`internal/game/battlecandidates.go` 新增四個純原語：
+`IsUnrailedWaterTile`、`SortBattleCandidatesByDefense`、
+`SortBattleCandidatesByTargetDistance`、`SelectBattleCandidate`；測試固定嚴格
+比較、平手不交換、無鐵路河海不前移、特殊旗標與防禦值平手分支。這些函式不會
+自動改變現有 `RouteNextCell` 或所有 AI 呼叫端；完整 `sub_567B9` 仍包含六格前置
+候選、`sub_562BF` 特殊省份值、`sub_56729` 條件式 Dijkstra 與預約表生命週期，
+尚未有正常玩家 `+12` 序列／`.DT2` 差分裁決，故維持 fail-closed。
+
+## 67. `sub_567B9` stack 參數勘誤：六格是目標格鄰域，不是目前格鄰域
+
+> 證據輸入：同一份 `WAR.EXE`（SHA-256
+> `11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`）；IDA Pro
+> `9.4.0.260610`；以下均為 IDA linear address。原始函式名、位址與相對運算元保留。
+
+前一版 §64／§66 以「目前格六個鄰格」描述前置掃描；那是 stack slot 方向未先
+核對造成的錯誤，保留作歷史索引，本節為正式勘誤。`sub_503BB`（`0x503BB–0x505FD`）
+的兩參數 callsite 已固定物理 stack 對照：`arg_0` 是最後壓入的格編號，`arg_2`
+是先壓入的 runtime 單位 ID。`sub_567B9` 的三參數 caller 依序 push
+`(current, target, mode)`，所以物理 slot 對應為 `(arg_0, arg_2, arg_4)` =
+`(mode, target, current)`。
+
+這個對照與資料流相互印證：
+
+- `sub_567B9` `0x567CF` 先拒絕 `arg_4==FF`／`arg_2==FF`；`0x567DE–56813`
+  以 `arg_4` 查目前 runtime 單位、暫時清掉目前格佔用與舊 `+12` 預約。
+- `0x56844` 起的方向迴圈把 `arg_2` 拆成六個鄰格，並以該六格做
+  `sub_510E0`、佔用、預約與成本上限篩選；因此候選來源是 **target 的六個鄰格**。
+- `sub_3B079+0x3B0D6`（mode 1）把單位目前格先壓入、`word_64902` 的司令格後壓入；
+  `sub_3D261+0x3D3E0`（mode 0）同樣先壓目前單位格、再壓城市候選格。兩個 caller
+  都把回傳值寫回該單位 `+12`。
+- `sub_58209+0x583F3` 逐一試候選目標時也沿用「目前格、候選格、mode」的 push 順序，
+  但目前尚未找到把 `+12` 直接消費成實際移動格的完整 call chain。
+
+因此 `+12` 可以確認是 AI 指派的目標格／下一跳候選欄位，**不能只憑
+`sub_567B9` 宣稱每次都是目前格的相鄰下一步**。這也解釋了為何既有
+`internal/game/battlepath.go` 的 `RouteNextCell` 只能代表已驗證的矩陣讀端，
+不應被改寫成這支候選掃描器。
+
+### Go 的窄接合
+
+`internal/game/battlecandidatepath.go` 新增純函式方法
+`SelectOriginalBattleCandidate`，只落地已閉合的部分：
+
+1. 由 target 六鄰格建立候選，排除佔用、明確注入的預約與高於
+   `sub_5619C` 的 12／13 成本上限（目前格周圍至少四個無鐵路河海，且兵種 1／5
+   時為 13）。
+2. 複製兩份清單，分別呼叫既有 `sub_56461`／`sub_56548` 純原語，再以
+   `sub_566B6` 的特殊省旗標／防禦值平手規則選擇。
+3. 保留 `sub_567B9` 最後「目前格與所選格防禦值相同且目前格鄰接 target」的回退。
+
+當 `EnableLastSteps`（`byte_6FFCA & 4`）開啟且省份不在
+`sub_581C0` 的 `{15,20,26,29,33,34}` 時，方法回傳 `Complete=false`，不猜
+`sub_562BF`／`sub_56729` 或預約表生命週期；沒有候選則回傳 `NoCell, Complete=true`。
+這個切片不改 `Occ`／`NextCell`，也沒有接進既有 AI 派工，直到取得正常玩家 `+12`
+序列與 `.DT2` 差分裁決。
+
+## 68. `+12` 消費端 audit：目前只能閉合到「產生／清理／動畫」，不可宣稱 AI 移動
+
+> 證據輸入：同一份 `WAR.EXE`（SHA-256
+> `11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`）；IDA Pro
+> `9.4.0.260610`；以下均為 IDA linear address。這是對 §67 後續追查的新增證據，
+> 不是把未找到的 caller 當成「不存在」。
+
+本輪以 `+12 = 0x7A89` 全檔讀寫掃描，再用 IDA 匯出函式與 direct code xref 交叉核對：
+
+- `sub_4A1C0`（`0x4A1C0–0x4A2B7`）會依明確方向參數把目的地寫回單位 `+5`
+  （`0x4A267`），更新 `word_62A8` 與 `byte_91E`，但
+  `funcxref-sub_4A1C0.txt` 只有 `sub_4ABFD+0x4B121` 一個 direct caller；該路徑
+  是玩家移動輸入，不能自動當成 AI `+12` 消費端。
+- `sub_50992`（`0x50992` 起的畫面函式）在 `0x50E46–0x50E71` 讀 `+12`，把格號
+  拆成 `/14` 的列／欄後只餵 `GETIMAGE`／`PUTIMAGE` 與延遲；該分支沒有 `+5`
+  寫入。
+- `sub_58449`（`0x58449–0x58613`）在戰鬥動畫中暫時把一方的 `+5` 換到另一方格，
+  呼叫 `sub_50992`、`sub_51D68` 與戰損扣除，再把原格寫回；它是交戰動畫／公式鏈，
+  不是 AI 依 `+12` 走格。
+- `sub_3F0EF`（`0x3F0EF–0x3F339`）與 `sub_3C777`（`0x3C777–0x3C89A`）只
+  檢查 `+12==FF`，未指派時再呼叫 `sub_58209` 產生候選；`sub_3B492`、
+  `sub_4732C` 等則讀 `+12` 做重複目標過濾／清理。這些都是派工狀態管理，沒有
+  由 `+12` 直接呼叫 `sub_4A1C0` 的證據。
+
+因此目前最強的可重現結論是：`+12` 的寫入與其後的檢查／繪製已可追查，**正常
+AI 如何把它落成 `+5` 的執行期移動仍未知**。Go 端維持 `RouteNextCell` 的矩陣讀端、
+`SelectOriginalBattleCandidate` 的純候選切片與 fail-closed；下一步必須取得一段
+正常玩家／電腦回合的 `+12`、`+5`、`word_62A8` 與 `.DT2` 差分，或找到新的
+間接函式指標 caller，才可擴大接線。
+
+## 69. 自動守方部署使用 NWMAP `0x4000`，不是 WARPOS 腹地
+
+> 證據輸入：`WAR.EXE` SHA-256
+> `11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`；IDA Pro
+> `9.4.0.260610`；以下均為 IDA linear address。原始函式名與運算元保留。
+
+`sub_4166E`（`0x4166E–0x417CF`）在 `0x416B2–0x4172D` 逐格讀取
+`word[0x796h + 格×2] & 4000h`，格號由 0 遞增到 `0xC3`；守方 `+8` 在函式
+開頭被寫成 0。第一輪對候選呼叫 `sub_55CEC(mode=1)`，再檢查
+`word_62A8[格] == 0`；找不到時 `0x4173E–0x417A6` 掃同一旗標清單但不再做
+前置拒絕。`sub_4180D+0x419A5` 是自動守方的 direct callsite。
+
+同一建立函式在 `sub_4180D+0x41AF3` 稍後呼叫 `sub_41513`；後者把攻方 `+8`
+設為 1，按來源省的 WARPOS 分區由 195 反向掃描。這固定了兩條候選來源與
+先後順序：自動守方先取 NWMAP `0x4000`，攻方後取 WARPOS 來源格。
+
+Go 端新增 `Map.DefenderDeployZone` 與 `DefenderDeployFlag`，並把
+`cmd/dsds/startBattle` 的守方落點從 `WARPOS==0` 腹地猜法改成這份旗標清單；
+`internal/game/deploy_test.go` 逐省驗證候選非空、旗標命中及 0→195 順序。這不
+解開 `sub_55CEC` 的完整條件，也不替 `0x1000`／`0x2000`／`0x8000` 命名。
+
+## 70. `.DT1` 戰爭記錄有兩個玩家派將 layout，`+18` 是 union
+
+> 證據輸入：同一份 `WAR.EXE`，SHA-256
+> `11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`；IDA Pro
+> `9.4.0.260610`；以下均為 IDA linear address。這一節的 `+18`／`+38` 指
+> `ds:B346h` 的 60-byte `.DT1` 戰爭記錄，不是 `ds:A358h` 參戰部隊表的同名
+> `+38`，兩個位址空間必須分開記帳。
+
+`sub_2DD1F`（`0x2DD57–0x2DD68`）將玩家選將陣列中的非零 1-based 將領 ID
+複製到 `[bp-1BAh]`，最多 10 個 word。`sub_2D812` 隨後在計算
+`ds:B346h + 省編號×60` 的分支中，先寫四種資源，再以 `var×2` 寫入將領清單：
+
+| 原始位址 | 寫入位置 | 證據語意 |
+|---|---|---|
+| `sub_2D812+0x2DA9E..0x2DB1E` → `+0x2DB41` | 資源 `+4/+6/+0C/+10`，將領 `+0x12 + var×2`（檔案 `+18`） | 第一 layout：黃金／糧食／彈藥／燃料＋一組 ID 槽位 |
+| `sub_2D812+0x2DB70..0x2DBF3` → `+0x2DC16` | 資源 `+8/+0A/+0E/+0x12`，將領 `+0x26 + var×2`（檔案 `+38`） | 第二 layout：同四種資源＋另一組 ID 槽位 |
+
+`sub_3426A` 的返回值會先放進 `[bp-0Ch]`，成為清單起始索引；兩個分支不是攻方／
+守方命名。特別是第一 layout 的第一個將領 word 位於 `+18`，第二 layout 的燃料
+word 也位於 `+18`，這是同一筆記錄的 **union**，不能把兩者同時宣稱有效。
+`internal/game.ParseWarRecords` 已暴露 `WarRecord.Branch4`／`Branch8`，各自保留
+四種資源與中性將領 ID 槽位；`WriteWarRecords` 仍只改已由 `sub_3964E` 證實的
+`+0/+2`，避免未閉合的存檔同步時機改寫原版殘料。`+58..+59` 仍未知。

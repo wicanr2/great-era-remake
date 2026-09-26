@@ -1,13 +1,18 @@
 # DESIGN-22 人物自傳可追溯整合提案
 
-狀態：**DRAFT（流程提案；尚未解除 DESIGN-21 §9 的寫回禁令）**  
+狀態：**DRAFT（完整寫回流程；尚未解除 DESIGN-21 §9 的寫回禁令）**
 日期：2026-08-02
 
 2026-08-03 實作進度：`tools/gen_authored_bios.py` 已完成本提案第 2、3 節的
 唯讀／暫存輸出階段。`--check` 會失敗即關閉地驗證 417 筆骨架、387 篇正文、
 30 筆 unknown、#274 佔位排除、姓名／信心度一致、可畫性、格數、禁用詞與來源
-SHA-256；`--output /tmp/...` 連跑兩次可產生位元組相同的索引。**尚未建立版控內的
-`authored-bios.json`，也未接 `gen_people.py` 或寫回產品資料**，所以本文件仍是 DRAFT。
+SHA-256；`--output /tmp/...` 連跑兩次可產生位元組相同的索引。完整的
+`authored-bios.json` 仍未建立，也未接 `gen_people.py` 或寫回既有產品資料；因此本文件
+仍是 DRAFT。2026-08-10 另以 `docs/spec/11-authored-biography-overlay-p2c.md`（READY）
+授權一個較窄的 additive 路徑：`people-authored.json` 只填目前空白的 61 篇，並由
+`PeopleDB` fail-closed 載入；它不解除本文件的完整寫回禁令。
+2026-08-11 英／日 387 篇 machine-draft overlay 也已接入 runtime，但同樣不代表正式
+人審譯稿或完整 `authored-bios.json` 已完成。
 
 ## 0. 現況與問題
 
@@ -33,6 +38,11 @@ authored-bios.json（可重生的來源索引，不手改）
                   │ 只覆蓋明列欄位
 people.json ──────┴─→ translations/zh-Hant/people.json
 ```
+
+英／日語系目前不把這條完整寫回提案誤當成已完成：`tools/gen_locale_packs.py` 產生的
+`translations/en`／`translations/ja` 會保留繁中自傳正文，並以
+`bio_language=zh-Hant`、`bio_status=source-fallback` 讓 runtime 與畫面明示來源。
+只有取得可追溯英／日譯稿後，才可依本提案增加 locale-specific biography overlay。
 
 不整批覆寫原研究 `people.json`，讓舊版 326 篇仍可比較；發行資料由
 `tools/gen_people.py` 合併。這項裁決仍需使用者確認後，才能把本文件升為 READY。
@@ -124,3 +134,10 @@ people.json ──────┴─→ translations/zh-Hant/people.json
 tools/py.sh tools/gen_authored_bios.py --check
 tools/py.sh tools/gen_authored_bios.py --output /tmp/authored-bios.json
 ```
+
+## 9. 與 SPEC-11 的關係
+
+`SPEC-11` 的 `translations/zh-Hant/people-authored.json` 是獨立的 runtime overlay，
+只含 `newly_available` 的 61 筆，且載入器拒絕覆蓋 base `people.json` 已有的 326 篇。
+它不是本文件所提的完整 `authored-bios.json`，不會改動 `gen_people.py` 的輸出；未來若
+使用者裁決完整合併策略，仍須依本文件重新建立 READY 規格與完整驗收。

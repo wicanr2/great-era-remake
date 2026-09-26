@@ -1,10 +1,48 @@
 # 視覺現代化與復古／現代切換
 
-> **狀態：DRAFT**（`CLAUDE.md` §2：只有標 READY 的規格可以動手實作）
+> **狀態：DRAFT**（640×350 邏輯畫布與 1280×720 Modern high 玩家路徑均已接；`GEMF`
+> 可再散布比例 atlas 已接，逐篇語系審稿、向量字型、symbol 軸與正式現代音檔仍是發行 gate。P0/P1 的地形／鐵路窄切片、P2a 部隊
+> 圖示、P2b 顯示設定與 P3 HUD 輔助圖示已分別抽出至 `docs/spec/08-modern-theme-p1.md`、
+> `docs/spec/09-modern-unit-icons-p2.md`、`docs/spec/10-theme-preferences-p2b.md`、
+> `docs/spec/14-modern-hud-icons-p3.md`。）
 > 日期：2026-08-01
 > 範圍：呈現層（`internal/ui/`）與資產組織。**不改任何規則層行為。**
 > 前置文件：`docs/formats/04-tpc-bgi-image.md`、`docs/formats/05-tpc-tilesets.md`、
 > `docs/spec/04-battlefield-tiles.md`、`docs/mechanics/01-vocabulary.md`
+
+### 目前落地校準（2026-08-10）
+
+`internal/ui/theme`、retro adapter、`-theme retro|modern` 與遊戲中 `F2` 已完成；
+P1 的 `modern` 已替換 22 張地形與 21 張鐵路，P2a 已接上 18 張 modern 部隊圖示，
+P3-HUD 已接上 6 種資源／15 項指令圖示。2026-08-11 再補上 modern 資訊卡、十勢力
+色帶（**remake 自訂色，不宣稱原版色票**）、戰鬥面板控制鍵配色、地圖外殼與新聞／史事
+入口；英／日語系面板也走 semantic wording。這條完整垂直鏈保留 640×350 幾何，
+因此不會讓寬版面、向量字型或授權資產阻塞可玩交付；它們仍保留為日後可丟棄的 polish。
+
+### 目前落地校準（2026-08-11，Modern UI 完整邏輯鏈）
+
+Modern 模式現在沿著同一條玩家路徑完成：`Theme`／`Style` → 640×350 戰場與鐵路 →
+十勢力色帶的部隊圖示 → 資源／指令 HUD → semantic 面板與戰鬥控制鍵 → `N`／滑鼠／
+觸控進入 `NEWSDATA.DAT` 敘事畫廊。主題切換只交換已載入的 provider 指標；規則狀態、
+輸入動作、存檔 bytes 不變。`internal/ui/render` 的 modern 測試會檢查卡片底色、勢力
+色帶與語系字串，`cmd/dsds` 的 Xvfb 測試則覆蓋正常啟動與畫面分支。
+
+這裡的「完整」是**可玩的邏輯外殼**，不是原版美術逐像素，也不是尚未定案的寬版
+產品設計。向量／比例字型、1280×720 layout、symbol 軸與正式現代音檔必須另有授權與
+視覺 QA，列為非阻塞 polish；未知新聞字型則永遠保留 source-image fallback。
+
+2026-08-11 使用者要求先規劃高解析度 Modern 與 Android 版，並暫停三平台打包。
+這不會改寫本節已完成的 640×350 shell；高解析度設計畫布、字型、密度與 Android
+生命週期另見 [`docs/design/33-high-resolution-modern-android.md`](33-high-resolution-modern-android.md)。
+該文件目前是 DRAFT，推薦 1280×720 橫向，但要等使用者確認後才進入 renderer
+prototype；在此之前不能把 `scale = 2` 的 1280×700 視窗稱為高解析版。
+
+### 目前狀態勘誤（2026-08-11）
+
+使用者已確認 A：1280×720、16:9、橫向；H1-a 地圖／資訊卡、H1-b 指令／設定／自傳／
+敘事、H1-c 戰鬥 HUD 與 H2 政略／查閱流程已由專用或共用 Modern renderer 接通。
+本段早期「等待確認／尚未進入 renderer」只保留作歷史規劃，不再代表目前狀態；正式比例
+字型、Android 實機與現代音檔清權仍未完成。
 
 ---
 
@@ -19,7 +57,10 @@
 「畫什麼」與「怎麼畫」拆開。這份文件定義那條界線、兩套資產怎麼並存、
 切換的粒度與時機，以及分階段的落地路徑。
 
-**沒有涵蓋的**：音樂與音效（`.MUS`／`.TIM` 格式未解，見 §10 未決 9）、
+**沒有涵蓋的**：音樂與音效（retro OPL2 與 Modern Ogg runtime 的接線另見
+[`docs/design/30-audio-direction.md`](30-audio-direction.md) 與
+[`docs/spec/32-modern-ogg-runtime-m1.md`](../spec/32-modern-ogg-runtime-m1.md)；
+現代音樂內容仍未交付）、
 開場動畫的重製（§10 未決 5）、多語系的字串內容（`translations/glossary.md` 的職責）。
 
 ---
@@ -55,7 +96,7 @@
 | `RAIL.TPC` | 21 張 32×24 鐵路圖塊（縱橫彎角 T 字十字車站），4-bit chunky | **可換** | |
 | `NEWICON.TPC` | 18 張 32×17 部隊圖示：鋼盔／戰車／馬頭 各綠紅一對，大砲綠紅各六朝向 | **可換**（朝向除外）| **砲兵的六個朝向是資訊不是裝飾**，見 §7 紅旗 R3 |
 | `AC.TPC` | 17 張 178×60 戰鬥插圖 | **可換** | 播放時機未解，現代對應物設計不了（未決 4）|
-| `NEWSDATA.DAT` | 17 條 215×16 新聞橫幅，**預繪成點陣圖的句子** | **保存 + 阻塞** | 字型來源未解，倚天反查 17/17 落空。現代模式要顯示為文字，得先解字型（未決 7）|
+| `NEWSDATA.DAT` | 17 條 215×16 新聞橫幅，**預繪成點陣圖的句子** | **保存 + source-image fallback** | 字型來源未解，倚天反查 17/17 落空。已接 17 張原圖畫廊；目前只有 #0／#9 有可追溯英／日／繁中 caption，其餘明示未解，不以猜測 OCR 阻塞玩家路徑（未決 7）|
 | `.GLB`／`.GTB` 圖庫 | 45 筆 256 色圖，含書法標題（索引 0 透明）| **保存** | 開場美術，重繪成本另計 |
 | `CHOOSE*.TPC`／`HEAD*.TPC`／`FRAME1.TPC`／`BOOK1.TPC` | UI 框線與標題圖 | **可換** | |
 
@@ -80,7 +121,7 @@
 | 政略畫面：左側省份面板 + 右側 14×14 戰場 | 實機截圖 | **可換** |
 | 15 項政略指令選單（兩欄）| `docs/playtest/02` §5 | **可換** |
 | 戰場六角格排列：`x = col×32`、`y = row×24 + (奇數欄 +12)`，整場 448×348 | `docs/re/07` §3，出自 `sub_50FF5` | **保存**（幾何是規則，見 §7 R1）|
-| 數字鍵 1–6 對應六個移動方向 | `docs/playtest/14` | **改了會碰玩法**（R5）|
+| 戰鬥主選單 1–5（移動／攻擊／撤退／駐軍／查閱），移動子項再讀 1–6 方向 | `docs/mechanics/30-combat.md` §3、`docs/playtest/16` §4b | **保存**（主選單分派已確認；攻擊方式與撤退後續輸入仍未閉合）|
 | ESC 只退回、F10 才離開 | `CLAUDE.md` §9 硬規則 | **保存**（兩套主題都要遵守）|
 
 ---
@@ -159,10 +200,10 @@ Preset（玩家看到的那個開關）
 
 | 時機 | 是否支援 | 理由 |
 |---|---|---|
-| 命令列旗標 `-theme retro\|modern` | ✅ | 無頭截圖與 CI 比對要用，這是最重要的一個 |
-| 設定選單（指令 15「其他選項」底下）| ✅ | 原版就有這個入口，不必自己發明選單 |
-| 遊戲中即時熱鍵 | ✅ | 主題只影響呈現層，切換不碰任何狀態。建議 **F2**（避開 ESC／F10 的既定語意）|
-| 戰鬥中切換 | ✅ | 同上。戰鬥狀態在 `internal/game`，重畫一張畫面就好 |
+| 命令列旗標 `-theme retro\|modern` | ✅（P0/P1） | 無頭截圖與 CI 比對要用，這是最重要的一個 |
+| 設定選單（指令 15「其他選項」底下）| ✅（P2b） | 原版就有這個入口，不必自己發明選單 |
+| 遊戲中即時熱鍵 | ✅（`F2`，P0/P1） | 主題只影響呈現層，切換不碰任何狀態；避開 ESC／F10 的既定語意 |
+| 設定選單／戰鬥中切換 | 設定選單 ✅（P2b）／戰鬥中設計中 | F2 是捷徑；設定頁已提供可發現的 retro／modern 選項，戰鬥中仍不另造規則入口 |
 
 **即時切換能成立的前提**：呈現層對規則層是唯讀的。這一條要當硬規則寫進 §7（R7）。
 
@@ -241,8 +282,10 @@ type Theme interface {
 ```
 
 `Bitmap` 是一張已經解好的 RGBA（不是 `*ebiten.Image`）。
-兩個實作：`retroTheme`（包住現有的 `TileSet` / `LoadIcons` / `PanelFonts`）
-與 `modernTheme`（讀 `theme.json` + PNG）。
+長期方向是兩個完整實作：`retroTheme`（包住現有的 `TileSet` / `LoadIcons` /
+`PanelFonts`）與讀 `theme.json` + PNG 的 `modernTheme`。目前 P0/P1 的實際介面
+先縮成 `Tile`／`Rail` 兩個方法；`internal/ui/theme.NewModern` 以純 Go 生成
+deterministic 地形／鐵路，其他資產仍由 retro fallback，細節以 READY 規格為準。
 
 **`render` 層的改動方向**：現在 `DrawTiledBattlefield` 直接吃 `*TileSet`，
 改成吃 `theme.Theme`。這是唯一必要的簽章改動，其餘畫圖函式不動。
@@ -492,7 +535,7 @@ func Layout(boxes []Box, f Face, m Metrics) []Placement
 | **R2** | 現代模式新增狀態圖示（缺糧、被包圍、已行動…）| 原版沒有這些提示，玩家要自己判讀數字。加上去等於降低難度 | 做成可關的「輔助顯示」，**預設關**；差異表登記 |
 | **R3** | 砲兵圖示不畫朝向 | `+31` 疑似是朝向（1..6），六張預繪圖示配六角格六方向是強證據（`docs/formats/05` §3.3）。不畫朝向 = 隱藏資訊 | 現代圖示**必須**表示朝向。若後續證實 `+31` 是射程不是朝向，這條再訂正 |
 | **R4** | 現代模式顯示敵方部隊的兵力數值 | 原版顯示到什麼程度尚未逐項確認 | 先確認原版行為再決定；未確認前**照原版**（`docs/playtest` 有截圖可查）|
-| **R5** | 加入滑鼠操作 | 原版是純鍵盤（數字鍵 1–6 六方向）。滑鼠點選會讓「選到不合法的目標」變成可能的輸入 | 可以做，但**滑鼠必須走與鍵盤同一條規則 API**，不得直接寫規則層狀態 |
+| **R5** | 加入滑鼠操作 | 原版主選單是 1–5，移動子項才讀 1–6；滑鼠點選會讓「選到不合法的目標」變成可能的輸入 | 可以做，但**滑鼠必須走與鍵盤同一條規則 API**，不得直接寫規則層狀態 |
 | **R6** | 加入移動範圍／攻擊範圍高亮 | 原版要玩家自己算機動力與地形成本 | 同 R2：可關的輔助顯示，預設關 |
 | **R7** | 呈現層呼叫 `game.Rand` | 原版的 LCG 序列是可重現的（`docs/re/17`），呈現層抽一次亂數就把序列污染了，固定種子的截圖驗收會失效 | **硬規則：`internal/ui/**` 不得 import 或呼叫 `game.Rand`。** 動畫需要隨機就自己開一個獨立的 `math/rand` |
 | **R8** | 現代模式「修正」原版的顯示怪癖（欄位順序、疑似 bug 的畫面）| `CLAUDE.md` §1「不得默默改動遊戲規則」，術語表「原版 bug 照抄並標記」 | 不修。要修是 remake 差異，由使用者決定 |
@@ -520,6 +563,8 @@ func Layout(boxes []Box, f Face, m Metrics) []Placement
 | VD-12 | 短數值輸入頁增加 6×2、每鍵 64×48 的觸控數字鍵盤，實體鍵盤與存檔結果不變 | 純呈現 | 兩者 | Android／點擊正式路線（2026-08-03）；`docs/playtest/35-pointer-m1-keypad.md` | 否（觸控數值輸入必要）|
 | VD-13 | 省份／將領候選列可直接點選；調動多選須另點條件式勾號送出，不改原選取集合 | 純呈現 | 兩者 | Android／點擊正式路線（2026-08-03）；`docs/playtest/36-pointer-m1-lists.md` | 否（觸控清單必要）|
 | VD-14 | 產能四資源列可直接點選，選定後高亮並顯示共用數字鍵盤；黃金仍是不可選的剩餘值 | 純呈現 | 兩者 | 原版欄位順序與 Android 路線；`docs/playtest/37-pointer-m1-production.md` | 否（觸控產能必要）|
+| VD-15 | modern 640×350 資訊卡、十勢力語意色帶、戰鬥面板控制鍵與地圖外框 | 純呈現 | modern | 2026-08-11 Modern UI 垂直鏈；不改欄位順序、數值、命中區或規則 | 是（切回 retro）|
+| VD-16 | 地圖新增 `N`／滑鼠／觸控新聞入口與 17 張來源圖像畫廊；未知模板顯示 fallback | 純呈現 | 兩者 | `docs/spec/31-narrative-gallery-m1.md`；不以猜測 OCR 取代原圖 | 是（不開啟畫廊）|
 
 **類別只有兩種**：`純呈現`、`資訊量增加`。第二種一律要有「可關」欄且預設關。
 沒有第三種——若某個改動既不是純呈現也不只是資訊量增加，那它就是改規則，
@@ -530,23 +575,26 @@ func Layout(boxes []Box, f Face, m Metrics) []Placement
 ## 8. 落地路徑
 
 每一階段獨立可驗收，前一階段沒綠就不做下一階段。
-**這份文件是 DRAFT，所有階段都要等它轉 READY 才能動手。**
+**這份文件本身仍是 DRAFT；只有已抽出的 READY 規格可以動手。** P0/P1 的窄切片
+例外由 `docs/spec/08-modern-theme-p1.md` 定義，P2 以後仍須各自取得 READY。
 
-### P0 — 主題介面（不換任何一張圖）
+### P0 — 主題介面（不換任何一張圖；已由 `docs/spec/08` 窄接）
 
 - 新增 `internal/ui/theme`，`Theme` 介面 + `retroTheme` 實作（包住現行程式碼）
 - `render` 層的 `DrawTiledBattlefield` 等函式改吃 `theme.Theme`
-- `cmd/dsds`、`cmd/screenshot` 加 `-theme` 旗標（此時只有 `retro` 一個合法值）
+- `cmd/dsds`、`cmd/screenshot` 加 `-theme` 旗標，並保留 retro 預設；遊戲中 `F2`
+  可在已載入 provider 間切換
 
 **驗收**：`internal/ui/render` 現有測試全綠且**逐像素零差異**；
 `cmd/screenshot` 產出的 `menu-26.png`／`province-26.png` 與重構前 byte-identical。
 這一階段的價值就是「什麼都沒變」——有一個像素變了就是重構出錯。
 
-### P1 — 現代地形圖塊（22 + 21 張）
+### P1 — 現代地形圖塊（22 + 21 張；已由 `docs/spec/08` 窄接）
 
-- 建 `assets/themes/modern/`、`theme.json`、SVG 原始檔與出圖流程（chrome-headless）
-- `modernTheme` 實作，但**只實作 `Tile` 與 `Rail`**，其餘 fallback 回 retro
-- `deny_scan.sh` 加白名單 + 「PNG 必須有對應 SVG」的檢查
+- 長期的 `assets/themes/modern/`、`theme.json`、SVG 原始檔與出圖流程仍待後續
+  美術規格；目前不新增 PNG，以純 Go provider 先閉合索引、尺寸與接線契約
+- `modernTheme` **只實作 `Tile` 與 `Rail`**，其餘 fallback 回 retro
+- `deny_scan.sh` 不需增加 modern PNG 白名單；P1 沒有原版衍生圖檔
 
 **驗收**：`-theme modern` 能畫出全 39 省的戰場，22 種地形與 21 種鐵路各出現至少一次
 且無縫平鋪；混用（現代地形 + 原版部隊圖示）畫面不破。
@@ -554,14 +602,48 @@ func Layout(boxes []Box, f Face, m Metrics) []Placement
 
 ### P2 — 現代部隊圖示與勢力色
 
-- 4 個 base 圖示 + 執行期上色 + 砲兵旋轉
-- `Unit(branch, faction, facing)` 的 retro 折疊（十勢力 → 攻守兩色）
+> **2026-08-11 P2 checkpoint：** `docs/spec/09-modern-unit-icons-p2.md`（READY）
+> 的 18 張部隊圖示索引／尺寸／攻守色／砲兵朝向已接到 modern provider；十勢力色帶
+> 也已接到面板與單位呈現。色帶是 remake 自訂語意色，不是原版色票的 parity 宣稱；
+> symbol 軸、狀態 icon 與完整美術資產仍不是本輪範圍。
+
+- 4 個 base 圖示 + 執行期上色 + 砲兵旋轉（P2a 已以 18 個索引圖先接通）
+- `Unit(branch, faction, facing)` 的 retro 折疊（十勢力 → 攻守兩色）仍待下一個
+  明確決定勢力色資料與可關閉的資訊差異後再做
 
 **驗收**：六個朝向的砲兵圖示與六角格六方向逐一對上（做一張對照圖）；
 retro 模式下 `faction` 參數不影響輸出（回歸測試）；
 十色 + 描邊在 22 種地形底上的對比度全部達標（自動量測，不靠肉眼）。
 
+### P2b — 顯示設定中的主題選擇
+
+> **2026-08-10 checkpoint：** `docs/spec/10-theme-preferences-p2b.md`（READY）。
+> 既有 O→顯示設定頁現在可用 1／2 切換用語、3／4 切換 `retro`／`modern` 圖形；
+> F2 與設定頁共用同一個 provider 交換入口，滑鼠／觸控命中也共用版面幾何。
+
+P2b 只處理可發現性與偏好持久化；十勢力色帶已在 640×350 modern shell 中使用，
+但不宣稱是原版色票。向量字型與寬版面仍是後續 polish。
+資源／指令 icon 的已接窄切片見 SPEC-14；主題選擇仍與用語選擇獨立，四種組合都不得
+改變規則層或遊戲存檔。
+
+### P3-HUD — modern 資源／指令輔助圖示
+
+> **2026-08-10 checkpoint：** `docs/spec/14-modern-hud-icons-p3.md`（READY）已接上
+> 6 種資源與 15 項政略指令的 16×16 圖示。這個 P3-HUD 與下方仍待實作的 P3
+> `textlayout` 是兩個獨立窄切片，不互相冒充完成。
+
+- `HUDIconProvider` 以固定 0-based 索引提供資源／指令圖示；modern provider 在建構時
+  一次生成完整組，retro 保留原版字模 fallback。
+- 圖示只作操作分類提示，文字、數值、命中區、規則與存檔完全不變；切換缺 provider
+  時 fail-closed。
+- 驗收包含 provider 全索引、renderer panel／指令頁、主題原子交換、retro／modern
+  固定省份截圖與 deny-list；正式原版色票量測、向量字型與 wide layout 仍屬後續工作。
+
 ### P3 — `textlayout` 與向量字
+
+> **交付邊界（2026-08-11）：** modern 640×350 路徑已採 `EtenFonts` 的 semantic text
+> 量測與半形／全形網格，英／日 UI 可在同一張卡片內顯示。`vectorFace` 與比例字型
+> 仍未接到發行包，避免在沒有字型授權與 Android fallback 前硬塞寬版設計。
 
 - `internal/ui/textlayout`，`bitmapFace` + `vectorFace`
 - `panel.go` 改成語意化 Box
@@ -597,7 +679,8 @@ SHA-256 同為 `32d6dd6f47116af23de9df60eebbedeb8e02e50a23911502d926a11f6109ddb0
 不代表全遊戲十五項指令已完成白話化。
 
 **設定持久化證據**：政略選單按 `O` 開啟 remake 顯示設定，選 1／2 可立即切換
-原典／白話。偏好以 `0600`、同目錄暫存檔 + `fsync` + 原子 `rename` 寫入；重啟無旗標
+原典／白話，選 3／4 可立即切換原版／現代圖形。偏好以 `0600`、同目錄暫存檔 +
+`fsync` + 原子 `rename` 寫入；重啟無旗標
 會沿用，命令列 `-wording` 優先但不覆寫偏好。三次設定路徑產生的遊戲存檔都與原始
 輸入逐位元組相同，見 `docs/playtest/22-wording-preferences.md`。
 
@@ -607,6 +690,10 @@ SHA-256 同為 `32d6dd6f47116af23de9df60eebbedeb8e02e50a23911502d926a11f6109ddb0
 
 ### P4 — 現代版面與 HUD
 
+> **本輪狀態（2026-08-11）：** 640×350 modern shell、資訊卡、戰鬥面板色彩／控制鍵、
+> 地圖外框與敘事入口已完成；以下 1280×720 是可選的寬版 polish，不是玩家路徑的阻塞
+> 條件。新聞畫廊採 17 張來源圖像，未知模板顯示 fallback。
+
 - 1280×720 版面：面板 + 指令選單並排
 - 可關的輔助顯示（VD-05／VD-06），預設關
 
@@ -615,8 +702,9 @@ SHA-256 同為 `32d6dd6f47116af23de9df60eebbedeb8e02e50a23911502d926a11f6109ddb0
 
 ### P5 — 開場與過場（範圍待定）
 
-320×200 256 色的開場、`AC.TPC` 的 17 張戰鬥插圖、`NEWSDATA.DAT` 的 17 條新聞。
-**三者都有前置未解項**（未決 4、5、7），現在排不進去。
+320×200 256 色的開場、`AC.TPC` 的 17 張戰鬥插圖仍有前置未解項（未決 4、5）。
+`NEWSDATA.DAT` 已不再阻塞：可從地圖開啟 17 張來源圖像，#0／#9 有已證實 caption，
+其餘 15 張維持 source-image fallback；若未來解出字型，再以同一個 catalog 增補文字。
 
 ---
 
@@ -631,10 +719,10 @@ SHA-256 同為 `32d6dd6f47116af23de9df60eebbedeb8e02e50a23911502d926a11f6109ddb0
 | 3 | **現代模式的字型與授權** | 繁中／日文／英文各要一套可再散布的字型。候選 Noto Sans TC + Noto Sans JP（OFL），但全字檔 10 MB 級，要不要 subset、subset 之後日後加詞條會不會缺字，都要先算 |
 | 4 | **`AC.TPC` 17 張戰鬥插圖的播放時機** | 反組譯未解（`docs/formats/05` §5）。不知道什麼時候播，就設計不出現代對應物 |
 | 5 | **開場 320×200 256 色的現代化做法** | 三個選項：整數放大 + 掃描線濾鏡／AI 放大／重繪。重繪是純美術工作且成本最高。需使用者決定投入程度 |
-| 6 | **十大勢力的原版配色** | 原版政略地圖是分勢力上色的，但**還沒量過那十個顏色的實際值**。量出來之後才知道現代色票該沿用還是重配。做法：DOSBox 截圖 + `tools/map_diff.py` 的色域統計 |
-| 7 | **`NEWSDATA.DAT` 的字型來源** | 倚天反查 17/17 落空（`docs/formats/04` §4）。解不出來就無法把新聞橫幅轉成文字，現代模式只能沿用原版點陣圖 |
+| 6 | **十大勢力的原版配色** | 原版政略地圖仍未完成色票量測；modern 已先使用有對比度測試的 remake 語意色帶，不把它冒充原版色票。若日後需要 parity，再以 DOSBox 截圖 + `tools/map_diff.py` 量測 |
+| 7 | **`NEWSDATA.DAT` 的字型來源** | 倚天反查 17/17 落空（`docs/formats/04` §4）。目前 17 張原圖已進畫廊，#0／#9 有 caption，其餘 15 張 source-image fallback；解出字型後可增補 catalog，不阻塞玩家路徑 |
 | ~~8~~ | ~~滑鼠操作是否納入~~ | ✅ **已裁決（使用者，2026-08-02）：**納入全部選單與地圖操作，並作為 Android 單指點擊移植的共用基礎。必須依 R5 經同一條規則 API；分期與驗收見 `docs/design/40-pointer-touch-input.md` |
-| 9 | **音效與音樂是否也納入主題軸** | `.MUS`／`.TIM` 格式與音源都未解（`CLAUDE.md` §3.7）。格式解出來之前，「復古 FM 音源 vs 現代重錄」這個軸沒有意義 |
+| 9 | **音效與音樂是否也納入主題軸** | ✅ 音訊軸已納入：`audio=retro` 的純 Go OPL2／AdLib 與 `audio=modern` 的 manifest／純 Go Ogg runtime、情境切換已接；現代音樂創作、授權與交付仍見 `docs/design/32-modern-music-direction.md`，尚未把新音檔塞進發行包 |
 | 10 | **原版在戰場上顯示到什麼程度的敵方資訊** | R4 的前置。`docs/playtest` 有截圖可查，但還沒有人逐項核對過 |
 
 ---

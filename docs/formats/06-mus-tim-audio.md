@@ -278,14 +278,23 @@ tick 速率 = `tempo / 60 × tickBeat`；秒數 = `totalTick / tick 速率`。
 |---|---|
 | 解析長度 = `dataSize` | **8/8 精確**（全部剛好停在 EOF）|
 | 事件數 = `nrCommand` | **8/8 精確** |
-| 總 tick = `totalTick` | 6/8 精確（例外見 U2）|
+| 總 tick = `totalTick` | 6/8 精確（例外見 §4.5）|
 | 所有 `Cn` 音色索引 < `nrTimbre` | **8/8** |
 | 未知 status | **0** |
+
+### 4.5 `totalTick` metadata 勘誤（2026-08-10）
+
+重跑既有 parser 後發現，事件數與檔尾仍全部吻合，但 `MAINTHEM.MUS` 的 header
+`totalTick=62880`、事件累計為 `60800`；`STRATEGY.MUS` 的 header `15540`、事件累計
+為 `15600`。其餘六首一致。這兩筆差異已記入 `docs/re/40-mus-tick-metadata-anomaly.md`。
+
+因此「8/8 `totalTick` 全部精確」是被推翻的舊敘述：解碼器保留 header，另報告實際
+累計 tick，不補資料、不改 `F8` 語意，也不把 metadata anomaly 當成 OPL2 播放時序。
 
 事件數 8/8 逐一相符是最強的整體性驗證：只要 `An` 的 data 長度、running status、
 `F8` 的處理任一條猜錯，7,967 個事件的檔案不可能剛好對上。
 
-### 4.5 已量到的表情控制
+### 4.6 已量到的表情控制
 
 - **速度倍率**（`F0 7F 00 …`）真的被拿來當音樂手法。實際落點如下
   （`tools/mus.py events` 可重跑；百分比是佔 `totalTick` 的位置）：

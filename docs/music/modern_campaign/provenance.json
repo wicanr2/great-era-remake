@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "cue": "modern_campaign",
+  "motif_id": "dsds-modern-campaign-m01",
+  "status": "draft-not-for-release",
+  "created": "2026-08-11",
+  "author": "Codex 協作草稿；尚未指定可發行自然人／法人作者",
+  "generator": "tools/music/modern_campaign_draft.py",
+  "source_material": [],
+  "technical_reference": [
+    "1992 DOS／AdLib／OPL2 的聲部清晰度與瞬態限制",
+    "遊戲中政略地圖、人物敘事與推廣片需要留白再進高潮"
+  ],
+  "explicit_exclusions": [
+    "原版 .MUS／.TIM／分析 MIDI",
+    "原版旋律、和聲、低音、節奏、取樣與其衍生物",
+    "國歌、軍歌、黨歌、傳統曲牌與可辨識既有歌曲"
+  ],
+  "score": {
+    "sha256": "3b00e3345e859a843d295dc2bdda189ab28088d0791ee60a1b30ce21eb406106",
+    "loop_ticks": 9216,
+    "bpm": 112,
+    "time_signature": "4/4",
+    "ppqn": 96
+  },
+  "audio": {
+    "midi": "draft only",
+    "ogg": "local preview only; not a release asset",
+    "preview_path": "workplace/promo/modern_audio/modern_campaign_loop.ogg",
+    "preview_sha256": "bbbdfb061ba8a175f66c09f9e923a9aea6da443a3873e81ef77ffdc77fa5aa55",
+    "sample_sources": [],
+    "license": "not-cleared-draft"
+  },
+  "runtime": {
+    "generator": "internal/ui/audio/procedural.go",
+    "status": "reproducible-playable-24-bar-fallback",
+    "tracks": [
+      "scene",
+      "strategy",
+      "main-theme",
+      "battle-1",
+      "battle-2",
+      "battle-alt",
+      "wall",
+      "final"
+    ],
+    "motif": "D4,G4,F4,Bb4,A4,D5; six-note original runtime motif",
+    "arrangement": "low progression, pulse, brass entry, bars 13-14 void, bars 15-20 climax",
+    "rights": "source-code composition; formal Ogg mix and human clearance pending"
+  },
+  "runtime_preview": {
+    "command": "tools/go.sh run ./cmd/modern_audio -out /tmp/great-era-modern-audio -track main-theme -effects",
+    "format": "48 kHz stereo signed-16 PCM WAV; technical listening output only",
+    "main_theme_sha256": "387f63071f375c091c94fd48cf7119524fe5c7e3f96e52f7e24e9f60a6586e20",
+    "qa_report_schema": 1,
+    "qa_sample_rate": 48000,
+    "qa_main_theme_peak_normalized": 0.678009033203125,
+    "qa_main_theme_rms": 0.1353841646155175,
+    "qa_main_theme_mono_rms": 0.13502072531213002,
+    "qa_main_theme_first_last_delta_abs": 0,
+    "qa_main_theme_clipped": false,
+    "effects": "eight WAV files generated in the same run; hashes remain local to the QA report",
+    "release": "not an Ogg manifest asset; no public distribution until human, rights and device QA"
+  },
+  "qa": {
+    "identity_blind_test": "pending",
+    "human_listening": "pending",
+    "loop_waveform": "0.5s crossfade at 24-bar boundary; first/last decoded sample max delta 3425/32768; pending human check",
+    "mono": "technical decode and non-zero downmix passed",
+    "loudness": "-15.8 LUFS integrated; -1.7 dBFS true peak; suitable preview headroom",
+    "android_device": "pending"
+  }
+}

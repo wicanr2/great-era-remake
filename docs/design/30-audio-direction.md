@@ -7,6 +7,48 @@
 > `docs/design/10-visual-modernization.md`（復古／現代切換的主題模型）
 > 原版作曲：**吳宗凱**、**游戲工場**（1992，漢堂國際資訊）
 
+> **實作註記（2026-08-10）**：P0 解碼切片已依 `docs/spec/20-audio-decode-p0.md`
+>（READY）完成，入口為純 Go `internal/audio/mus`，並以 8 首 MUS／8 份 TIM golden 與
+> 畸形輸入測試驗收。這不等於現代 Ogg 創作或原版 register parity；P1／P1a／P1b 與
+> 情境 M1 已接，modern 音檔仍依 `docs/design/32-modern-music-direction.md` 規劃。
+
+> **實作註記（2026-08-10，P1a）**：新增 `docs/spec/22-audio-opl2-p1a.md`（READY）與
+> 純 Go `internal/audio/opl2`。目前可把 typed MUS events 以 bounded、deterministic
+> 的兩 operator 近似轉成 stereo PCM；這不是 `SDFA.EXE` 的 register trace，也沒有把
+> `An`、鼓組或 envelope 的近似升格成 confirmed。
+
+> **實作註記（2026-08-10，P1b）**：新增 `docs/spec/23-audio-ebiten-adapter-m0.md` 與
+> `internal/ui/audio`。`cmd/dsds -audio=retro` 現在會讀取玩家自備的 `SCENE.MUS/TIM`，
+> 建立單一 Ebiten `audio.Player` 並播放開局曲目；`-audio=off` 完全跳過 audio context。
+> 這只接通開局預覽；後續情境切換另由 `docs/spec/26-audio-context-switch-m1.md` 定義。
+
+> **實作註記（2026-08-11，情境切換 M1 收尾）**：`internal/ui/audio.Manager` 現在提供
+> `Track`／`NewRetroTracks`／`PlayTrack`，延遲載入 `STRATEGY`、`BATTLE1`、`BATTLE2`、
+> `BT02`、`MAINTHEM`、`WALL`、`FINAL` 等可選配對；`cmd/dsds` 依政略／戰鬥畫面切換，
+> 缺檔時沿用目前曲目。切換現在先建立新 player，再以 bounded 18 frame（約 300 ms）
+> 交叉淡入淡出關閉舊 player；這是 remake 聽感選擇，不宣稱小節對齊或原版 register
+> parity。Modern Ogg 音樂內容尚未產生；runtime loader／manifest／循環 reader 已接，
+> 邊界見 `docs/spec/32-modern-ogg-runtime-m1.md`，創作規劃仍見
+> `docs/design/32-modern-music-direction.md`。
+
+> **實作註記（2026-08-10，精度邊界）**：情境管理器會快取初始與首次成功渲染的 PCM，
+> 避免每次切換重複解析；`internal/audio/opl2.ProgramRegisterWrites` 另提供 TIM
+> operator → 公開 YM3812 靜態 bitfield 的純 Go adapter。後者是 strong inference，
+> 不是 `SDFA.EXE` 的 register trace；寫入順序、port delay、F-number／Key-On、`An`
+> 映射、鼓組與循環時序仍列為未決，取得新證據時只替換 adapter。
+
+> **實作註記（2026-08-11，Modern runtime composition）**：Modern 缺少 Ogg 時現在由
+> `internal/ui/audio/procedural.go` lazy 產生八條 24 小節原創 cue 與八類效果音；地圖／
+> 政略主頁、敘事、人物／將領、戰鬥與離開確認已有情境選曲。`cmd/modern_audio` 可透過
+> Docker wrapper 重生 WAV 技術預覽。這些是可播放 runtime／聽審輸出，不等於正式 Ogg、
+> 人耳、授權或 Android 裝置完成；原版 MUS／TIM 仍只在 `audio=retro` 使用。
+
+> **實作註記（2026-08-10，直接播放範圍決策）**：`internal/audio/opl2.RenderAdLib`
+> 已成為 MUS/TIM → PCM 的直接入口；五個 rhythm channel 也有純 Go 的 kick／snare／
+> hat／tom／cymbal 可聽輸出。這條路徑的完成條件是音樂與音效能播放，不追求
+> `SDFA.EXE` 寄存器時序或逐樣本等價；`ProgramRegisterWrites` 保留作可選研究工具，
+> 不得再把 SDFA 解包當成 remake 播放的前置工作。
+
 ---
 
 ## 0. 這份文件要解決什麼
@@ -261,9 +303,10 @@ tincan1、syn1/2/3 這種特別的音色），`BATTLE2` 是完整的 C 大調七
 |---|---|---|
 | `audio` | `retro` / `modern` | BGM 音源與音效層 |
 
-- `audio=retro`：**軟體 OPL2 合成**，直接播放原版 `.MUS` / `.TIM`。
-  逐暫存器重現 1992 年的聲音。
-- `audio=modern`：播放重新編曲的串流音檔。
+- `audio=retro`：**純 Go OPL2 風格合成**，直接播放玩家提供的 `.MUS` / `.TIM`。
+  目標是保留事件、音色與節奏的可聽輸出，不宣稱逐暫存器重現 1992 年的聲音。
+- `audio=modern`：依 manifest 播放有 provenance 的重新編曲 Ogg 串流；缺 manifest／scene
+  或壞檔時安全降級成 `off`，目前儲存庫沒有 placeholder 音檔。
 
 `prefs.json` 沿用同一個檔案（視覺文件 §2.3）：
 
@@ -284,32 +327,30 @@ tincan1、syn1/2/3 這種特別的音色），`BATTLE2` 是完整的 C 大調七
 | 情況 | 行為 |
 |---|---|
 | 遊戲中切換 `audio` 軸 | **交叉淡入淡出 300 ms**，新音源從**相同的音樂位置**（小節：拍）接續。§5.4 的小節對齊就是為了這件事 |
-| 切換曲目（進戰鬥、看戰報）| 淡出 200 ms → 新曲從頭。原版是硬切，remake 這裡允許差異，登記進差異表 |
+| 切換曲目（進戰鬥、看戰報）| bounded 18 frame（約 300 ms）交叉淡入淡出，新曲從頭。原版是硬切，remake 這裡允許差異，登記進差異表 |
 | 熱鍵 | 視覺用 F2；音訊建議 **F3**，同樣避開 ESC／F10 的既定語意（`CLAUDE.md` §9）|
 | 無音訊裝置 / CI | `-audio=off` 完全跳過音訊初始化 |
 
 **`-audio=off` 是硬需求，不是選配。** Ebiten 的 audio context 在無音效裝置的環境會失敗，
 而截圖回歸測試與 CI 都跑在那種環境。音訊子系統必須能整個不啟動而不影響其他部分。
 
-### 6.3 復古路徑：內嵌 OPL2 合成器
+### 6.3 復古路徑：內嵌 OPL2 風格合成器
 
 ```
-.MUS ──► 事件排程器（tick → 事件）──► OPL2 暫存器寫入 ──► 軟體合成 ──► 48 kHz PCM
-.TIM ──► 音色 → 暫存器對應 ───────────┘
+.MUS ──► 事件排程器（tick → 事件）──► 純 Go OPL2 風格合成 ──► 48 kHz PCM
+.TIM ──► 音色參數 ──────────────────┘
 ```
 
-- **合成器選型**：兩個候選。`Nuked-OPL3`（週期精確，音質基準）與 DOSBox 的 `dbopl`
-  （較快，音質已足夠）。兩者都是 C，需要移植成純 Go——**不要用 cgo**，
-  跨平台建置（`CLAUDE.md` §8 M7）會變複雜。建議先移植 `dbopl`，
-  用 `Nuked` 當離線比對基準。**未決，見 §9 A1。**
+- **合成器選型已收斂**：採用現有 `internal/audio/opl2` 的純 Go 兩 operator 近似，
+  不引入 C wrapper，也不等待 `Nuked-OPL3`／`dbopl` 的寄存器 parity。若未來需要
+  硬體精度，另開不阻塞玩家路徑的研究支線。
 - **排程**：事件排程器的時間基準用取樣數，不用 wall clock。
   tick 速率 = `tempo / 60 × 240` Hz（`docs/formats/06` §4.1）。
   每產生 `sampleRate / tickRate` 個取樣就推進一個 tick。這樣暫停、變速、
   無頭離線算繪都一致。
-- **`An`（聲部音量）到 OPL total level 的對應目前未知**（`docs/formats/06` U1）。
-  解不出來就先用對數對應並標為 remake 差異；解開驅動後改回原樣。
-- **驗收**：把原版在 DOSBox 裡的 OPL 暫存器串流錄下來，與 Go 版產生的串流逐筆比對。
-  這是唯一可信的驗收標準——「聽起來很像」不算（`CLAUDE.md` §5 第 3 條的音訊版）。
+- **`An`（聲部音量）到 OPL total level 的對應**仍標為 remake approximation；
+  直接播放驗收只要求 bounded PCM 非零且可交給 `audio.Player`，不以 DOSBox register
+  trace 或逐樣本比對阻塞交付。
 
 ### 6.4 現代路徑：串流音檔
 
@@ -317,7 +358,7 @@ tincan1、syn1/2/3 這種特別的音色），`BATTLE2` 是完整的 C 大調七
 |---|---|---|
 | 格式 | **Ogg Vorbis**，48 kHz 立體聲，約 160 kbps | Ebiten 內建解碼；無授權疑慮；檔案小 |
 | 即時合成 | **不做** | 要內嵌音色庫與合成引擎，體積與複雜度都比串流高，換不到相應的好處 |
-| 循環 | `LOOPSTART` / `LOOPLENGTH` Vorbis comment（取樣數）| 業界慣例，解析簡單 |
+| 循環 | manifest 的 `loop_start`／`loop_length`（每聲道取樣數）；Vorbis comment 可並存 | loader 可驗證、與 SHA-256／授權同一 provenance 邊界 |
 | 分軌 | **第一版不做** | 動態混音（例如戰況吃緊時加入打擊聲部）很誘人，但那是**新玩法回饋**，會踩到 §4.2 與 remake 差異的界線。列為 §9 A3 |
 | 時代質感 | 蟲膠噪聲／AM 頻寬只用在 `MAINTHEM` 開頭與 `FINAL` 結尾，且**可關閉** | 用整首會犧牲可聽性；而且「老唱片」是一種外部懷舊視角，不是 1930 年代的人聽到的聲音 |
 
@@ -389,14 +430,26 @@ internal/game/           只發「播第 N 首 / 停」的訊號，不碰音訊
 每一階段可獨立驗收，前一階段沒過不進下一階段。
 
 ### P0 — 解碼層與離線驗證（不出聲）
-- `internal/audio/mus` 移植 `tools/mus.py` 的解析器，附 8 首曲子的 golden test：
-  事件數對 `nrCommand`、資料長度對 `dataSize`、音色索引全部落在範圍內。
-- **驗收**：8/8 解析結果與 `tools/mus.py` 逐事件相同。無頭可跑。
+- **已完成（2026-08-10）**：`internal/audio/mus` 以純 Go 移植 `tools/mus.py` 的 MUS／
+  TIM 解析器，保留原始 header、running status、F8 filler、SysEx、FC、絕對 tick 與
+  28-word 音色欄位，附 8 首 MUS／8 份 TIM golden、畸形輸入與 residue 測試；詳見
+  `docs/spec/20-audio-decode-p0.md` 與 `docs/re/40-mus-tick-metadata-anomaly.md`。
+- **驗收已通過**：8/8 解析結果與既有 parser 逐事件／逐音色摘要相同，無頭 Docker
+  測試可跑。`MAINTHEM`／`STRATEGY` 的 `totalTick` metadata 差異以欄位暴露，不修正。
 
-### P1 — 復古音源（`audio=retro`）
-- 移植 OPL2 合成器，接上排程器，輸出 PCM。
-- **驗收**：與 DOSBox 錄下的 OPL 暫存器串流逐筆比對（§6.3）。
-  這一步同時把 `docs/formats/06` 的 U1／U2／U5 三個未決項推向定案。
+### P1 — 復古音源（`audio=retro`）— **已完成直接播放切片**
+- `internal/audio/opl2.RenderAdLib` 直接把 MUS/TIM 轉成 bounded stereo PCM；旋律與
+  rhythm channel 6..10 都有純 Go 輸出，`internal/ui/audio` 再接 Ebiten player。
+- **驗收**：Docker 內 synthetic／真實 SCENE 素材測試有非零 PCM，並以 `-audio=off`
+  保留無裝置路徑。SDFA 解包、寄存器 trace、逐樣本 parity 列為可選精度研究，不是 P1
+  完成條件。
+
+### P1a — Modern Ogg 執行期接線 — **已完成 runtime slice，音樂內容待交付**
+- `internal/ui/audio.LoadModernTracks` 驗證 schema、同目錄 `.ogg`、author／license 與
+  SHA-256；`NewModernTracks` 使用 Ebiten 內建純 Go Vorbis 解碼與 bounded crossfade。
+- `cmd/dsds -audio modern -modern-audio <dir>` 缺 manifest／scene／codec 時安全改成
+  `off`；非 scene cue 可缺，切換保留目前曲目。
+- 無任何 `.ogg` 或 MIDI 直轉檔進儲存庫；可聽內容與 provenance 仍待 P2–P5。
 
 ### P2 — 一首試作編曲
 - 先做 **`BT02`**（40 秒、9 聲部、最短），走完整條流程：
@@ -422,13 +475,13 @@ internal/game/           只發「播第 N 首 / 停」的訊號，不碰音訊
 
 | 編號 | 項目 | 現況 | 消除條件 |
 |---|---|---|---|
-| **A1** | OPL2 合成器選型（`dbopl` vs `Nuked-OPL3`）| 兩者都要移植成純 Go（不用 cgo）| 各移植一首曲子，比對輸出與 CPU 佔用後決定 |
+| **A1** | OPL2 合成器選型（`dbopl` vs `Nuked-OPL3`）| **已關閉：採用現有純 Go OPL2 風格 renderer**| 若日後有硬體精度需求，另開不阻塞播放的研究支線 |
 | **A2** | PC 喇叭掃頻音的正確時長 | 原版用空迴圈，隨 CPU 速度漂 | DOSBox 固定 cycles 量測，取值寫成常數並登記差異 |
 | **A3** | 是否做動態分軌混音（戰況影響配器）| 傾向不做——那是新玩法回饋 | 需使用者決定。若做，必須確認它不改變任何規則、也不洩漏 AI 資訊 |
 | **A4** | 曲目到情境的對應 | 只有「哪支函式設定索引」是 confirmed | DOSBox 實跑（`docs/formats/06` U4）。**編曲可以先做，情境判斷要留修正空間** |
 | **A5** | 是否做勢力／時期專屬音樂 | 原版沒有。加了是新內容，可能違反 §4.2 的「不用音樂做道德標記」 | 需使用者決定。傾向**不做**，改用同一批曲目的不同編制變體（北伐期偏軍樂、抗戰期偏弦樂）|
 | **A6** | 編曲執行者 | 未定 | 這份文件是規格，不是編曲。實際製作需要人聲樂器演奏或高品質取樣庫，屬於專案外部資源 |
-| **A7** | `An`（聲部音量）到 OPL total level 的映射 | 未知，卡在 `SDFA.EXE` 未解包 | `docs/formats/06` U1 |
+| **A7** | `An`（聲部音量）到 OPL total level 的映射 | **remake approximation；不阻塞播放** | 若日後要精度研究，再以獨立 register oracle 處理 |
 | **A8** | 原版是否自動循環 | 未知 | 同上（U6）。remake 一律循環，若實測原版不循環則登記差異 |
 
 **沒有一項寫「暫緩」或「低投報」。** 每一列都有消除條件。
@@ -442,7 +495,7 @@ internal/game/           只發「播第 N 首 / 停」的訊號，不碰音訊
 | 編號 | 差異 | 理由 |
 |---|---|---|
 | A-1 | 新增 `audio=modern` 音源（重新編曲）| 需求本體 |
-| A-2 | 曲目切換改為 200 ms 淡出（原版硬切）| 現代化外殼 |
+| A-2 | 曲目切換改為 bounded 300 ms 交叉淡入淡出（原版硬切）| 現代化外殼；`internal/ui/audio.Manager` 18 frame 驗收 |
 | A-3 | 樂曲加入導入段與收束段，並提供乾淨循環點 | 原版是硬循環 |
 | A-4 | 立體聲（原版單聲道）| 現代化外殼 |
 | A-5 | **`BATTLE1` / `BATTLE2` 接上戰鬥場景**（原版無觸發路徑）| 保存：兩首完成品原本聽不到 |
