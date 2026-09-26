@@ -57,7 +57,10 @@ query() {
 
   local query_dir
   query_dir="$(mktemp -d /tmp/dsds-ida-query-XXXXXX)"
-  trap 'cleanup_query_dir "$query_dir"' EXIT
+  # EXIT trap 可能在 query() 的區域變數離開作用域後才執行；
+  # set -u 下直接展開會以「query_dir: unbound variable」遮住真正的 IDA 錯誤。
+  # 空值交給 cleanup_query_dir 安全忽略，並保留原始失敗狀態。
+  trap 'cleanup_query_dir "${query_dir:-}"' EXIT
 
   docker run --rm \
     --network none --memory 128m --cpus 1 --pids-limit 32 \

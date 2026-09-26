@@ -27,6 +27,10 @@ chmod -R u+w /game
 find /shots -maxdepth 1 -type f -name '*.png' -delete
 rm -rf /shots/snapshots
 mkdir -p /shots/captures /shots/snapshots /tmp/dsds-home
+# 部分最小容器沒有預先建立 X11 socket 目錄；非 root 的 Xvfb 會在此處
+# 只印警告後讓 SDL 以為沒有 DISPLAY。目錄位於容器 tmpfs，建立它不觸碰
+# 原始資料或工作樹。
+mkdir -p /tmp/.X11-unix
 
 Xvfb :99 -screen 0 1024x768x24 -nolisten tcp &
 xvfb_pid=$!
@@ -95,7 +99,16 @@ window=""
 find_window() {
     local found=""
     for _ in $(seq 1 40); do
+        # 攻擊目標確認後，DOSBox 可能重建顯示視窗；某些版本重建時只
+        # 保留 class 名稱，或把標題大小寫改成 `dosbox`。先用不分大小寫
+        # 的標題查，再用 class 作後備，避免把遊戲仍在跑誤判成視窗消失。
         found=$(xdotool search --name "DOSBox" 2>/dev/null | tail -1 || true)
+        if [[ -z "$found" ]]; then
+            found=$(xdotool search --name "dosbox" 2>/dev/null | tail -1 || true)
+        fi
+        if [[ -z "$found" ]]; then
+            found=$(xdotool search --class "dosbox" 2>/dev/null | tail -1 || true)
+        fi
         if [[ -n "$found" ]]; then
             window="$found"
             return 0
@@ -120,6 +133,11 @@ focus_window() {
 
 IFS=';' read -ra steps <<< "$timeline"
 for step in "${steps[@]}"; do
+    # Timeline 由人手編寫時常在分號後留空白；先去除兩端空白，避免
+    # `; snap:name` 被當成未知 action，導致已完成的 oracle 工作在最後一步
+    # 被誤報失敗。
+    step="${step#"${step%%[![:space:]]*}"}"
+    step="${step%"${step##*[![:space:]]}"}"
     action="${step%%:*}"; arg="${step#*:}"
     case "$action" in
         wait) echo "[probe] wait ${arg}s"; sleep "$arg" ;;

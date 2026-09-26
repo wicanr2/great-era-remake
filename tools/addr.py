@@ -145,11 +145,18 @@ GLOBALS = {
     0x6FE7D: ("遊戲內年（民國紀年）", "docs/re/16 §3b", "confirmed"),
     0x6FE7E: ("遊戲內月；戰鬥回合上限在 2 月是 15、其他 16", "docs/re/16 §3b / re/31 §49", "confirmed"),
     0x6FE88: ("時期編號 1/2/3，也是 MAN(N).DAT／TOWN(N).DAT 的 N", "docs/re/31 §50", "confirmed"),
+    0x6FE81: ("政略指令完成旗標：sub_10193 清零；貸款／外援進入第一次亂數後各結果仍立旗標，信用度零 gate 不立；主迴圈非零時扣命令", "docs/re/35-loan-command-cost.md／docs/re/36-aid-command-cost.md", "confirmed"),
     0x7001E: ("該期可用的省份數（北伐 36、抗戰 39）", "docs/re/11 / re/31 §50", "confirmed"),
     0x6BC4A: ("該期的將領數（274／191／191）", "docs/spec/02 §7", "confirmed"),
     0x6AA84: ("戰鬥 AI 分支 B 的決策值（& 1Fh）；bit 6/7 另有用途", "docs/re/31 §3", "confirmed"),
     0x6AA85: ("戰鬥 AI 分支 A 的決策值（& 1Fh）；bit 6/7 見 §18", "docs/re/31 §3/§18", "confirmed"),
     0x6FFCA: ("難度／階段旗標位元組", "docs/mechanics/70-ai", "confirmed"),
+    # 這兩列刻意用組語中的負位移作 key：查詢 IDA 匯出的
+    # ``[di-4225h]``／``[di-421Eh]`` 時，原始運算元與語意會同列顯示。
+    # 負位移本身是 1-based 表的 index 0 哨兵；有效的 index 1 分別落在
+    # ds:BDDB+1（IDA 6FF8Ch）與 ds:BDE2+4（IDA 6FF96h）。
+    -0x4225: ("外交信用度表：10 × u8，索引 1..10；基址 ds:BDDBh，index 1 = IDA 線性 6FF8Ch；sub_391E1 初值 100、sub_2164A 扣、sub_223ED 加並夾 100", "docs/spec/06-diplomacy-ledger.md §2 / docs/mechanics/50-diplomacy.md §帳本", "confirmed"),
+    -0x421E: ("外交外債表：10 × little-endian u32，索引 1..10；基址 ds:BDE2h，index 1 = IDA 線性 6FF96h；sub_391E1 清零、sub_2164A add/adc、sub_223ED sub/sbb", "docs/spec/06-diplomacy-ledger.md §2 / docs/mechanics/50-diplomacy.md §帳本", "confirmed"),
 }
 
 

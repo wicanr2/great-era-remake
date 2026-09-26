@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Great Era Remake
+Comment=A clean-room remake launcher; original game data is required separately.
+Exec=dsds
+Icon=dsds
+Categories=Game;StrategyGame;
+Terminal=false
+StartupNotify=true

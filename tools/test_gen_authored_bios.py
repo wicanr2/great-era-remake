@@ -36,6 +36,14 @@ class AuthoredBiosTest(unittest.TestCase):
             json.dumps(second, ensure_ascii=False, indent=2) + "\n",
         )
 
+    def test_overlay_contains_only_new_runtime_biographies(self) -> None:
+        document, summary = MODULE.build_document()
+        overlay = MODULE.make_overlay(document, summary)
+        self.assertEqual("zh-Hant", overlay["language"])
+        self.assertEqual("new-biographies-only", overlay["overlay_scope"])
+        self.assertEqual(61, len(overlay["people"]))
+        self.assertEqual(summary["newly_available"], [p["id"] for p in overlay["people"]])
+
     def test_rejects_malformed_person_header(self) -> None:
         path = self.write("## #1 蔣中正 medium\n\n正文。\n")
         with self.assertRaisesRegex(MODULE.InputError, "無法解析人物標題"):

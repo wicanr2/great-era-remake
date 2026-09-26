@@ -24,7 +24,9 @@ for path in "$CACHE" "$CACHE/pkg" "$CACHE/build"; do
   fi
 done
 
-# Ebiten 走 CGO，需要 X11/OpenGL 標頭檔，官方 golang image 沒有 → 自建一份
+# 遊戲／規則層不含 cgo；目前 Ebiten v2.8.8 的 Linux desktop GLFW 後端需要
+# cgo 與 X11/OpenGL 標頭檔，官方 golang image 沒有 → 自建一份。Windows
+# 純 Go 交叉建置可用 CGO_ENABLED=0；不要把後端需求誤當成專案原始碼依賴。
 if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
   echo "[go.sh] 建 image $IMAGE（含 X11/OpenGL 開發套件）…" >&2
   docker build -f "$ROOT/tools/go.dockerfile" -t "$IMAGE" "$ROOT/tools" >&2

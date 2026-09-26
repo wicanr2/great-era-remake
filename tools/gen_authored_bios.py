@@ -5,9 +5,13 @@
 
     python tools/gen_authored_bios.py --check
     python tools/gen_authored_bios.py --output /tmp/authored-bios.json
+    python tools/gen_authored_bios.py --overlay \
+        --output translations/zh-Hant/people-authored.json
 
 DESIGN-22 仍是 DRAFT，因此本工具刻意沒有直接改寫 people.json 或 translations 的
-模式。輸出只包含自傳、信心度與來源雜湊，供裁決後的合併器使用。
+模式。預設輸出只包含自傳、信心度與來源雜湊，供研究索引使用；`--overlay` 是
+SPEC-11 READY 的增量產物，只輸出目前執行期沒有正文的 61 筆，供 `PeopleDB` 填入
+空白欄位。兩種模式都不覆寫既有 `people.json`。
 """
 
 from __future__ import annotations
@@ -195,6 +199,7 @@ def build_document() -> tuple[dict, dict]:
 
     document = {
         "schema_version": "1",
+        "language": "zh-Hant",
         "generated_from": "versioned research batches",
         "people": authored,
     }
@@ -208,13 +213,37 @@ def build_document() -> tuple[dict, dict]:
     return document, summary
 
 
+def make_overlay(document: dict, summary: dict) -> dict:
+    """只保留執行期目前缺正文的 61 筆，供 SPEC-11 additive merge 使用。"""
+    wanted = set(summary["newly_available"])
+    rows = [row for row in document["people"] if row["id"] in wanted]
+    if len(rows) != len(wanted) or len(rows) != 61:
+        raise InputError(f"overlay 應恰有 61 筆新增正文，實際 {len(rows)}")
+    return {
+        "schema_version": "1",
+        "language": "zh-Hant",
+        "overlay_scope": "new-biographies-only",
+        "generated_from": document["generated_from"],
+        "people": rows,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="只驗證（預設行為）")
+    parser.add_argument(
+        "--overlay",
+        action="store_true",
+        help="只輸出目前 people.json 缺少正文的 61 筆（需搭配 --output）",
+    )
     parser.add_argument("--output", type=pathlib.Path, help="明確寫出索引；不得指向產品 people.json")
     args = parser.parse_args()
+    if args.overlay and not args.output:
+        parser.error("--overlay 必須搭配 --output")
     try:
         document, summary = build_document()
+        if args.overlay:
+            document = make_overlay(document, summary)
     except (InputError, json.JSONDecodeError) as error:
         print(f"⛔ {error}", file=sys.stderr)
         return 1
