@@ -11,22 +11,26 @@ import (
 // 只有 buildSession 全部成功後才能交給 app 替換；解析中途不得觸碰
 // 目前遊戲的任何指標。這是桌面載入與未來 Android 背景恢復共用的邊界。
 type gameSession struct {
-	tbl             *game.ProvinceTable
-	generals        []game.General
-	factions        game.FactionTable
-	leaders         game.FactionLeaders
-	factionOf       game.FactionOfGeneral
-	world           *game.AIWorld
-	cmdBudget       *game.CommandBudget
-	origSave        []byte
-	current         game.ProvinceID
-	playerCommander game.GeneralID
-	year            uint16
-	month           uint8
+	tbl               *game.ProvinceTable
+	generals          []game.General
+	factions          game.FactionTable
+	leaders           game.FactionLeaders
+	factionOf         game.FactionOfGeneral
+	warRecords        [game.ProvinceCount + 1]game.WarRecord
+	majorPowerLeaders game.MajorPowerLeaders
+	ledger            game.DiplomacyLedger
+	world             *game.AIWorld
+	cmdBudget         *game.CommandBudget
+	origSave          []byte
+	current           game.ProvinceID
+	playerCommander   game.GeneralID
+	year              uint16
+	month             uint8
 }
 
 // buildSession 從 .DT1 建立一份完整快照。省份、將領、勢力、領袖、
-// 勢力反查與停火任一區塊解析失敗，整份載入就失敗。
+// 勢力反查、block10 runtime 清單、外交帳本與停火任一區塊解析失敗，
+// 整份載入就失敗。
 //
 // ⚠️ .DT1 沒有自述期別；呼叫端必須先以 SAVE(N).DT1 的 N 對應 sc.Stage。
 // 不可單靠內容猜期別，因為第一期的前 191 筆也能被當成第二期解析。
@@ -53,6 +57,18 @@ func buildSession(save []byte, sc game.Scenario, current game.ProvinceID, player
 	factionOf, err := game.ParseFactionOfGeneral(save)
 	if err != nil {
 		return nil, fmt.Errorf("session: 勢力反查表：%w", err)
+	}
+	warRecords, err := game.ParseWarRecords(save)
+	if err != nil {
+		return nil, fmt.Errorf("session: 戰爭記錄：%w", err)
+	}
+	ledger, err := game.ParseDiplomacyLedger(save)
+	if err != nil {
+		return nil, fmt.Errorf("session: 外交帳本：%w", err)
+	}
+	majorPowerLeaders, err := game.ParseMajorPowerLeaders(save)
+	if err != nil {
+		return nil, fmt.Errorf("session: 十大勢力執行期清單：%w", err)
 	}
 	ceasefire, err := game.ParseCeasefireStates(save)
 	if err != nil {
@@ -107,7 +123,10 @@ func buildSession(save []byte, sc game.Scenario, current game.ProvinceID, player
 	raw := append([]byte(nil), save...)
 	s := &gameSession{
 		tbl: tbl, generals: gens, factions: factions, leaders: leaders, factionOf: factionOf,
-		world: world, cmdBudget: game.NewCommandBudget(world), origSave: raw,
+		warRecords:        warRecords,
+		majorPowerLeaders: majorPowerLeaders,
+		ledger:            ledger,
+		world:             world, cmdBudget: game.NewCommandBudget(world), origSave: raw,
 		current: chosen, playerCommander: player,
 	}
 	if tbl.Date != nil {
@@ -118,7 +137,9 @@ func buildSession(save []byte, sc game.Scenario, current game.ProvinceID, player
 
 // applySession 只接受已完整建好的快照，並一次替換所有會交叉引用的核心指標。
 func (a *app) applySession(s *gameSession) {
-	a.tbl, a.generals, a.world = s.tbl, s.generals, s.world
+	a.tbl, a.generals, a.factions, a.world, a.ledger = s.tbl, s.generals, s.factions, s.world, s.ledger
+	a.factionLeaders, a.factionOf, a.warRecords = s.leaders, s.factionOf, s.warRecords
+	a.majorPowerLeaders = s.majorPowerLeaders
 	a.cmdBudget, a.origSave = s.cmdBudget, s.origSave
 	a.current, a.playerCommander = s.current, s.playerCommander
 	a.year, a.month = s.year, s.month
@@ -136,6 +157,8 @@ func (a *app) applySession(s *gameSession) {
 	a.viewGenerals, a.viewIndex, a.viewProvince, a.viewInput, a.viewPage = nil, 0, 0, 0, 0
 	a.bioPage, a.bioPages = 0, 0
 	a.covertAction, a.covertInput = 0, 0
+	a.diplomacySlot, a.diplomacyInput = 0, 0
+	a.ceasefireInput = 0
 	a.autonomyTargets, a.autonomyInput, a.autonomySpent = nil, 0, false
 	a.productionItem, a.productionInput, a.productionSpent = 0, 0, false
 }

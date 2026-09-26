@@ -148,3 +148,129 @@ func TestAutosaveUsesAtomicOutputAndRefreshesBase(t *testing.T) {
 		t.Fatalf("原子儲存留下暫存檔：%v", matches)
 	}
 }
+
+func TestAutosavePersistsCeasefireStateWithoutTouchingOtherBytes(t *testing.T) {
+	save := readStage1Save(t)
+	current, player := stage1Player(t, save)
+	sc, _ := game.ScenarioByStage(1)
+	s, err := buildSession(save, sc, current, player)
+	if err != nil {
+		t.Fatal(err)
+	}
+	state, err := game.ParseCeasefireStates(save)
+	if err != nil {
+		t.Fatal(err)
+	}
+	province := game.ProvinceID(1)
+	state[province]++
+	s.world.CeasefireState = state
+
+	a := &app{savePath: filepath.Join(t.TempDir(), "SAVE(1).DT1")}
+	a.applySession(s)
+	if err := a.autosave(); err != nil {
+		t.Fatal(err)
+	}
+	got, err := os.ReadFile(a.savePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	blk, err := game.SaveBlockByGlobal("byte_6FE56")
+	if err != nil {
+		t.Fatal(err)
+	}
+	wantOffset := blk.Offset + int(province) - 1
+	diff := game.DiffBytes(save, got, 0)
+	if len(diff) != 1 || diff[0] != wantOffset {
+		t.Fatalf("停火寫回應只改 offset %d，實際差分=%v", wantOffset, diff)
+	}
+	back, err := game.ParseCeasefireStates(got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if back[province] != state[province] {
+		t.Fatalf("停火狀態未持久化：want=%d got=%d", state[province], back[province])
+	}
+}
+
+func TestAutosavePersistsDiplomacyLedgerWithoutTouchingOtherBytes(t *testing.T) {
+	save := readStage1Save(t)
+	current, player := stage1Player(t, save)
+	sc, _ := game.ScenarioByStage(1)
+	s, err := buildSession(save, sc, current, player)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s.ledger.Debt[1] = 0xAABBCCDD
+	s.ledger.Credit[1] = 77
+
+	a := &app{savePath: filepath.Join(t.TempDir(), "SAVE(1).DT1")}
+	a.applySession(s)
+	if err := a.autosave(); err != nil {
+		t.Fatal(err)
+	}
+	got, err := os.ReadFile(a.savePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	back, err := game.ParseDiplomacyLedger(got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if back.Debt[1] != 0xAABBCCDD || back.Credit[1] != 77 {
+		t.Fatalf("外交帳本未寫回：debt=%#x credit=%d", back.Debt[1], back.Credit[1])
+	}
+	diff := game.DiffBytes(save, got, 0)
+	for _, off := range diff {
+		if !((off >= 14620 && off < 14624) || off == 14610) {
+			t.Fatalf("外交帳本寫回改到未授權 offset %d（全部差分=%v）", off, diff)
+		}
+	}
+	if len(diff) != 5 {
+		t.Fatalf("外債 4 bytes + 信用度 1 byte 應有 5 個差分，實際=%v", diff)
+	}
+}
+
+func TestAutosaveSyncsBattleForceWithoutTouchingUnknownBytes(t *testing.T) {
+	save := readStage1Save(t)
+	current, player := stage1Player(t, save)
+	sc, _ := game.ScenarioByStage(1)
+	s, err := buildSession(save, sc, current, player)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// 翻動高低 byte，讓差分護欄確實驗到 little-endian u16 的兩個已解位置。
+	wantForce := s.generals[0].Force ^ 0x0101
+	sim := &game.BattleSim{
+		Attacker: []*game.Combatant{{
+			CombatUnit: game.CombatUnit{General: 1},
+			Strength:   game.StrengthInput{Force: wantForce},
+		}},
+	}
+	a := &app{savePath: filepath.Join(t.TempDir(), "SAVE(1).DT1")}
+	a.applySession(s)
+	a.battle = &battleState{sim: sim, forceDirty: true}
+	if err := a.autosave(); err != nil {
+		t.Fatal(err)
+	}
+	got, err := os.ReadFile(a.savePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	back, err := game.ParseSaveGenerals(got, sc.Generals)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if back[0].Force != wantForce {
+		t.Fatalf("戰鬥兵力沒有透過 autosave 寫回：want=%d got=%d", wantForce, back[0].Force)
+	}
+	// Force 是已解欄位；其餘將領區與整份存檔都不得因同步被重建。
+	diff := game.DiffBytes(save, got, 0)
+	if len(diff) != 2 {
+		t.Fatalf("只改 Force 應有 2 個 byte 差分，實際=%v", diff)
+	}
+	for _, off := range diff {
+		if off < game.SaveGeneralsOffset || off >= game.SaveGeneralsOffset+game.GeneralRecordSize {
+			t.Fatalf("戰損同步改到將領區外 offset %d", off)
+		}
+	}
+}

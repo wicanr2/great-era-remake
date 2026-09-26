@@ -24,8 +24,9 @@ func (a *app) recruitWording() (render.RecruitWording, error) {
 
 // 政略指令的執行層：把 `internal/game` 已解出的規則接到介面上。
 //
-// **只接規則層已經 confirmed 且有測試的指令**——公式沒讀出來的
-// （外交、停火）一律不接，按鍵沒反應勝過假裝有效果。
+// **只接規則層已經 confirmed 且有測試的指令**——公式、前置條件或成本
+// 沒讀出來的路徑一律不接，按鍵沒反應勝過假裝有效果。外交貸款／外援／
+// 償債與第 10 項停火已有各自窄規格；完整外交仍未宣告完成。
 // 政策的授權自治與產能分配均已接通；後者對應見 docs/re/26。
 // 各指令的來歷見 `docs/mechanics/10-political.md` §3。
 
@@ -51,11 +52,13 @@ func buildWorld(tbl *game.ProvinceTable, gens []game.General, factions *game.Fac
 			faction = p.Commander
 		}
 		w.Units = append(w.Units, game.CombatUnit{
-			General:  game.GeneralID(i + 1),
-			Active:   g.Raw[16]&1 == 1,
-			Cell:     game.NoCell,
-			Faction:  faction,
-			Province: g.Province,
+			General:    game.GeneralID(i + 1),
+			Experience: g.Experience,
+			Active:     g.Raw[16]&1 == 1,
+			Deployed:   g.Raw[16]&4 == 4,
+			Cell:       game.NoCell,
+			Faction:    faction,
+			Province:   g.Province,
 		})
 		w.Strengths = append(w.Strengths, game.StrengthInput{
 			Ability: g.AbilityA, Force: g.Force, Branch: g.Branch,
