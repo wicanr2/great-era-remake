@@ -5,6 +5,7 @@ import (
 
 	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/game"
+	uitheme "github.com/wicanr2/great-era-remake/internal/ui/theme"
 )
 
 // 政略畫面的左側面板。
@@ -67,6 +68,18 @@ type PanelFonts struct {
 	Gen *assets.GlyphFile // MAN{期}15，將領姓名（三字）
 }
 
+// PanelLabels 是 modern 面板的語系化顯示文字。retro 路徑仍直接使用原版
+// 詞表索引；modern 路徑則由 wording catalog 填入，讓英／日語系不會在側欄
+// 偷留繁中原典。每個欄位都是顯示文字，不參與規則判斷。
+type PanelLabels struct {
+	Status, Commander, Governor  string
+	Gold, Food, Ammo, Fuel       string
+	Coal, Iron, Land, Population string
+	Cities, Arsenal              string
+	Force, Generals, People      string
+	Loyalty, Commands, Count     string
+}
+
 // PanelData 是面板要顯示的一個省的狀態。
 type PanelData struct {
 	ID       game.ProvinceID
@@ -76,10 +89,25 @@ type PanelData struct {
 	Year     uint16
 	Month    uint8
 	Commands int // 本省本月剩餘指令數
+	// Icons 只在 modern 主題提供 HUD 輔助圖示；nil 時保留原典文字排版。
+	Icons uitheme.HUDIconProvider
+	// Style 與 SemanticFonts／Labels 同時存在時，啟用完整 modern 面板。
+	// 三者任一缺少就退回既有 retro-safe 路徑，避免半套主題污染畫面。
+	Style         uitheme.UIStyle
+	SemanticFonts *assets.EtenFonts
+	Labels        PanelLabels
+	ProvinceName  string
+	CommanderName string
+	GovernorName  string
+	Status        string
+	Faction       int // 1-based；只用於 modern 色帶，0 表示未知
 }
 
 // DrawStrategyPanel 把政略畫面的左側面板畫到畫布上。
 func (c *Canvas) DrawStrategyPanel(d PanelData, f PanelFonts) error {
+	if d.Style.Name == uitheme.ModeModern && d.SemanticFonts != nil {
+		return c.drawModernStrategyPanel(d)
+	}
 	c.fillRect(panelX, 0, panelValue-panelX+8, ModeBGIH, panelBG)
 
 	y := panelTop
@@ -117,17 +145,29 @@ func (c *Canvas) DrawStrategyPanel(d PanelData, f PanelFonts) error {
 	for _, row := range []struct {
 		label int
 		value uint32
+		icon  int
 	}{
-		{w2Gold, uint32(p.Gold)},
-		{w2Food, uint32(p.Food)},
-		{w2Ammo, uint32(p.Ammo)},
-		{w2Fuel, uint32(p.Fuel)}, // 畫面上燃料在煤礦之前
-		{w2Coal, uint32(p.Coal)},
-		{w2Iron, uint32(p.Iron)},
-		{w2Land, uint32(p.LandValue)},
-		{w2Pop, p.PopulationWan()},
+		{w2Gold, uint32(p.Gold), 0},
+		{w2Food, uint32(p.Food), 1},
+		{w2Ammo, uint32(p.Ammo), 2},
+		{w2Fuel, uint32(p.Fuel), 3}, // 畫面上燃料在煤礦之前
+		{w2Coal, uint32(p.Coal), 4},
+		{w2Iron, uint32(p.Iron), 5},
+		{w2Land, uint32(p.LandValue), -1},
+		{w2Pop, p.PopulationWan(), -1},
 	} {
-		if err := c.DrawEntry(f.W2, row.label, 2, panelFG, panelLabel, y, true); err != nil {
+		labelX := panelLabel
+		if d.Icons != nil && row.icon >= 0 {
+			icon, err := d.Icons.ResourceIcon(row.icon)
+			if err != nil {
+				return err
+			}
+			if err := c.DrawThemedHUDIcon(icon, panelX, y); err != nil {
+				return err
+			}
+			labelX += uitheme.HUDIconW + 6
+		}
+		if err := c.DrawEntry(f.W2, row.label, 2, panelFG, labelX, y, true); err != nil {
 			return err
 		}
 		c.DrawNumber(row.value, panelFG, panelValue, y)
@@ -181,6 +221,127 @@ func (c *Canvas) DrawStrategyPanel(d PanelData, f PanelFonts) error {
 	}
 	c.DrawNumber(uint32(remaining), panelFG, panelValue, y)
 
+	return nil
+}
+
+// drawModernStrategyPanel 是完整 modern UI 的左側資訊卡：保留 640×350
+// 邏輯畫布與原版資料順序，但把每個欄位改成語系文字、卡片層級、資源 icon
+// 與十勢力色帶。它不改動戰場座標、數值或輸入命中區，因此 theme switch
+// 只改呈現 provider。
+func (c *Canvas) drawModernStrategyPanel(d PanelData) error {
+	style := d.Style
+	if style.Name == "" {
+		style = uitheme.RetroStyle()
+	}
+	accent := style.Accent
+	if d.Faction > 0 && d.Faction <= len(style.FactionTint) {
+		accent = style.FactionTint[d.Faction-1]
+	}
+	c.fillRect(4, 0, 182, ModeBGIH, style.Panel)
+	c.fillRect(4, 0, 4, ModeBGIH, accent)
+	c.strokeRect(4, 0, 182, ModeBGIH, style.Muted)
+	c.fillRect(12, 8, 166, 24, style.Paper)
+	c.strokeRect(12, 8, 166, 24, accent)
+
+	draw := func(value string, x, y, maxHalf int, color assets.RGB) error {
+		if value == "" {
+			return nil
+		}
+		missing := c.DrawSemanticText(d.SemanticFonts, trimHalfCells(value, maxHalf), color, x, y)
+		if len(missing) != 0 {
+			return fmt.Errorf("modern 政略面板缺字：%q", string(missing))
+		}
+		return nil
+	}
+	drawValue := func(value uint32, y int) { c.DrawNumber(value, style.Ink, 176, y) }
+
+	name := d.ProvinceName
+	if name == "" {
+		name = fmt.Sprintf("省 %d", d.ID)
+	}
+	if err := draw(name, 20, 12, 14, style.Ink); err != nil {
+		return err
+	}
+	status := d.Status
+	if status == "" {
+		status = d.Labels.Status
+	}
+	if err := draw(status, 20, 35, 14, style.Muted); err != nil {
+		return err
+	}
+	if err := draw(d.Labels.Commander, 12, 52, 7, style.AccentAlt); err != nil {
+		return err
+	}
+	if err := draw(d.CommanderName, 86, 52, 9, style.Ink); err != nil {
+		return err
+	}
+	if err := draw(d.Labels.Governor, 12, 69, 7, style.AccentAlt); err != nil {
+		return err
+	}
+	if err := draw(d.GovernorName, 86, 69, 9, style.Ink); err != nil {
+		return err
+	}
+	c.strokeRect(12, 82, 166, 1, style.Muted)
+
+	rows := []struct {
+		label string
+		value uint32
+		icon  int
+	}{
+		{d.Labels.Gold, uint32(d.Province.Gold), 0},
+		{d.Labels.Food, uint32(d.Province.Food), 1},
+		{d.Labels.Ammo, uint32(d.Province.Ammo), 2},
+		{d.Labels.Fuel, uint32(d.Province.Fuel), 3},
+		{d.Labels.Coal, uint32(d.Province.Coal), 4},
+		{d.Labels.Iron, uint32(d.Province.Iron), 5},
+		{d.Labels.Land, uint32(d.Province.LandValue), -1},
+		{d.Labels.Population, d.Province.PopulationWan(), -1},
+	}
+	for i, row := range rows {
+		y := 88 + i*17
+		labelX := 12
+		if d.Icons != nil && row.icon >= 0 {
+			icon, err := d.Icons.ResourceIcon(row.icon)
+			if err != nil {
+				return err
+			}
+			if err := c.DrawThemedHUDIcon(icon, 12, y); err != nil {
+				return err
+			}
+			labelX = 32
+		}
+		if err := draw(row.label, labelX, y, 12, style.Ink); err != nil {
+			return err
+		}
+		drawValue(row.value, y)
+	}
+	c.strokeRect(12, 224, 166, 1, style.Muted)
+	civic := []struct {
+		label string
+		value uint32
+	}{
+		{d.Labels.Cities, uint32(d.Province.Cities)},
+		{d.Labels.Arsenal, uint32(d.Province.Arsenals)},
+		{d.Labels.Force, d.Force},
+		{d.Labels.Generals, uint32(d.Generals)},
+		{d.Labels.People + "／" + d.Labels.Loyalty, uint32(d.Province.Loyalty)},
+	}
+	for i, row := range civic {
+		y := 231 + i*17
+		if err := draw(row.label, 12, y, 14, style.Ink); err != nil {
+			return err
+		}
+		drawValue(row.value, y)
+	}
+	c.strokeRect(12, 319, 166, 1, style.Muted)
+	if err := draw(d.Labels.Commands+" "+d.Labels.Count, 12, 326, 13, accent); err != nil {
+		return err
+	}
+	remaining := d.Commands
+	if remaining < 0 {
+		remaining = 0
+	}
+	drawValue(uint32(remaining), 326)
 	return nil
 }
 

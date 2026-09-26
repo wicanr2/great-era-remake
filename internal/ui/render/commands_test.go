@@ -7,6 +7,7 @@ import (
 
 	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/game"
+	uitheme "github.com/wicanr2/great-era-remake/internal/ui/theme"
 )
 
 // TestStrategyCommandsShape 指令表要是 1..15 連續，且每個詞條索引在字模檔範圍內。
@@ -89,6 +90,40 @@ func TestCommandMenuDraws(t *testing.T) {
 		t.Errorf("選單只畫出 %d 個前景像素，看起來沒畫成功", n)
 	}
 	t.Logf("十五個指令畫出 %d 個前景像素", n)
+}
+
+func TestModernCommandMenuDrawsHUDIconsAndText(t *testing.T) {
+	const gameDir = "../../../workplace/orig/game"
+	load := func(name string) *assets.GlyphFile {
+		b, err := os.ReadFile(filepath.Join(gameDir, name))
+		if err != nil {
+			t.Skipf("沒有原版素材 %s，跳過", name)
+		}
+		gf, err := assets.ParseGlyphFile(b)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return gf
+	}
+	c := NewBGICanvas()
+	fg, bg := assets.RGB{R: 0xAE}, assets.RGB{R: 0xFF, G: 0xFF, B: 0xA2}
+	if err := c.DrawCommandPageWithIcons(CommandFonts{W2: load("2.15"), W4: load("4.15")},
+		uitheme.NewModern(), fg, bg, 190, 0, 450, 350); err != nil {
+		t.Fatal(err)
+	}
+	// 第一欄第一列 icon 位於 command page 的 x=204..219、y=18..33。
+	colored := 0
+	for y := 18; y < 34; y++ {
+		for x := 204; x < 220; x++ {
+			r, g, b, _ := c.Image().At(x, y).RGBA()
+			if uint8(r>>8) != bg.R || uint8(g>>8) != bg.G || uint8(b>>8) != bg.B {
+				colored++
+			}
+		}
+	}
+	if colored == 0 {
+		t.Fatal("modern 指令頁沒有畫出第一個 HUD 圖示")
+	}
 }
 
 func TestTradeScreensUseOriginalGlyphs(t *testing.T) {

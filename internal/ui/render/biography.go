@@ -8,6 +8,7 @@ import (
 
 	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/i18n"
+	uilayout "github.com/wicanr2/great-era-remake/internal/ui/layout"
 	"github.com/wicanr2/great-era-remake/internal/ui/textlayout"
 )
 
@@ -18,6 +19,9 @@ type BiographyView struct {
 	Page        int // 0-based
 	Title       string
 	Unavailable string
+	// SourceNotice 在語系包沒有可追溯譯稿時顯示在頁首；空字串表示
+	// 目前語系的自傳正文就是原文，不額外打擾繁中母本畫面。
+	SourceNotice string
 }
 
 // BiographyRenderResult 回報實際頁數與無法由字庫呈現的字。Missing 永遠排序且
@@ -90,6 +94,9 @@ func (c *Canvas) DrawBiography(fonts *assets.EtenFonts, v BiographyView,
 	c.strokeRect(20, 326, 600, 1, fg)
 	confidence := biographyConfidenceLabel(p.Confidence)
 	footer := fmt.Sprintf("資料來源：%d筆　可靠度：%s", len(p.Sources), confidence)
+	if v.SourceNotice != "" {
+		footer = v.SourceNotice + "　" + footer
+	}
 	draw(footer, 20, 332, 48)
 	page := fmt.Sprintf("%d/%d", v.Page+1, len(doc.Pages))
 	draw(page, 580, 332, 6)
@@ -170,6 +177,16 @@ func (c *Canvas) DrawSemanticText(fonts *assets.EtenFonts, s string, fg assets.R
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i] < out[j] })
 	return out
+}
+
+// DrawBiographyButton 畫將領詳細頁的可見自傳入口。這是 remake 操作外殼，
+// 不改原版查閱欄位；文字沿用目前用語模式的「人物自傳／人物生平」。
+func (c *Canvas) DrawBiographyButton(fonts *assets.EtenFonts, label string,
+	fg, bg assets.RGB, logicalWidth, y int) []rune {
+	p := uilayout.BiographyButton(logicalWidth, y)
+	c.fillRect(p.X, p.Y, p.HitW, p.HitH, bg)
+	c.strokeRect(p.X, p.Y, p.HitW, p.HitH, fg)
+	return c.DrawSemanticText(fonts, label, fg, p.X+12, p.Y+16)
 }
 
 func (c *Canvas) drawASCIIGlyph(g [assets.EtenASCIIStride]byte, fg assets.RGB, x, y int) {

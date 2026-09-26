@@ -5,6 +5,7 @@ import (
 
 	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/game"
+	uilayout "github.com/wicanr2/great-era-remake/internal/ui/layout"
 )
 
 // 用實機那一場（蔣中正攻打孫傳芳的江西）的數值畫一次，
@@ -100,6 +101,133 @@ func TestBattlePanelLayoutConstants(t *testing.T) {
 		if got := battlePanelLabel2X + i*battlePanelLabel2W; got != w {
 			t.Errorf("二字標籤第 %d 字的 x 是 %d，實機是 %d", i+1, got, w)
 		}
+	}
+}
+
+// 五項戰鬥選單使用 2.15 原版詞條；這個測試只護欄「每列真的畫出字」，
+// 不把尚未量完的選單位置宣稱成原版逐像素等價。
+func TestBattleCommandMenuRendersConfirmedLabels(t *testing.T) {
+	fonts, err := LoadPanelFonts(readFile(t, gameDir, "1.15"), readFile(t, gameDir, "2.15"),
+		readFile(t, gameDir, "3.15"), readFile(t, gameDir, "MAN115"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	c := NewCanvas(ModeBGIW, ModeBGIH)
+	if err := c.DrawBattlePanel(BattlePanelData{
+		Province: 25, Month: 8, Day: 1, ShowBattleMenu: true,
+		BattleMenuMode: BattleMenuAttack,
+	}, fonts); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 5; i++ {
+		y := battleMenuY + i*battleMenuRowH
+		ink := 0
+		for yy := y; yy < y+assets.GlyphH; yy++ {
+			for x := battleMenuLabelX; x < battleMenuLabelX+2*assets.GlyphW; x++ {
+				r, g, b, _ := c.Image().At(x, yy).RGBA()
+				if uint8(r>>8) != battlePanelPaper.R || uint8(g>>8) != battlePanelPaper.G ||
+					uint8(b>>8) != battlePanelPaper.B {
+					ink++
+				}
+			}
+		}
+		if ink == 0 {
+			t.Errorf("戰鬥選單第 %d 列沒有畫出原版詞條", i+1)
+		}
+	}
+}
+
+func TestBattleControlButtonsRenderWithoutTouchingMeasuredRows(t *testing.T) {
+	fonts, err := LoadPanelFonts(readFile(t, gameDir, "1.15"), readFile(t, gameDir, "2.15"),
+		readFile(t, gameDir, "3.15"), readFile(t, gameDir, "MAN115"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	c := NewCanvas(ModeBGIW, ModeBGIH)
+	if err := c.DrawBattlePanel(BattlePanelData{
+		Province: 25, Month: 8, Day: 1, ShowBattleMenu: true,
+		ShowBattleControls: true,
+	}, fonts); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 3; i++ {
+		p := uilayout.BattleControlButton(i)
+		ink := 0
+		for y := p.Y; y < p.Y+p.HitH; y++ {
+			for x := p.X; x < p.X+p.HitW; x++ {
+				r, g, b, _ := c.Image().At(x, y).RGBA()
+				if uint8(r>>8) != battlePanelPaper.R || uint8(g>>8) != battlePanelPaper.G ||
+					uint8(b>>8) != battlePanelPaper.B {
+					ink++
+				}
+			}
+		}
+		if ink == 0 {
+			t.Errorf("控制按鈕 %d 沒有繪製內容", i)
+		}
+	}
+	// 六個已量測資料列仍保有藍色標籤；控制列位於 y=286 之後，不得蓋到它們。
+	for _, y := range []int{49, 65, 81, 97, 113, 129} {
+		found := false
+		for yy := y; yy < y+assets.GlyphH && !found; yy++ {
+			for x := battlePanelLabelX; x < battlePanelLabel2X+2*battlePanelLabel2W; x++ {
+				r, g, b, _ := c.Image().At(x, yy).RGBA()
+				if uint8(r>>8) == battlePanelLabel.R && uint8(g>>8) == battlePanelLabel.G &&
+					uint8(b>>8) == battlePanelLabel.B {
+					found = true
+					break
+				}
+			}
+		}
+		if !found {
+			t.Errorf("控制按鈕覆蓋了 y=%d 的量測標籤", y)
+		}
+	}
+}
+
+func TestBattleRetreatPanelRendersCandidatesAndKeypad(t *testing.T) {
+	fonts, err := LoadPanelFonts(readFile(t, gameDir, "1.15"), readFile(t, gameDir, "2.15"),
+		readFile(t, gameDir, "3.15"), readFile(t, gameDir, "MAN115"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	c := NewCanvas(ModeBGIW, ModeBGIH)
+	if err := c.DrawBattlePanel(BattlePanelData{
+		Province: 18, Month: 8, Day: 1, RetreatActive: true,
+		RetreatInput: 19, RetreatTargets: []game.ProvinceID{19, 26, 14, 17},
+	}, fonts); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 12; i++ {
+		p := uilayout.BattleRetreatKeypadButton(i)
+		ink := 0
+		for y := p.Y; y < p.Y+p.HitH; y++ {
+			for x := p.X; x < p.X+p.HitW; x++ {
+				r, g, b, _ := c.Image().At(x, y).RGBA()
+				if uint8(r>>8) != battlePanelPaper.R || uint8(g>>8) != battlePanelPaper.G ||
+					uint8(b>>8) != battlePanelPaper.B {
+					ink++
+				}
+			}
+		}
+		if ink == 0 {
+			t.Errorf("撤退鍵盤 %d 沒有繪製內容", i)
+		}
+	}
+	// 候選省份區與輸入數字都必須在右欄保留可見墨色；這不是逐像素
+	// 原版等價，只是防止撤退面板接線後變成空白外殼。
+	ink := 0
+	for y := battlePanelSideY; y < battlePanelSideY+90; y++ {
+		for x := BattlePanelX; x < ModeBGIW; x++ {
+			r, g, b, _ := c.Image().At(x, y).RGBA()
+			if uint8(r>>8) != battlePanelPaper.R || uint8(g>>8) != battlePanelPaper.G ||
+				uint8(b>>8) != battlePanelPaper.B {
+				ink++
+			}
+		}
+	}
+	if ink == 0 {
+		t.Fatal("撤退候選／輸入區沒有繪製內容")
 	}
 }
 

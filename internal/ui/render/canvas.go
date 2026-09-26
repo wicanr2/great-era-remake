@@ -91,6 +91,28 @@ func (c *Canvas) DrawSprite(sp *assets.Sprite, pal assets.Palette, x, y int) err
 // colorOf 把 assets.RGB 轉成 color.RGBA（不透明）。
 func colorOf(c assets.RGB) color.RGBA { return color.RGBA{c.R, c.G, c.B, 0xFF} }
 
+// blendPixel 以 coverage 把前景色合成到既有不透明畫布。Modern 灰階字模與
+// 程式化圖示共用這個純 Go 邊界；coverage=0 不改背景，255 等同直接覆蓋。
+// 原味模式的像素 renderer 不呼叫本函式，因此不會被抗鋸齒改寫。
+func (c *Canvas) blendPixel(x, y int, fg assets.RGB, coverage uint8) {
+	if c == nil || c.img == nil || coverage == 0 || !image.Pt(x, y).In(c.img.Bounds()) {
+		return
+	}
+	if coverage == 0xff {
+		c.img.SetRGBA(x, y, colorOf(fg))
+		return
+	}
+	bg := c.img.RGBAAt(x, y)
+	a := uint32(coverage)
+	inv := uint32(255 - coverage)
+	blend := func(src, dst uint8) uint8 {
+		return uint8((uint32(src)*a + uint32(dst)*inv + 127) / 255)
+	}
+	c.img.SetRGBA(x, y, color.RGBA{
+		R: blend(fg.R, bg.R), G: blend(fg.G, bg.G), B: blend(fg.B, bg.B), A: 0xff,
+	})
+}
+
 // DiffCount 回傳兩張圖有多少像素不同，用於對照原版截圖。
 //
 // 尺寸不同直接回錯——比對前必須先確認範圍一致，否則「差異少」沒有意義。

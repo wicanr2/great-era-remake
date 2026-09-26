@@ -16,6 +16,9 @@ var DefaultBiographyOptions = Options{Columns: 28, Rows: 13}
 type Line struct {
 	Text      string
 	HalfCells int
+	// PixelWidth 是比例排版使用的實際度量；固定格 Layout 也填入
+	// half-cells×8，讓呼叫端可以共用 Line 結構而不猜測來源。
+	PixelWidth int
 }
 
 // Page 是固定行數的一頁。
@@ -74,7 +77,7 @@ func Layout(text string, opt Options) (Document, error) {
 		if len(current) == 0 && !force {
 			return
 		}
-		lines = append(lines, Line{Text: string(current), HalfCells: width})
+		lines = append(lines, Line{Text: string(current), HalfCells: width, PixelWidth: width * 8})
 		current, width = nil, 0
 	}
 	for _, r := range text {
@@ -115,6 +118,80 @@ func Layout(text string, opt Options) (Document, error) {
 		}
 		pageLines := append([]Line(nil), lines[start:end]...)
 		doc.Pages = append(doc.Pages, Page{Lines: pageLines})
+	}
+	return doc, nil
+}
+
+// ProportionalOptions 是 Modern 長文的像素排版契約。Advance 回傳單一 rune
+// 在設計字級下的比例字距；renderer 可再用整數 scale 放大，不把裝置像素混進
+// 文字資料。Rows 仍固定，確保 bioPage／翻頁 Action 不漂移。
+type ProportionalOptions struct {
+	Width   int
+	Rows    int
+	Advance func(rune) int
+}
+
+// LayoutProportional 依比例字距斷行與分頁，沿用既有中日文禁則：閉標點不落
+// 行首，開標點不落行尾。它不依賴任何字型套件，字型 atlas 的責任只在
+// Advance callback；未知 glyph 由呼叫端決定 fallback 或回報缺字。
+func LayoutProportional(text string, opt ProportionalOptions) (Document, error) {
+	if opt.Width <= 0 || opt.Rows <= 0 {
+		return Document{}, fmt.Errorf("textlayout: 比例 Width 與 Rows 必須大於 0")
+	}
+	if opt.Advance == nil {
+		return Document{}, fmt.Errorf("textlayout: 比例排版缺少 Advance")
+	}
+	var lines []Line
+	var current []rune
+	width, halfWidth := 0, 0
+	flush := func(force bool) {
+		if len(current) == 0 && !force {
+			return
+		}
+		lines = append(lines, Line{Text: string(current), HalfCells: halfWidth, PixelWidth: width})
+		current, width, halfWidth = nil, 0, 0
+	}
+	for _, r := range text {
+		if r == '\r' {
+			continue
+		}
+		if r == '\n' {
+			flush(true)
+			continue
+		}
+		rw := RuneHalfCells(r)
+		advance := opt.Advance(r)
+		if advance <= 0 {
+			return Document{}, fmt.Errorf("textlayout: U+%04X 字距無效：%d", r, advance)
+		}
+		if forbiddenLineEnd[r] && len(current) > 0 && width+advance >= opt.Width {
+			flush(false)
+		}
+		if width+advance > opt.Width {
+			flush(false)
+		}
+		if forbiddenLineStart[r] && len(current) == 0 && len(lines) > 0 {
+			last := &lines[len(lines)-1]
+			last.Text += string(r)
+			last.HalfCells += rw
+			last.PixelWidth += advance
+			continue
+		}
+		current = append(current, r)
+		width += advance
+		halfWidth += rw
+	}
+	flush(false)
+	if len(lines) == 0 {
+		lines = append(lines, Line{})
+	}
+	doc := Document{Pages: make([]Page, 0, (len(lines)+opt.Rows-1)/opt.Rows)}
+	for start := 0; start < len(lines); start += opt.Rows {
+		end := start + opt.Rows
+		if end > len(lines) {
+			end = len(lines)
+		}
+		doc.Pages = append(doc.Pages, Page{Lines: append([]Line(nil), lines[start:end]...)})
 	}
 	return doc, nil
 }

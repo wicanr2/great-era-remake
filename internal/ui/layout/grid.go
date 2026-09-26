@@ -31,6 +31,15 @@ func NavigationButton(logicalWidth, y, slot int) Placement {
 	return Placement{X: x, Y: y, HitX: x, HitY: y, HitW: size, HitH: size}
 }
 
+// BiographyButton 是將領詳細頁的可見自傳入口。它放在右側導覽箭頭左方，
+// renderer 與滑鼠／觸控命中共用幾何；鍵盤 B 仍保留作為快捷鍵。
+func BiographyButton(logicalWidth, y int) Placement {
+	const width, height, margin, gap = 144, 48, 8, 8
+	navX := logicalWidth - margin - 48 // NavigationButton(slot=0)
+	x := navX - gap - width
+	return Placement{X: x, Y: y, HitX: x, HitY: y, HitW: width, HitH: height}
+}
+
 // NumericKeypadButton 是 6×2 觸控數字鍵盤；索引 0..11 依序為
 // 1..9、0、刪除、送出。64×48 邏輯像素高於 48 px 操作基準。
 func NumericKeypadButton(index int) Placement {

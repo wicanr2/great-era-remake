@@ -15,12 +15,17 @@ const (
 	Confirm Action = "common.confirm"
 	Cancel  Action = "common.cancel"
 
-	OpenCommands Action = "command.open"
-	PreviousPage Action = "page.previous"
-	NextPage     Action = "page.next"
-	DeleteDigit  Action = "input.delete"
-	Submit       Action = "input.submit"
-	BattleAttack Action = "battle.attack"
+	OpenCommands             Action = "command.open"
+	OpenNarrative            Action = "narrative.open"
+	OpenBiography            Action = "biography.open"
+	PreviousPage             Action = "page.previous"
+	NextPage                 Action = "page.next"
+	DeleteDigit              Action = "input.delete"
+	Submit                   Action = "input.submit"
+	BattleAttack             Action = "battle.attack"
+	BattleAttackTargetPrefix        = "battle.attack-target."
+	BattleNextUnit           Action = "battle.next-unit"
+	BattleEndTurn            Action = "battle.end-turn"
 
 	Digit0 Action = "input.digit.0"
 	Digit1 Action = "input.digit.1"
@@ -66,6 +71,43 @@ func BattleMoveDirection(action Action) (int, bool) {
 	}
 	d, err := strconv.Atoi(strings.TrimPrefix(raw, "battle.move."))
 	return d, err == nil && d >= 1 && d <= 6
+}
+
+// BattleAttackTarget 把攻擊子選單的 1..6 目標包成裝置無關動作。
+// 目標順序由戰鬥層公告；動作本身不攜帶規則或傷害。
+func BattleAttackTarget(number int) Action {
+	if number < 1 || number > 6 {
+		return None
+	}
+	return Action(BattleAttackTargetPrefix + strconv.Itoa(number))
+}
+
+// BattleAttackTargetNumber 解出 BattleAttackTarget 的 1..6 編號。
+func BattleAttackTargetNumber(action Action) (int, bool) {
+	if !strings.HasPrefix(string(action), BattleAttackTargetPrefix) {
+		return 0, false
+	}
+	n, err := strconv.Atoi(strings.TrimPrefix(string(action), BattleAttackTargetPrefix))
+	return n, err == nil && n >= 1 && n <= 6
+}
+
+// BattleCommand 把戰鬥右側五項命令包成裝置無關動作。
+// 它只代表進入原版已確認的命令子狀態，不直接執行規則。
+func BattleCommand(number int) Action {
+	if number < 1 || number > 5 {
+		return None
+	}
+	return Action("battle.command." + strconv.Itoa(number))
+}
+
+// BattleCommandNumber 解出 BattleCommand 的 1..5 編號。
+func BattleCommandNumber(action Action) (int, bool) {
+	raw := string(action)
+	if !strings.HasPrefix(raw, "battle.command.") {
+		return 0, false
+	}
+	n, err := strconv.Atoi(strings.TrimPrefix(raw, "battle.command."))
+	return n, err == nil && n >= 1 && n <= 5
 }
 
 var selections = [...]Action{Select1, Select2, Select3, Select4, Select5, Select6, Select7, Select8, Select9,

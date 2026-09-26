@@ -4,6 +4,7 @@ import (
 	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/game"
 	uilayout "github.com/wicanr2/great-era-remake/internal/ui/layout"
+	uitheme "github.com/wicanr2/great-era-remake/internal/ui/theme"
 )
 
 // 政略指令選單。
@@ -166,8 +167,15 @@ func (c *Canvas) DrawNavigationButton(fg, bg assets.RGB, logicalWidth, y, slot i
 
 // DrawCommandPage 先鋪底色再畫選單，用於整頁的指令清單。
 func (c *Canvas) DrawCommandPage(f CommandFonts, fg, bg assets.RGB, x, y, w, h int) error {
+	return c.DrawCommandPageWithIcons(f, nil, fg, bg, x, y, w, h)
+}
+
+// DrawCommandPageWithIcons 是 modern P3 的指令頁版本；文字與編號仍保留，
+// HUD 圖示只是同一索引順序的輔助視覺。
+func (c *Canvas) DrawCommandPageWithIcons(f CommandFonts, icons uitheme.HUDIconProvider,
+	fg, bg assets.RGB, x, y, w, h int) error {
 	c.fillRect(x, y, w, h, bg)
-	return c.DrawCommandMenu(f, fg, x+14, y+16)
+	return c.DrawCommandMenuWithIcons(f, icons, fg, x+14, y+16)
 }
 
 // DrawDevelopPage 畫原版「開發」的三個子項。詞條與索引取自
@@ -207,6 +215,12 @@ func (c *Canvas) DrawSemanticConfirm(fonts *assets.EtenFonts, fg, bg assets.RGB,
 // 原版是按鍵之後才列出完整清單（`docs/playtest/02` 截圖 A2），
 // 這裡的版面（兩欄、欄寬、行距）是 remake 的排版選擇。
 func (c *Canvas) DrawCommandMenu(f CommandFonts, fg assets.RGB, x, y int) error {
+	return c.DrawCommandMenuWithIcons(f, nil, fg, x, y)
+}
+
+// DrawCommandMenuWithIcons 畫十五項指令與可選的 modern HUD 圖示。
+func (c *Canvas) DrawCommandMenuWithIcons(f CommandFonts, icons uitheme.HUDIconProvider,
+	fg assets.RGB, x, y int) error {
 	const (
 		perCol = 8
 		colW   = 210
@@ -216,8 +230,19 @@ func (c *Canvas) DrawCommandMenu(f CommandFonts, fg assets.RGB, x, y int) error 
 		p := uilayout.Grid(i, x, y, perCol, colW, rowH, 0, colW-5, rowH)
 		cx, cy := p.X, p.Y
 
-		c.DrawNumber(uint32(cmd.Num), fg, cx+DigitAdvance*2, cy)
-		wx := cx + DigitAdvance*2 + 8
+		numberX := cx + DigitAdvance*2
+		if icons != nil {
+			icon, err := icons.CommandIcon(i)
+			if err != nil {
+				return err
+			}
+			if err := c.DrawThemedHUDIcon(icon, cx, cy+2); err != nil {
+				return err
+			}
+			numberX += uitheme.HUDIconW + 4
+		}
+		c.DrawNumber(uint32(cmd.Num), fg, numberX, cy)
+		wx := numberX + 8
 		for _, p := range cmd.Parts {
 			gf, width := f.W2, 2
 			if p.FromW4 {
@@ -236,14 +261,37 @@ func (c *Canvas) DrawCommandMenu(f CommandFonts, fg assets.RGB, x, y int) error 
 // 座標、編號與選項數量與原典路徑相同。
 func (c *Canvas) DrawSemanticCommandPage(fonts *assets.EtenFonts, fg, bg assets.RGB,
 	x, y, w, h int, labels []string) []rune {
+	return c.DrawSemanticCommandPageWithIcons(fonts, nil, fg, bg, x, y, w, h, labels)
+}
+
+// DrawSemanticCommandPageWithIcons 是現代白話指令頁的 P3 版本；缺 icon provider
+// 時維持既有文字版，讓語系／字庫測試仍可無頭執行。
+func (c *Canvas) DrawSemanticCommandPageWithIcons(fonts *assets.EtenFonts,
+	icons uitheme.HUDIconProvider, fg, bg assets.RGB,
+	x, y, w, h int, labels []string) []rune {
 	c.fillRect(x, y, w, h, bg)
 	const perCol, colW, rowH = 8, 210, 38
 	missing := []rune{}
 	for i, label := range labels {
 		p := uilayout.Grid(i, x+14, y+30, perCol, colW, rowH, 0, colW-5, rowH)
 		cx, cy := p.X, p.Y
-		c.DrawNumber(uint32(i+1), fg, cx+DigitAdvance*2, cy)
-		missing = append(missing, c.DrawSemanticText(fonts, label, fg, cx+DigitAdvance*2+14, cy)...)
+		numberX := cx + DigitAdvance*2
+		if icons != nil {
+			icon, err := icons.CommandIcon(i)
+			if err != nil {
+				// 語意 renderer 沒有 error 回傳契約；以可見缺字標記保留
+				// fail-closed 行為，呼叫端會在既有檢查中報告。
+				missing = append(missing, '\uFFFD')
+				continue
+			}
+			if err := c.DrawThemedHUDIcon(icon, cx, cy+2); err != nil {
+				missing = append(missing, '\uFFFD')
+				continue
+			}
+			numberX += uitheme.HUDIconW + 4
+		}
+		c.DrawNumber(uint32(i+1), fg, numberX, cy)
+		missing = append(missing, c.DrawSemanticText(fonts, label, fg, numberX+14, cy)...)
 	}
 	return uniqueRunes(missing)
 }

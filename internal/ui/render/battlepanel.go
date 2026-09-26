@@ -3,6 +3,8 @@ package render
 import (
 	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/game"
+	uilayout "github.com/wicanr2/great-era-remake/internal/ui/layout"
+	uitheme "github.com/wicanr2/great-era-remake/internal/ui/theme"
 )
 
 // 戰鬥畫面的右側面板。
@@ -76,6 +78,26 @@ const (
 	w3UnitCount   = 48  // 3.15 詞 49「單位數」
 	w3SoldierCnt  = 49  // 3.15 詞 50「士兵數」
 	w2AttackLabel = 159 // 2.15 詞 160「攻擊」
+	w2MoveLabel   = 168 // 2.15 詞 169「移動」
+	w2Retreat     = 169 // 2.15 詞 170「撤退」
+	w2Garrison    = 170 // 2.15 詞 171「駐軍」
+	w2Inspect     = 5   // 2.15 詞 6「查閱」
+	w2HowProvince = 39  // 2.15 詞 40「何省」
+)
+
+// BattleMenuMode 是戰鬥五項選單目前顯示的輸入層。
+//
+// 數值刻意與 `cmd/dsds` 的 battleMode 保持一致，但 render 不依賴
+// Ebiten 或命令列程式；若未來換入口，只要遵守這個顯示契約即可。
+type BattleMenuMode uint8
+
+const (
+	BattleMenuCommand BattleMenuMode = iota
+	BattleMenuMove
+	BattleMenuAttack
+	BattleMenuRetreat
+	BattleMenuGarrison
+	BattleMenuInspect
 )
 
 // BattleSide 是交戰一方在面板上要顯示的六個數字。
@@ -108,47 +130,63 @@ type BattlePanelData struct {
 	//
 	// `AIAction == 0` 表示還沒有 AI 行動，不畫。
 	AIAction, AIMoves, AIFights int
+
+	// ShowBattleMenu 是 remake 戰鬥畫面才使用的五項指令區；一般面板測試
+	// 預設為 false，因此不會改動既有原版欄位的逐像素基準。
+	ShowBattleMenu bool
+	BattleMenuMode BattleMenuMode
+	// ShowBattleControls 是 M3 remake 外殼的三個大按鍵；預設 false，
+	// 讓既有原版面板逐像素測試不被新增控制圖形污染。
+	ShowBattleControls bool
+	// RetreatActive 只在已取得正常玩家撤退候選清單的切片顯示輸入面板。
+	// 候選清單由 cmd/dsds 注入，renderer 不推導省份關係。
+	RetreatActive  bool
+	RetreatInput   uint32
+	RetreatTargets []game.ProvinceID
+	// Style 只改 battle HUD 的色彩外殼；零值仍是原版米黃／藍紅。
+	Style uitheme.UIStyle
 }
 
 // DrawBattlePanel 把戰鬥畫面的右側面板畫到畫布上。
 //
 // `f.Gen` 是該期的將領姓名字模（`MAN115` 等），用來畫攻守雙方的領袖名。
 func (c *Canvas) DrawBattlePanel(d BattlePanelData, f PanelFonts) error {
-	c.fillRect(BattlePanelX, 0, ModeBGIW-BattlePanelX, ModeBGIH, battlePanelPaper)
+	ink, label, vs, paper := battlePalette(d.Style)
+	c.fillRect(BattlePanelX, 0, ModeBGIW-BattlePanelX, ModeBGIH, paper)
 
 	// 第一行：省名（三字）+ 月日。編號與「月」「日」還沒接上詞條，
 	// 目前只畫省名與兩個數字——**這是已知的缺口**，不假裝畫完了。
 	if err := c.DrawEntry(f.W3, int(d.Province)-1, 3,
-		battlePanelInk, battlePanelTitleX, battlePanelTitleY, true); err != nil {
+		ink, battlePanelTitleX, battlePanelTitleY, true); err != nil {
 		return err
 	}
-	c.DrawSmallNumber(uint32(d.Month), battlePanelInk, 596, battlePanelTitleY)
-	c.DrawSmallNumber(uint32(d.Day), battlePanelInk, 632, battlePanelTitleY)
+	c.DrawSmallNumber(uint32(d.Month), ink, 596, battlePanelTitleY)
+	c.DrawSmallNumber(uint32(d.Day), ink, 632, battlePanelTitleY)
 
 	// ⚠️ remake 新增：守方 AI 的行動編號與動作次數（見 BattlePanelData）。
 	// 畫在面板最下緣，避開所有對實機驗證過的欄位。
 	if d.AIAction != 0 {
 		const aiY = ModeBGIH - 14
-		c.DrawSmallNumber(uint32(d.AIAction), battlePanelInk, BattlePanelX+8, aiY)
-		c.DrawSmallNumber(uint32(d.AIMoves), battlePanelInk, BattlePanelX+40, aiY)
-		c.DrawSmallNumber(uint32(d.AIFights), battlePanelInk, BattlePanelX+72, aiY)
+		c.DrawSmallNumber(uint32(d.AIAction), ink, BattlePanelX+8, aiY)
+		c.DrawSmallNumber(uint32(d.AIMoves), ink, BattlePanelX+40, aiY)
+		c.DrawSmallNumber(uint32(d.AIFights), ink, BattlePanelX+72, aiY)
 	}
 
 	// 第二行：攻方 攻擊 守方。
-	if err := c.drawLeader(f, d.Attacker.Leader, battlePanelAtkX, battlePanelSideY); err != nil {
+	if err := c.drawLeaderWithColor(f, d.Attacker.Leader, battlePanelAtkX, battlePanelSideY, ink); err != nil {
 		return err
 	}
 	if err := c.DrawEntry(f.W2, w2AttackLabel, 2,
-		battlePanelVs, battlePanelVsX, battlePanelSideY, true); err != nil {
+		vs, battlePanelVsX, battlePanelSideY, true); err != nil {
 		return err
 	}
-	if err := c.drawLeader(f, d.Defender.Leader, battlePanelDefX, battlePanelSideY); err != nil {
+	if err := c.drawLeaderWithColor(f, d.Defender.Leader, battlePanelDefX, battlePanelSideY, ink); err != nil {
 		return err
 	}
 
 	// 兩條分隔線。
-	c.fillRect(BattlePanelX+7, battlePanelRuleY, ModeBGIW-BattlePanelX-14, 2, battlePanelLabel)
-	c.fillRect(BattlePanelX+7, battlePanelRuleY2, ModeBGIW-BattlePanelX-14, 2, battlePanelLabel)
+	c.fillRect(BattlePanelX+7, battlePanelRuleY, ModeBGIW-BattlePanelX-14, 2, label)
+	c.fillRect(BattlePanelX+7, battlePanelRuleY2, ModeBGIW-BattlePanelX-14, 2, label)
 
 	// 六個資料列。前兩列的標籤是三字（`3.15`），後四列是二字（`2.15`）——
 	// 二字的畫在中間一格，與原版「黃　金」那種分散排版一致。
@@ -175,21 +213,162 @@ func (c *Canvas) DrawBattlePanel(d BattlePanelData, f PanelFonts) error {
 	for i, r := range rows {
 		y := battlePanelRowY + i*battlePanelRowH
 		if err := c.drawSpacedEntry(r.font, r.entry, r.width,
-			battlePanelLabel, r.x, y, r.adv); err != nil {
+			label, r.x, y, r.adv); err != nil {
 			return err
 		}
-		c.DrawSmallNumber(r.atk, battlePanelInk, battlePanelAtkRight, y)
-		c.DrawSmallNumber(r.def, battlePanelInk, battlePanelDefRight, y)
+		c.DrawSmallNumber(r.atk, ink, battlePanelAtkRight, y)
+		c.DrawSmallNumber(r.def, ink, battlePanelDefRight, y)
+	}
+	if d.RetreatActive {
+		return c.drawBattleRetreat(f, d, ink, label, vs, paper)
+	}
+	if d.ShowBattleMenu {
+		if err := c.drawBattleCommandMenu(f, d.BattleMenuMode, label, vs); err != nil {
+			return err
+		}
+	}
+	if d.ShowBattleControls {
+		if err := c.drawBattleControls(f, label, vs, paper); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func battlePalette(style uitheme.UIStyle) (ink, label, vs, paper assets.RGB) {
+	ink, label, vs, paper = battlePanelInk, battlePanelLabel, battlePanelVs, battlePanelPaper
+	if style.Name == uitheme.ModeModern {
+		ink, label, vs, paper = style.Ink, style.AccentAlt, style.Accent, style.Panel
+	}
+	return ink, label, vs, paper
+}
+
+// drawBattleRetreat 畫目前證據閉合的撤退輸入外殼。它覆蓋右側的戰鬥
+// 選單／控制鍵，但保留上方省名與左側戰場；數字鍵盤與指標命中共用
+// BattleRetreatKeypadButton，不增加另一套觸控規則。
+func (c *Canvas) drawBattleRetreat(f PanelFonts, d BattlePanelData,
+	ink, label, vs, paper assets.RGB) error {
+	const (
+		overlayY = battlePanelSideY - 2
+		overlayH = ModeBGIH - overlayY
+		textX    = BattlePanelX + 7
+		inputR   = BattlePanelX + 176
+	)
+	c.fillRect(BattlePanelX+1, overlayY, ModeBGIW-BattlePanelX-2, overlayH, paper)
+	if err := c.DrawEntry(f.W2, w2Retreat, 2, vs, textX, overlayY+4, true); err != nil {
+		return err
+	}
+	if err := c.DrawEntry(f.W2, w2HowProvince, 2, label,
+		textX+58, overlayY+4, true); err != nil {
+		return err
+	}
+	c.DrawNumber(d.RetreatInput, ink, inputR, overlayY+4)
+
+	// 只顯示注入的已證實候選；未知場景不會由 renderer 自行補出鄰省。
+	for i, id := range d.RetreatTargets {
+		col, row := i%4, i/4
+		x := textX + col*42 + 24
+		y := overlayY + 38 + row*22
+		c.DrawNumber(uint32(id), label, x, y)
+	}
+
+	for i := 0; i < 12; i++ {
+		p := uilayout.BattleRetreatKeypadButton(i)
+		c.fillRect(p.X, p.Y, p.HitW, p.HitH, paper)
+		c.strokeRect(p.X, p.Y, p.HitW, p.HitH, label)
+		switch {
+		case i < 9:
+			c.DrawNumber(uint32(i+1), label, p.X+36, p.Y+15)
+		case i == 9:
+			c.DrawNumber(0, label, p.X+36, p.Y+15)
+		case i == 10:
+			// 刪除：向左箭頭加尾端叉記，與一般數字鍵盤相同。
+			c.fillRect(p.X+11, p.Y+22, 28, 4, label)
+			for j := 0; j < 4; j++ {
+				c.fillRect(p.X+12-j*2, p.Y+22-j*2, 4, 4, label)
+				c.fillRect(p.X+12-j*2, p.Y+22+j*2, 4, 4, label)
+			}
+			c.fillRect(p.X+42, p.Y+17, 3, 14, label)
+		case i == 11:
+			c.drawCheckmark(label, p.X-4, p.Y)
+		}
+	}
+	return nil
+}
+
+const (
+	battleMenuY      = 164
+	battleMenuRowH   = 24
+	battleMenuNumX   = BattlePanelX + 10
+	battleMenuLabelX = BattlePanelX + 30
+)
+
+// drawBattleCommandMenu 畫出已由 DOSBox／IDA 證實的五項戰鬥主選單。
+//
+// 這裡只顯示選單本身與目前輸入層；攻擊方式、駐軍、查閱的原版後續欄位
+// 尚未閉合，但可玩的 remake 外殼會在 cmd/dsds 以同一命中區接線。
+func (c *Canvas) drawBattleCommandMenu(f PanelFonts, mode BattleMenuMode,
+	label, active assets.RGB) error {
+	entries := [...]int{w2MoveLabel, w2AttackLabel, w2Retreat, w2Garrison, w2Inspect}
+	for i, entry := range entries {
+		y := battleMenuY + i*battleMenuRowH
+		fg := label
+		if mode == BattleMenuMode(i+1) {
+			fg = active
+		}
+		c.DrawSmallDigit(i+1, fg, battleMenuNumX, y)
+		if err := c.DrawEntry(f.W2, entry, 2, fg, battleMenuLabelX, y, true); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// drawBattleControls 畫三個不依賴新增字模的 remake 控制鍵：攻擊沿用原版
+// 「攻擊」詞條，換部隊與結束回合使用程式圖形。三者的命中區由
+// `internal/ui/layout.BattleControlButton` 共用，輸入端不可另造座標。
+func (c *Canvas) drawBattleControls(f PanelFonts,
+	label, active, paper assets.RGB) error {
+	for i := 0; i < 3; i++ {
+		p := uilayout.BattleControlButton(i)
+		c.fillRect(p.X, p.Y, p.HitW, p.HitH, paper)
+		c.strokeRect(p.X, p.Y, p.HitW, p.HitH, label)
+		switch i {
+		case 0:
+			// 攻擊按鍵沿用已驗證的 2.15 詞條；原版第二層六鍵選單尚未完整映射，
+			// 實際派送的是既有近身攻擊 remake 差異。
+			if err := c.DrawEntry(f.W2, w2AttackLabel, 2, active,
+				p.X+12, p.Y+18, true); err != nil {
+				return err
+			}
+		case 1:
+			// 兩個向右三角代表換到下一個攻方單位（Tab 等價）。
+			for row := 0; row < 5; row++ {
+				c.fillRect(p.X+16+row*2, p.Y+17+row*3, 4, 4, label)
+				c.fillRect(p.X+28+row*2, p.Y+17+row*3, 4, 4, label)
+			}
+		case 2:
+			// 方框加向下箭頭代表結束回合（Space 等價）。
+			c.fillRect(p.X+18, p.Y+14, 20, 4, label)
+			c.fillRect(p.X+18, p.Y+30, 20, 4, label)
+			for row := 0; row < 4; row++ {
+				c.fillRect(p.X+22+row*2, p.Y+20+row*2, 4, 4, label)
+			}
+		}
 	}
 	return nil
 }
 
 // drawLeader 畫一位領袖的姓名（三字）。0 表示沒有，什麼都不畫。
 func (c *Canvas) drawLeader(f PanelFonts, id game.GeneralID, x, y int) error {
+	return c.drawLeaderWithColor(f, id, x, y, battlePanelInk)
+}
+
+func (c *Canvas) drawLeaderWithColor(f PanelFonts, id game.GeneralID, x, y int, fg assets.RGB) error {
 	if id == 0 || f.Gen == nil {
 		return nil
 	}
-	return c.DrawEntry(f.Gen, int(id)-1, 3, battlePanelInk, x, y, true)
+	return c.DrawEntry(f.Gen, int(id)-1, 3, fg, x, y, true)
 }
 
 // drawSpacedEntry 與 DrawEntry 相同，但字距可以指定。
