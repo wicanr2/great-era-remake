@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 
 	"github.com/wicanr2/great-era-remake/internal/i18n"
+	uiresolution "github.com/wicanr2/great-era-remake/internal/ui/resolution"
+	uitheme "github.com/wicanr2/great-era-remake/internal/ui/theme"
 )
 
 // Preferences 預留 DESIGN-10 的四條呈現軸；目前 Wording 與
@@ -20,6 +22,7 @@ type Preferences struct {
 	Layout      string `json:"layout,omitempty"`
 	Wording     string `json:"wording,omitempty"`
 	Scale       int    `json:"scale,omitempty"`
+	Resolution  string `json:"resolution,omitempty"`
 	MessageTime int    `json:"message_time,omitempty"`
 }
 
@@ -49,8 +52,18 @@ func Load(path string) (Preferences, error) {
 	if err := json.Unmarshal(b, &loaded); err != nil {
 		return p, fmt.Errorf("prefs: 解析 %s：%w", path, err)
 	}
+	if loaded.Theme != "" {
+		if _, err := uitheme.ParseMode(loaded.Theme); err != nil {
+			return p, fmt.Errorf("prefs: %w", err)
+		}
+	}
 	if loaded.Wording != "" {
 		if _, err := i18n.ParseWordingMode(loaded.Wording); err != nil {
+			return p, fmt.Errorf("prefs: %w", err)
+		}
+	}
+	if loaded.Resolution != "" {
+		if _, err := uiresolution.Parse(loaded.Resolution); err != nil {
 			return p, fmt.Errorf("prefs: %w", err)
 		}
 	}
@@ -65,8 +78,18 @@ func Load(path string) (Preferences, error) {
 
 // Save 以同目錄暫存檔 + rename 原子取代，避免程式中止留下半份 JSON。
 func Save(path string, p Preferences) (err error) {
+	if p.Theme != "" {
+		if _, err := uitheme.ParseMode(p.Theme); err != nil {
+			return fmt.Errorf("prefs: %w", err)
+		}
+	}
 	if p.Wording != "" {
 		if _, err := i18n.ParseWordingMode(p.Wording); err != nil {
+			return fmt.Errorf("prefs: %w", err)
+		}
+	}
+	if p.Resolution != "" {
+		if _, err := uiresolution.Parse(p.Resolution); err != nil {
 			return fmt.Errorf("prefs: %w", err)
 		}
 	}

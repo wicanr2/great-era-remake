@@ -51,6 +51,7 @@ ASCFONT.*
 
 # 建置產物
 /dist/
+/dist-all/
 /bin/
 *.test
 

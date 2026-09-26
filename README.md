@@ -280,7 +280,7 @@ tools/go.sh run ./cmd/screenshot -game workplace/orig/game -province 26 \
 每一項改動都在文件裡標記為 remake 差異。不做玩法設計改動。
 
 專案的工作紀律有兩條寫死的原則：**完整性優先於投報**（不以成本為由跳過任何素材），
-以及 **spec 齊了才實作**（反組譯 → 規格 → 程式）。細節見 [`CLAUDE.md`](./CLAUDE.md)。
+以及 **spec 齊了才實作**（反組譯 → 規格 → 程式）。細節見 [`AGENTS.md`](./AGENTS.md)。
 
 ## 目錄
 

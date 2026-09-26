@@ -55,6 +55,32 @@ func TestBrokenOrUnknownPreferencesFailAsWholeFile(t *testing.T) {
 	}
 }
 
+func TestThemeValidationFailsClosed(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "prefs.json")
+	if err := Save(path, Preferences{Theme: "neon", Scale: 2, MessageTime: 5}); err == nil {
+		t.Fatal("未知主題不得寫入偏好")
+	}
+	if err := os.WriteFile(path, []byte(`{"theme":"neon"}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := Load(path); err == nil || got.Theme != "retro" {
+		t.Fatalf("未知主題應回到預設：got=%+v err=%v", got, err)
+	}
+}
+
+func TestResolutionValidationFailsClosed(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "prefs.json")
+	if err := Save(path, Preferences{Resolution: "4k", MessageTime: 5}); err == nil {
+		t.Fatal("未知解析度不得寫入偏好")
+	}
+	if err := os.WriteFile(path, []byte(`{"resolution":"4k"}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := Load(path); err == nil || got != Default() {
+		t.Fatalf("未知解析度應回到預設：got=%+v err=%v", got, err)
+	}
+}
+
 func TestDefaultPathUsesXDGConfigHome(t *testing.T) {
 	dir := t.TempDir()
 	t.Setenv("XDG_CONFIG_HOME", dir)
