@@ -38,8 +38,11 @@ type WordingCatalog struct {
 // RequiredWordingKeys 是目前已有玩家入口的穩定語意鍵。語系檔少任何一項都
 // 整份拒絕，避免某個深層畫面才突然退回原典或顯示空白。
 var RequiredWordingKeys = []string{
-	"common.confirm", "common.cancel",
+	"common.confirm", "common.cancel", "common.back", "common.previous", "common.next",
 	"settings.title", "settings.wording", "settings.wording.original", "settings.wording.plain",
+	"settings.theme", "settings.theme.retro", "settings.theme.modern",
+	"settings.resolution", "settings.resolution.original", "settings.resolution.high",
+	"other.resolution",
 	"other.save.confirm", "other.load.confirm", "other.message_time.prompt",
 	"policy.title", "policy.autonomy", "policy.production", "policy.production.unavailable",
 	"autonomy.title", "autonomy.normal", "autonomy.enabled", "autonomy.prompt",
@@ -52,6 +55,12 @@ var RequiredWordingKeys = []string{
 	"command.01", "command.02", "command.03", "command.04", "command.05",
 	"command.06", "command.07", "command.08", "command.09", "command.10",
 	"command.11", "command.12", "command.13", "command.14", "command.15",
+	"diplomacy.loan", "diplomacy.aid", "diplomacy.repay", "diplomacy.loan.prompt",
+	"diplomacy.loan.credit", "diplomacy.loan.unavailable", "diplomacy.loan.refused", "diplomacy.aid.result", "diplomacy.aid.refused",
+	"diplomacy.repay.prompt", "diplomacy.repay.debt",
+	"diplomacy.repay.none", "diplomacy.repay.invalid", "diplomacy.repay.result",
+	"ceasefire.prompt", "ceasefire.range", "ceasefire.unavailable", "ceasefire.no_commander",
+	"ceasefire.invalid", "ceasefire.no_battle", "ceasefire.agreed", "ceasefire.refused",
 	"trade.import", "trade.export", "trade.food", "trade.ammo", "trade.fuel",
 	"trade.coal", "trade.iron", "trade.buy_amount", "trade.sell_amount",
 	"supply.target", "supply.gold", "supply.food", "supply.ammo", "supply.fuel",
@@ -59,7 +68,16 @@ var RequiredWordingKeys = []string{
 	"transfer.target", "transfer.select.partial", "transfer.select.all",
 	"transfer.selection.confirm", "transfer.resource.gold", "transfer.resource.food",
 	"transfer.resource.ammo", "transfer.resource.fuel",
-	"biography.unavailable", "biography.page",
+	"biography.unavailable", "biography.page", "biography.source_fallback", "biography.portrait_unavailable",
+	"panel.commander", "panel.governor", "panel.gold", "panel.food", "panel.ammo",
+	"panel.fuel", "panel.coal", "panel.iron", "panel.land", "panel.population",
+	"panel.cities", "panel.arsenal", "panel.force", "panel.generals", "panel.people",
+	"panel.loyalty", "panel.commands", "panel.count", "panel.status.normal",
+	"narrative.open", "narrative.title",
+	"view.general.lead", "view.general.loyalty", "view.general.politics",
+	"view.general.experience", "view.general.branch", "view.general.force",
+	"view.general.attack", "view.general.armed", "view.general.skill",
+	"view.general.stamina", "view.general.morale",
 }
 
 // LoadWording 載入一個語系目錄的 wording.json，並採失敗即關閉：任何一套缺文

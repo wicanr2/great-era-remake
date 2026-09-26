@@ -1,6 +1,7 @@
 package i18n
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -12,6 +13,16 @@ func load(t *testing.T) *Locale {
 		t.Fatal(err)
 	}
 	return l
+}
+
+func TestLoadRejectsUnknownLanguage(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "glyphtext.json"), []byte(`{"language":"xx","files":{"3.15":{"entries":[]}}}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Load(dir); err == nil {
+		t.Fatal("未知語系應 fail-closed")
+	}
 }
 
 // 省名要對得上原版：39 條，而且已知的幾個要正確。

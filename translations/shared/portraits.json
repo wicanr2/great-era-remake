@@ -1,0 +1,35 @@
+{
+  "schema_version": "1",
+  "portraits": [
+    {
+      "person_id": 1,
+      "status": "available",
+      "asset": "portraits/0001-chiang-kai-shek-1945.jpg",
+      "asset_sha256": "9bc515a19da722ce4e7680ef3bb59b3fe19eed1bf7a2931dbfd66b6315852ddf",
+      "identity": {
+        "name": "蔣中正",
+        "verification": "confirmed",
+        "reference_url": "https://www.wikidata.org/wiki/Q16574"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/Template:PD-USGov-Military",
+        "author": "作者不詳（推定為美國陸軍人員）",
+        "attribution": "作者不詳（推定為美國陸軍人員），1945；美國聯邦政府公有領域。來源：美國國會圖書館／Wikimedia Commons。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Chiang_Kai-shek.jpg",
+        "retrieved_at": "2026-08-12"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-08-12"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    }
+  ]
+}

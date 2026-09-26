@@ -8,10 +8,49 @@
       "original": "取消",
       "plain": "取消"
     },
+    "common.back": {
+      "original": "返回",
+      "plain": "返回"
+    },
+    "common.previous": {
+      "original": "上一頁",
+      "plain": "上一頁"
+    },
+    "common.next": {
+      "original": "下一頁",
+      "plain": "下一頁"
+    },
     "settings.title": {
       "original": "顯示設定",
       "plain": "顯示設定"
     },
+    "command.title": {
+      "original": "政略指令",
+      "plain": "政略指令"
+    },
+    "battle.title": { "original": "戰鬥", "plain": "戰鬥" },
+    "battle.attacker": { "original": "攻方", "plain": "攻方" },
+    "battle.defender": { "original": "守方", "plain": "守方" },
+    "battle.attack": { "original": "攻擊", "plain": "攻擊" },
+    "battle.province": { "original": "戰場省份", "plain": "戰場省份" },
+    "battle.date": { "original": "日期", "plain": "日期" },
+    "battle.units": { "original": "單位", "plain": "單位" },
+    "battle.soldiers": { "original": "士兵", "plain": "士兵" },
+    "battle.gold": { "original": "黃金", "plain": "黃金" },
+    "battle.food": { "original": "糧食", "plain": "糧食" },
+    "battle.ammo": { "original": "彈藥", "plain": "彈藥" },
+    "battle.fuel": { "original": "燃料", "plain": "燃料" },
+    "battle.command.move": { "original": "移動", "plain": "移動" },
+    "battle.command.attack": { "original": "攻擊", "plain": "攻擊" },
+    "battle.command.retreat": { "original": "撤退", "plain": "撤退" },
+    "battle.command.garrison": { "original": "駐軍", "plain": "駐軍" },
+    "battle.command.inspect": { "original": "查閱", "plain": "查閱" },
+    "battle.control.attack": { "original": "攻擊", "plain": "攻擊" },
+    "battle.control.next": { "original": "換部隊", "plain": "換部隊" },
+    "battle.control.end": { "original": "結束回合", "plain": "結束回合" },
+    "battle.mode.retreat": { "original": "撤退輸入", "plain": "撤退目的地" },
+    "battle.delete": { "original": "刪除", "plain": "刪除" },
+    "battle.submit": { "original": "送出", "plain": "送出" },
     "settings.wording": {
       "original": "顯示用語",
       "plain": "顯示用語"
@@ -24,6 +63,31 @@
       "original": "現代白話",
       "plain": "現代白話"
     },
+    "settings.theme": {
+      "original": "圖形主題",
+      "plain": "畫面風格"
+    },
+    "settings.theme.retro": {
+      "original": "原版圖形",
+      "plain": "經典原味"
+    },
+    "settings.theme.modern": {
+      "original": "現代圖形",
+      "plain": "現代清晰版"
+    },
+    "settings.resolution": {
+      "original": "畫面解析度",
+      "plain": "畫面大小"
+    },
+    "settings.resolution.original": {
+      "original": "原版 640×350",
+      "plain": "原味畫布"
+    },
+    "settings.resolution.high": {
+      "original": "高解析 1280×720",
+      "plain": "高解析畫布"
+    },
+    "other.title": { "original": "其他選項", "plain": "其他設定" },
     "other.save": { "original": "儲存遊戲", "plain": "儲存進度" },
     "other.load": { "original": "載入遊戲", "plain": "載入進度" },
     "other.save.confirm": { "original": "您確定嗎？", "plain": "確定要儲存目前進度嗎？" },
@@ -36,6 +100,7 @@
     "other.spectate": { "original": "觀戰", "plain": "觀看電腦戰鬥" },
     "other.quit": { "original": "結束遊戲", "plain": "儲存並離開" },
     "other.display": { "original": "顯示設定", "plain": "顯示設定" },
+    "other.resolution": { "original": "解析度切換", "plain": "切換畫面大小" },
     "other.unavailable": { "original": "尚未完成", "plain": "尚未完成" },
     "policy.title": {
       "original": "政策",
@@ -106,6 +171,28 @@
     "command.13": { "original": "練兵", "plain": "訓練部隊" },
     "command.14": { "original": "慰勞軍民", "plain": "慰勞軍人與民眾" },
     "command.15": { "original": "其他選項", "plain": "其他設定" },
+    "diplomacy.loan": { "original": "向外國貸款", "plain": "申請外國貸款" },
+    "diplomacy.aid": { "original": "請求外援", "plain": "請求國際援助" },
+    "diplomacy.repay": { "original": "償還外債", "plain": "償還對外借款" },
+    "diplomacy.loan.prompt": { "original": "司令，欲貸款多少？（0-5000）", "plain": "要借多少黃金？（0-5000）" },
+    "diplomacy.loan.credit": { "original": "報告司令，目前信用度", "plain": "目前信用度" },
+    "diplomacy.loan.unavailable": { "original": "無法貸款", "plain": "目前信用度為 0，無法申請貸款" },
+    "diplomacy.loan.refused": { "original": "各國均拒絕提供貸款", "plain": "各國暫不核准這筆貸款（已消耗一個指令）" },
+    "diplomacy.aid.result": { "original": "同意援助：黃金 +%d、糧食 +%d、彈藥 +%d、燃料 +%d（剩餘指令 %d）", "plain": "援助核准：黃金 +%d、糧食 +%d、彈藥 +%d、燃料 +%d（剩餘指令 %d）" },
+    "diplomacy.aid.refused": { "original": "各國均拒絕提供援助", "plain": "國際援助未獲批准（已消耗一個指令）" },
+    "diplomacy.repay.prompt": { "original": "司令，欲償還多少外債？", "plain": "要償還多少對外借款？" },
+    "diplomacy.repay.debt": { "original": "目前外債 %d，黃金 %d", "plain": "目前外債 %d，黃金 %d" },
+    "diplomacy.repay.none": { "original": "目前沒有外債", "plain": "目前沒有需要償還的對外借款" },
+    "diplomacy.repay.invalid": { "original": "償還額要為正", "plain": "請輸入大於零的償還金額" },
+    "diplomacy.repay.result": { "original": "已償還外債 %d（餘額 %d；信用度 %d；剩餘指令 %d）", "plain": "已償還對外借款 %d（剩餘 %d；信用度 %d；剩餘指令 %d）" },
+    "ceasefire.prompt": { "original": "司令欲在何省談判停火？", "plain": "要在哪個省談停火？" },
+    "ceasefire.range": { "original": "可輸入省份 1-%d", "plain": "省份編號範圍 1-%d" },
+    "ceasefire.unavailable": { "original": "無法使用", "plain": "本期無法使用停火談判" },
+    "ceasefire.no_commander": { "original": "司令不在本省", "plain": "司令目前不在這個省份" },
+    "ceasefire.invalid": { "original": "停火目標省編號無效", "plain": "請輸入有效的停火目標省份" },
+    "ceasefire.no_battle": { "original": "並無戰事", "plain": "目標省目前沒有戰事" },
+    "ceasefire.agreed": { "original": "同意在省 %d 停火（剩餘指令 %d）", "plain": "已同意在省 %d 停火（剩餘指令 %d）" },
+    "ceasefire.refused": { "original": "拒絕在省 %d 停火（剩餘指令 %d）", "plain": "對方拒絕在省 %d 停火（剩餘指令 %d）" },
     "develop.reclaim": { "original": "墾地", "plain": "開墾土地" },
     "develop.arsenal": { "original": "建兵工廠", "plain": "建造兵工廠" },
     "develop.mine": { "original": "挖金礦", "plain": "開採金礦" },
@@ -122,6 +209,17 @@
     "view.choice.generals": { "original": "查閱將領", "plain": "查看該省將領" },
     "view.owned.title": { "original": "所屬各省概況", "plain": "所屬省份概況" },
     "view.names.title": { "original": "查閱省名", "plain": "省份編號對照表" },
+    "view.general.lead": { "original": "帶兵能力", "plain": "帶兵能力" },
+    "view.general.loyalty": { "original": "忠誠度", "plain": "忠誠度" },
+    "view.general.politics": { "original": "政治手腕", "plain": "政治手腕" },
+    "view.general.experience": { "original": "經驗", "plain": "經驗" },
+    "view.general.branch": { "original": "兵種", "plain": "兵種" },
+    "view.general.force": { "original": "兵力", "plain": "兵力" },
+    "view.general.attack": { "original": "士兵攻擊力", "plain": "部隊攻擊力" },
+    "view.general.armed": { "original": "武裝程度", "plain": "武裝程度" },
+    "view.general.skill": { "original": "士兵戰技", "plain": "士兵戰技" },
+    "view.general.stamina": { "original": "體力", "plain": "體力" },
+    "view.general.morale": { "original": "士氣", "plain": "士氣" },
     "trade.import": { "original": "進口", "plain": "買入物資" },
     "trade.export": { "original": "出口", "plain": "賣出物資" },
     "trade.food": { "original": "糧食", "plain": "糧食" },
@@ -187,6 +285,35 @@
     "biography.page": {
       "original": "人物自傳",
       "plain": "人物生平"
-    }
+    },
+    "biography.portrait_unavailable": {
+      "original": "尚未找到可驗證照片",
+      "plain": "目前沒有可確認的人物照片"
+    },
+    "biography.source_fallback": {
+      "original": "傳記正文：繁中原文",
+      "plain": "目前顯示繁中原文，尚待本語系譯稿"
+    },
+    "panel.commander": { "original": "司令", "plain": "司令" },
+    "panel.governor": { "original": "省長", "plain": "省長" },
+    "panel.gold": { "original": "黃金", "plain": "黃金" },
+    "panel.food": { "original": "糧食", "plain": "糧食" },
+    "panel.ammo": { "original": "彈藥", "plain": "彈藥" },
+    "panel.fuel": { "original": "燃料", "plain": "燃料" },
+    "panel.coal": { "original": "煤礦", "plain": "煤礦" },
+    "panel.iron": { "original": "鐵礦", "plain": "鐵礦" },
+    "panel.land": { "original": "地價", "plain": "地價" },
+    "panel.population": { "original": "人口", "plain": "人口" },
+    "panel.cities": { "original": "城市", "plain": "城市" },
+    "panel.arsenal": { "original": "兵工廠", "plain": "兵工廠" },
+    "panel.force": { "original": "兵力", "plain": "兵力" },
+    "panel.generals": { "original": "將領", "plain": "將領" },
+    "panel.people": { "original": "人民", "plain": "人民" },
+    "panel.loyalty": { "original": "忠誠度", "plain": "忠誠度" },
+    "panel.commands": { "original": "指令", "plain": "行動" },
+    "panel.count": { "original": "數", "plain": "數" },
+    "panel.status.normal": { "original": "正常", "plain": "中央管理" },
+    "narrative.open": { "original": "新聞", "plain": "史事新聞" },
+    "narrative.title": { "original": "新聞圖庫", "plain": "史事新聞圖庫" }
   }
 }

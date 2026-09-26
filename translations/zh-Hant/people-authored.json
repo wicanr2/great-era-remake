@@ -1,0 +1,801 @@
+{
+  "schema_version": "1",
+  "language": "zh-Hant",
+  "overlay_scope": "new-biographies-only",
+  "generated_from": "versioned research batches",
+  "people": [
+    {
+      "id": 13,
+      "name_ingame": "蔡仲笏",
+      "bio_zh": "蔡仲笏，生卒年與籍貫不詳，以此寫法未查得任何記載。中文維基百科記，1924年底國民革命軍以黃埔軍校第二期學生為骨幹組建炮兵營，營長為蔡忠笏，陳誠、羅卓英分任第一、第三連連長；北伐時期的戰鬥序列列國民革命軍第一軍炮兵團團長為蔡忠笏，淞滬會戰的砲兵序列亦列其名。另據中華民國政府官職資料庫，該蔡忠笏1928年7月25日任國民革命軍陸軍第三師步兵第七旅旅長，1934年11月18日任陸軍砲兵第二旅旅長，1936年2月1日敘陸軍少將，1939年10月14日署浙江磐安縣縣長，1941年6月10日免。保定陸軍軍官學校第三期炮兵科名單亦有其名。名字與遊戲寫法一字之差，兵科與時期相合，是否同一人待考。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "5ec96752250adb4c3a85d52faa5b84489068fddbfc0b79cb269dfbf2d2832eab"
+      }
+    },
+    {
+      "id": 19,
+      "name_ingame": "劉自珍",
+      "bio_zh": "劉自珍，生卒年不詳，天津人。1937年任國民革命軍第二十九軍第三十七師第一百十一旅旅長，駐北平城內。1948年11月任第三綏靖區幹訓團教育長，同月8日所部隨第三綏靖區前進指揮所直屬單位共兩千餘人，在江蘇賈汪、山東台兒庄一帶離開國民革命軍建制。另據中華民國政府官職資料庫，有一名劉自珍於1923年敘陸軍步兵少校、1936年敘陸軍少將；官階與時序相接，是否同一人待考。籍貫僅見於一處記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "58439e8c5b53615f77f8095b07795d69b314cd922e0018bdb63c39a1cf15a1d6"
+      }
+    },
+    {
+      "id": 23,
+      "name_ingame": "周岱",
+      "bio_zh": "周岱，生卒年與籍貫不詳。1927年9月任國民革命軍北方軍直轄炮兵集團長。其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "eb5dda30bb06c3f81532c94bf0465a5c95b816688bdd55f2a928cf43fca57f01"
+      }
+    },
+    {
+      "id": 35,
+      "name_ingame": "郭思演",
+      "bio_zh": "郭思演，生卒年與籍貫不詳。保定陸軍軍官學校第八期炮兵科畢業。1933年12月4日任陸軍第九十九師師長，1935年4月15日敘陸軍少將，1936年10月5日晉陸軍中將，1938年任虎門要塞司令，另曾任國民革命軍第十八軍參謀長。1934年4月29日至5月1日，率第九十九師在江西龍岡作戰，取得該地據點。1935年4月，紅軍主力進逼貴陽，貴陽附近守軍僅所部四個團，滇軍孫渡部四日急行軍四百餘里馳援。其後行止未查得記載。",
+      "confidence": "high",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "f3239cf6ebdd19650dc7d338472985dbaa37431916b26cf2e0fb5ca8dbe69864"
+      }
+    },
+    {
+      "id": 42,
+      "name_ingame": "鄧彥善",
+      "bio_zh": "鄧彥善，生卒年與籍貫不詳，以此寫法未查得任何記載。中文維基百科記，1926年1月建國湘軍改編為國民革命軍第六軍，軍長程潛，鄧彥華在該軍第十七師任職；1927年4月29日該師在江蘇鎮江被包圍繳械，其後改編歸白崇禧節制；同年12月29日李福林辭第五軍軍長，遺缺由鄧彥華代理；1928年3月19日所部攻占廣東海豐城。另據中華民國政府官職資料庫，該鄧彥華1923年任大本營參軍處上校副官，1925年9月30日任國民政府副官長，1929年8月12日任廣東省政府委員兼建設廳廳長，1937年1月25日派廣東省第一區行政督察專員，1939年2月8日免。名字與遊戲寫法一字之差，軍職與時期相合，是否同一人待考。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "07ce34a745b5f8fc3e24e305d01e1758bd5a4adacc52d8d3f9ea878651c9442f"
+      }
+    },
+    {
+      "id": 63,
+      "name_ingame": "陳德麟",
+      "bio_zh": "陳德麟，生卒年與籍貫不詳。1913年敘陸軍步兵上校，1917年任直隸陸軍第三混成旅步兵第二團團長，1918年敘陸軍少將，1920年任陸軍步兵第九十八團團長，1922年敘陸軍中將，1924年2月任將軍府將軍，同年9月特任敬威將軍。此後行止未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "42bea22e5db5e0aa1b48cc3b412aab9791b5b586e936ac615f701c2bd6a0e621"
+      }
+    },
+    {
+      "id": 71,
+      "name_ingame": "王都慶",
+      "bio_zh": "王都慶，生卒年與籍貫不詳。北洋陸軍學堂出身。1913年敘陸軍步兵中校、陸軍步兵上校，1915年任陸軍第二師步兵第八團團長，1916年任陸軍第六混成旅步兵第三團團長並敘陸軍少將，1918年任陸軍第十八師步兵第三十五旅旅長，1921年任陸軍第二十一混成旅旅長，1922年敘陸軍中將，1924年2月任將軍府將軍、同年8月特任亮威將軍，1925年9月該旅改編為暫編陸軍第七師，任師長，1926年6月任援湘軍右翼司令。1921年率部進入湖北咸豐縣，對當地民間武裝作戰。1926年7月，所部第七師隨陳嘉謨部佈防於湖南汨羅江北岸。此後行止未查得記載。",
+      "confidence": "high",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "fbac01b857bd065ec0fa761cb025ae2d78983e61b8c6a64a8832cc94d798407e"
+      }
+    },
+    {
+      "id": 77,
+      "name_ingame": "閻日仁",
+      "bio_zh": "閻日仁，生卒年與籍貫不詳。1920年敘陸軍步兵上校。另據中文維基百科轉引郭廷以系統的年表條目，1927年5月奉系收編豫軍改組番號時，有一名閰曰仁所部改編為第二十三軍；兩個姓名逐字形近而寫法不同，是否同一人待考。其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "21b03c90e1ac77809136e6ef2b0690fcab779d645119cb29a4b0efee65879a7e"
+      }
+    },
+    {
+      "id": 78,
+      "name_ingame": "吳俊卿",
+      "bio_zh": "吳俊卿，生卒年與籍貫不詳。1926年任河南陸軍第三師師長，駐守武昌城南。1925年9月13日至16日於湖北北部武勝關參與作戰，16日退出。1926年參與鄂南會戰。同年9月2日起武昌被圍，10月8日所部向國民革命軍傳達停戰意向，10月10日開武昌城保安門，國民革命軍入城，武昌陷落，湖北督辦陳嘉謨被俘。另據中華民國政府官職資料庫，有一名吳俊卿於1913年敘陸軍步兵中校，1917年任黑龍江陸軍第一師步兵第二團第三營營長，1920年任山東陸軍第六混成旅第一團團長，1925年9月8日敘陸軍中將；該敘階日期與武勝關作戰相隔五日，是否同一人待考。此後行止未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "c4c7d7d76bd45ae3c4b3362cbb874d61a8bf21cac83eeef536c962e9cf89602c"
+      }
+    },
+    {
+      "id": 79,
+      "name_ingame": "袁家聲",
+      "bio_zh": "袁家聲，生卒年不詳，安徽壽州人。1911年11月任淮上軍副總司令，1912年敘陸軍少將，1927年1月任國民革命軍第三十三軍副軍長兼第一師師長。1911年11月壽州光復後，淮上軍分三路向皖北推進，先後光復六安、懷遠、鳳陽、蚌埠、霍丘、阜陽、渦陽等地。1927年5月3日至25日於安徽中部參與六安戰鬥，25日棄守六安。1928年1月14日以第三十三軍第一師師長獲國民政府嘉獎。此後行止未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "43bd0c3a66a13d8b35661f9fa08ba9f216350094902f506d051a0960c06602a5"
+      }
+    },
+    {
+      "id": 80,
+      "name_ingame": "薛傳峰",
+      "bio_zh": "薛傳峰，生卒年與籍貫不詳，原屬豫軍萬選才部。1930年10月13日任新編第六軍軍長，同日在山東陽谷就職。其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "95b8e9d69c4e65cf5b8f57e1f50225691dab05502f09e786c4d786682e44ee5a"
+      }
+    },
+    {
+      "id": 83,
+      "name_ingame": "王相賢",
+      "bio_zh": "王相賢，生卒年與籍貫不詳。曾任陸軍第十五混成旅旅長，該旅原屬賈德耀，任內為靳雲鶚收編，其後為徐壽椿所殺。另據中華民國政府官職資料庫，有一名王相賢於1916年加銜陸軍步兵上尉；與旅長一職之間無中間記載，是否同一人待考。以上各事的年份均未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "286736130f3e762b1fd50b9b184567002074fc413d32dc785fe6a5fed994ad72"
+      }
+    },
+    {
+      "id": 85,
+      "name_ingame": "安錫嘏",
+      "bio_zh": "安錫嘏，生卒年與籍貫不詳。畢業於陸軍大學正則班第六期。1921年歷任陸軍第二十四師砲兵第二十四團中校團附、第二十四師二等參謀官、第二十四師步兵第九十四團第一營營長，同年敘陸軍砲兵少校，1922年署第二十四師參謀長，1923年敘陸軍砲兵中校、陸軍砲兵上校，1924年晉授陸軍少將，1927年加銜陸軍少將兼中將。第二十四師的所屬系統與此後行止均未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "39b5ad61dbdf7912067caca3a2b367875e59eeb35e8250623362f9c3356b8b3a"
+      }
+    },
+    {
+      "id": 86,
+      "name_ingame": "馬文德",
+      "bio_zh": "馬文德（1880年—1932年），河南南召人。1919年敘陸軍步兵中校，1922年敘陸軍步兵上校，1924年晉授陸軍少將。1927年5月所部豫軍被收編改編。1928年3月22日任國民革命軍第四十二軍軍長，駐河南南陽。同年12月6日所部編入國民革命軍第四集團軍，改稱第四集團軍第十二、第十三師；1929年1月20日第四十二軍番號撤銷。",
+      "confidence": "high",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "8bcfb0bc06c9707deebc6d67f76a0bf3d83226d3e31c93e044f46d6b4861497e"
+      }
+    },
+    {
+      "id": 88,
+      "name_ingame": "張繼武",
+      "bio_zh": "張繼武，生卒年與籍貫不詳。1913年敘陸軍步兵中尉，1914年敘陸軍工兵中尉，1916年敘陸軍步兵少校並加銜中校，1918年敘陸軍騎兵少校，1919年敘陸軍步兵中校並加銜上校，1922年12月任林西鎮守使署參謀長，1923年敘陸軍少將，1926年10月敘陸軍中將，1927年3月任毅軍第一軍總司令。此後行止未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "214b877f8d0469ff9faedd9cb7e0ac9f068443e3669292cf9afdea399ee3a162"
+      }
+    },
+    {
+      "id": 89,
+      "name_ingame": "劉正芳",
+      "bio_zh": "劉正芳，生卒年與籍貫不詳。1913年8月敘陸軍步兵少校並加銜中校，同年10月敘陸軍步兵中校、陸軍步兵上校，同年11月敘陸軍少將，1915年加銜陸軍中將，1916年敘陸軍中將。所任職務與所屬部隊均未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "638d68b83a5e08cdaaea0f077981b3d38225af87d922cae10c032c02080da31c"
+      }
+    },
+    {
+      "id": 90,
+      "name_ingame": "張錦標",
+      "bio_zh": "張錦標，生卒年與籍貫不詳。1914年4月敘陸軍步兵少尉兼中尉、陸軍砲兵少尉，同月敘陸軍步兵上尉兼少校，同年6月敘陸軍步兵少校兼中校，1919年敘陸軍步兵中校，1923年敘陸軍步兵上校，1926年10月敘陸軍少將。所任職務與所屬部隊均未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "323c2962e53f1f4c31ac91defd85020be853fc815962b5277442d56310c1f36d"
+      }
+    },
+    {
+      "id": 91,
+      "name_ingame": "米國賢",
+      "bio_zh": "米國賢，生卒年與籍貫不詳。1919年敘陸軍步兵中校，1923年敘陸軍步兵上校，1924年敘陸軍少將，1926年10月敘陸軍中將，1927年3月任毅軍第二軍總司令。此後行止未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "391ff2b418707309b543039e138bcfc48e72dea22bc6914e68bd9189fe1ecc4f"
+      }
+    },
+    {
+      "id": 95,
+      "name_ingame": "吳德芳",
+      "bio_zh": "吳德芳，生卒年與籍貫不詳。1913年敘陸軍二等測量正兼一等測量正、陸軍步兵中尉，1915年任中央陸軍測量學校校長，1917年敘陸軍一等測量正，1918年2月任陸軍第二師副官長、同年12月免測量學校校長職，1925年加銜陸軍測量監，1927年2月署理中央陸軍測量學校校長、同年11月任全國陸軍測繪總局科長，1928年10月歷任國民政府軍事委員會參謀廳第九科科長、江蘇陸軍測量局局長，同年11月任國民政府參謀部測量總局副局長，1933年2月任參謀本部陸地測量總局局長，1936年2月免本職。另據同一資料庫，有一名吳德芳於1923年1月任湖北陸軍第二混成旅步兵第四團砲兵營營長；該職與測量學校校長一職相隔甚遠，是否同一人待考。此後行止未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU2.json",
+        "facts_sha256": "bc70313d313b098cd301319e615ba5aa77b9d13adc2ed396ee52e2bd93b02db0",
+        "bios": "docs/reference/people/bios-batchU2.md",
+        "bios_sha256": "93f7e67f4fc477e09f90267884703be7c840f820e76bd242709143c6ae9e14c5",
+        "bio_sha256": "940658239fe8b8aa87bc110c240a04f91ea09d0122e8bc903c7ac37dab68de5c"
+      }
+    },
+    {
+      "id": 100,
+      "name_ingame": "楊賡和",
+      "bio_zh": "楊賡和，生卒年與籍貫不詳。1923年授陸軍步兵少校。1926年10月，在江西贛江西岸的蛟橋、楊村一帶率皖軍第五混成旅與國民革命軍第三軍及所屬第七師、第八師激戰，雙方傷亡慘重，國民革命軍第八師傷亡逾半。同年，在江西九仙嶺為國民革命軍第七軍所俘，時記為獨立第一旅旅長。另據五省聯軍的編制記載，第二方面軍所屬江蘇第一混成旅旅長作楊庚和，原屬楊化昭部；三處所繫的番號互不相同，是否同一人待考。其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "fe3ed8173c09281d30cd16ca742529b50185d379b7f91853f42df86168b3db10"
+      }
+    },
+    {
+      "id": 101,
+      "name_ingame": "彭德銓",
+      "bio_zh": "彭德銓，生卒年與籍貫不詳。1913年授陸軍砲兵少校，1917年任陸軍第二師砲兵第二團團長，1920年授陸軍砲兵中校，1922年復任原職，1923年加銜陸軍砲兵上校兼少將，1924年加銜陸軍少將兼中將，1925年任暫編陸軍第六混成旅旅長，1926年晉授陸軍中將。1927年4月，經孫傳芳委任為第四師師長兼五省聯軍副司令，在江蘇淮陰就職。同年6月，所部第三團在江蘇漣水向國民革命軍第十七軍杜起雲部繳械；同月張宗昌、孫傳芳等在濟南舉行軍事會議，派彭為五省聯軍前敵司令。1927年8月，率部在安徽北部固鎮、襄遠一帶與國民革命軍第四十軍作戰，國民革命軍向南撤退；同月在安徽東部滁縣與國民革命軍第四十四軍對峙。其後行止未查得記載。",
+      "confidence": "high",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "4869fa0ce75a4c6a989b6d5e5bbd4cf1b08586db513a56489e62876d2051bda1"
+      }
+    },
+    {
+      "id": 102,
+      "name_ingame": "楊鎮東",
+      "bio_zh": "楊鎮東，生卒年與籍貫不詳。1915年至1916年間加銜並實授陸軍步兵少校，1918年任陸軍第二師步兵第八團第二營營長，同年加銜陸軍步兵中校，1921年改任該師步兵第七團團長，1922年加銜陸軍步兵上校兼少將，1923年授陸軍少將，1926年加銜陸軍中將。1926年10月，在江西北部德安與國民革命軍第七軍作戰；3日國民革命軍一部遭四個旅包圍，雙方各傷亡千餘人，德安數度易手。另據五省聯軍的編制記載，第三方面軍所屬浙江第七混成旅旅長作楊振東，該方面軍總指揮盧香亭兼領中央陸軍第二師；番號與所屬師別和上列任職相合，是否同一人待考。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "f5bff1194c76ffcdcc0467ef5a611a378ec38dfe025dc7df8aba0b1b33c1f7d0"
+      }
+    },
+    {
+      "id": 103,
+      "name_ingame": "顏景宗",
+      "bio_zh": "顏景宗，直隸河間人，生卒年不詳。1908年入日本陸軍士官學校第七期炮兵科，1910年畢業。1913年授陸軍砲兵中校，1916年任陸軍第二師砲兵第二團第三營營長，1924年授陸軍砲兵上校，同年改任該師步兵第五團團長並晉授陸軍少將，1925年任暫編陸軍第八混成旅旅長，1926年加銜陸軍中將。另據五省聯軍的編制記載與一部戰役表，浙江第八混成旅旅長兼第六方面軍總司令作顏景琮，1926年10月底至11月初在江西德安、馬迴嶺一帶與國民革命軍第七軍作戰；旅的番號與上列任職逐字相合，是否同一人待考。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "a18f929dcf79116df3e5d270c8dafd59c3bfd536de5b8b8ebc01d500fe7ea46d"
+      }
+    },
+    {
+      "id": 104,
+      "name_ingame": "張中立",
+      "bio_zh": "張中立，生卒年與籍貫不詳。1914年授陸軍步兵少校，1921年任江蘇陸軍第二師步兵第六團第二營營長，1924年加銜陸軍步兵中校，1925年加銜陸軍步兵中校兼上校。1929年任江蘇省政府民政廳第三科科長，1930年辭職。另據逐日引郭廷以系統的年表，1927年9月南京方面右翼軍右縱隊的第三十一軍第九十二師師長作張中立，該師9日自江蘇江陰南星鎮渡江，循水道經南通、如皋，11日晚抵海安，13日拂曉抵鹽城，14日克阜寧；時地與上列任職相接，是否同一人待考。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "449c463ff5e4beb7f75b1f9ff21fbbaa761899ddda115e62e19bcd896a228d81"
+      }
+    },
+    {
+      "id": 115,
+      "name_ingame": "倪朝榮",
+      "bio_zh": "倪朝榮，生卒年與籍貫不詳。1914年授陸軍步兵少校，1917年授陸軍步兵中校，1920年任安徽陸軍第一混成旅步兵第一團團長，1922年至1923年間加銜並實授陸軍步兵上校，1924年1月加銜陸軍中將，同年4月任安徽陸軍第一混成旅旅長，7月晉授陸軍中將。1925年10月，與王普、高世讀、華疏庵等皖軍將領率部自安徽臨淮關、壽縣、潁上出發進取蚌埠，解除駐蚌埠奉軍姜登選部的武裝。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "2ad7f9cdc1973e80692e1f7ea4ff62947ae72bdf9cbe3950b8f6dac5f4a5e8e5"
+      }
+    },
+    {
+      "id": 118,
+      "name_ingame": "劉鳳圖",
+      "bio_zh": "劉鳳圖，生卒年與籍貫不詳。1913年先後授陸軍步兵少校、中校，1916年授陸軍少將，1917年任陸軍第六師一等參謀官，1921年任江蘇陸軍第二混成旅步兵第二團砲兵營營長，1922年升該團團長，1925年授陸軍中將。1925年10月，所部一個旅經孫傳芳與皖軍總司令陳調元協商後撥交陳部，與高世讀第四旅、華毓庵旅共同合圍孫殿英部於安徽亳州。1926年11月4日，以五省聯軍第五方面軍第二軍軍長在江西九江、瑞昌與國民革命軍獨立第二師作戰，國民革命軍攻佔九江，五方面軍被俘數千，瑞昌失守後隻身撤離。1927年3月，在安徽當塗指揮國民革命軍第六軍第十七師與第三十七軍所部，與直魯聯軍第四軍作戰，至17日對方撤退。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "670b384e514b12795fc7979540bac9d3e34422027b9bddd861b17928f9f42f7c"
+      }
+    },
+    {
+      "id": 125,
+      "name_ingame": "張鳳歧",
+      "bio_zh": "張鳳歧，生卒年與籍貫不詳。1920年任陸軍第九混成旅步兵第一團第三營營長，1922年任江西陸軍憲兵營營長，1923年任江西陸軍步兵第一團團長，1925年任陸軍第九混成旅旅長，同年加銜陸軍步兵上校兼少將，1926年授陸軍少將。1922年，隨江西贛軍在虔南、龍南與贛南一帶與粵軍作戰。1925年9月，在江西萍鄉、宜春與國民革命軍第二軍、第三軍作戰，贛軍敗退。1926年9月至10月，在江西新喻與市汊街一帶再與該兩軍作戰，10月9日退向南昌。同年11月南昌之役為國民革命軍所俘，由中國國民黨江西省黨部組織的「江西人民裁判逆犯委員會」審判，1927年1月11日與岳思寅、唐福山等在南昌貢院處決。上列記載中，任免令與一部分戰鬥繫於張鳳岐，另一部分戰鬥與審判繫於張鳳歧，兩種寫法所繫的番號、同僚與事件相同，是否同一人待考。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "326e9ecc219daac3d83252eab21e7da0466dbb1ae44fc63310f87e1f5bbc3395"
+      }
+    },
+    {
+      "id": 129,
+      "name_ingame": "李生春",
+      "bio_zh": "李生春，生卒年與籍貫不詳。1914年授陸軍騎兵少校並加銜騎兵中校，1917年授陸軍騎兵中校，1920年授陸軍騎兵上校，同年改任陸軍第十二師步兵第四十五團團長，1921年加銜陸軍少將，1922年升該師步兵第二十三旅旅長，同年授陸軍少將，1923年6月任福寧鎮守使，同年8月授陸軍中將，1924年6月特任純威將軍。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "3b2d0c5a30baa475b577072d6430ae8af62e0e669a99c863d79de2f4cc40d2c3"
+      }
+    },
+    {
+      "id": 134,
+      "name_ingame": "吳大洪",
+      "bio_zh": "吳大洪，生卒年與籍貫不詳。1923年授陸軍工兵上校，1924年加銜陸軍少將。1924年5月，福建督理周蔭人收編王永泉部的工兵教導團，編為福建陸軍第五旅，約三千餘人，由吳任旅長，駐防福建涵江一帶。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "2982782bf2dd17ab2692df04a7779a22f0419234a39e785e3cff0ac20898b51f"
+      }
+    },
+    {
+      "id": 137,
+      "name_ingame": "張慶昶",
+      "bio_zh": "張慶昶，生卒年與籍貫不詳。1921年任陸軍第一師步兵第一團第一營營長，1922年6月改任該師步兵第二團團長，同年12月授陸軍少將，1923年加銜陸軍中將，1925年授陸軍中將。1922年9月，蔡成勳任督理江西軍務善後事宜，所部近畿陸軍第一師分駐江西各地，張時任步兵第一旅所屬步兵第二團團長。另據同姓名的任免令，1916年至1918年間有一名張慶昶歷任黑龍江陸軍第一師步兵第二旅少校副官、黑龍江督軍公署上校參謀，1918年1月因病辭職；該段與上列任職之間有職務落差，是否同一人待考。其餘經歷未查得記載。",
+      "confidence": "high",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "cb93e11b3d01d12342e1237ee8dba1a59a4bb41b4ed1a35e6c664eb0583dd404"
+      }
+    },
+    {
+      "id": 150,
+      "name_ingame": "何璧輝",
+      "bio_zh": "何璧輝，生卒年與籍貫不詳。1924年4月加銜陸軍少將兼中將，同年10月授陸軍中將，1926年1月任暫編陸軍第九混成旅旅長。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "b5a3d54e9de9e378a2693bd271c14edf572f4eb91f23729cc85f0803b2547967"
+      }
+    },
+    {
+      "id": 151,
+      "name_ingame": "吳傳心",
+      "bio_zh": "吳傳心，生卒年與籍貫不詳。1917年任暫編貴州第一師步兵第三團第一營營長，1924年10月加銜陸軍少將兼中將。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "f902b87847d8f65b07b3d9d88cda877ea2260d0c0d94a958ae0be36aa3833e56"
+      }
+    },
+    {
+      "id": 164,
+      "name_ingame": "何光烈",
+      "bio_zh": "何光烈，生卒年與籍貫不詳。1920年，熊克武、但懋辛所部退往四川閬中整編，與退處陝南的劉存厚結盟合組靖國軍，何所領的第五師編入但懋辛的第一軍。1924年7月，北京政府任命何為四川陸軍第五師師長。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "97024ae24fff546d93c15974e3e55fddbccacbea09d24cadfe93c5fa446ea3f9"
+      }
+    },
+    {
+      "id": 184,
+      "name_ingame": "陳文釗",
+      "bio_zh": "陳文釗，生卒年與籍貫不詳。1927年10月任直魯聯軍第十五軍軍長，駐山東濟寧。1927年10月3日，在安徽鳳陽收編靳雲鶚部于學忠、劉培緒兩師。另據中華民國政府官職資料庫，有一名陳文釗1913年敘陸軍步兵少校，1920年至1921年歷任陸軍第八混成旅步兵第一團第一營、第三營營長，1924年3月任陸軍第十四師步兵第二十七旅旅長，同年9月晉授陸軍少將；第十四師正是靳雲鶚1923年起統率的部隊，官階與時序亦相銜，是否同一人待考。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "a2169e008c4fc577b192ab77feb5157275950d7c2f646f701998a65777a7f989"
+      }
+    },
+    {
+      "id": 210,
+      "name_ingame": "王樹林",
+      "bio_zh": "王樹林，生卒年與籍貫不詳。另據中華民國政府官職資料庫，有一名王樹林1919年4月任陸軍第十混成旅步兵第一團團長，1920年8月敘陸軍步兵上校；同一姓名下另有數筆1914年至1924年的敘階令，官階前後倒退，可分出三群以上，其中只有這一群兼有機關且官階與職務相稱，是否同一人待考。其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "542697de0896d7115356476c0034c0d99523c18ba69696557e9dd38b13f81d7f"
+      }
+    },
+    {
+      "id": 211,
+      "name_ingame": "李振聲",
+      "bio_zh": "李振聲（1875年—卒年不詳），字子鐸，遼寧省遼陽人。畢業於奉天講武堂。1918年11月任陸軍第二十七師砲兵第二十七團團長，1919年10月敘陸軍砲兵上校，1921年4月任陸軍第二十七師步兵第五十四旅旅長，1924年任東三省陸軍第二十一旅旅長，1926年至1927年任東北陸軍第二十一旅旅長，隸安國軍第六方面軍團，1927年8月敘陸軍中將。1928年4月，奉安國軍第五方面軍團長張作相電召，率部入關作戰。1931年九一八事變後代理吉林邊防副司令，其後任滿洲國吉林省長公署參議。1946年2月任東北保安第七支隊司令，駐遼寧新民，1947年10月該支隊番號撤銷。其後行止未查得記載。",
+      "confidence": "high",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "dbe520840923e2190e30bfb803e93ab3c85147ca797d7b2601ffe902a49f3d5c"
+      }
+    },
+    {
+      "id": 213,
+      "name_ingame": "孫旭昌",
+      "bio_zh": "孫旭昌，生卒年與籍貫不詳。1918年2月任陸軍第二十七師步兵第一百六團團附，1919年5月敘陸軍輜重兵少校，同年7月任暫編奉天陸軍第一師步兵第一旅第二團第一營營長，1921年3月任暫編奉天陸軍第五混成旅步兵第二團團長，1925年3月任東北陸軍第五師第十二旅旅長，隸東北軍京榆駐軍司令部，1927年6月加銜陸軍少將兼中將，1931年5月任安東關監督。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "72c2b9bf33ea5501e638ea57471ea9b3164867ae4ab49bf38376057c65788409"
+      }
+    },
+    {
+      "id": 214,
+      "name_ingame": "史文會",
+      "bio_zh": "史文會，生卒年與籍貫不詳。1918年7月敘陸軍步兵少校，1920年6月任暫編陸軍第一師步兵第三團第三營營長。其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "021385773311012fd5186355a64ac1bd5ad2b8d5cefef43d74b864cb8014c153"
+      }
+    },
+    {
+      "id": 217,
+      "name_ingame": "張作舟",
+      "bio_zh": "張作舟，生卒年與籍貫不詳。1918年11月任陸軍第二十七師步兵第一百六團第二營營長，1927年8月敘陸軍少將，1931年任東北軍獨立第二十五旅旅長，該旅同年9月已調關內。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "fd4a52faea7c2466f43a76d8a51f63710c9fabdc8c0cd0b24b209aba81e00968"
+      }
+    },
+    {
+      "id": 220,
+      "name_ingame": "楊遇春",
+      "bio_zh": "楊遇春，生卒年與籍貫不詳。1919年7月任暫編奉天陸軍第四混成旅步兵第一團團長，1920年2月派黑龍江哈滿副司令，同年7月任黑龍江陸軍騎兵第一旅第二團團長，1921年10月任吉林陸軍第六混成旅騎兵團團長，1926年任東北陸軍第十六師騎兵第十四旅旅長。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "7e9c8a1e1aec105ead70b7d7625300caa0e6d5f1f9491a2cdedad1fb6ac9915f"
+      }
+    },
+    {
+      "id": 223,
+      "name_ingame": "常堯臣",
+      "bio_zh": "常堯臣，生卒年與籍貫不詳。1918年11月任陸軍第二十七師步兵第五十四旅少校副官，1919年10月敘陸軍砲兵少校，1927年8月敘陸軍少將，1931年任東北軍獨立騎兵第七旅旅長，駐吉林農安。同年9月，所部隨熙洽脫離東北軍，其後成為吉林省警備軍的主要來源部隊之一。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "06b96004facea77b73587ca1fb789bb8b00c49ec484e2c66d2349320361c4bc7"
+      }
+    },
+    {
+      "id": 226,
+      "name_ingame": "吳泰來",
+      "bio_zh": "吳泰來，生卒年與籍貫不詳。1918年2月任陸軍第二十九師騎兵第二十九團第二營營長，1921年11月任該師步兵第一百十三團團長，1922年3月任該師砲兵第二十九團團長，1927年4月5日特任徠威將軍，同月9日敘陸軍中將。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "f95f8c17387af9de9b3337eee5935cfe447a1f723b5f3e1640c7302cb689517d"
+      }
+    },
+    {
+      "id": 230,
+      "name_ingame": "張遜庭",
+      "bio_zh": "張遜庭，生卒年與籍貫不詳。1927年10月敘陸軍中將。其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "efb331fd9afe728116be950652dd528598894ff421e589b65ad2a7899ac452d6"
+      }
+    },
+    {
+      "id": 231,
+      "name_ingame": "謝玉田",
+      "bio_zh": "謝玉田，生卒年與籍貫不詳。1927年1月任將軍府將軍，同日敘陸軍中將。同年11月，率直魯聯軍所部與袁振青等部共三萬餘人圍攻河南彰德，11月7日占彰德、湯陰、淇縣。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "43a335f2cd3332b3ab5c56722d24160977b9b8c68d6c1e4a79b23d929eead330"
+      }
+    },
+    {
+      "id": 233,
+      "name_ingame": "劉世安",
+      "bio_zh": "劉世安，生卒年與籍貫不詳。1927年2月敘陸軍少將。另據中文維基百科的直魯聯軍編制序列，該軍鐵甲車司令列有劉世安一名，同職另列兩名白俄軍官；年代與所屬系統相合，是否同一人待考。其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "8a62d8e65da10982c2d8ae7d742dddb393e19793bf212d1503be5232d1d6aec9"
+      }
+    },
+    {
+      "id": 234,
+      "name_ingame": "何其昌",
+      "bio_zh": "何其昌，生卒年與籍貫不詳。1913年9月加銜陸軍輜重兵少校，1927年10月敘陸軍少將。其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "c2b7c9b1d994dfecc7206929caef0906ccb5caff9908940aeba6cf8fac6432c3"
+      }
+    },
+    {
+      "id": 236,
+      "name_ingame": "張冠五",
+      "bio_zh": "張冠五，生卒年與籍貫不詳。1922年8月任陸軍第二十師步兵第三十九旅少校副官，1923年11月任該師第七十八團第一營營長，1927年2月任將軍府將軍，同日敘陸軍中將，同年9月任泰寧鎮守使，同年10月任督辦直隸軍務善後事宜公署參謀長。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "4c25aa8fc4a9990454e6cc75f4049e390a9194b2c7b80ea622b4e3c7bdfbde52"
+      }
+    },
+    {
+      "id": 237,
+      "name_ingame": "劉振邦",
+      "bio_zh": "劉振邦，生卒年與籍貫不詳。1927年6月敘陸軍步兵上校。其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bio_sha256": "30c42a32cb3edd43b3f01c6aa1f65bf73f1fd6e185ce3f0bfb3a01907b15088e"
+      }
+    },
+    {
+      "id": 242,
+      "name_ingame": "莫希德",
+      "bio_zh": "莫希德，生卒年與籍貫不詳。1931年任廣州國民政府第一軍第一師副師長。1936年1月29日敘陸軍少將，同年8月7日任陸軍第一百五十一師師長，10月5日晉陸軍中將。1937年7月國民革命軍第六十二軍以第一百五十一、第一百五十二師編成，仍任第一百五十一師師長；1938年9月該師調歸國民革命軍第八十三軍，並兼任該軍軍長，駐廣東惠州。1938年10月廣州戰役，10日判斷日軍有登陸企圖並報第四路軍總司令部，12日日軍在大亞灣澳頭、霞涌一帶登陸，13日進攻惠州，14日所部撤往博羅，惠州陷落。11月15日撤職押送重慶查辦，處分由槍決改為判刑，再改為保釋。1941年冬出獄，回福建武平岩前老家閒居。",
+      "confidence": "high",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "b659ea1fc5efcff8578bcaca09b2d353a0ade964aef280bc87b8b0892e624a3c"
+      }
+    },
+    {
+      "id": 243,
+      "name_ingame": "羅心源",
+      "bio_zh": "羅心源，生卒年與籍貫不詳。1912年2月8日派陸軍第十四旅參謀官，1913年4月2日授陸軍砲兵上校。其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "6596dcf9c85e1c0b38c6066b89bae963e068a5904af4199210f449df9d4d5ff0"
+      }
+    },
+    {
+      "id": 248,
+      "name_ingame": "劉日福",
+      "bio_zh": "劉日福，生卒年與籍貫不詳。1924年9月3日授陸軍少將。1926年任國民革命軍第七軍第三旅旅長，該軍軍長為李宗仁，所轄第五團團長張國柱、第六團團長龔壽儀。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "7fe5495d9f053b9ea7e238179ab3a64ac950fef41699ebf93a69a6f3fb743178"
+      }
+    },
+    {
+      "id": 258,
+      "name_ingame": "王錫壽",
+      "bio_zh": "王錫壽，生卒年與籍貫不詳。1913年11月12日授陸軍騎兵上尉，1920年10月5日加銜陸軍騎兵少校。兩筆均為敘階，所屬部隊與其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "86727a6dcf2cc4e4d310f2db725f7c04723a88049212e6a108338027340e2450"
+      }
+    },
+    {
+      "id": 273,
+      "name_ingame": "唐繼麟",
+      "bio_zh": "唐繼麟，生卒年與籍貫不詳。1926年至1927年間領雲南省步兵第三團，與王炳章及步兵第五團歐陽好謙先後奉派前往雲南大理、洱源一帶，對張占彪所部用兵；1927年二六政變後張占彪接受招安。1929年11月任雲南省政府委員。其餘經歷未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bio_sha256": "419f5d05eba6984ad63652524edfdead14447497fe0ef4a66812eb0a13deaba0"
+      }
+    },
+    {
+      "id": 282,
+      "name_ingame": "彭進之",
+      "bio_zh": "彭進之，生卒年與籍貫不詳。保定陸軍軍官學校第四期步兵科畢業。國民革命軍第十九軍1928年10月編併為第十六師，蔣桂戰爭後殘部改編為獨立第二旅，中原大戰前夕調入國民革命軍第一軍為下轄獨立旅，任旅長；其後任第一軍第一師第三旅旅長。1934年12月31日任陸軍第一師副師長，1935年4月17日敘陸軍少將，同年7月10日任河南省保安處處長，7月30日免第一師副師長，1938年3月4日免保安處處長，5月10日晉陸軍中將，6月27日任第十七軍團副軍團長。其後行止未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "5dbca67e7534d821fe10ac56d2b5af3276c007c5928488b05ebe8896b13fd98e"
+      }
+    },
+    {
+      "id": 329,
+      "name_ingame": "周祖晁",
+      "bio_zh": "周祖晁，生卒年與籍貫不詳，以此寫法未查得任何記載。中文維基百科記，1930年10月廖磊升任國民革命軍第七軍軍長，周祖晃任副軍長，軍司令部設於廣西百色；1937年11月接任第七軍軍長，隸第二十一集團軍；1938年因安徽宿縣失守撤職查辦，遺缺由第二十一集團軍參謀長張淦接任；1939年12月桂南會戰任西路軍第一縱隊司令，攻擊高峰隘；1940年5月1日任國民革命軍第四十六軍軍長，至1942年12月。另據中華民國政府官職資料庫，該周祖晃1936年1月29日敘陸軍少將，1937年3月13日晉陸軍中將，1949年7月29日派桂林綏靖公署副主任，1950年5月9日免本兼各職。名字與遊戲寫法一字之差，軍職與時期相合，是否同一人待考。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "bf628a07ab2eb16f1272d70560d44abaeee3be044ebbf0e7906d6243d19f42c2"
+      }
+    },
+    {
+      "id": 366,
+      "name_ingame": "劉召棠",
+      "bio_zh": "劉召棠，生卒年不詳，北京人，日本陸軍士官學校步科畢業。1933年3月9日任陸軍獨立第三旅第六團團長，該旅旅長為豐玉璽；1935年5月7日敘陸軍步兵上校。其後任國民革命軍第十九軍第二百零三旅旅長、第六十八師師長。1941年3月28日，軍事委員會任第十九軍代理軍長，同日梁培璜升第六集團軍副總司令，副軍長為艾子謙。其後行止未查得記載。",
+      "confidence": "high",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "ef27cee0ac685ea17cd616a71401a087205b6206a4a9a430d647a2e4751ac0dd"
+      }
+    },
+    {
+      "id": 369,
+      "name_ingame": "張翼",
+      "bio_zh": "張翼，生卒年與籍貫不詳。1939年2月任國民革命軍陸軍第三十四軍第二百零一旅旅長，時軍長為彭毓斌；1941年1月該旅改編為暫編第四十三師。1942年8月升任第三十四軍軍長，副軍長滑廷壁；1943年12月由高倬之繼任。1948年晉中戰役，時任第三十四軍中將副軍長，軍部及第七十三師被殲，與高級參謀席安仁等被俘。其後行止未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "51623cfd40ca4f93ad7c1e193c9d4f3aeb39f0528818f58d7f38a50f097c3b2e"
+      }
+    },
+    {
+      "id": 372,
+      "name_ingame": "孫福麟",
+      "bio_zh": "孫福麟，生卒年與籍貫不詳。1929年8月9日任國軍編遣委員會遣置部安置處籌置科中校科員，1933年8月28日任陸軍第七十師第二百一十五旅第四百三十團團長，1935年5月9日敘陸軍步兵上校。其後任國民革命軍陸軍第八十三軍第二百零六旅旅長，該旅1941年1月改稱暫編第五十師。1941年3月28日任第八十三軍代理軍長，副軍長賈毓芝，軍部駐山西鄉寧石碣村。1945年9月上黨戰役，所部轄三個師，遭晉冀魯豫野戰軍全殲。同年10月10日受頒抗戰勝利勳章。",
+      "confidence": "high",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "9ea9479ea643c258681b3ca375f6dd2c3397440cd838af3d99336d0357b905c9"
+      }
+    },
+    {
+      "id": 376,
+      "name_ingame": "佟毅",
+      "bio_zh": "佟毅，生卒年與籍貫不詳，陸軍大學畢業。1932年豫鄂皖邊區第四次圍剿時任團長。1937年任國民革命軍第二十一軍第四百三十三旅旅長，該軍軍長唐式遵於同年9月21日奉命率部出川作戰。1939年12月8日，軍事委員會任命為國民革命軍陸軍第五十軍軍長；1943年9月17日任第二十三集團軍副總司令。1945年10月10日受頒抗戰勝利勳章。其後行止未查得記載。",
+      "confidence": "medium",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "b7891663758f786447e5e5554654200dbebf7197a02ebc8015d1948f5d31060c"
+      }
+    },
+    {
+      "id": 393,
+      "name_ingame": "趙璧光",
+      "bio_zh": "趙璧光，生卒年與籍貫不詳。1936年12月26日任陸軍步兵中校。1948年徐州剿匪總司令部的戰鬥序列列第七兵團第四十四軍第一百五十師師長為趙璧光，該軍軍長為王澤浚；第七兵團於同年11月21日在江蘇邳縣碾莊覆滅。兩筆之間相隔十二年，中間經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "5a09f4f3d2ed46e7ed70fdf787fa4b033e30635498e8fef9768cb53a298716a0"
+      }
+    },
+    {
+      "id": 417,
+      "name_ingame": "蔣公權",
+      "bio_zh": "蔣公權，生卒年不詳，浙江省諸暨人，日本陸軍士官學校野戰重炮科畢業。任獨立炮兵第四團團長，該團裝備日製三八式七五毫米野炮，前任團長為孔慶桂。任期年份與其餘經歷未查得記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bio_sha256": "10c820f2fa09c6818707dd4c792d56a2c0a5517aeecadea4492f5e89e28857a0"
+      }
+    }
+  ]
+}

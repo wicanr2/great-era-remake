@@ -42,6 +42,14 @@ type Locale struct {
 	Files    map[string]*File `json:"files"`
 }
 
+// SupportedLanguages 是目前 runtime 有目錄與測試契約的語系代碼。
+// 英／日人物自傳正文的 fallback 狀態另由 people.json 明示，不在這裡偷換成繁中。
+var SupportedLanguages = map[string]bool{
+	"zh-Hant": true,
+	"en":      true,
+	"ja":      true,
+}
+
 // ProvinceCount 是省份數。省名在 `3.15` 的前 39 條
 // （`docs/formats/01-glyph-text.md` §4）。
 const ProvinceCount = 39
@@ -61,6 +69,9 @@ func Load(dir string) (*Locale, error) {
 	}
 	if l.Files == nil {
 		return nil, fmt.Errorf("i18n: %s 沒有 files", dir)
+	}
+	if !SupportedLanguages[l.Language] {
+		return nil, fmt.Errorf("i18n: 不支援語系 %q（可用 zh-Hant、en、ja）", l.Language)
 	}
 	return &l, nil
 }

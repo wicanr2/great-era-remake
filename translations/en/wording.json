@@ -1,0 +1,664 @@
+{
+  "entries": {
+    "common.confirm": {
+      "original": "Commander, are you sure?",
+      "plain": "Proceed?"
+    },
+    "common.cancel": {
+      "original": "Cancel",
+      "plain": "Cancel"
+    },
+    "common.back": {
+      "original": "Back",
+      "plain": "Back"
+    },
+    "common.previous": {
+      "original": "Previous",
+      "plain": "Previous"
+    },
+    "common.next": {
+      "original": "Next",
+      "plain": "Next"
+    },
+    "settings.title": {
+      "original": "Display settings",
+      "plain": "Display settings"
+    },
+    "command.title": {
+      "original": "Strategy commands",
+      "plain": "Strategy commands"
+    },
+    "battle.title": { "original": "Battle", "plain": "Battle" },
+    "battle.attacker": { "original": "Attacker", "plain": "Attacker" },
+    "battle.defender": { "original": "Defender", "plain": "Defender" },
+    "battle.attack": { "original": "Attack", "plain": "Attack" },
+    "battle.province": { "original": "Province", "plain": "Province" },
+    "battle.date": { "original": "Date", "plain": "Date" },
+    "battle.units": { "original": "Units", "plain": "Units" },
+    "battle.soldiers": { "original": "Soldiers", "plain": "Soldiers" },
+    "battle.gold": { "original": "Gold", "plain": "Gold" },
+    "battle.food": { "original": "Food", "plain": "Food" },
+    "battle.ammo": { "original": "Ammo", "plain": "Ammo" },
+    "battle.fuel": { "original": "Fuel", "plain": "Fuel" },
+    "battle.command.move": { "original": "Move", "plain": "Move" },
+    "battle.command.attack": { "original": "Attack", "plain": "Attack" },
+    "battle.command.retreat": { "original": "Retreat", "plain": "Retreat" },
+    "battle.command.garrison": { "original": "Garrison", "plain": "Garrison" },
+    "battle.command.inspect": { "original": "Inspect", "plain": "Inspect" },
+    "battle.control.attack": { "original": "Attack", "plain": "Attack" },
+    "battle.control.next": { "original": "Next unit", "plain": "Next unit" },
+    "battle.control.end": { "original": "End turn", "plain": "End turn" },
+    "battle.mode.retreat": { "original": "Retreat input", "plain": "Retreat destination" },
+    "battle.delete": { "original": "Delete", "plain": "Delete" },
+    "battle.submit": { "original": "Submit", "plain": "Submit" },
+    "settings.wording": {
+      "original": "Wording",
+      "plain": "Text style"
+    },
+    "settings.wording.original": {
+      "original": "Original register",
+      "plain": "Original register"
+    },
+    "settings.wording.plain": {
+      "original": "Plain language",
+      "plain": "Modern plain language"
+    },
+    "settings.theme": {
+      "original": "Visual theme",
+      "plain": "Screen style"
+    },
+    "settings.theme.retro": {
+      "original": "Original graphics",
+      "plain": "Classic look"
+    },
+    "settings.theme.modern": {
+      "original": "Modern graphics",
+      "plain": "Clear modern look"
+    },
+    "settings.resolution": {
+      "original": "Display resolution",
+      "plain": "Screen size"
+    },
+    "settings.resolution.original": {
+      "original": "Original 640x350",
+      "plain": "Classic canvas"
+    },
+    "settings.resolution.high": {
+      "original": "High 1280x720",
+      "plain": "High-resolution canvas"
+    },
+    "other.title": {
+      "original": "Other options",
+      "plain": "Other settings"
+    },
+    "other.save": {
+      "original": "Save game",
+      "plain": "Save progress"
+    },
+    "other.load": {
+      "original": "Load game",
+      "plain": "Load progress"
+    },
+    "other.save.confirm": {
+      "original": "Are you sure?",
+      "plain": "Save the current progress?"
+    },
+    "other.load.confirm": {
+      "original": "Are you sure?",
+      "plain": "Load progress? Unsaved changes will be lost."
+    },
+    "other.sound": {
+      "original": "Sound effects",
+      "plain": "Sound effects"
+    },
+    "other.command_art": {
+      "original": "Command illustrations",
+      "plain": "Command illustrations"
+    },
+    "other.music": {
+      "original": "Music",
+      "plain": "Background music"
+    },
+    "other.message_time": {
+      "original": "Message time",
+      "plain": "Message display time"
+    },
+    "other.message_time.prompt": {
+      "original": "Message time (1-10)",
+      "plain": "How long should messages stay? (1-10)"
+    },
+    "other.spectate": {
+      "original": "Spectate",
+      "plain": "Watch the computer battle"
+    },
+    "other.quit": {
+      "original": "Quit game",
+      "plain": "Save and quit"
+    },
+    "other.display": {
+      "original": "Display settings",
+      "plain": "Display settings"
+    },
+    "other.resolution": {
+      "original": "Resolution toggle",
+      "plain": "Change screen size"
+    },
+    "other.unavailable": {
+      "original": "Not available",
+      "plain": "Not implemented"
+    },
+    "policy.title": {
+      "original": "Policy",
+      "plain": "Policy"
+    },
+    "policy.autonomy": {
+      "original": "Authorize autonomy",
+      "plain": "Set provincial autonomy"
+    },
+    "policy.production": {
+      "original": "Production allocation",
+      "plain": "Adjust resource production"
+    },
+    "policy.production.unavailable": {
+      "original": "Allocate iron, coal, oil and food",
+      "plain": "Move gold production to iron, coal, oil or food"
+    },
+    "autonomy.title": {
+      "original": "Authorize autonomy",
+      "plain": "Set provincial autonomy"
+    },
+    "autonomy.normal": {
+      "original": "Normal",
+      "plain": "Central control"
+    },
+    "autonomy.enabled": {
+      "original": "Autonomy",
+      "plain": "Autonomy active"
+    },
+    "autonomy.prompt": {
+      "original": "Enter province number; ESC finishes",
+      "plain": "Enter a province number; ESC finishes"
+    },
+    "production.title": {
+      "original": "Provincial production",
+      "plain": "Resource production allocation"
+    },
+    "production.gold": {
+      "original": "Gold",
+      "plain": "Gold remaining"
+    },
+    "production.iron": {
+      "original": "Iron",
+      "plain": "Iron"
+    },
+    "production.coal": {
+      "original": "Coal",
+      "plain": "Coal"
+    },
+    "production.oil": {
+      "original": "Oil",
+      "plain": "Oil"
+    },
+    "production.food": {
+      "original": "Food",
+      "plain": "Food"
+    },
+    "production.select": {
+      "original": "Commander, which production?",
+      "plain": "Which production should change?"
+    },
+    "production.value": {
+      "original": "Commander, set it to what?",
+      "plain": "What percentage should it be?"
+    },
+    "recruit.action": {
+      "original": "Recruit",
+      "plain": "Recruit soldiers"
+    },
+    "recruit.reorganize": {
+      "original": "Reorganize",
+      "plain": "Redistribute existing forces"
+    },
+    "recruit.infantry": {
+      "original": "Infantry",
+      "plain": "Infantry"
+    },
+    "recruit.armour": {
+      "original": "Armour",
+      "plain": "Armour"
+    },
+    "recruit.artillery": {
+      "original": "Artillery",
+      "plain": "Artillery"
+    },
+    "recruit.cavalry": {
+      "original": "Cavalry",
+      "plain": "Cavalry"
+    },
+    "recruit.amount": {
+      "original": "Commander, how many?",
+      "plain": "How many to recruit?"
+    },
+    "recruit.limit": {
+      "original": "Recruitment limit",
+      "plain": "Maximum recruitable"
+    },
+    "recruit.cost": {
+      "original": "Cost",
+      "plain": "This action costs"
+    },
+    "recruit.gold": {
+      "original": "Gold",
+      "plain": "Gold"
+    },
+    "recruit.confirm": {
+      "original": "Are you sure?",
+      "plain": "Recruit these forces? (Y/N)"
+    },
+    "recruit.remaining": {
+      "original": "Remaining forces",
+      "plain": "Unassigned forces"
+    },
+    "recruit.general": {
+      "original": "Commander",
+      "plain": "General"
+    },
+    "recruit.force": {
+      "original": "Force",
+      "plain": "Force"
+    },
+    "command.01": {
+      "original": "Movement",
+      "plain": "Move forces"
+    },
+    "command.02": {
+      "original": "Military action",
+      "plain": "Conduct a military action"
+    },
+    "command.03": {
+      "original": "Resupply",
+      "plain": "Deliver supplies"
+    },
+    "command.04": {
+      "original": "Taxation",
+      "plain": "Collect taxes"
+    },
+    "command.05": {
+      "original": "Recruitment",
+      "plain": "Recruit soldiers"
+    },
+    "command.06": {
+      "original": "Inspect",
+      "plain": "View information"
+    },
+    "command.07": {
+      "original": "Development",
+      "plain": "Build and develop"
+    },
+    "command.08": {
+      "original": "Policy",
+      "plain": "Set provincial policy"
+    },
+    "command.09": {
+      "original": "Diplomacy",
+      "plain": "Handle diplomacy"
+    },
+    "command.10": {
+      "original": "Ceasefire talks",
+      "plain": "Negotiate a ceasefire"
+    },
+    "command.11": {
+      "original": "Covert action",
+      "plain": "Conduct a covert action"
+    },
+    "command.12": {
+      "original": "Commerce",
+      "plain": "Buy and sell supplies"
+    },
+    "command.13": {
+      "original": "Training",
+      "plain": "Train forces"
+    },
+    "command.14": {
+      "original": "Support troops and civilians",
+      "plain": "Care for troops and civilians"
+    },
+    "command.15": {
+      "original": "Other options",
+      "plain": "Other settings"
+    },
+    "diplomacy.loan": {
+      "original": "Foreign loan",
+      "plain": "Apply for a foreign loan"
+    },
+    "diplomacy.aid": {
+      "original": "Request aid",
+      "plain": "Request international aid"
+    },
+    "diplomacy.repay": {
+      "original": "Repay debt",
+      "plain": "Repay foreign debt"
+    },
+    "diplomacy.loan.prompt": {
+      "original": "Commander, loan amount? (0-5000)",
+      "plain": "How much gold to borrow? (0-5000)"
+    },
+    "diplomacy.loan.credit": {
+      "original": "Commander, current credit",
+      "plain": "Current credit"
+    },
+    "diplomacy.loan.unavailable": {
+      "original": "Loan unavailable",
+      "plain": "Credit is zero; no loan can be requested"
+    },
+    "diplomacy.loan.refused": {
+      "original": "All countries refused the loan",
+      "plain": "The loan was refused (one command spent)"
+    },
+    "diplomacy.aid.result": {
+      "original": "Aid approved: gold +%d, food +%d, ammo +%d, fuel +%d (commands left %d)",
+      "plain": "Aid approved: gold +%d, food +%d, ammo +%d, fuel +%d (commands left %d)"
+    },
+    "diplomacy.aid.refused": {
+      "original": "All countries refused aid",
+      "plain": "International aid was refused (one command spent)"
+    },
+    "diplomacy.repay.prompt": {
+      "original": "Commander, repayment amount?",
+      "plain": "How much foreign debt to repay?"
+    },
+    "diplomacy.repay.debt": {
+      "original": "Current debt %d, gold %d",
+      "plain": "Current debt %d, gold %d"
+    },
+    "diplomacy.repay.none": {
+      "original": "No foreign debt",
+      "plain": "There is no foreign debt to repay"
+    },
+    "diplomacy.repay.invalid": {
+      "original": "Repayment must be positive",
+      "plain": "Enter an amount greater than zero"
+    },
+    "diplomacy.repay.result": {
+      "original": "Repaid debt %d (balance %d; credit %d; commands left %d)",
+      "plain": "Repaid foreign debt %d (remaining %d; credit %d; commands left %d)"
+    },
+    "ceasefire.prompt": {
+      "original": "Commander, where to negotiate a ceasefire?",
+      "plain": "Which province should negotiate a ceasefire?"
+    },
+    "ceasefire.range": {
+      "original": "Province number 1-%d",
+      "plain": "Province number range 1-%d"
+    },
+    "ceasefire.unavailable": {
+      "original": "Unavailable",
+      "plain": "Ceasefire talks are unavailable this period"
+    },
+    "ceasefire.no_commander": {
+      "original": "Commander is not in this province",
+      "plain": "The commander is not here"
+    },
+    "ceasefire.invalid": {
+      "original": "Invalid ceasefire province",
+      "plain": "Enter a valid ceasefire target"
+    },
+    "ceasefire.no_battle": {
+      "original": "No battle",
+      "plain": "The target province is not at war"
+    },
+    "ceasefire.agreed": {
+      "original": "Ceasefire agreed in province %d (commands left %d)",
+      "plain": "Ceasefire agreed in province %d (commands left %d)"
+    },
+    "ceasefire.refused": {
+      "original": "Ceasefire refused in province %d (commands left %d)",
+      "plain": "The opponent refused a ceasefire in province %d (commands left %d)"
+    },
+    "develop.reclaim": {
+      "original": "Reclaim land",
+      "plain": "Open new farmland"
+    },
+    "develop.arsenal": {
+      "original": "Build arsenal",
+      "plain": "Build an arsenal"
+    },
+    "develop.mine": {
+      "original": "Mine gold",
+      "plain": "Open a gold mine"
+    },
+    "train.confirm": {
+      "original": "Commander, train the forces?",
+      "plain": "Train this province's forces?"
+    },
+    "covert.guerrilla": {
+      "original": "Guerrillas",
+      "plain": "Send guerrillas"
+    },
+    "covert.student": {
+      "original": "Student agitation",
+      "plain": "Agitate student protests"
+    },
+    "covert.student.target": {
+      "original": "Commander, which province to agitate?",
+      "plain": "Where should students protest?"
+    },
+    "view.other": {
+      "original": "Inspect other provinces",
+      "plain": "View another province"
+    },
+    "view.owned": {
+      "original": "Inspect owned provinces",
+      "plain": "View provinces under control"
+    },
+    "view.generals": {
+      "original": "Inspect generals",
+      "plain": "View generals here"
+    },
+    "view.province_names": {
+      "original": "Inspect province names",
+      "plain": "View province numbers"
+    },
+    "view.select_prompt": {
+      "original": "Inspect another province",
+      "plain": "Enter a province number to view"
+    },
+    "view.choice.overview": {
+      "original": "Overview",
+      "plain": "View province data"
+    },
+    "view.choice.generals": {
+      "original": "Inspect generals",
+      "plain": "View generals in this province"
+    },
+    "view.owned.title": {
+      "original": "Owned provinces",
+      "plain": "Owned province overview"
+    },
+    "view.names.title": {
+      "original": "Province names",
+      "plain": "Province number reference"
+    },
+    "view.general.lead": {
+      "original": "Leadership",
+      "plain": "Troop command"
+    },
+    "view.general.loyalty": {
+      "original": "Loyalty",
+      "plain": "Loyalty"
+    },
+    "view.general.politics": {
+      "original": "Politics",
+      "plain": "Political skill"
+    },
+    "view.general.experience": {
+      "original": "Experience",
+      "plain": "Experience"
+    },
+    "view.general.branch": {
+      "original": "Branch",
+      "plain": "Unit type"
+    },
+    "view.general.force": {
+      "original": "Force",
+      "plain": "Soldiers"
+    },
+    "view.general.attack": {
+      "original": "Attack",
+      "plain": "Troop attack"
+    },
+    "view.general.armed": {
+      "original": "Equipment",
+      "plain": "Equipment"
+    },
+    "view.general.skill": {
+      "original": "Combat skill",
+      "plain": "Combat skill"
+    },
+    "view.general.stamina": {
+      "original": "Stamina",
+      "plain": "Stamina"
+    },
+    "view.general.morale": {
+      "original": "Morale",
+      "plain": "Morale"
+    },
+    "trade.import": {
+      "original": "Import",
+      "plain": "Buy supplies"
+    },
+    "trade.export": {
+      "original": "Export",
+      "plain": "Sell supplies"
+    },
+    "trade.food": {
+      "original": "Food",
+      "plain": "Food"
+    },
+    "trade.ammo": {
+      "original": "Ammunition",
+      "plain": "Ammunition"
+    },
+    "trade.fuel": {
+      "original": "Fuel",
+      "plain": "Fuel"
+    },
+    "trade.coal": {
+      "original": "Coal",
+      "plain": "Coal"
+    },
+    "trade.iron": {
+      "original": "Iron",
+      "plain": "Iron"
+    },
+    "trade.buy_amount": {
+      "original": "Commander, purchase how much?",
+      "plain": "How much to buy?"
+    },
+    "trade.sell_amount": {
+      "original": "Commander, sell how much?",
+      "plain": "How much to sell?"
+    },
+    "supply.target": {
+      "original": "Commander, resupply which province?",
+      "plain": "Which province should receive supplies?"
+    },
+    "supply.gold": {
+      "original": "Commander, how much gold?",
+      "plain": "How much gold to deliver?"
+    },
+    "supply.food": {
+      "original": "Commander, how much food?",
+      "plain": "How much food to deliver?"
+    },
+    "supply.ammo": {
+      "original": "Commander, how much ammunition?",
+      "plain": "How much ammunition to deliver?"
+    },
+    "supply.fuel": {
+      "original": "Commander, how much fuel?",
+      "plain": "How much fuel to deliver?"
+    },
+    "transfer.mode": {
+      "original": "Commander, how to move forces?",
+      "plain": "How should forces move?"
+    },
+    "transfer.mode.partial": {
+      "original": "Move some",
+      "plain": "Choose generals"
+    },
+    "transfer.mode.all": {
+      "original": "Move all",
+      "plain": "Move all available generals"
+    },
+    "transfer.target": {
+      "original": "Commander, move to which province?",
+      "plain": "Which province should receive them?"
+    },
+    "transfer.select.partial": {
+      "original": "Commander, which general?",
+      "plain": "Which general should move?"
+    },
+    "transfer.select.all": {
+      "original": "Commander, who stays?",
+      "plain": "Which generals should stay?"
+    },
+    "transfer.selection.confirm": {
+      "original": "Confirm selection",
+      "plain": "Confirm this roster"
+    },
+    "transfer.resource.gold": {
+      "original": "Commander, how much gold?",
+      "plain": "How much gold to carry?"
+    },
+    "transfer.resource.food": {
+      "original": "Commander, how much food?",
+      "plain": "How much food to carry?"
+    },
+    "transfer.resource.ammo": {
+      "original": "Commander, how much ammunition?",
+      "plain": "How much ammunition to carry?"
+    },
+    "transfer.resource.fuel": {
+      "original": "Commander, how much fuel?",
+      "plain": "How much fuel to carry?"
+    },
+    "biography.unavailable": {
+      "original": "No reliable biography",
+      "plain": "No confirmed life record is available"
+    },
+    "biography.page": {
+      "original": "Biography",
+      "plain": "Life record"
+    },
+    "biography.portrait_unavailable": {
+      "original": "No verified portrait",
+      "plain": "No confirmed portrait is available yet"
+    },
+    "biography.source_fallback": {
+      "original": "Biography text: Traditional Chinese source",
+      "plain": "Showing the Traditional Chinese source; a localized biography is pending"
+    },
+    "panel.commander": { "original": "Commander", "plain": "Commander" },
+    "panel.governor": { "original": "Governor", "plain": "Governor" },
+    "panel.gold": { "original": "Gold", "plain": "Gold" },
+    "panel.food": { "original": "Food", "plain": "Food" },
+    "panel.ammo": { "original": "Ammunition", "plain": "Ammunition" },
+    "panel.fuel": { "original": "Fuel", "plain": "Fuel" },
+    "panel.coal": { "original": "Coal", "plain": "Coal" },
+    "panel.iron": { "original": "Iron", "plain": "Iron" },
+    "panel.land": { "original": "Land value", "plain": "Land value" },
+    "panel.population": { "original": "Population", "plain": "Population" },
+    "panel.cities": { "original": "Cities", "plain": "Cities" },
+    "panel.arsenal": { "original": "Arsenal", "plain": "Arsenal" },
+    "panel.force": { "original": "Forces", "plain": "Forces" },
+    "panel.generals": { "original": "Generals", "plain": "Generals" },
+    "panel.people": { "original": "People", "plain": "People" },
+    "panel.loyalty": { "original": "Loyalty", "plain": "Loyalty" },
+    "panel.commands": { "original": "Commands", "plain": "Actions" },
+    "panel.count": { "original": "Count", "plain": "Count" },
+    "panel.status.normal": { "original": "Normal", "plain": "Central control" },
+    "narrative.open": { "original": "News", "plain": "Historical news" },
+    "narrative.title": { "original": "News archive", "plain": "Historical news archive" }
+  }
+}
