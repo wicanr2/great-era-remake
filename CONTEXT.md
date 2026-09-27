@@ -3161,3 +3161,19 @@ register parity，也不把這支單一 preview cue 擴大宣稱為六首 Modern
 2. **驗收：** theme／render 全綠（測試更名＋期望色同步）；1280×720 省 26 目檢
    米黃紙＋暗紅字框＋寶藍地圖框，版面無破損；deny（677 檔）／no-cgo／diff 全過。
 3. **下一步：** M2 部隊剪影＋地形 BGI 對照＋頁面套框。
+
+### 5.161 2026-09-27 致敬 M2 部隊剪影＋地形 BGI＋頁面套框已接
+
+1. **實作（confirmed-remake）：** 低解析 `Unit` 18 張與高解析 `HighUnit` 改滿框
+   實心剪影（步兵盔帽半身／裝甲側視戰車／騎兵馬頭／砲兵雙輪＋六朝向炮身，
+   勢力色為體、墨色為影）；過程發現戰鬥地圖單位以 32×17 原尺寸疊放，
+   線稿剪影縮成小點，故改佔框八成。地形 `modernPattern`／`fillHighTerrain`
+   照 MAP1.TPC 濃密肌理（水波／樹簇／雪峰／沙丘／城樓／長城 10 變體／中性 22）。
+   頁面套框沿用 M1 花框角（`drawModernDecoratedPanel`），戰鬥／政略／自傳共用。
+2. **驗收：** theme／render 測試全綠（含新增剪影／地形 motif 測試）；
+   Xvfb 下 `go test -count=1 ./...` 全綠；deny（680 檔）／no-cgo 通過；
+   1280×720 目檢：戰鬥單位清晰可辨、政略地圖 BGI 肌理、自傳頁套框。
+   `docs/images/homage-{battle,biography,province}-m2.png` 為 M2 驗收圖。
+3. **重包：** `tools/package.sh 0.1.3-homage` 完成
+   windows-amd64／darwin-arm64／linux-appimage（不含原版資料）。
+4. **下一步：** 使用者目檢 M2；外部 gate（人眼 A/B、人審已刪、Ogg、Android、真機）仍待。

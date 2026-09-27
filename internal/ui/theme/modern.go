@@ -203,51 +203,63 @@ func modernUnit(index int) *assets.Image {
 	if red {
 		team = 3 // vermilion：敵方／原版紅色的現代化延伸
 	}
-	ink, highlight := byte(2), byte(1)
-	copper, bronze := byte(16), byte(17)
-	// 民國戰棋算子：圓角銅框、深青銅內線、勢力色底、墨色兵種符號。
-	// 32×17 尺寸、透明索引 0、四角透明、18 張索引順序一律保留；
-	// 高解析戰場放大時以框線與符號辨識，不靠散點剪影。
-	counterFrame(pix, copper, bronze)
-	iconRect(pix, 3, 3, 28, 13, team)
+	ink := byte(2)
+	// 原版致敬剪影（SPEC-47 M2）：照 NEWICON.TPC 的無框平面剪影重繪——
+	// 步兵盔帽半身、裝甲側視戰車、騎兵馬頭、砲兵炮身，勢力色為體、墨色為影。
+	// 32×17 尺寸、透明索引 0、18 張索引順序、砲兵六朝向一律保留。
 	switch kind {
 	case 0:
-		// 步兵：交叉步槍上的鋼盔。帽體高光、槍身墨線，灰階下以交叉斜線辨識。
-		iconLine(pix, 11, 12, 21, 5, ink)
-		iconLine(pix, 21, 12, 11, 5, ink)
-		iconRect(pix, 13, 4, 19, 7, highlight)
-		iconLine(pix, 12, 8, 20, 8, ink)
-		iconRect(pix, 14, 9, 18, 12, highlight)
+		// 步兵：盔帽半身像（滿框）。盔體勢力色、帽帶與衣褶墨線。
+		iconRect(pix, 4, 2, 27, 7, team)
+		iconLine(pix, 4, 5, 27, 5, ink)
+		iconRect(pix, 2, 8, 29, 9, team)
+		iconRect(pix, 3, 11, 9, 14, team)
+		iconRect(pix, 22, 11, 28, 14, team)
+		iconRect(pix, 8, 10, 23, 16, team)
+		iconLine(pix, 14, 10, 16, 12, ink)
+		iconLine(pix, 18, 10, 16, 12, ink)
+		iconLine(pix, 12, 11, 12, 15, ink)
+		iconLine(pix, 19, 11, 19, 15, ink)
 	case 1:
-		// 裝甲：菱形車體＋砲塔＋短砲管。菱形是與步兵圓盔的最大差異。
-		iconLine(pix, 10, 9, 16, 5, highlight)
-		iconLine(pix, 16, 5, 22, 9, highlight)
-		iconLine(pix, 22, 9, 16, 13, ink)
-		iconLine(pix, 16, 13, 10, 9, ink)
-		iconRect(pix, 14, 7, 18, 10, highlight)
-		iconLine(pix, 18, 8, 25, 8, ink)
-		iconLine(pix, 11, 13, 21, 13, ink)
+		// 裝甲：側視戰車（滿框）。車體勢力色、履帶墨色鑲勢力色輪。
+		iconRect(pix, 20, 5, 30, 6, team)
+		iconRect(pix, 10, 4, 20, 8, team)
+		iconLine(pix, 10, 4, 20, 4, ink)
+		iconRect(pix, 2, 8, 29, 12, team)
+		iconLine(pix, 2, 9, 29, 9, ink)
+		iconRect(pix, 3, 13, 28, 15, ink)
+		for _, x := range []int{6, 11, 16, 21, 26} {
+			iconCircle(pix, x, 14, 1, team)
+		}
 	case 2:
-		// 騎兵：馬頭頸剪影＋前傾騎手；長斜線是其指紋。
-		iconLine(pix, 9, 12, 18, 5, highlight)
-		iconLine(pix, 18, 5, 23, 8, highlight)
-		iconLine(pix, 23, 8, 21, 12, ink)
-		iconLine(pix, 15, 7, 13, 4, ink)
-		iconLine(pix, 11, 13, 21, 13, ink)
+		// 騎兵：馬頭剪影（滿框）。頭頸勢力色、鬃溝與眼口墨線。
+		iconRect(pix, 6, 7, 18, 16, team)
+		iconRect(pix, 3, 12, 10, 16, team)
+		iconRect(pix, 15, 1, 27, 8, team)
+		iconRect(pix, 15, 0, 18, 3, team)
+		iconRect(pix, 24, 6, 29, 10, team)
+		iconLine(pix, 9, 9, 9, 15, ink)
+		iconLine(pix, 12, 9, 12, 15, ink)
+		iconLine(pix, 16, 8, 24, 8, ink)
+		iconPixel(pix, 22, 4, ink)
+		iconLine(pix, 25, 9, 28, 9, ink)
 	case 3:
-		// 砲兵：炮身楔形＋雙輪，方向依原版 +31 的六值保留。
-		iconRect(pix, 10, 10, 22, 12, ink)
-		iconCircle(pix, 10, 13, 2, ink)
-		iconCircle(pix, 22, 13, 2, ink)
-		iconPixel(pix, 10, 13, highlight)
-		iconPixel(pix, 22, 13, highlight)
+		// 砲兵：炮身＋雙輪側視（滿框），方向依原版 +31 的六值保留。
+		iconRect(pix, 6, 8, 25, 10, team)
+		iconCircle(pix, 8, 12, 3, team)
+		iconCircle(pix, 23, 12, 3, team)
+		iconCircle(pix, 8, 12, 1, ink)
+		iconCircle(pix, 23, 12, 1, ink)
+		iconPixel(pix, 8, 12, team)
+		iconPixel(pix, 23, 12, team)
+		iconLine(pix, 6, 11, 25, 11, ink)
 		dirs := [...]struct{ dx, dy int }{
 			{0, -1}, {1, -1}, {1, 0}, {0, 1}, {-1, 1}, {-1, 0},
 		}
 		d := dirs[facing-1]
-		ex, ey := 16+d.dx*9, 8+d.dy*5
-		iconLine(pix, 16, 8, ex, ey, highlight)
-		iconLine(pix, 16, 9, ex, ey+1, ink)
+		ex, ey := 16+d.dx*12, 8+d.dy*6
+		iconLine(pix, 16, 8, ex, ey, team)
+		iconLine(pix, 16, 9, ex, ey+1, team)
 	}
 	return &assets.Image{W: modernUnitW, H: modernUnitH, Pix: pix}
 }
@@ -269,22 +281,6 @@ func iconCircle(pix []byte, cx, cy, radius int, value byte) {
 			}
 		}
 	}
-}
-
-// counterFrame 畫部隊圖的外框：四角透明。M1 暫用暗紅外框＋寶藍內線；
-// M2 換剪影語彙時連框重繪。框線佔 x=1..30、y=1..15，內部留給底色與兵符。
-func counterFrame(pix []byte, copper, bronze byte) {
-	iconLine(pix, 3, 1, 28, 1, copper)
-	iconLine(pix, 3, 15, 28, 15, copper)
-	iconLine(pix, 1, 3, 1, 13, copper)
-	iconLine(pix, 30, 3, 30, 13, copper)
-	for _, p := range [][2]int{{2, 2}, {29, 2}, {2, 14}, {29, 14}} {
-		iconPixel(pix, p[0], p[1], copper)
-	}
-	iconLine(pix, 4, 2, 27, 2, bronze)
-	iconLine(pix, 4, 14, 27, 14, bronze)
-	iconLine(pix, 2, 4, 2, 12, bronze)
-	iconLine(pix, 29, 4, 29, 12, bronze)
 }
 
 func iconLine(pix []byte, x0, y0, x1, y1 int, value byte) {
@@ -593,7 +589,7 @@ func terrainColors(kind int) (base, accent byte) {
 	case kind == 3: // 森林
 		return 5, 2
 	case kind == 5: // 高山
-		return 9, 14
+		return 9, 13
 	case kind == 6: // 沙漠
 		return 10, 6
 	case kind == 9: // 高原
@@ -612,29 +608,35 @@ func terrainColors(kind int) (base, accent byte) {
 }
 
 func modernPattern(kind, x, y int) bool {
+	// 原版致敬（SPEC-47 M2）：照 MAP1.TPC 的濃密 BGI 肌理重繪——水波紋、
+	// 樹簇、雪峰、沙丘弧皆採原版式密集重複，取代測繪期的低雜訊留白。
 	switch kind {
-	case 2: // 水波：兩條稀疏的長波，不再用密集橫紋把海面畫成舊式圖案。
-		return y%8 == 3 && x%12 >= 2 && x%12 <= 8
-	case 3: // 森林：每張 tile 只有兩簇樹冠，保留低雜訊的現代地圖閱讀性。
+	case 2: // 水波：原版式雙排波紋。
+		return (y%6 == 2 && x%8 >= 1 && x%8 <= 5) || (y%6 == 5 && x%8 >= 3 && x%8 <= 7)
+	case 3: // 森林：三簇樹冠＋樹幹點。
 		px, py := x%11, y%9
-		return (px >= 4 && px <= 6 && py >= 2 && py <= 7) || (px >= 2 && px <= 8 && py == 5)
-	case 5: // 高山：重複但明確的雪峰輪廓。
+		return (px >= 1 && px <= 3 && py >= 1 && py <= 6) ||
+			(px >= 5 && px <= 7 && py >= 2 && py <= 7) ||
+			(px >= 8 && px <= 10 && py >= 0 && py <= 4) ||
+			(py == 8 && (px == 2 || px == 6 || px == 9))
+	case 5: // 高山：赭紅山脊雪峰輪廓。
 		px, py := x%16, y%12
 		return py >= 2 && py <= 9 && absInt(px-8) <= py/2
-	case 9: // 高原：短脊線，避免與高山共用同一種斜線噪點。
-		return y%9 == 5 && x%12 >= 2 && x%12 <= 9
+	case 9: // 高原：密脊線。
+		return (y%6 == 3 && x%12 >= 1 && x%12 <= 10) || (y%6 == 4 && x%2 == 0)
 	case 10: // 關口：窄門與兩翼岩壁。
 		return (x >= 13 && x <= 18) || (y >= 8 && y <= 10 && (x < 8 || x > 23))
-	case 6: // 沙漠：低密度沙丘弧。
-		return y%10 == 6 && x%14 >= 3 && x%14 <= 10
+	case 6: // 沙漠：密沙丘弧。
+		return (y%6 == 4 && x%10 >= 2 && x%10 <= 8) || (y%6 == 5 && x%2 == 0)
 	case 4: // 城市：方整街區，與地圖資料的城市語意一致。
-		return (x%10 >= 3 && x%10 <= 6 && y%8 >= 2 && y%8 <= 5) || (x%10 == 7 && y%8 == 6)
+		return (x%10 >= 3 && x%10 <= 6 && y%8 >= 2 && y%8 <= 5) || (x%10 == 7 && y%8 == 6) ||
+			(x%10 <= 1 && y%8 <= 1)
 	case 7: // 縱橋
 		return x >= 14 && x <= 17
 	case 8: // 橫橋
 		return y >= 10 && y <= 13
-	default: // 長城／平原：只留少量地圖紋理，不讓格子本身變成視覺主角。
-		return (x*11+y*7+kind*5)%47 == 0
+	default: // 長城／平原：原版式有序抖點。
+		return (x*11+y*7+kind*5)%23 == 0
 	}
 }
 

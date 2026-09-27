@@ -91,33 +91,58 @@ func (m *Modern) HighUnit(index, width, height int) (*image.RGBA, error) {
 		team = modernPalette()[3]
 	}
 	ink, highlight := modernPalette()[2], modernPalette()[1]
+	_ = highlight
 	w, h := hi.Bounds().Dx(), hi.Bounds().Dy()
 	cx, cy := w/2, h/2
-	r := minHUD(w, h) * 36 / 100
-	fillHighCircle(hi, cx, cy, r, toHighRGBA(ink))
-	fillHighCircle(hi, cx, cy, r*86/100, toHighRGBA(team))
-	lineHUD(hi, cx-r/2, cy+r/3, cx+r/2, cy+r/3, maxHUD(2, w/32), toHighRGBA(highlight))
-	stroke := maxHUD(2, w/28)
+	// 原版致敬剪影（SPEC-47 M2）：滿框實心勢力色塊＋墨線細節，與低解
+	// 析版同語彙；佔框約八成，戰鬥地圖縮放後仍清晰，四角保持透明。
+	teamC, inkC := toHighRGBA(team), toHighRGBA(ink)
+	stroke := maxHUD(2, w/20)
+	hw, hh := w*42/100, h*38/100
 	switch kind {
-	case 0:
-		fillHighRect(hi, cx-r/2, cy-r/2, cx+r/2, cy-r/8, toHighRGBA(highlight))
-		lineHUD(hi, cx-r*3/4, cy, cx+r*3/4, cy, stroke, toHighRGBA(ink))
-		fillHighRect(hi, cx-r/4, cy, cx+r/4, cy+r/2, toHighRGBA(highlight))
-	case 1:
-		fillHighRect(hi, cx-r*3/4, cy, cx+r*3/4, cy+r/3, toHighRGBA(ink))
-		fillHighRect(hi, cx-r/2, cy-r/5, cx+r/3, cy+r/8, toHighRGBA(highlight))
-		lineHUD(hi, cx, cy-r/5, cx+r, cy-r/5, stroke, toHighRGBA(highlight))
-	case 2:
-		lineHUD(hi, cx-r, cy+r/2, cx-r/4, cy-r/5, stroke, toHighRGBA(highlight))
-		lineHUD(hi, cx-r/4, cy-r/5, cx+r/2, cy, stroke, toHighRGBA(highlight))
-		lineHUD(hi, cx+r/4, cy, cx+r*3/4, cy-r*2/3, stroke, toHighRGBA(ink))
-	case 3:
-		fillHighRect(hi, cx-r/2, cy+r/5, cx+r/2, cy+r/2, toHighRGBA(ink))
-		fillHighCircle(hi, cx-r/2, cy+r/2, r/5, toHighRGBA(ink))
-		fillHighCircle(hi, cx+r/2, cy+r/2, r/5, toHighRGBA(ink))
+	case 0: // 步兵盔帽半身
+		fillHighRect(hi, cx-hw, cy-hh, cx+hw, cy-hh/4, teamC)
+		lineHUD(hi, cx-hw, cy-hh*3/5, cx+hw, cy-hh*3/5, stroke, inkC)
+		fillHighRect(hi, cx-hw-hw/10, cy-hh/4, cx+hw+hw/10, cy, teamC)
+		fillHighRect(hi, cx-hw, cy+hh/5, cx+hw, cy+hh*3/5, teamC)
+		fillHighRect(hi, cx-hw*3/5, cy, cx+hw*3/5, cy+hh, teamC)
+		lineHUD(hi, cx-hw/4, cy, cx, cy+hh/3, stroke, inkC)
+		lineHUD(hi, cx+hw/4, cy, cx, cy+hh/3, stroke, inkC)
+		lineHUD(hi, cx-hw/3, cy+hh/4, cx-hw/3, cy+hh*4/5, stroke, inkC)
+		lineHUD(hi, cx+hw/3, cy+hh/4, cx+hw/3, cy+hh*4/5, stroke, inkC)
+	case 1: // 裝甲側視戰車
+		fillHighRect(hi, cx+hw/4, cy-hh/2-stroke/2, cx+hw, cy-hh/2+stroke/2, teamC)
+		fillHighRect(hi, cx-hw/2, cy-hh, cx+hw/4, cy-hh/4, teamC)
+		lineHUD(hi, cx-hw/2, cy-hh, cx+hw/4, cy-hh, stroke, inkC)
+		fillHighRect(hi, cx-hw, cy-hh/4, cx+hw, cy+hh/2, teamC)
+		lineHUD(hi, cx-hw, cy-hh/4+stroke, cx+hw, cy-hh/4+stroke, stroke, inkC)
+		fillHighRect(hi, cx-hw, cy+hh/2, cx+hw, cy+hh, inkC)
+		for i := 0; i < 5; i++ {
+			wx := cx - hw + (2*hw)*(1+i*2)/10
+			fillHighCircle(hi, wx, cy+hh*3/4, stroke, teamC)
+		}
+	case 2: // 騎兵馬頭
+		fillHighRect(hi, cx-hw, cy+hh/3, cx-hw/2, cy+hh, teamC)
+		fillHighRect(hi, cx-hw*3/4, cy-hh/3, cx, cy+hh, teamC)
+		fillHighRect(hi, cx-hw/4, cy-hh, cx+hw, cy, teamC)
+		fillHighRect(hi, cx-hw/4, cy-hh-hh/4, cx, cy-hh+stroke, teamC)
+		fillHighRect(hi, cx+hw*3/5, cy-hh/5, cx+hw+hw/10, cy+hh/4, teamC)
+		lineHUD(hi, cx-hw/2, cy-hh/5, cx-hw/2, cy+hh*4/5, stroke, inkC)
+		lineHUD(hi, cx-hw/5, cy-hh/5, cx-hw/5, cy+hh*4/5, stroke, inkC)
+		lineHUD(hi, cx, cy, cx+hw*3/5, cy, stroke, inkC)
+		fillHighCircle(hi, cx+hw/2, cy-hh/2, stroke/2+1, inkC)
+		lineHUD(hi, cx+hw*3/5, cy+hh/8, cx+hw, cy+hh/8, stroke, inkC)
+	case 3: // 砲兵炮身＋雙輪，朝向保留
+		fillHighRect(hi, cx-hw*3/4, cy-hh/4, cx+hw*3/4, cy+hh/4, teamC)
+		lineHUD(hi, cx-hw*3/4, cy+hh/4, cx+hw*3/4, cy+hh/4, stroke, inkC)
+		fillHighCircle(hi, cx-hw*3/4, cy+hh/2, hh/2, teamC)
+		fillHighCircle(hi, cx+hw*3/4, cy+hh/2, hh/2, teamC)
+		fillHighCircle(hi, cx-hw*3/4, cy+hh/2, hh/5, inkC)
+		fillHighCircle(hi, cx+hw*3/4, cy+hh/2, hh/5, inkC)
 		dirs := [...]struct{ dx, dy int }{{0, -1}, {1, -1}, {1, 0}, {0, 1}, {-1, 1}, {-1, 0}}
 		d := dirs[facing-1]
-		lineHUD(hi, cx, cy, cx+d.dx*r, cy+d.dy*r*2/3, stroke, toHighRGBA(highlight))
+		lineHUD(hi, cx, cy-hh/4, cx+d.dx*hw, cy-hh/4+d.dy*hh, stroke, teamC)
+		fillHighCircle(hi, cx+d.dx*hw, cy-hh/4+d.dy*hh, stroke/2+1, inkC)
 	}
 	return downsampleHUD(hi, width, height), nil
 }
@@ -142,12 +167,14 @@ func fillHighTerrain(im *image.RGBA, kind int, base, accent byte) {
 			im.SetRGBA(x, y, bc)
 		}
 	}
-	ink := color.RGBA{R: 75, G: 47, B: 32, A: 255}
-	green := color.RGBA{R: 100, G: 126, B: 78, A: 255}
-	water := color.RGBA{R: 52, G: 127, B: 145, A: 255}
-	cream := color.RGBA{R: 248, G: 232, B: 181, A: 255}
-	gold := color.RGBA{R: 177, G: 123, B: 61, A: 255}
-	red := color.RGBA{R: 179, G: 61, B: 47, A: 255}
+	// 原版致敬（SPEC-47 M2）： motif 色轉原版三色基準——深棕墨線、
+	// 暗紅點綴、米黃紙面，戰棋金銅退場。
+	ink := color.RGBA{R: 101, G: 52, B: 30, A: 255}
+	green := color.RGBA{R: 86, G: 132, B: 82, A: 255}
+	water := color.RGBA{R: 57, G: 103, B: 137, A: 255}
+	cream := color.RGBA{R: 255, G: 255, B: 162, A: 255}
+	gold := color.RGBA{R: 132, G: 77, B: 52, A: 255}
+	red := color.RGBA{R: 174, G: 0, B: 0, A: 255}
 	cx, cy := w/2, h/2
 	stroke := maxHUD(highResolutionSamples, minHUD(w, h)/18)
 	switch {

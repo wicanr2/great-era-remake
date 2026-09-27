@@ -361,8 +361,60 @@ func TestModernArtilleryFacingChangesPixels(t *testing.T) {
 	}
 }
 
-func TestModernUnitCounterFrameUsesCopperAndTeamCore(t *testing.T) {
+func TestModernTerrainHomageMotifs(t *testing.T) {
 	m := NewModern()
+	tiles := map[int]string{}
+	for _, kind := range []int{0, 1, 2, 3, 4, 5, 6, 9, 10} {
+		b, err := m.Tile(kind)
+		if err != nil {
+			t.Fatal(err)
+		}
+		key := string(b.Image.Pix)
+		for other, otherKey := range tiles {
+			if otherKey == key {
+				t.Fatalf("地形 %d 與 %d 像素完全相同", kind, other)
+			}
+		}
+		tiles[kind] = key
+	}
+	// 高山用赭紅山脊（調色盤 13），不是雪峰白。
+	if base, accent := terrainColors(5); accent != 13 {
+		t.Fatalf("高山 accent=%d，應為 13 赭紅", accent)
+	} else {
+		_ = base
+	}
+}
+
+func TestModernHighUnitHomageSilhouettes(t *testing.T) {
+	m := NewModern()
+	for i := 0; i < 18; i++ {
+		im, err := m.HighUnit(i, 48, 26)
+		if err != nil {
+			t.Fatal(err)
+		}
+		// 無框剪影：四角透明，中央不透明。
+		for _, p := range [][2]int{{0, 0}, {47, 0}, {0, 25}, {47, 25}} {
+			if got := im.RGBAAt(p[0], p[1]); got.A != 0 {
+				t.Fatalf("高解析剪影 %d 角落 (%d,%d) alpha=%d 應透明", i, p[0], p[1], got.A)
+			}
+		}
+		if got := im.RGBAAt(24, 13); got.A == 0 {
+			t.Fatalf("高解析剪影 %d 中央透明，不應為空", i)
+		}
+	}
+}
+
+func TestModernUnitHomageSilhouettes(t *testing.T) {
+	m := NewModern()
+	countTeam := func(pix []byte, want byte) int {
+		n := 0
+		for _, v := range pix {
+			if v == want {
+				n++
+			}
+		}
+		return n
+	}
 	for i := 0; i < 18; i++ {
 		u, err := m.Unit(i)
 		if err != nil {
@@ -370,26 +422,26 @@ func TestModernUnitCounterFrameUsesCopperAndTeamCore(t *testing.T) {
 		}
 		pix := u.Image.Pix
 		at := func(x, y int) byte { return pix[y*32+x] }
-		// 四角透明
-		for _, p := range [][2]int{{0, 0}, {31, 0}, {0, 16}, {31, 16}, {1, 1}, {30, 1}, {1, 15}, {30, 15}} {
+		// 無框剪影：四角透明
+		for _, p := range [][2]int{{0, 0}, {31, 0}, {0, 16}, {31, 16}} {
 			if at(p[0], p[1]) != 0 {
-				t.Fatalf("算子 %d 角落 (%d,%d)=%d 應透明", i, p[0], p[1], at(p[0], p[1]))
+				t.Fatalf("剪影 %d 角落 (%d,%d)=%d 應透明", i, p[0], p[1], at(p[0], p[1]))
 			}
 		}
-		// 暗紅框上下邊（原版致敬；框內符號 M2 才換剪影）
-		if at(16, 1) != 16 || at(16, 15) != 16 {
-			t.Fatalf("算子 %d 上下框應為暗紅 16", i)
-		}
-		// 勢力底：0..5 奇數紅、砲兵 12..17 紅，其餘綠
+		// 勢力色為體：0..5 奇數紅、砲兵 12..17 紅，其餘綠，且佔比足夠
 		want := byte(5)
 		if i == 1 || i == 3 || i == 5 || i >= 12 {
 			want = 3
 		}
-		if at(5, 5) != want {
-			t.Fatalf("算子 %d 內底=%d，應為勢力色 %d", i, at(5, 5), want)
+		if n := countTeam(pix, want); n < 40 {
+			t.Fatalf("剪影 %d 勢力色像素僅 %d，應 >= 40", i, n)
+		}
+		// 墨色陰影存在
+		if n := countTeam(pix, 2); n < 10 {
+			t.Fatalf("剪影 %d 墨色像素僅 %d，應 >= 10", i, n)
 		}
 	}
-	// 四兵種符號互不相同
+	// 四兵種剪影互不相同
 	seen := map[string]int{}
 	for _, i := range []int{0, 2, 4, 6} {
 		u, err := m.Unit(i)
@@ -398,7 +450,7 @@ func TestModernUnitCounterFrameUsesCopperAndTeamCore(t *testing.T) {
 		}
 		key := string(u.Image.Pix)
 		if prev, dup := seen[key]; dup {
-			t.Fatalf("算子 %d 與 %d 像素完全相同", i, prev)
+			t.Fatalf("剪影 %d 與 %d 像素完全相同", i, prev)
 		}
 		seen[key] = i
 	}
