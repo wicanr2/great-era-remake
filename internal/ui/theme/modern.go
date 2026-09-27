@@ -76,19 +76,19 @@ func (m *Modern) Name() string { return string(ModeModern) }
 func (m *Modern) Style() UIStyle {
 	return UIStyle{
 		Name:      ModeModern,
-		Ink:       assets.RGB{R: 0xAE, G: 0x00, B: 0x00},
-		Paper:     assets.RGB{R: 0xFF, G: 0xFF, B: 0xA2},
-		Panel:     assets.RGB{R: 0xFF, G: 0xF2, B: 0xB0},
-		Muted:     assets.RGB{R: 0x80, G: 0x5A, B: 0x52},
-		Accent:    assets.RGB{R: 0x00, G: 0x00, B: 0xAA},
-		AccentAlt: assets.RGB{R: 0xAA, G: 0x00, B: 0x00},
-		Focus:     assets.RGB{R: 0x00, G: 0x00, B: 0xAA},
+		Ink:       assets.RGB{R: 0x1E, G: 0x1A, B: 0x16},
+		Paper:     assets.RGB{R: 0xF2, G: 0xEA, B: 0xD8},
+		Panel:     assets.RGB{R: 0xE4, G: 0xD6, B: 0xB6},
+		Muted:     assets.RGB{R: 0x7A, G: 0x4A, B: 0x2E},
+		Accent:    assets.RGB{R: 0x27, G: 0x41, B: 0x56},
+		AccentAlt: assets.RGB{R: 0xB7, G: 0x32, B: 0x26},
+		Focus:     assets.RGB{R: 0x27, G: 0x41, B: 0x56},
 		FactionTint: [10]assets.RGB{
-			{R: 224, G: 89, B: 47}, {R: 42, G: 191, B: 211},
-			{R: 68, G: 160, B: 137}, {R: 237, G: 195, B: 88},
-			{R: 178, G: 116, B: 79}, {R: 105, G: 168, B: 139},
-			{R: 91, G: 143, B: 180}, {R: 142, G: 157, B: 169},
-			{R: 174, G: 137, B: 87}, {R: 141, G: 163, B: 100},
+			{R: 183, G: 50, B: 38}, {R: 47, G: 93, B: 98},
+			{R: 94, G: 122, B: 90}, {R: 201, G: 162, B: 39},
+			{R: 62, G: 110, B: 142}, {R: 194, G: 160, B: 107},
+			{R: 138, G: 154, B: 91}, {R: 217, G: 210, B: 184},
+			{R: 122, G: 74, B: 46}, {R: 39, G: 65, B: 86},
 		},
 		Ornaments: m.ornaments,
 	}
@@ -136,25 +136,27 @@ func (m *Modern) CommandIcon(index int) (Bitmap, error) {
 // modernPalette 是 A2 明亮土黃介面的程式化地圖色組，並保留第 0 格作鐵路
 // 透明索引。所有顏色是可再散布的程式常數，不是原版調色盤或衛星照片。
 func modernPalette() assets.Palette {
+	// 水墨戰圖 18 色（SPEC-48 §1，設計師定稿）：宣紙為底、焦墨為骨、
+	// 朱砂為攻、石青為守。索引角色沿用舊盤，色值整套換。
 	return assets.Palette{
-		{R: 0, G: 0, B: 0},       // 0：透明（鐵路）
-		{R: 255, G: 245, B: 204}, // 1：紙白高光
-		{R: 70, G: 43, B: 24},    // 2：深褐輪廓
-		{R: 164, G: 45, B: 34},   // 3：朱紅／敵軍
-		{R: 72, G: 133, B: 142},  // 4：水系／資訊線
-		{R: 86, G: 132, B: 82},   // 5：植被
-		{R: 214, G: 166, B: 57},  // 6：金黃高亮
-		{R: 180, G: 174, B: 103}, // 7：平原
-		{R: 57, G: 103, B: 137},  // 8：深水
-		{R: 127, G: 117, B: 91},  // 9：山石陰影
-		{R: 190, G: 145, B: 83},  // 10：乾燥地表
-		{R: 126, G: 151, B: 85},  // 11：丘陵植被
-		{R: 205, G: 195, B: 151}, // 12：高原／城牆
-		{R: 132, G: 77, B: 52},   // 13：關口
-		{R: 239, G: 231, B: 199}, // 14：雪峰
-		{R: 47, G: 91, B: 86},    // 15：鐵路／資料線
-		{R: 0xAE, G: 0x00, B: 0x00}, // 16：暗紅框（原版致敬外框，M1 暫代算子框）
-		{R: 0x00, G: 0x00, B: 0xAA}, // 17：寶藍線（原版致敬內線，M1 暫代算子內線）
+		{R: 0, G: 0, B: 0},          // 0：透明（鐵路）
+		{R: 0xF2, G: 0xEA, B: 0xD8}, // 1：宣紙底
+		{R: 0x1E, G: 0x1A, B: 0x16}, // 2：焦墨
+		{R: 0xB7, G: 0x32, B: 0x26}, // 3：朱砂／攻方
+		{R: 0x2F, G: 0x5D, B: 0x62}, // 4：石青／守方
+		{R: 0x5E, G: 0x7A, B: 0x5A}, // 5：墨綠
+		{R: 0xC9, G: 0xA2, B: 0x27}, // 6：藤黃
+		{R: 0xD8, G: 0xC6, B: 0x9A}, // 7：米黃地
+		{R: 0x3E, G: 0x6E, B: 0x8E}, // 8：花青
+		{R: 0x6B, G: 0x5B, B: 0x4C}, // 9：赭石灰
+		{R: 0xC2, G: 0xA0, B: 0x6B}, // 10：赭石
+		{R: 0x8A, G: 0x9A, B: 0x5B}, // 11：苔綠
+		{R: 0xD9, G: 0xD2, B: 0xB8}, // 12：灰白壁
+		{R: 0x7A, G: 0x4A, B: 0x2E}, // 13：赭墨
+		{R: 0xE8, G: 0xE4, B: 0xD8}, // 14：雪峰白
+		{R: 0x4A, G: 0x3B, B: 0x2C}, // 15：渴墨
+		{R: 0x8E, G: 0x1F, B: 0x1F}, // 16：暗紅框
+		{R: 0x27, G: 0x41, B: 0x56}, // 17：黛藍線
 	}
 }
 
@@ -199,9 +201,9 @@ func modernUnit(index int) *assets.Image {
 		red = index >= 12
 		facing = (index % 6) + 1
 	}
-	team := byte(5) // jade：我方／原版綠色的現代化延伸
+	team := byte(3) // 朱砂：攻方（SPEC-48 §1）
 	if red {
-		team = 3 // vermilion：敵方／原版紅色的現代化延伸
+		team = 4 // 石青：守方（SPEC-48 §1）
 	}
 	ink := byte(2)
 	// 原版致敬剪影（SPEC-47 M2）：照 NEWICON.TPC 的無框平面剪影重繪——
