@@ -3106,3 +3106,14 @@ register parity，也不把這支單一 preview cue 擴大宣稱為六首 Modern
    全綠；1280×720 省 26 目檢回紋角全版面生效、版面無破損。deny／no-cgo／diff check 通過。
 3. **下一步：** M3 戰鬥 HUD／人物肖像框線收尾＋成果圖更新＋三平台重包；
    R1 傳記重查待新史料角度。
+
+### 5.157 2026-09-27 民國戰棋 M3 肖像框＋成果圖＋重包已接
+
+1. **實作（confirmed-remake）：** 人物照片墨線外框內加銅章內線（`modern_pages.go`）；
+   戰鬥 HUD／高解析外殼經由 M2 共用底板自動沿用回紋角，無需另改。commit `013ccf5`。
+2. **驗收：** 肖像框線新斷言＋比例測試座標上移一格（意圖不變）；`internal/ui/...` 全綠；
+   新增 `docs/images/wargame-*.png` 三張（省 26 政略／戰鬥／#058 自傳，目檢通過）；
+   deny（676 檔）／no-cgo／diff check 通過。
+3. **重包：** `tools/package.sh 0.1.2-wargame` 三平台成功，雜湊：
+   Windows `ad7485ea…`、macOS `2b7669ce…`、AppImage `39946d7f…`。
+   真機 smoke／簽署仍是獨立 gate。
