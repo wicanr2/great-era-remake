@@ -3130,3 +3130,24 @@ register parity，也不把這支單一 preview cue 擴大宣稱為六首 Modern
    #274 維持排除；全槽覆蓋在功能面關閉，29 篇正文仍待新史料。
 3. **驗收：** 組裝測試＋fallback 仍一頁（既有測試通過）；i18n 全綠（日文鍵一度用
    倚天未覆蓋的「録」字被字形 gate 擋下，已改登錄資料）；deny／no-cgo／diff 全過。
+
+### 5.159 2026-09-27 四項新指示落地（wiki-sourced／osxcross／smoke／致敬重設計）
+
+1. **W1 wiki-sourced（confirmed-remake）：** 逐篇人審刪除。`TRANSLATION_STATUS` 改
+   `wiki-sourced` 並重產 387×2 overlay（正文免責同步改 wiki 衍生表述）；
+   `locale_bio_gate.py --release` 與 Go `PeopleDB` 載入器同步放行（review 須維持
+   `unreviewed`，不冒充已審稿）；SPEC-28／46、英日 README 修訂。commit `b218ba8`，
+   gate 預覽＋發行四模式與 i18n／render／自傳測試全綠。
+2. **M1 osxcross（verified）：** 0.1.2-wargame macOS 包靜態驗收——Mach-O arm64 單弧、
+   連結全系統庫無外來路徑、minos 11.0、`battle.command` 字串在版、LC_CODE_SIGNATURE
+   存在。編譯由 Go 原生交叉編譯完成（純 Go 無 cgo），osxcross 工具鏈負責 lipo 與
+   app bundle 組裝；bundle 未簽（Linux 上做不出來），文件維持右鍵打開指引。
+   真機執行仍需 Apple 硬體。
+3. **S1 smoke（partial）：** debian:bookworm 容器解包新 AppImage 通過，
+   `ldd` 同 ubuntu 僅缺 `libX11`／ALSA（已文件化）。Windows：主機有 wine 但無
+   wine 容器映像，依 Docker-only 不在主機執行，缺容器化 Wine 即缺 Windows smoke
+   環境，列為待補；macOS 執行需實機。以上缺口皆已如實記錄，不冒充完成。
+4. **U1 致敬重設計（confirmed-user-decision）：** 戰棋主題（含配色）全否決，
+   新方向為原版致敬高解析（SPEC-47 READY）：RetroStyle 米黃／暗紅／寶藍為基準，
+   花框程式化重繪，部隊回剪影語彙，retro 模式不動，戰棋產物保留為歷史。
+   下一步：M1 色組＋邊框實作。
