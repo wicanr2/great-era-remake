@@ -3235,3 +3235,14 @@ register parity，也不把這支單一 preview cue 擴大宣稱為六首 Modern
    Xvfb 實機 `-audio modern` 無 manifest／解碼錯誤（僅缺容器音效卡，
    Ebiten eager decode 已過）；Xvfb 全套綠；deny 687 檔零命中。
 3. **誠實邊界：** 技術預覽，非正式作曲署名／盲聽／人耳混音；SPEC-32 §3 已同步。
+
+### 5.167 2026-09-27 人審忽略＋玩法差異驗證＋史料補查中
+
+1. **人審忽略（confirmed-user-decision）：** 使用者指示人審 gate 整組忽略，
+   不再排逐篇／禁則人眼驗收；英日維持 wiki-sourced machine-draft 標示。
+2. **玩法差異（confirmed-remake）：** DOSBox 原版開局全流程截圖
+   （標題→主選單→三幕→人數→領袖→個性→intro→全國地圖）vs remake retro；
+   差異：無密碼 quiz、無互動開局屏、無全國戰略地圖屏；規則層維持 SPEC-30。
+   見 `docs/playtest/43-remake-original-gameplay-diff.md`。戰鬥同態待補。
+3. **史料補查（進行中）：** subagent 換角度重查 29 槽（異寫／別名／番號追人），
+   輸出 facts/batchU5，gate＋overlay 由本輪後續接。
