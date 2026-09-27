@@ -360,3 +360,46 @@ func TestModernArtilleryFacingChangesPixels(t *testing.T) {
 		t.Fatal("砲兵六朝向不應共用同一張像素圖")
 	}
 }
+
+func TestModernUnitCounterFrameUsesCopperAndTeamCore(t *testing.T) {
+	m := NewModern()
+	for i := 0; i < 18; i++ {
+		u, err := m.Unit(i)
+		if err != nil {
+			t.Fatal(err)
+		}
+		pix := u.Image.Pix
+		at := func(x, y int) byte { return pix[y*32+x] }
+		// 四角透明
+		for _, p := range [][2]int{{0, 0}, {31, 0}, {0, 16}, {31, 16}, {1, 1}, {30, 1}, {1, 15}, {30, 15}} {
+			if at(p[0], p[1]) != 0 {
+				t.Fatalf("算子 %d 角落 (%d,%d)=%d 應透明", i, p[0], p[1], at(p[0], p[1]))
+			}
+		}
+		// 銅框上下邊
+		if at(16, 1) != 16 || at(16, 15) != 16 {
+			t.Fatalf("算子 %d 上下框應為銅色 16", i)
+		}
+		// 勢力底：0..5 奇數紅、砲兵 12..17 紅，其餘綠
+		want := byte(5)
+		if i == 1 || i == 3 || i == 5 || i >= 12 {
+			want = 3
+		}
+		if at(5, 5) != want {
+			t.Fatalf("算子 %d 內底=%d，應為勢力色 %d", i, at(5, 5), want)
+		}
+	}
+	// 四兵種符號互不相同
+	seen := map[string]int{}
+	for _, i := range []int{0, 2, 4, 6} {
+		u, err := m.Unit(i)
+		if err != nil {
+			t.Fatal(err)
+		}
+		key := string(u.Image.Pix)
+		if prev, dup := seen[key]; dup {
+			t.Fatalf("算子 %d 與 %d 像素完全相同", i, prev)
+		}
+		seen[key] = i
+	}
+}

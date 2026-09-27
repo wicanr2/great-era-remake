@@ -70,19 +70,19 @@ func NewModern() *Modern {
 
 func (m *Modern) Name() string { return string(ModeModern) }
 
-// Style 回傳與 modern 圖像同一批次建立的語意外殼。A2 採明亮土黃紙面、
-// 深褐文字、朱紅主指令與黛青焦點。十個勢力色只作
+// Style 回傳與 modern 圖像同一批次建立的語意外殼。民國戰棋採印刷暖紙、
+// 濃墨文字、朱紅主指令、銅章焦點與黛青次要色。十個勢力色只作
 // 資訊色帶／焦點標記，不改變原版勢力編號、外交規則或存檔內容。
 func (m *Modern) Style() UIStyle {
 	return UIStyle{
 		Name:      ModeModern,
-		Ink:       assets.RGB{R: 70, G: 43, B: 24},
+		Ink:       assets.RGB{R: 48, G: 30, B: 16},
 		Paper:     assets.RGB{R: 239, G: 211, B: 137},
 		Panel:     assets.RGB{R: 250, G: 231, B: 170},
 		Muted:     assets.RGB{R: 133, G: 91, B: 51},
-		Accent:    assets.RGB{R: 164, G: 45, B: 34},
+		Accent:    assets.RGB{R: 168, G: 48, B: 32},
 		AccentAlt: assets.RGB{R: 47, G: 91, B: 86},
-		Focus:     assets.RGB{R: 190, G: 130, B: 38},
+		Focus:     assets.RGB{R: 176, G: 110, B: 52},
 		FactionTint: [10]assets.RGB{
 			{R: 224, G: 89, B: 47}, {R: 42, G: 191, B: 211},
 			{R: 68, G: 160, B: 137}, {R: 237, G: 195, B: 88},
@@ -153,6 +153,8 @@ func modernPalette() assets.Palette {
 		{R: 132, G: 77, B: 52},   // 13：關口
 		{R: 239, G: 231, B: 199}, // 14：雪峰
 		{R: 47, G: 91, B: 86},    // 15：鐵路／資料線
+		{R: 176, G: 110, B: 52},  // 16：銅框（民國戰棋算子外框）
+		{R: 110, G: 66, B: 32},   // 17：深青銅（算子內線）
 	}
 }
 
@@ -202,46 +204,50 @@ func modernUnit(index int) *assets.Image {
 		team = 3 // vermilion：敵方／原版紅色的現代化延伸
 	}
 	ink, highlight := byte(2), byte(1)
-	// 所有兵種先置於同一種現代策略遊戲的「部隊 token」底座：深色外框、
-	// 勢力色核心與高光基線。這保留 32×17／透明索引／原有索引順序，卻讓
-	// 高解析戰場上的單位一眼可讀，而不是放大的散點剪影。
-	iconCircle(pix, 16, 9, 7, ink)
-	iconCircle(pix, 16, 9, 6, team)
-	iconLine(pix, 11, 13, 21, 13, highlight)
+	copper, bronze := byte(16), byte(17)
+	// 民國戰棋算子：圓角銅框、深青銅內線、勢力色底、墨色兵種符號。
+	// 32×17 尺寸、透明索引 0、四角透明、18 張索引順序一律保留；
+	// 高解析戰場放大時以框線與符號辨識，不靠散點剪影。
+	counterFrame(pix, copper, bronze)
+	iconRect(pix, 3, 3, 28, 13, team)
 	switch kind {
 	case 0:
-		// 步兵：鋼盔與正面人形。白色帽簷令 1.5× 放大時仍可辨識。
-		iconRect(pix, 12, 6, 20, 9, highlight)
-		iconLine(pix, 10, 10, 22, 10, ink)
-		iconRect(pix, 14, 10, 18, 14, highlight)
-		iconLine(pix, 12, 14, 20, 14, ink)
+		// 步兵：交叉步槍上的鋼盔。帽體高光、槍身墨線，灰階下以交叉斜線辨識。
+		iconLine(pix, 11, 12, 21, 5, ink)
+		iconLine(pix, 21, 12, 11, 5, ink)
+		iconRect(pix, 13, 4, 19, 7, highlight)
+		iconLine(pix, 12, 8, 20, 8, ink)
+		iconRect(pix, 14, 9, 18, 12, highlight)
 	case 1:
-		// 裝甲：履帶、砲塔與短砲管。深色履帶避免和步兵 token 混淆。
-		iconRect(pix, 10, 10, 21, 13, ink)
-		iconRect(pix, 11, 9, 19, 11, highlight)
-		iconLine(pix, 18, 9, 25, 9, highlight)
-		iconLine(pix, 11, 14, 21, 14, ink)
+		// 裝甲：菱形車體＋砲塔＋短砲管。菱形是與步兵圓盔的最大差異。
+		iconLine(pix, 10, 9, 16, 5, highlight)
+		iconLine(pix, 16, 5, 22, 9, highlight)
+		iconLine(pix, 22, 9, 16, 13, ink)
+		iconLine(pix, 16, 13, 10, 9, ink)
+		iconRect(pix, 14, 7, 18, 10, highlight)
+		iconLine(pix, 18, 8, 25, 8, ink)
+		iconLine(pix, 11, 13, 21, 13, ink)
 	case 2:
-		// 騎兵：奔馬的頭頸與前傾騎手；斜線是其與戰車最大的視覺差異。
-		iconLine(pix, 10, 13, 17, 9, highlight)
-		iconLine(pix, 16, 9, 22, 11, highlight)
-		iconLine(pix, 20, 10, 24, 6, ink)
-		iconLine(pix, 13, 8, 11, 5, ink)
-		iconLine(pix, 11, 14, 21, 14, ink)
+		// 騎兵：馬頭頸剪影＋前傾騎手；長斜線是其指紋。
+		iconLine(pix, 9, 12, 18, 5, highlight)
+		iconLine(pix, 18, 5, 23, 8, highlight)
+		iconLine(pix, 23, 8, 21, 12, ink)
+		iconLine(pix, 15, 7, 13, 4, ink)
+		iconLine(pix, 11, 13, 21, 13, ink)
 	case 3:
-		// 砲兵：車架與雙輪，砲管方向依原版 +31 的六值保留。
-		iconRect(pix, 10, 11, 22, 13, ink)
-		iconCircle(pix, 11, 14, 3, ink)
-		iconCircle(pix, 21, 14, 3, ink)
-		iconCircle(pix, 11, 14, 1, highlight)
-		iconCircle(pix, 21, 14, 1, highlight)
+		// 砲兵：炮身楔形＋雙輪，方向依原版 +31 的六值保留。
+		iconRect(pix, 10, 10, 22, 12, ink)
+		iconCircle(pix, 10, 13, 2, ink)
+		iconCircle(pix, 22, 13, 2, ink)
+		iconPixel(pix, 10, 13, highlight)
+		iconPixel(pix, 22, 13, highlight)
 		dirs := [...]struct{ dx, dy int }{
 			{0, -1}, {1, -1}, {1, 0}, {0, 1}, {-1, 1}, {-1, 0},
 		}
 		d := dirs[facing-1]
-		ex, ey := 16+d.dx*10, 9+d.dy*6
-		iconLine(pix, 16, 9, ex, ey, highlight)
-		iconLine(pix, 16, 10, ex, ey+1, ink)
+		ex, ey := 16+d.dx*9, 8+d.dy*5
+		iconLine(pix, 16, 8, ex, ey, highlight)
+		iconLine(pix, 16, 9, ex, ey+1, ink)
 	}
 	return &assets.Image{W: modernUnitW, H: modernUnitH, Pix: pix}
 }
@@ -263,6 +269,22 @@ func iconCircle(pix []byte, cx, cy, radius int, value byte) {
 			}
 		}
 	}
+}
+
+// counterFrame 畫民國戰棋算子的圓角銅框：外框銅色、四角透明、內側一圈
+// 深青銅線。框線佔 x=1..30、y=1..15，內部 x=3..28、y=3..13 留給勢力底與兵符。
+func counterFrame(pix []byte, copper, bronze byte) {
+	iconLine(pix, 3, 1, 28, 1, copper)
+	iconLine(pix, 3, 15, 28, 15, copper)
+	iconLine(pix, 1, 3, 1, 13, copper)
+	iconLine(pix, 30, 3, 30, 13, copper)
+	for _, p := range [][2]int{{2, 2}, {29, 2}, {2, 14}, {29, 14}} {
+		iconPixel(pix, p[0], p[1], copper)
+	}
+	iconLine(pix, 4, 2, 27, 2, bronze)
+	iconLine(pix, 4, 14, 27, 14, bronze)
+	iconLine(pix, 2, 4, 2, 12, bronze)
+	iconLine(pix, 29, 4, 29, 12, bronze)
 }
 
 func iconLine(pix []byte, x0, y0, x1, y1 int, value byte) {
