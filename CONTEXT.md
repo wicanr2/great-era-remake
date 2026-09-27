@@ -3051,3 +3051,23 @@ register parity，也不把這支單一 preview cue 擴大宣稱為六首 Modern
    `dist-all/2026-08-12-a2-m2-portraits/`。包內含肖像登錄、已審核 JPEG 與授權 notice，但不含
    原版遊戲資料、原版音訊或倚天字型。推廣片依指定 ffmpeg 技能限制 2 CPU、使用 `veryfast`
    與同一 Xvfb 視窗連續錄影；Modern 純 Go 配樂仍是本機技術預覽，不冒稱正式已清權音樂。
+
+### 5.153 2026-09-27 E 組未知項收束與 F1 Go 註解遷移
+
+1. **E1 第 6 鍵（approximate，unknown 維持）：** 五鍵邊界四層封死，無需改碼——版面 retro／modern
+   各只產 5 個命令鈕（`modern.go` 迴圈 `i<5`，命中區測試 pin 5+3）；`BattleCommand` 只收 1..5，
+   `BattleCommand(6)` 回 `None` 並由 `BattleCommandNumber` 拒絕；鍵盤只讀 Key1..Key5；
+   `TestApproximateKey6KeepsCommandAndTargetNamespacesSeparate` 鎖住 command／target 命名空間分離。
+   第 6 鍵玩家語意仍標 `unknown`，不升格。
+2. **E2 block10（unknown 維持）：** `ParseMajorPowerLeaders`／`WriteMajorPowerLeaders` 皆為明確窄
+   writer，遊戲流程內無自動同步呼叫端（生成／覆滅時機未閉合，`savelayout.go` 已標示）。
+   `factiontable_test.go` 與 `approximate_validation_test.go` 的 block10 遮罩測試通過。
+3. **E3 DT2（unknown 維持）：** `WriteBattleStates` 以 Raw 為基底只覆蓋已解析欄位；
+   `TestApplyRemakeSnapshotPreservesUnknownBytes` 斷言非解析 bytes（含 +8／+18）不動；
+   `ApplyRemakeSnapshot` 註解明示 remake 投影、非原版同步證據。live 落盤時機仍標 `unknown`。
+4. **F1 補遺：** 43 個 Go 檔註解的現行規範引用由舊 `CLAUDE.md` 章節遷到 `AGENTS.md`
+   對映章節（Docker 內腳本批量替換，62 insertions／62 deletions 全為註解，零邏輯改動，
+   無殘留）。歷史引文與研究資料註記保留。commit `1a3a825` 已推送。
+5. **回歸：** Docker `go test -count=1` 全套綠（`cmd/dsds` 走 Xvfb :99）；deny scan 670 檔
+   零命中；no-cgo、diff check 通過；附帶發現 `cmd/dsds/` 下有兩個前輪遺留的 root 擁有空目錄
+   （`main_test.go`、`messages.go` 同名目錄），為空且不影響建置，暫留待使用者處置。
