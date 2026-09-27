@@ -3261,3 +3261,9 @@ register parity，也不把這支單一 preview cue 擴大宣稱為六首 Modern
 2. **結果（honest-negative）：** 五槽皆維持 `unknown`，`bio_zh` 續留空，
    檔案卡路徑不變；`docs/reference/people/bios-batchU5.md` 記載查證範圍與落空點，
    無編造（郭振甲／振才僅記待考）。剩餘 24 槽（U1-12／U3-8／U4-3＋#96）待後續批次。
+
+### 5.170 2026-09-27 史料 U6 五槽覆核完成（皆維持 unknown）
+
+1. 本批 #96、#36、#303、#416、#132（番號追人／音譯／同音異寫新角度），
+   五槽皆維持 `unknown`，誠實陰性，無編造；見 `docs/reference/people/bios-batchU6.md`。
+2. 剩餘 19 槽：U1-12、U3-7（#140、#153、#154、#238～#241）。
