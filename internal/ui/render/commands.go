@@ -893,7 +893,7 @@ const w4Confirm = 0
 // DrawConfirmBox 畫一個離開確認框。
 //
 // 用原版詞表的「您確定嗎」（`4.15` 詞條 0），不是重打的字串。
-// 依 CLAUDE.md §9：ESC 只取消／退回，F10 才離開，離開前要確認並自動存檔。
+// 依 AGENTS.md §8：ESC 只取消／退回，F10 才離開，離開前要確認並自動存檔。
 func (c *Canvas) DrawConfirmBox(w4 *assets.GlyphFile, fg, bg assets.RGB, x, y int) {
 	const w, h = 4*GlyphAdvance + 40, 60
 	c.fillRect(x, y, w, h, bg)

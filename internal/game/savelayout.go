@@ -7,7 +7,7 @@ import "fmt"
 // 原版把整個檔案當一筆記錄讀進來（`Reset(f, 395Bh)`），再用 Turbo Pascal
 // 的 `$basg` 逐段搬到全域變數——**每一段的大小就寫在參數裡**，不必猜。
 //
-// 這張表的用途是給「改寫而非重建」的存檔寫回劃出邊界（`CLAUDE.md` §9）：
+// 這張表的用途是給「改寫而非重建」的存檔寫回劃出邊界（`AGENTS.md` §8）：
 // 哪些區域已解可以蓋、哪些一個 byte 都不能動。
 
 // SaveBlock 是 `.DT1` 裡的一個 `$basg` 區塊。
@@ -96,7 +96,7 @@ func SaveBlockAt(offset int) (SaveBlock, bool) {
 
 // SaveWritable 回答某個位置能不能被寫回覆蓋。
 //
-// `CLAUDE.md` §9：**存檔寫回是「改寫」不是「重建」**，未解區域一個 byte
+// `AGENTS.md` §8：**存檔寫回是「改寫」不是「重建」**，未解區域一個 byte
 // 都不動。檔頭與七個未映射 runtime byte 都算不可寫——檔頭的第 4 個 byte
 // 仍未解。
 func SaveWritable(offset int) bool {

@@ -11,7 +11,7 @@ package game
 // 只有「先動誰、往哪走」是我們補的。
 //
 // 這份實作原本在 `cmd/battlesim`，移進規則層是為了不讓
-// `cmd/aisim` 抄第二份——`CLAUDE.md` §7 第 4 條。
+// `cmd/aisim` 抄第二份——`AGENTS.md` §5 第 4 條。
 
 // BattleOutcome 是一場自動戰鬥的結果。
 type BattleOutcome struct {

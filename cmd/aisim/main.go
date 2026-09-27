@@ -141,7 +141,7 @@ func run(dir string, turns int, verbose, fight, until, recruit bool) error {
 			fmt.Printf("第 %3d 回合後：%s\n", t, summary(w))
 		}
 		// 統一 = 只剩一個勢力還有省。這是我們定的結束條件，
-		// **不是原版的勝負判定**（那個還沒解，見 CLAUDE.md §8 M3）。
+		// **不是原版的勝負判定**（那個還沒解，見 AGENTS.md §8 M3）。
 		if until && len(w.Table.Factions()) <= 1 {
 			fmt.Printf("\n第 %d 回合天下統一：%s\n", t, summary(w))
 			break
@@ -226,7 +226,7 @@ func alertMark(r game.TransferReport) string {
 
 // summary 印一行局面：幾個勢力、佔了幾省、將領最集中的省有幾人。
 //
-// **看狀態不是看畫面**（`CLAUDE.md` §7 第 6 條）——兵力全擠到一省
+// **看狀態不是看畫面**（`AGENTS.md` §5 第 6 條）——兵力全擠到一省
 // 這種失控只有數字看得出來。
 func summary(w *game.AIWorld) string {
 	factions := w.Table.Factions()

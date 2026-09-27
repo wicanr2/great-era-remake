@@ -147,7 +147,7 @@ func (w *AIWorld) combatants(p ProvinceID, faction GeneralID) ([]*Combatant, []i
 //
 // 原版兵力歸零的將領會怎樣仍未解（`+16` 的 `{0, 1, 32}` 三個值、
 // 畫面上的「狀態：任用」都還沒對上），**所以這裡什麼都不做**。
-// `CLAUDE.md` §9：不准為了讓行為看起來合理而編規則。
+// `AGENTS.md` §8：不准為了讓行為看起來合理而編規則。
 func (w *AIWorld) writeBack(us []*Combatant, idx []int) {
 	for k, u := range us {
 		if u == nil || k >= len(idx) || idx[k] < 0 || idx[k] >= len(w.Strengths) {

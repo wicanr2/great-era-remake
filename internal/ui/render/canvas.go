@@ -1,6 +1,6 @@
 // Package render 是呈現層的合成核心：把解好的資產畫成一張點陣圖。
 //
-// **這一層不依賴 Ebiten**（CLAUDE.md §11）。理由不是潔癖——Ebiten 在 init 期
+// **這一層不依賴 Ebiten**（AGENTS.md §8）。理由不是潔癖——Ebiten 在 init 期
 // 就要求顯示器，無頭環境連測都測不了。把合成邏輯留在純 image 這一層，
 // 就能在 CI 上逐像素比對原版截圖；Ebiten 只負責把成品貼到視窗。
 //

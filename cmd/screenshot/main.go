@@ -2,7 +2,7 @@
 //
 //	tools/go.sh run ./cmd/screenshot -game workplace/orig/game -province 26 -out workplace/shots
 //
-// internal/ui/render 不依賴 Ebiten（CLAUDE.md §11），所以這支可以在
+// internal/ui/render 不依賴 Ebiten（AGENTS.md §8），所以這支可以在
 // 無頭環境跑，用來做視覺驗收與對照原版截圖。
 //
 // 輸出含原版美術，不要放進版控。

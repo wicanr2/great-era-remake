@@ -1,6 +1,6 @@
 // Package game 是規則層：只認識遊戲規則與狀態，不認識畫面。
 //
-// 這一層不得 import Ebiten 或任何繪圖套件（CLAUDE.md §11）——否則無頭環境
+// 這一層不得 import Ebiten 或任何繪圖套件（AGENTS.md §8）——否則無頭環境
 // 連測都測不了。呈現層在 internal/ui。
 package game
 
@@ -67,7 +67,7 @@ type Map struct {
 // LoadMap 從 WARPOS.DAT、TERNAME.DAT 與 NWMAP.DAT 建出地圖。
 //
 // 鄰接表是**從檔案導出**的，不在程式碼裡重打一份——重抄的那份一定會漂
-// （CLAUDE.md §7 第 4 條）。
+// （AGENTS.md §5 第 4 條）。
 func LoadMap(warpos, tername, nwmap []byte) (*Map, error) {
 	pos, err := assets.ParseProvinceGrids(warpos)
 	if err != nil {

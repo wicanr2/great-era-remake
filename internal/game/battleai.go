@@ -226,7 +226,7 @@ func DecideBattleA(in BattleAIInput) BattleDecision {
 		}
 		// ⛔ 原版這裡再問一次 `sub_53619(0)`，但外層已經確定它非 0，
 		// 而 `sub_56D49` 是純查詢無副作用——所以**恆走 17，值 16 走不到**。
-		// 那是原版的死碼，照抄（`CLAUDE.md` §9：原版行為就是規格）。
+		// 那是原版的死碼，照抄（`AGENTS.md` §8：原版行為就是規格）。
 		// 值 16 本身不是死碼，`sub_3A94E` 走得到它。
 		return BattleDecision{Action: ActARecompute, Step: "sub_3A817（值 16 是死碼）"}
 	}

@@ -277,7 +277,7 @@ func TestUnitAssignmentLifecycle(t *testing.T) {
 
 func TestClearAssignmentKeepsOtherBits(t *testing.T) {
 	// ⚠️ +13 的 bit 2/3/6 是別層在用的，只准動 bit 7
-	//（CLAUDE.md §9：未解區域一個 byte 都不動）。
+	//（AGENTS.md §8：未解區域一個 byte 都不動）。
 	u := &CombatUnit{General: 1, Flags13: 0x4C} // bit 2 + 3 + 6
 	u.AssignTo(3, 9)
 	if u.Flags13 != 0xCC {

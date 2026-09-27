@@ -4,7 +4,7 @@ import "fmt"
 
 // 存檔寫回。
 //
-// CLAUDE.md §9 的硬規則：**「改寫」不是「重建」**——從原始 bytes 出發，
+// AGENTS.md §8 的硬規則：**「改寫」不是「重建」**——從原始 bytes 出發，
 // 只蓋已解欄位，未解區域一個 byte 都不動。驗收標準是 byte-for-byte round-trip。
 //
 // 已解的省份區、將領區與外交帳本可以整片／逐欄寫回；停火表另提供逐 byte writer。

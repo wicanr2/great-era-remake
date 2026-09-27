@@ -153,7 +153,7 @@ func TestChainAAttackCandidatesSkipInBattle(t *testing.T) {
 // 在**真實存檔**上跑一輪決策鏈 A，統計行動分佈。
 //
 // 這不是斷言某個數字，是**驗證電腦真的會動**——單元測試都是人造世界，
-// 全綠不代表接上真實資料後不會整輪空轉（`CLAUDE.md` §10.4：測試綠只是
+// 全綠不代表接上真實資料後不會整輪空轉（`AGENTS.md` §8：測試綠只是
 // 沒退步）。分佈印出來供人看，只在「一件事都沒做」時判失敗。
 func TestChainAOnRealSave(t *testing.T) {
 	w := realWorld(t)

@@ -97,7 +97,7 @@ func (g GeneralID) Valid() bool { return g != 0 }
 // Province 是一個省的狀態。
 //
 // 37 bytes 裡解出 14 個欄位，**未解的部分原樣保留在 Raw**——存檔寫回是
-// 「改寫」不是「重建」（CLAUDE.md §9）。
+// 「改寫」不是「重建」（AGENTS.md §8）。
 type Province struct {
 	// 六種資源。順序照資料，不是照畫面。
 	Gold, Food, Ammo, Coal, Fuel, Iron uint16

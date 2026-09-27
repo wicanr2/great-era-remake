@@ -671,7 +671,7 @@ func (w *AIWorld) poorerThan(target, here ProvinceID) bool {
 // 兩個常數同時不同，而型別剛好相容（兩邊都是勢力領袖 ID 的 u16），
 // 所以不會崩，只是讀到不相干的將領。詳見 `70-ai.md` §6m。
 //
-// **照抄是刻意的**：`CLAUDE.md` §1 的定位是還原，「不得默默改動遊戲規則」
+// **照抄是刻意的**：`AGENTS.md` §2 的定位是還原，「不得默默改動遊戲規則」
 // ——bug 也是 1992 年玩家玩到的行為。要修是 remake 差異，由使用者決定。
 func (w *AIWorld) generalsLoyalTo(neighbour ProvinceID, faction GeneralID) bool {
 	i := int(neighbour) - 1 // 將領 ID 是 1-based

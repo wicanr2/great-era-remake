@@ -5,7 +5,7 @@ import "testing"
 // 政略回合的端到端測試：把已解出的指令串成一年，看數值走得合不合理。
 //
 // 這是無頭環境唯一能驗的「遊戲跑得動」——`cmd/dsds` 需要顯示器，
-// 而規則層不認識畫面（`CLAUDE.md` §11 的分層理由）。
+// 而規則層不認識畫面（`AGENTS.md` §8 的分層理由）。
 //
 // ⚠️ **這不是「對齊原版」的驗收。** 它驗的是規則層自己不會爆炸、
 // 不變量守得住。真正的對齊要拿原版逐次比對，那條路還沒走
@@ -155,7 +155,7 @@ func TestStrategyYearRuns(t *testing.T) {
 	}
 }
 
-// 固定種子必須產生固定結果——`CLAUDE.md` §9 的截圖驗收前提。
+// 固定種子必須產生固定結果——`AGENTS.md` §8 的截圖驗收前提。
 func TestStrategyDeterministic(t *testing.T) {
 	run := func() (uint16, uint8) {
 		w := realWorld(t)

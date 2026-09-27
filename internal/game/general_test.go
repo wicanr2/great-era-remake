@@ -19,7 +19,7 @@ func readGame(t *testing.T, name string) []byte {
 }
 
 // TestGeneralRoundTrip 驗證「改寫而非重建」：不改任何欄位時，
-// Bytes() 必須與原始 33 bytes byte-for-byte 相同（CLAUDE.md §9）。
+// Bytes() 必須與原始 33 bytes byte-for-byte 相同（AGENTS.md §8）。
 func TestGeneralRoundTrip(t *testing.T) {
 	data := readGame(t, "MAN(1).DAT")
 	gs, err := ParseGenerals(data, len(data)/GeneralRecordSize)

@@ -12,7 +12,7 @@ package game
 //	    jmp     loc_10E55            ; 否則繼續主迴圈
 //
 // 結束時把一個**結局代碼**寫進 `Config.dat`（`sub_10541`），
-// 由 `GRTE.EXE` 讀去播對應的結局——這印證了 `CLAUDE.md` §3.7
+// 由 `GRTE.EXE` 讀去播對應的結局——這印證了 `AGENTS.md` §3
 // 「模組間靠檔案交接狀態」的假說。
 
 // EndingCode 是寫進 `Config.dat` 的結局代碼。
@@ -37,7 +37,7 @@ const (
 //	cmp     byte_6FE7E, 7           ; 月 >= 7
 //
 // 民國 26 年 7 月 = **1937 年 7 月 = 盧溝橋事變**。北伐那一期到此
-// 強制結束，接抗戰——與 `CLAUDE.md` §1.5 記的三期分法完全吻合。
+// 強制結束，接抗戰——與 `AGENTS.md` §3 記的三期分法完全吻合。
 const (
 	Stage1DeadlineYear  = 26
 	Stage1DeadlineMonth = 7

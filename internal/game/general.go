@@ -78,7 +78,7 @@ const (
 
 // branchFullStrength 是各兵種的**滿員數**。
 //
-// 這是**社群資料第一次被原版資料證實**：`CLAUDE.md` §1.5 記的
+// 這是**社群資料第一次被原版資料證實**：`AGENTS.md` §3 記的
 // 20000／10000／2000／200 全部對上第一期 `MAN(1).DAT` 的最大值，
 // 而且四個一起對上，不是巧合。
 //
@@ -123,7 +123,7 @@ func BranchName(branch uint8) string {
 //
 // 33 bytes 裡已解欄位包含三項能力、經驗、所屬省、兵力、戰技、武裝、兵種、
 // 番號四欄、體力、士氣與射程；其餘 byte 原樣保留在 Raw。存檔寫回是「改寫」
-// 不是「重建」，未解區域一個 byte 都不能動（CLAUDE.md §9）。
+// 不是「重建」，未解區域一個 byte 都不能動（AGENTS.md §8）。
 type General struct {
 	// 三個能力值，**名字全部來自實機「查閱將領」畫面**
 	// （`docs/playtest/08` §2，五個將領逐格對照）：
@@ -210,7 +210,7 @@ func ParseGeneral(rec []byte) (General, error) {
 
 // Bytes 產生寫回用的 33 bytes：以原始 bytes 為基底，只蓋已解欄位。
 //
-// 這是 CLAUDE.md §9 要求的「改寫而非重建」——未解 byte 原樣帶過去，
+// 這是 AGENTS.md §8 要求的「改寫而非重建」——未解 byte 原樣帶過去，
 // 驗收標準是 byte-for-byte round-trip。
 func (g *General) Bytes() [GeneralRecordSize]byte {
 	out := g.Raw

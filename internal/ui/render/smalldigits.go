@@ -20,7 +20,7 @@ import "github.com/wicanr2/great-era-remake/internal/assets"
 // （搜過 IBM ROM 字型、BGI `.CHR` 簽名、`.GLB` 解壓內容，全部落空）。
 // 這裡照量到的尺寸（6 × 14、筆劃 1 px）自己畫一套。
 //
-// 解出原版字型之後要換掉。**這一項已標記為 remake 差異**（`CLAUDE.md` §1）。
+// 解出原版字型之後要換掉。**這一項已標記為 remake 差異**（`AGENTS.md` §2）。
 
 // SmallDigitW / SmallDigitH 是戰鬥面板數字的尺寸，從實機截圖量到。
 const (

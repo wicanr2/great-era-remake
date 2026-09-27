@@ -19,7 +19,7 @@ import (
 //	            y   = 24*row + (col 為奇數 ? 12 : 0)
 //
 // 奇數欄整體下移半格 = column-staggered 六角格排列。這是「戰鬥用六角格」
-// （CLAUDE.md §1.5 原本只是社群說法）的第一份程式碼證據。
+// （AGENTS.md §3 原本只是社群說法）的第一份程式碼證據。
 const (
 	HexCellW = 32 // 一格的寬（sub_50FF5 的 shl ax, 5）
 	HexCellH = 24 // 一格的高（sub_50FF5 的 mul 18h）

@@ -24,7 +24,7 @@ func TestWriteProvincesUnchanged(t *testing.T) {
 
 // TestWriteProvincesTouchesOnlyTarget 改一個欄位時，**只有那兩個 byte 變**。
 //
-// 這才是「改寫而非重建」的真正驗收（CLAUDE.md §9）：
+// 這才是「改寫而非重建」的真正驗收（AGENTS.md §8）：
 // round-trip 相同只證明沒壞掉，這一條證明沒有波及未解區域。
 func TestWriteProvincesTouchesOnlyTarget(t *testing.T) {
 	orig := readGame(t, "SAVE(1).DT1")
@@ -106,7 +106,7 @@ func TestDateRoundTrip(t *testing.T) {
 // TestAutosaveDoesNotTouchOriginal 模擬離開時的自動存檔：
 // 寫出的是副本，原始 bytes 不變。
 //
-// CLAUDE.md §9：原版資產唯讀，測試存檔一律寫到明確的輸出目錄。
+// AGENTS.md §8：原版資產唯讀，測試存檔一律寫到明確的輸出目錄。
 func TestAutosaveDoesNotTouchOriginal(t *testing.T) {
 	orig := readGame(t, "SAVE(1).DT1")
 	snapshot := make([]byte, len(orig))

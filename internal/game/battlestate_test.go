@@ -3,7 +3,7 @@ package game
 import "testing"
 
 // TestBattleStateRoundTrip 驗證「改寫而非重建」：不改欄位時 Bytes() 必須
-// byte-for-byte 相同（CLAUDE.md §9）。三個檔案都要過。
+// byte-for-byte 相同（AGENTS.md §8）。三個檔案都要過。
 func TestBattleStateRoundTrip(t *testing.T) {
 	for _, name := range []string{"MEM_WAR.DAT", "SAVE(1).DT2", "SAVE(2).DT2"} {
 		data := readGame(t, name)

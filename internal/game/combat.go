@@ -143,7 +143,7 @@ type CombatUnit struct {
 
 	// Flags13 是 `+13` 的完整 byte。**存整個 byte 而不是拆成具名 bool**，
 	// 因為只有 bit 7 解出語意，其餘位元要原封不動帶回存檔
-	// （`CLAUDE.md` §9：只蓋已解欄位，未解區域一個 byte 都不動）。
+	// （`AGENTS.md` §8：只蓋已解欄位，未解區域一個 byte 都不動）。
 	//
 	// 位元地圖見 `docs/re/31` §31。bit 2／3／6 由玩家互動層操作，語意未解。
 	Flags13 uint8

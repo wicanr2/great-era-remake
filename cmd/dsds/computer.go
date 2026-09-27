@@ -34,7 +34,7 @@ func (a *app) runComputerTurn(playerFaction game.GeneralID) computerTurnReport {
 	var rep computerTurnReport
 
 	// 依省編號跑，順序固定——原版是照它自己的清單，我們沒有那份清單，
-	// 但**固定順序**至少讓行為可重現（`CLAUDE.md` §9 截圖驗收要可重現）。
+	// 但**固定順序**至少讓行為可重現（`AGENTS.md` §8 截圖驗收要可重現）。
 	for p := game.ProvinceID(1); p <= game.ProvinceCount; p++ {
 		prov, err := a.tbl.At(p)
 		if err != nil || prov.Commander == 0 || prov.Commander == playerFaction {

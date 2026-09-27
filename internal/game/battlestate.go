@@ -148,7 +148,7 @@ func ParseBattleState(rec []byte) (BattleState, error) {
 
 // Bytes 產生寫回用的 469 bytes：以原始 bytes 為基底，只蓋已切出的欄位。
 //
-// 未解區域一個 byte 都不動（CLAUDE.md §9）。
+// 未解區域一個 byte 都不動（AGENTS.md §8）。
 func (b *BattleState) Bytes() [BattleStateSize]byte {
 	out := b.Raw
 	for i, v := range b.Header {
@@ -189,7 +189,7 @@ func ParseBattleStates(data []byte) ([ProvinceCount]BattleState, error) {
 //
 // 每個 BattleState 都應由 ParseBattleStates 取得；Bytes 會以該狀態保留的
 // Raw bytes 為基底，只覆蓋目前已切出的欄位。這讓尚未解出的區域不會因為
-// 重建結構而被清成 Go 零值（CLAUDE.md §9）。orig 不會被修改。
+// 重建結構而被清成 Go 零值（AGENTS.md §8）。orig 不會被修改。
 func WriteBattleStates(orig []byte, states [ProvinceCount]BattleState) ([]byte, error) {
 	want := ProvinceCount * BattleStateSize
 	if len(orig) != want {

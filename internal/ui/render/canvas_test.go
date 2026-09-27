@@ -42,7 +42,7 @@ func loadPNG(t *testing.T, name string) image.Image {
 
 // TestRenderLoadMenuMatchesOriginal 重現「載入遊戲」畫面，逐像素比對原版截圖。
 //
-// 這是呈現層的驗收標準（CLAUDE.md §5 步驟 3、§7 第 7 條：
+// 這是呈現層的驗收標準（AGENTS.md §6 步驟 3、§7 第 7 條：
 // 畫面 bug 測試看不到，編譯過 ≠ 視覺驗證）。
 //
 // 原版畫面：640×350 全黑，CHOOSE1.TPC 畫在 (90,20)，用 CHOOSE.RGB 調色盤。
@@ -153,7 +153,7 @@ func TestEmbolden(t *testing.T) {
 
 // TestGlyphRoundTripAgainstOriginal 拿字模重繪原版畫面上的中文，逐像素比對。
 //
-// 這是 CLAUDE.md §5 步驟 3 的驗收標準。政略畫面的「湖北省」三字用 3.15
+// 這是 AGENTS.md §6 步驟 3 的驗收標準。政略畫面的「湖北省」三字用 3.15
 // 的字模畫成，位置 (18,16)、(38,16)、(58,16)，字距 20、加粗、前景 (174,0,0)。
 //
 // 加粗這一步是量出來的：不加粗的話最佳匹配還差 49 個像素

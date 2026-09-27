@@ -6,7 +6,7 @@ package game
 // 主迴圈跑到它歸零才換下一個省。實機畫面右下角就顯示剩餘指令數
 // （`docs/playtest/02`，湖北開局是 2）。
 //
-// ⚠️ 這一層放在 `internal/game` 而不是 `cmd/`，理由是 `CLAUDE.md` §11：
+// ⚠️ 這一層放在 `internal/game` 而不是 `cmd/`，理由是 `AGENTS.md` §8：
 // **Ebiten 在 init 期就要求顯示器**，放進 `cmd/dsds` 的話連測都測不了
 // （第一版就是放那裡，`go test` 直接 panic 在 GLFW 初始化）。
 

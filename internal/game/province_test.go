@@ -198,7 +198,7 @@ func TestProvinceCoastal(t *testing.T) {
 }
 
 // TestProvinceRoundTrip 驗證「改寫而非重建」：不改欄位時 Bytes() 必須
-// byte-for-byte 相同（CLAUDE.md §9）。TOWN 與 .DT1 兩種相位都要過。
+// byte-for-byte 相同（AGENTS.md §8）。TOWN 與 .DT1 兩種相位都要過。
 func TestProvinceRoundTrip(t *testing.T) {
 	for _, c := range []struct {
 		file string

@@ -12,7 +12,7 @@
 //	tools/go.sh run ./cmd/dsds -game workplace/orig/game -audio retro
 //	tools/go.sh run ./cmd/dsds -game workplace/orig/game -audio modern -modern-audio assets/music/modern
 //
-// 操作（CLAUDE.md §9：**ESC 只取消／退回上一層，F10 才離開**）：
+// 操作（AGENTS.md §8：**ESC 只取消／退回上一層，F10 才離開**）：
 //
 //	← →      切換省份
 //	Enter    叫出政略指令選單
@@ -64,7 +64,7 @@ import (
 
 // scale 是視窗放大倍率。
 //
-// remake 差異（CLAUDE.md §1「外殼允許現代化」）：只放大視窗，
+// remake 差異（AGENTS.md §2「外殼允許現代化」）：只放大視窗，
 // 邏輯解析度仍是原版的 640×350。
 const scale = 2
 
@@ -359,7 +359,7 @@ func (a *app) Update() error {
 	if a.pointerAction != actions.None {
 		a.playInputEffect(a.pointerAction)
 	}
-	// F10 是唯一的離開鍵，而且要先確認（CLAUDE.md §9）。
+	// F10 是唯一的離開鍵，而且要先確認（AGENTS.md §8）。
 	if inpututil.IsKeyJustPressed(ebiten.KeyF10) && a.screen != screenQuit {
 		a.quitBack, a.screen, a.dirty = a.screen, screenQuit, true
 		return nil
@@ -2284,7 +2284,7 @@ func (a *app) setMessageTimePreference(units int) error {
 
 // autosave 把當前 DT1State 的已解欄位寫回一份**副本**。
 //
-// CLAUDE.md §9：原版資產唯讀，測試存檔一律寫到明確的輸出目錄，
+// AGENTS.md §8：原版資產唯讀，測試存檔一律寫到明確的輸出目錄，
 // 不覆蓋原版的 SAVE(1).DT1。寫回是「改寫」不是「重建」——
 // 未解區域一個 byte 都不動（internal/game/save.go）。
 func (a *app) autosave() error {
@@ -3673,13 +3673,13 @@ func (a *app) Layout(_, _ int) (int, int) {
 func main() {
 	gameDir := flag.String("game", "workplace/orig/game", "原版素材目錄（唯讀）")
 	start := flag.Int("province", 26, "起始省編號（1-39），預設 26 = 湖北省")
-	// CLAUDE.md §9：原版資產唯讀，存檔一律寫到別的地方。
+	// AGENTS.md §8：原版資產唯讀，存檔一律寫到別的地方。
 	savePath := flag.String("save", "workplace/saves/SAVE(1).DT1",
 		"離開時自動存檔的路徑（**不會**覆蓋原版）")
-	// 固定亂數種子是 CLAUDE.md §9 的硬規則：截圖驗收要能重現。
+	// 固定亂數種子是 AGENTS.md §8 的硬規則：截圖驗收要能重現。
 	seed := flag.Uint("seed", 1, "亂數種子（原版 LCG，docs/re/17）")
 	localeDir := flag.String("locale", "translations/zh-Hant",
-		"語系資料目錄。換一個目錄就換一種語言（CLAUDE.md §6）")
+		"語系資料目錄。換一個目錄就換一種語言（AGENTS.md §6）")
 	etenDir := flag.String("eten", "workplace/eten",
 		"使用者提供的倚天 STDFONT.15／SPCFONT.15／ASCFONT.15 目錄（不隨遊戲散布）")
 	wording := flag.String("wording", "", "顯示用語：original 或 plain；空白沿用 prefs.json")
@@ -3974,7 +3974,7 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 		current:         start, dirty: true, provinceLimit: sc.Provinces,
 		stage: int(sc.Stage), wordingMode: wordingMode,
 		prefsPath: prefsPath, preferences: preferences,
-		// 固定種子：`CLAUDE.md` §9 要求截圖驗收可重現。
+		// 固定種子：`AGENTS.md` §8 要求截圖驗收可重現。
 		rng:      game.NewRand(seed),
 		messages: newMessageQueue(preferences.MessageTime),
 	}

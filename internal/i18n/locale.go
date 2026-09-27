@@ -1,6 +1,6 @@
 // Package i18n 是 remake 的語系層：把玩家看得到的文字從程式碼裡抽出來。
 //
-// `CLAUDE.md` §6 的兩條要求：
+// `AGENTS.md` §6 的兩條要求：
 //
 //	所有玩家看得到的文字都在語系資料檔，不進 Go 原始碼
 //	原版的字模索引機制到 remake 就結束，重寫版用真正的字串表
@@ -9,7 +9,7 @@
 // 英文與日文版只要換一個目錄就行，不必重編。
 //
 // ⚠️ 這個 package **不依賴 Ebiten**，才能在無頭環境測試
-// （`CLAUDE.md` §11 對 `internal/ui/textlayout` 的同一條理由）。
+// （`AGENTS.md` §8 對 `internal/ui/textlayout` 的同一條理由）。
 package i18n
 
 import (

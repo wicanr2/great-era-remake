@@ -415,7 +415,7 @@ func combatants(gs []game.General, prov game.ProvinceID, faction game.GeneralID)
 
 // updateBattle 處理戰鬥畫面的輸入。
 //
-// ESC 退回政略畫面（`CLAUDE.md` §9：ESC 只取消／退回，不離開遊戲）。
+// ESC 退回政略畫面（`AGENTS.md` §8：ESC 只取消／退回，不離開遊戲）。
 func (a *app) updateBattle() error {
 	b := a.battle
 	if b == nil {
@@ -777,7 +777,7 @@ func (b *battleState) runDefenderAI() {
 	b.aiAction, b.aiMoves, b.aiFights = int(d.A.Action), moves, fights
 
 	// ⚠️ **畫面上還畫不出這行字。** 原版的字模是每個場景一份子集
-	// （`CLAUDE.md` §3.5），畫不出自由組合的中文；完整字型是 M6 的事。
+	// （`AGENTS.md` §3），畫不出自由組合的中文；完整字型是 M6 的事。
 	// 在那之前先印到 stderr，讓行為至少是可觀測的——
 	// 面板上用數字顯示（`aiAction`／`aiMoves`／`aiFights`）。
 	fmt.Fprintln(os.Stderr, "[battle]", b.aiLog)

@@ -16,7 +16,7 @@ import "github.com/wicanr2/great-era-remake/internal/assets"
 // 畫的時候套 Embolden 變成 3 px，與原版的視覺重量一致。
 //
 // 差異是明確的：原版的 `0` 帶一條右上到左下的對角線裝飾，這裡沒有。
-// 解出原版字型之後要換掉這一套（`CLAUDE.md` §1「每一項改動都要標記為 remake 差異」）。
+// 解出原版字型之後要換掉這一套（`AGENTS.md` §2「每一項改動都要標記為 remake 差異」）。
 
 // DigitW / DigitH 是一個數字字模的尺寸。
 const (

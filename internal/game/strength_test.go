@@ -73,7 +73,7 @@ func TestRealConstantsDecodeToWholeNumbers(t *testing.T) {
 	}
 }
 
-// 20000 值得單獨一條：CLAUDE.md §1.5 記過「grep 不到是正常的」。
+// 20000 值得單獨一條：AGENTS.md §3 記過「grep 不到是正常的」。
 // 它不是整數常數，是 48-bit Real 的尾數，所以 grep 20000 或 4E20 都不會中。
 func TestTwentyThousandIsHiddenInAReal(t *testing.T) {
 	if got := realFromRegs(0x008F, 0, 0x1C40); got != 20000 {

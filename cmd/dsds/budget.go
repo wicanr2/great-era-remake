@@ -7,7 +7,7 @@ import (
 )
 
 // 玩家指令與指令數上限的接點。規則本體在 `internal/game/budget.go`
-// ——那裡不依賴 Ebiten，才測得了（`CLAUDE.md` §11）。
+// ——那裡不依賴 Ebiten，才測得了（`AGENTS.md` §8）。
 //
 // ⚠️ **哪些指令消耗指令數還沒全部確認**。已知的兩條：
 //

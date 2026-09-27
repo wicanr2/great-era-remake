@@ -374,7 +374,7 @@ func assetsProvinceGrids(t *testing.T) (*assets.ProvinceGrids, error) {
 // ⛔ 這個測試是 2026-08-01 訂正時補的。舊實作挑最窮的，整套測試卻全綠——
 // 因為沒有任何一個測試檢查過排序方向，只檢查「目標是不是鄰省」。
 // 方向錯誤在行為統計裡也看不出來（兩個方向都會產生調動），
-// 這正是 `CLAUDE.md` §7.7「測試綠不是完成」的例子。
+// 這正是 `AGENTS.md` §5「測試綠不是完成」的例子。
 func TestRichestTransferPicksRichest(t *testing.T) {
 	w := realWorld(t)
 	prov, err := w.Table.At(1)
