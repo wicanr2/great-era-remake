@@ -36,8 +36,8 @@ func (m *Modern) HighRail(index, width, height int) (*image.RGBA, error) {
 		return nil, fmt.Errorf("theme: 高解析鐵路目的尺寸無效：%dx%d", width, height)
 	}
 	hi := image.NewRGBA(image.Rect(0, 0, width*highResolutionSamples, height*highResolutionSamples))
-	ink := color.RGBA{R: 0x4A, G: 0x3B, B: 0x2C, A: 255} // 渴墨運輸線
-	sleeper := color.RGBA{R: 0x7A, G: 0x4A, B: 0x2E, A: 255}
+	ink := color.RGBA{R: 0x3A, G: 0x35, B: 0x2E, A: 255} // 鐵灰運輸線
+	sleeper := color.RGBA{R: 0x5A, G: 0x44, B: 0x32, A: 255}
 	cx, cy := hi.Bounds().Dx()/2, hi.Bounds().Dy()/2
 	stroke := maxHUD(highResolutionSamples, minHUD(hi.Bounds().Dx(), hi.Bounds().Dy())/18)
 	mask := [...]uint8{0b0101, 0b1010, 0b1010, 0b1001, 0b1001, 0b0011, 0b0011, 0b1100, 0b1100, 0b0110, 0b0110, 0b1011, 0b1011, 0b1110, 0b1110, 0b0111, 0b0111, 0b1101, 0b1101, 0b1111, 0b1111}[index]
@@ -169,13 +169,13 @@ func fillHighTerrain(im *image.RGBA, kind int, base, accent byte) {
 	}
 	// 原版致敬（SPEC-47 M2）： motif 色轉原版三色基準——深棕墨線、
 	// 暗紅點綴、米黃紙面，戰棋金銅退場。
-	// 水墨地形色（SPEC-48 §1）：焦墨、墨綠、花青、雪峰白、藤黃、朱砂。
-	ink := color.RGBA{R: 0x1E, G: 0x1A, B: 0x16, A: 255}
-	green := color.RGBA{R: 0x5E, G: 0x7A, B: 0x5A, A: 255}
-	water := color.RGBA{R: 0x3E, G: 0x6E, B: 0x8E, A: 255}
-	cream := color.RGBA{R: 0xE8, G: 0xE4, B: 0xD8, A: 255}
-	gold := color.RGBA{R: 0xC9, G: 0xA2, B: 0x27, A: 255}
-	red := color.RGBA{R: 0xB7, G: 0x32, B: 0x26, A: 255}
+	// 套印地形色（SPEC-49 §1）：暖墨、灰苔、銀灰藍、雪灰白、赭黃、朱紅。
+	ink := color.RGBA{R: 0x2B, G: 0x26, B: 0x20, A: 255}
+	green := color.RGBA{R: 0x6E, G: 0x6B, B: 0x58, A: 255}
+	water := color.RGBA{R: 0x7A, G: 0x8A, B: 0x99, A: 255}
+	cream := color.RGBA{R: 0xEF, G: 0xE9, B: 0xDB, A: 255}
+	gold := color.RGBA{R: 0xC8, G: 0x9A, B: 0x2E, A: 255}
+	red := color.RGBA{R: 0xB0, G: 0x2A, B: 0x20, A: 255}
 	cx, cy := w/2, h/2
 	stroke := maxHUD(highResolutionSamples, minHUD(w, h)/18)
 	switch {

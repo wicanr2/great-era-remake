@@ -428,7 +428,7 @@ func TestModernUnitHomageSilhouettes(t *testing.T) {
 				t.Fatalf("剪影 %d 角落 (%d,%d)=%d 應透明", i, p[0], p[1], at(p[0], p[1]))
 			}
 		}
-		// 勢力色為體（SPEC-48 §1）：攻方朱砂 3、守方（紅旗）石青 4，且佔比足夠
+		// 勢力色為體（SPEC-49 §1）：攻方朱紅 3、守方（紅旗）藏青 4，且佔比足夠
 		want := byte(3)
 		if i == 1 || i == 3 || i == 5 || i >= 12 {
 			want = 4
