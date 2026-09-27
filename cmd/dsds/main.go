@@ -1884,6 +1884,21 @@ func (a *app) portraitForGeneral(id game.GeneralID) (*i18n.Portrait, string) {
 	return a.portraitForPerson(person)
 }
 
+// biographyFallbackBody 組出無正文槽的有據檔案卡：第一行是既有的
+// 待考宣告，第二行只列登錄資料（派系／時期，均出自 people.json），
+// 句句可溯源，不寫推定句。SPEC-46 R2 的關閉條件就靠這一頁。
+func biographyFallbackBody(p *i18n.Person, unavailable, recordLabel string) string {
+	faction := p.Faction
+	if faction == "" {
+		faction = "—"
+	}
+	periods := "—"
+	if len(p.Periods) > 0 {
+		periods = strings.Join(p.Periods, "／")
+	}
+	return unavailable + "\n" + recordLabel + "：" + faction + "／" + periods
+}
+
 func (a *app) openBiography(back screen) {
 	p, ok := a.currentBiography()
 	if !ok {
@@ -1892,12 +1907,17 @@ func (a *app) openBiography(back screen) {
 	}
 	body := p.Biography
 	if body == "" {
-		var found bool
-		body, found = a.wording.Text("biography.unavailable", a.wordingMode)
+		unavailable, found := a.wording.Text("biography.unavailable", a.wordingMode)
 		if !found {
 			a.report("人物自傳用語資料不完整")
 			return
 		}
+		recordLabel, found := a.wording.Text("biography.record", a.wordingMode)
+		if !found {
+			a.report("人物自傳用語資料不完整")
+			return
+		}
+		body = biographyFallbackBody(p, unavailable, recordLabel)
 	}
 	doc, err := textlayout.Layout(body, textlayout.DefaultBiographyOptions)
 	if err != nil {

@@ -158,6 +158,21 @@ func TestBiographyRosterKeepsUnknownFallbackButExcludesPlaceholder(t *testing.T)
 	}
 }
 
+func TestBiographyFallbackBodyListsSourcedRecordOnly(t *testing.T) {
+	p := &i18n.Person{Faction: "奉系", Periods: []string{"北伐時期"}}
+	got := biographyFallbackBody(p, "查無可靠傳記記載", "登錄資料")
+	want := "查無可靠傳記記載\n登錄資料：奉系／北伐時期"
+	if got != want {
+		t.Fatalf("檔案卡正文=%q，應為 %q", got, want)
+	}
+	empty := &i18n.Person{}
+	got = biographyFallbackBody(empty, "查無可靠傳記記載", "登錄資料")
+	want = "查無可靠傳記記載\n登錄資料：—／—"
+	if got != want {
+		t.Fatalf("空登錄檔案卡=%q，應為 %q", got, want)
+	}
+}
+
 func TestBiographyAllRosterSlotsJoinOrExplicitlyExclude(t *testing.T) {
 	people, err := i18n.LoadPeople(filepath.Join("..", "..", "translations", "zh-Hant"),
 		filepath.Join("..", "..", "translations", "shared"))

@@ -627,6 +627,10 @@
       "original": "No reliable biography",
       "plain": "No confirmed life record is available"
     },
+    "biography.record": {
+      "original": "Catalog record",
+      "plain": "Catalog record"
+    },
     "biography.page": {
       "original": "Biography",
       "plain": "Life record"
