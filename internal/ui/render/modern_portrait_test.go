@@ -46,6 +46,13 @@ func TestDrawModernPortraitCardRendersVerifiedImageAndFallback(t *testing.T) {
 	if got := withImage.Image().RGBAAt(card.X+20, imageY); got.R != 0x31 || got.G != 0x62 || got.B != 0x93 {
 		t.Fatalf("肖像像素沒有進入固定欄位：%+v", got)
 	}
+	// 銅章內線：均色測試圖寬高比 1，照片欄 204×272 置中後為
+	// (814,168,204,204)，內框上邊 y=171、左邊 x=817。
+	for _, p := range [][2]int{{916, 171}, {817, 250}} {
+		if got, want := withImage.Image().RGBAAt(p[0], p[1]), colorOf(style.Focus); got != want {
+			t.Fatalf("肖像銅章內線 (%d,%d)=%v，應為 %v", p[0], p[1], got, want)
+		}
+	}
 
 	fallback := NewCanvas(1280, 720)
 	if err := fallback.drawModernPortraitCard(card, nil, "", nil, style, map[rune]bool{}); err != nil {
@@ -126,7 +133,8 @@ func TestDrawModernPortraitCardPreservesPortraitAspectRatio(t *testing.T) {
 	if got := c.Image().RGBAAt(card.X+card.W/2, card.Y+18); got.R != 0xD0 || got.B != 0 {
 		t.Fatalf("肖像上半部色帶不在固定槽：%+v", got)
 	}
-	if got := c.Image().RGBAAt(card.X+card.W/2, card.Bottom()-58); got.B != 0xD0 || got.R != 0 {
+	// 銅章內線底邊在 card.Bottom()-4，本格改取其上一格，仍驗上下次序。
+	if got := c.Image().RGBAAt(card.X+card.W/2, card.Bottom()-59); got.B != 0xD0 || got.R != 0 {
 		t.Fatalf("肖像下半部色帶不在固定槽：%+v", got)
 	}
 }

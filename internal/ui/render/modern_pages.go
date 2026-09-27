@@ -433,6 +433,10 @@ func (c *Canvas) drawModernPortraitCard(card uilayout.Rect, portrait *i18n.Portr
 	drawSampledImage(c.img, imageRect, portrait.Image,
 		image.Rect(cropX, cropY, cropX+cropW, cropY+cropH))
 	c.strokeRect(imageRect.X, imageRect.Y, imageRect.W, imageRect.H, style.Ink)
+	// 民國戰棋檔案感：墨線外框內再加一圈銅章內線。
+	if imageRect.W >= 24 && imageRect.H >= 24 {
+		c.strokeRect(imageRect.X+3, imageRect.Y+3, imageRect.W-6, imageRect.H-6, style.Focus)
+	}
 	attribution := portrait.Attribution
 	if card.W < 160 {
 		if cut := strings.IndexRune(attribution, '（'); cut > 0 {
