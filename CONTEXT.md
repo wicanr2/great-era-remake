@@ -3210,3 +3210,16 @@ register parity，也不把這支單一 preview cue 擴大宣稱為六首 Modern
    銀鹽地形＋紅攻藍鉛筆可辨；守方藏青小圖偏灰綠，與灰苔地形對比中等，
    待使用者目檢判定是否加深。
 4. **下一步：** 使用者目檢 M1；M2 地形＋圖標＋頁面＋`0.1.5-photo`。
+
+### 5.165 2026-09-27 套印風 M2＋remake 自主完工（SPEC-49）
+
+1. **M1 定案（confirmed-user-decision）：** 使用者拍板 M1，藏青維持不加深，
+   指示先完成整個 remake。
+2. **M2 實作（confirmed-remake）：** 低／高解析地形加確定性銀鹽顆粒
+   （`photoGrain`／`applyPhotoGrain`，中央留白，種類參與雜湊）；
+   中性卡轉雪灰白；頁框沿用墨線外圈＋套印色內線（Style 已同步）。
+3. **收尾驗收：** Xvfb 全套綠；deny 679 檔／no-cgo 通過；戰鬥／政略／自傳
+   目檢一致；`docs/images/photo-*-m2.png` 三張驗收圖；`0.1.5-photo` 三包；
+   ubuntu:22.04 解包 smoke 通過（僅缺 libX11／ALSA，與既往一致）。
+4. **誠實缺口（非自主可解）：** 正式 Ogg、人耳、Android、真機 smoke／簽署、
+   Windows smoke（Wine 容器待補）、英日人審（已刪改 wiki）、29 篇待新史料。

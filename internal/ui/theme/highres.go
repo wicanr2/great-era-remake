@@ -238,9 +238,37 @@ func fillHighTerrain(im *image.RGBA, kind int, base, accent byte) {
 	case kind >= 11 && kind <= 20: // 長城十種可辨變體；不宣稱原版逐段命名
 		drawWallVariant(im, kind-11, stroke, ink)
 	default: // TileKind 22 unknown：中性安全節點，不升格成長城／城市／橋
-		fillHighRect(im, w/5, h/3, w*4/5, h*2/3, color.RGBA{R: 233, G: 212, B: 154, A: 255})
+		fillHighRect(im, w/5, h/3, w*4/5, h*2/3, color.RGBA{R: 0xEF, G: 0xE9, B: 0xDB, A: 255})
 		lineHUD(im, w/5, h/3, w*4/5, h/3, stroke/2, ink)
 		lineHUD(im, w/5, h*2/3, w*4/5, h*2/3, stroke/2, ink)
+	}
+	applyPhotoGrain(im, kind)
+}
+
+// applyPhotoGrain 是高解析地形的銀鹽顆粒（SPEC-49 M2）：確定性雜訊，
+// 約 1/25 像素壓暗、1/25 提亮，中央 5×5 留白保護中性卡檢測。
+func applyPhotoGrain(im *image.RGBA, kind int) {
+	w, h := im.Bounds().Dx(), im.Bounds().Dy()
+	cx, cy := w/2, h/2
+	for y := 0; y < h; y++ {
+		for x := 0; x < w; x++ {
+			if x >= cx-2 && x <= cx+2 && y >= cy-2 && y <= cy+2 {
+				continue
+			}
+			switch (x*31 + y*17 + kind*7) % 25 {
+			case 0:
+				c := im.RGBAAt(x, y)
+				im.SetRGBA(x, y, color.RGBA{R: c.R * 9 / 10, G: c.G * 9 / 10, B: c.B * 9 / 10, A: c.A})
+			case 1:
+				c := im.RGBAAt(x, y)
+				im.SetRGBA(x, y, color.RGBA{
+					R: uint8(minHUD(int(c.R)+18, 255)),
+					G: uint8(minHUD(int(c.G)+18, 255)),
+					B: uint8(minHUD(int(c.B)+18, 255)),
+					A: c.A,
+				})
+			}
+		}
 	}
 }
 

@@ -171,6 +171,14 @@ func modernTerrain(kind int) *assets.Image {
 				if modernPattern(kind, x, y) {
 					v = accent
 				}
+				// 銀鹽顆粒（SPEC-49 M2）：確定性雜訊，中央留白，種類參與雜湊。
+				if photoGrain(kind, x, y) {
+					if v == base {
+						v = 17 // 細線灰顆粒
+					} else {
+						v = base
+					}
+				}
 			}
 			pix[y*modernTileW+x] = v
 		}
@@ -264,6 +272,16 @@ func modernUnit(index int) *assets.Image {
 		iconLine(pix, 16, 9, ex, ey+1, team)
 	}
 	return &assets.Image{W: modernUnitW, H: modernUnitH, Pix: pix}
+}
+
+// photoGrain 是地形銀鹽顆粒的確定性雜訊（SPEC-49 M2）：約 1/23 的內部
+// 像素染成細線灰（底色區）或打回底色（紋理區），模擬照片顆粒；
+// 中央 4×4 留白，種類參與雜湊使各地形顆粒分佈不同。
+func photoGrain(kind, x, y int) bool {
+	if x >= modernTileW/2-2 && x < modernTileW/2+2 && y >= modernTileH/2-2 && y < modernTileH/2+2 {
+		return false
+	}
+	return (x*31+y*17+kind*7)%23 == 0
 }
 
 func iconRect(pix []byte, x0, y0, x1, y1 int, value byte) {
