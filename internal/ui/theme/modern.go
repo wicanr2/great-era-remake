@@ -70,19 +70,19 @@ func NewModern() *Modern {
 
 func (m *Modern) Name() string { return string(ModeModern) }
 
-// Style 回傳與 modern 圖像同一批次建立的語意外殼。民國戰棋採印刷暖紙、
-// 濃墨文字、朱紅主指令、銅章焦點與黛青次要色。十個勢力色只作
-// 資訊色帶／焦點標記，不改變原版勢力編號、外交規則或存檔內容。
+// Style 回傳與 modern 圖像同一批次建立的語意外殼。原版致敬（SPEC-47）
+// 直接採用 RetroStyle 的米黃紙／暗紅墨／寶藍焦點為基準；戰棋土黃與銅章退場。
+// 十個勢力色只作資訊色帶／焦點標記，不改變原版勢力編號、外交規則或存檔內容。
 func (m *Modern) Style() UIStyle {
 	return UIStyle{
 		Name:      ModeModern,
-		Ink:       assets.RGB{R: 48, G: 30, B: 16},
-		Paper:     assets.RGB{R: 239, G: 211, B: 137},
-		Panel:     assets.RGB{R: 250, G: 231, B: 170},
-		Muted:     assets.RGB{R: 133, G: 91, B: 51},
-		Accent:    assets.RGB{R: 168, G: 48, B: 32},
-		AccentAlt: assets.RGB{R: 47, G: 91, B: 86},
-		Focus:     assets.RGB{R: 176, G: 110, B: 52},
+		Ink:       assets.RGB{R: 0xAE, G: 0x00, B: 0x00},
+		Paper:     assets.RGB{R: 0xFF, G: 0xFF, B: 0xA2},
+		Panel:     assets.RGB{R: 0xFF, G: 0xF2, B: 0xB0},
+		Muted:     assets.RGB{R: 0x80, G: 0x5A, B: 0x52},
+		Accent:    assets.RGB{R: 0x00, G: 0x00, B: 0xAA},
+		AccentAlt: assets.RGB{R: 0xAA, G: 0x00, B: 0x00},
+		Focus:     assets.RGB{R: 0x00, G: 0x00, B: 0xAA},
 		FactionTint: [10]assets.RGB{
 			{R: 224, G: 89, B: 47}, {R: 42, G: 191, B: 211},
 			{R: 68, G: 160, B: 137}, {R: 237, G: 195, B: 88},
@@ -153,8 +153,8 @@ func modernPalette() assets.Palette {
 		{R: 132, G: 77, B: 52},   // 13：關口
 		{R: 239, G: 231, B: 199}, // 14：雪峰
 		{R: 47, G: 91, B: 86},    // 15：鐵路／資料線
-		{R: 176, G: 110, B: 52},  // 16：銅框（民國戰棋算子外框）
-		{R: 110, G: 66, B: 32},   // 17：深青銅（算子內線）
+		{R: 0xAE, G: 0x00, B: 0x00}, // 16：暗紅框（原版致敬外框，M1 暫代算子框）
+		{R: 0x00, G: 0x00, B: 0xAA}, // 17：寶藍線（原版致敬內線，M1 暫代算子內線）
 	}
 }
 
@@ -271,8 +271,8 @@ func iconCircle(pix []byte, cx, cy, radius int, value byte) {
 	}
 }
 
-// counterFrame 畫民國戰棋算子的圓角銅框：外框銅色、四角透明、內側一圈
-// 深青銅線。框線佔 x=1..30、y=1..15，內部 x=3..28、y=3..13 留給勢力底與兵符。
+// counterFrame 畫部隊圖的外框：四角透明。M1 暫用暗紅外框＋寶藍內線；
+// M2 換剪影語彙時連框重繪。框線佔 x=1..30、y=1..15，內部留給底色與兵符。
 func counterFrame(pix []byte, copper, bronze byte) {
 	iconLine(pix, 3, 1, 28, 1, copper)
 	iconLine(pix, 3, 15, 28, 15, copper)

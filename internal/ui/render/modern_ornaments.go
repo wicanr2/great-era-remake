@@ -15,13 +15,13 @@ func drawModernDecoratedControl(c *Canvas, r uilayout.Rect, style uitheme.UIStyl
 	if r.W > 8 && r.H > 8 {
 		c.strokeRect(r.X+4, r.Y+4, r.W-8, r.H-8, border)
 	}
-	// 民國戰棋：四角改繪回紋角（銅章色），取代舊式實心方塊。
+	// 原版致敬：四角改繪花框角（暗紅外圈＋寶藍內圈）。
 	if r.W >= 30 && r.H >= 30 {
 		s := 9
-		drawWargameFretCorner(c, r.X+1, r.Y+1, false, false, s, style.Focus)
-		drawWargameFretCorner(c, r.Right()-2, r.Y+1, true, false, s, style.Focus)
-		drawWargameFretCorner(c, r.X+1, r.Bottom()-2, false, true, s, style.Focus)
-		drawWargameFretCorner(c, r.Right()-2, r.Bottom()-2, true, true, s, style.Focus)
+		drawHomageCorner(c, r.X+1, r.Y+1, false, false, s, style.Ink, style.Focus)
+		drawHomageCorner(c, r.Right()-2, r.Y+1, true, false, s, style.Ink, style.Focus)
+		drawHomageCorner(c, r.X+1, r.Bottom()-2, false, true, s, style.Ink, style.Focus)
+		drawHomageCorner(c, r.Right()-2, r.Bottom()-2, true, true, s, style.Ink, style.Focus)
 	}
 	o := style.Ornaments
 	if !o.Valid() {
@@ -47,23 +47,24 @@ func drawModernDecoratedPanel(c *Canvas, r uilayout.Rect, style uitheme.UIStyle,
 	c.strokeRect(r.X, r.Y, r.W, r.H, style.Muted)
 	if r.W >= 40 && r.H >= 40 {
 		s := 11
-		drawWargameFretCorner(c, r.X+2, r.Y+2, false, false, s, style.Focus)
-		drawWargameFretCorner(c, r.Right()-3, r.Y+2, true, false, s, style.Focus)
-		drawWargameFretCorner(c, r.X+2, r.Bottom()-3, false, true, s, style.Focus)
-		drawWargameFretCorner(c, r.Right()-3, r.Bottom()-3, true, true, s, style.Focus)
+		drawHomageCorner(c, r.X+2, r.Y+2, false, false, s, style.Ink, style.Focus)
+		drawHomageCorner(c, r.Right()-3, r.Y+2, true, false, s, style.Ink, style.Focus)
+		drawHomageCorner(c, r.X+2, r.Bottom()-3, false, true, s, style.Ink, style.Focus)
+		drawHomageCorner(c, r.Right()-3, r.Bottom()-3, true, true, s, style.Ink, style.Focus)
 	}
 	if style.Ornaments.Valid() {
 		drawModernOrnamentMask(c, style.Ornaments.PanelFrame, r, style.Accent)
 	}
 }
 
-// drawWargameFretCorner 在給定的外角像素處畫一個回紋角。(ax,ay) 是外角，
+// drawHomageCorner 在給定的外角像素處畫一個原版致敬花框角。(ax,ay) 是外角，
 // flipX／flipY 把局部座標鏡射到其餘三個角。s 為邊長（建議 9）。
-func drawWargameFretCorner(c *Canvas, ax, ay int, flipX, flipY bool, s int, col assets.RGB) {
+// 外圈暗紅雙線、內圈寶藍線、角端實心方塊，均為程式化重繪，不讀原版位元組。
+func drawHomageCorner(c *Canvas, ax, ay int, flipX, flipY bool, s int, outer, inner assets.RGB) {
 	if c == nil || s < 7 {
 		return
 	}
-	put := func(i, j int) {
+	put := func(i, j int, col assets.RGB) {
 		x, y := ax, ay
 		if flipX {
 			x -= i
@@ -78,18 +79,22 @@ func drawWargameFretCorner(c *Canvas, ax, ay int, flipX, flipY bool, s int, col 
 		c.setPixel(x, y, col)
 	}
 	for i := 0; i < s; i++ {
-		put(i, 0)
-		put(0, i)
+		put(i, 0, outer)
+		put(0, i, outer)
 	}
-	for i := 3; i < s; i++ {
-		put(i, 3)
-		put(3, i)
+	for i := 2; i < s; i++ {
+		put(i, 2, outer)
+		put(2, i, outer)
 	}
-	for i := 3; i <= 5; i++ {
-		put(i, 6)
-		put(6, i)
+	for i := 4; i < s; i++ {
+		put(i, 4, inner)
+		put(4, i, inner)
 	}
-	put(4, 4)
+	for di := 0; di < 3; di++ {
+		for dj := 0; dj < 3; dj++ {
+			put(di, dj, outer)
+		}
+	}
 }
 
 func drawModernOrnamentMask(c *Canvas, src *assets.Image, dst uilayout.Rect, ink assets.RGB) {

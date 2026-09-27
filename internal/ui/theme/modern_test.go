@@ -376,9 +376,9 @@ func TestModernUnitCounterFrameUsesCopperAndTeamCore(t *testing.T) {
 				t.Fatalf("算子 %d 角落 (%d,%d)=%d 應透明", i, p[0], p[1], at(p[0], p[1]))
 			}
 		}
-		// 銅框上下邊
+		// 暗紅框上下邊（原版致敬；框內符號 M2 才換剪影）
 		if at(16, 1) != 16 || at(16, 15) != 16 {
-			t.Fatalf("算子 %d 上下框應為銅色 16", i)
+			t.Fatalf("算子 %d 上下框應為暗紅 16", i)
 		}
 		// 勢力底：0..5 奇數紅、砲兵 12..17 紅，其餘綠
 		want := byte(5)
@@ -413,14 +413,14 @@ func TestModernCommandIconsShareCounterFrame(t *testing.T) {
 		}
 		pix := icon.Image.Pix
 		at := func(x, y int) byte { return pix[y*16+x] }
-		// 四角透明，上下邊中點為銅框。
+		// 四角透明，上下邊中點為暗紅框。
 		for _, p := range [][2]int{{0, 0}, {15, 0}, {0, 15}, {15, 15}} {
 			if at(p[0], p[1]) != 0 {
 				t.Fatalf("指令 %d 角落 (%d,%d)=%d 應透明", i, p[0], p[1], at(p[0], p[1]))
 			}
 		}
 		if at(8, 0) != 16 || at(8, 15) != 16 {
-			t.Fatalf("指令 %d 上下框應為銅色 16", i)
+			t.Fatalf("指令 %d 上下框應為暗紅 16", i)
 		}
 	}
 }
