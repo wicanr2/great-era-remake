@@ -3177,3 +3177,12 @@ register parity，也不把這支單一 preview cue 擴大宣稱為六首 Modern
 3. **重包：** `tools/package.sh 0.1.3-homage` 完成
    windows-amd64／darwin-arm64／linux-appimage（不含原版資料）。
 4. **下一步：** 使用者目檢 M2；外部 gate（人眼 A/B、人審已刪、Ogg、Android、真機）仍待。
+
+### 5.162 2026-09-27 homage AppImage 解包 smoke（0.1.3-homage）
+
+1. **結果（partial-pass）：** ubuntu:22.04 容器內 `--appimage-extract` 成功，
+   AppRun／manifest／desktop／svg／usr 齊全；`ldd` 僅缺 `libX11.so.6`／
+   `libasound.so.2`（最小容器本來就沒有的桌面／音效庫，與 S1 結論一致，
+   非包裝缺陷）。Windows／macOS 執行仍需實機或 Wine 容器。
+2. 附帶發現：主機另有他專案的 `coab-wine-smoke` 映像，未動用（非本專案資源，
+   是否借用由使用者決定）。
