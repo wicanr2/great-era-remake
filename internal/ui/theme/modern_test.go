@@ -403,3 +403,24 @@ func TestModernUnitCounterFrameUsesCopperAndTeamCore(t *testing.T) {
 		seen[key] = i
 	}
 }
+
+func TestModernCommandIconsShareCounterFrame(t *testing.T) {
+	m := NewModern()
+	for i := 0; i < 15; i++ {
+		icon, err := m.CommandIcon(i)
+		if err != nil {
+			t.Fatal(err)
+		}
+		pix := icon.Image.Pix
+		at := func(x, y int) byte { return pix[y*16+x] }
+		// 四角透明，上下邊中點為銅框。
+		for _, p := range [][2]int{{0, 0}, {15, 0}, {0, 15}, {15, 15}} {
+			if at(p[0], p[1]) != 0 {
+				t.Fatalf("指令 %d 角落 (%d,%d)=%d 應透明", i, p[0], p[1], at(p[0], p[1]))
+			}
+		}
+		if at(8, 0) != 16 || at(8, 15) != 16 {
+			t.Fatalf("指令 %d 上下框應為銅色 16", i)
+		}
+	}
+}

@@ -367,13 +367,30 @@ func modernResourceIcon(index int) *assets.Image {
 }
 
 // modernCommandIcon 用十五個穩定但不含文字的幾何符號提示指令類別。
+// 民國戰棋收斂：十五張共用圓角銅框算子底（框線後畫，輪廓統一），
+// 內部符號沿用既有十五組幾何，不重繪。
 func modernCommandIcon(index int) *assets.Image {
 	pix := make([]byte, HUDIconW*HUDIconH)
 	ink, accent, light := byte(2), commandAccentIndex(index), byte(1)
 	hudCircle(pix, 8, 8, 6, accent)
 	hudCircle(pix, 8, 8, 4, ink)
 	drawCommandMarkLow(pix, index, light, accent)
+	hudCommandCounterFrame(pix)
 	return &assets.Image{W: HUDIconW, H: HUDIconH, Pix: pix}
+}
+
+// hudCommandCounterFrame 在 16×16 指令圖上以後畫方式罩上圓角銅框。
+// 四角留透明，框線統一 15 張的剪影；被罩掉的符號邊緣像素至多 1 px。
+func hudCommandCounterFrame(pix []byte) {
+	copper, bronze := byte(16), byte(17)
+	hudLine(pix, 1, 0, 14, 0, copper)
+	hudLine(pix, 1, 15, 14, 15, copper)
+	hudLine(pix, 0, 1, 0, 14, copper)
+	hudLine(pix, 15, 1, 15, 14, copper)
+	hudLine(pix, 2, 1, 13, 1, bronze)
+	hudLine(pix, 2, 14, 13, 14, bronze)
+	hudLine(pix, 1, 2, 1, 13, bronze)
+	hudLine(pix, 14, 2, 14, 13, bronze)
 }
 
 func commandAccentIndex(index int) byte {

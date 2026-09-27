@@ -34,11 +34,20 @@ func renderSmoothHUDIcon(index, width, height int, command bool, palette assets.
 	hi := image.NewRGBA(image.Rect(0, 0, w, h))
 	toRGBA := func(p assets.RGB) color.RGBA { return color.RGBA{R: p.R, G: p.G, B: p.B, A: 0xff} }
 	ink, accent, light := toRGBA(palette[2]), toRGBA(palette[commandAccentIndex(index)]), toRGBA(palette[1])
+	copper, bronze := toRGBA(palette[16]), toRGBA(palette[17])
 	cx, cy := w/2, h/2
 	r := minHUD(w, h) * 34 / 100
-	fillHUDCircle(hi, cx, cy, r, accent)
-	fillHUDCircle(hi, cx, cy, r*76/100, ink)
 	stroke := maxHUD(hudSupersample, minHUD(w, h)/18)
+	if command {
+		// 民國戰棋算子底：墨底圓角方框＋銅框＋青銅內線，與 16px 版同語系。
+		k := r / 3
+		fillHUDCounter(hi, cx-r, cy-r, cx+r, cy+r, k, ink)
+		strokeHUDCounter(hi, cx-r, cy-r, cx+r, cy+r, k, stroke, copper)
+		strokeHUDCounter(hi, cx-r+stroke*2, cy-r+stroke*2, cx+r-stroke*2, cy+r-stroke*2, k, stroke, bronze)
+	} else {
+		fillHUDCircle(hi, cx, cy, r, accent)
+		fillHUDCircle(hi, cx, cy, r*76/100, ink)
+	}
 	if command {
 		drawCommandMark(hi, index, cx, cy, r*68/100, stroke, light, accent)
 	} else {
@@ -209,6 +218,28 @@ func strokeHUDCircle(im *image.RGBA, cx, cy, r, stroke int, c color.RGBA) {
 			}
 		}
 	}
+}
+
+// fillHUDCounter 以切角矩形填滿算子底。k 為切角量，四角三角形外不填。
+func fillHUDCounter(im *image.RGBA, x0, y0, x1, y1, k int, c color.RGBA) {
+	for y := y0; y <= y1; y++ {
+		for x := x0; x <= x1; x++ {
+			dx := minHUD(x-x0, x1-x)
+			dy := minHUD(y-y0, y1-y)
+			if dx+dy >= k && image.Pt(x, y).In(im.Bounds()) {
+				im.SetRGBA(x, y, c)
+			}
+		}
+	}
+}
+
+// strokeHUDCounter 沿切角矩形邊描出算子框線。
+func strokeHUDCounter(im *image.RGBA, x0, y0, x1, y1, k, stroke int, c color.RGBA) {
+	pts := [][2]int{
+		{x0 + k, y0}, {x1 - k, y0}, {x1, y0 + k}, {x1, y1 - k},
+		{x1 - k, y1}, {x0 + k, y1}, {x0, y1 - k}, {x0, y0 + k},
+	}
+	polygonHUD(im, pts, stroke, c)
 }
 
 func lineHUD(im *image.RGBA, x0, y0, x1, y1, stroke int, c color.RGBA) {
