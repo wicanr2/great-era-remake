@@ -3071,3 +3071,16 @@ register parity，也不把這支單一 preview cue 擴大宣稱為六首 Modern
 5. **回歸：** Docker `go test -count=1` 全套綠（`cmd/dsds` 走 Xvfb :99）；deny scan 670 檔
    零命中；no-cgo、diff check 通過；附帶發現 `cmd/dsds/` 下有兩個前輪遺留的 root 擁有空目錄
    （`main_test.go`、`messages.go` 同名目錄），為空且不影響建置，暫留待使用者處置。
+
+### 5.154 2026-09-27 D 管線重建與異發行版 smoke
+
+1. **三平台重建（confirmed-remake）：** `tools/package.sh 0.1.1-post-e` 在 E 收束後 HEAD
+   重建 Windows／macOS／Linux 三包，產物在 `dist-all/` 根目錄，雜湊見
+   `docs/release/README.md` §2026-09-27。管線可重現，內容同代 A2 M2 肖像版 UI。
+2. **異發行版 smoke（approximate，部分通過）：** `ubuntu:22.04` 純淨容器解包新 AppImage
+   並執行：glibc／loader 可攜，`ldd` 僅缺 `libX11.so.6` 與 `libasound.so.2`（桌面版內建，
+   精簡版需自備）。已文件化於 release README；真機 smoke 仍是獨立 gate。
+3. **新方向（confirmed-user-decision）：** 使用者否決 Codex 新版 UI，改走整套重做的
+   「民國戰棋」主題（1920s 民國風為底、戰棋桌遊感邊框／圖像／部隊、高解析），人物傳記
+   以全槽覆蓋為目標。研究工作流已回報：theme 合約與資源擁有者齊備，字型排版兩處本體
+   待讀；傳記 387/417（29 可接合槽＋#274 佔位缺正文），缺口需新史料而非管線工作。

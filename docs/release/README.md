@@ -22,7 +22,7 @@ tools/package.sh 0.1.0-release dist-all linux-amd64
 |---|---|---|---|
 | Windows x86_64 | `great-era-remake-windows-amd64-<版本>.zip` | `GreatEraRemake/dsds.exe` | Docker 交叉建置；Windows 實機 smoke 待補 |
 | macOS Apple Silicon | `great-era-remake-macos-arm64-<版本>.zip` | `GreatEraRemake.app` | Mach-O arm64 檢查；macOS 實機、簽署與公證待補 |
-| Linux x86_64 | `great-era-remake-linux-x86_64-<版本>.AppImage` | AppImage `AppRun` | AppImage 解包、payload 拒絕掃描；不同發行版實機 smoke 待補 |
+| Linux x86_64 | `great-era-remake-linux-x86_64-<版本>.AppImage` | AppImage `AppRun` | AppImage 解包、payload 拒絕掃描；精簡發行版需自備 `libX11` 與 ALSA（`libasound2`），見下；不同發行版實機 smoke 待補 |
 
 每個包都附 `RELEASE-MANIFEST.txt`，記錄版本、目標、來源樹是否 dirty、commit、
 封裝內每檔 SHA-256，以及下列不可省略的素材邊界：
@@ -95,3 +95,23 @@ arm64 app ZIP、Linux x86_64 AppImage 與 `SHA256SUMS-0.1.0-a2-m2-portrait-20260
 ZIP 入口／CRC、Mach-O arm64、AppImage 解包與禁止素材掃描均由 `tools/package.sh` 的
 失敗即關閉流程驗證。這仍是交叉建置候選，不等於 Windows／macOS／Linux 真機 smoke、
 macOS 簽署／公證或公開正式發行。
+
+## 2026-09-27 `0.1.1-post-e` 管線重建（E 收束後 HEAD）
+
+交付在 `dist-all/` 根目錄（非版次子目錄），檔名含版本 `0.1.1-post-e`，
+另附 `SHA256SUMS-0.1.1-post-e.txt`。內容與 A2 M2 肖像版同代 UI（民國測繪＋受控肖像），
+用於證明發行管線在 E 收束後仍可重現三平台包。
+
+| 平台 | SHA-256 |
+|---|---|
+| Windows x86_64 ZIP | `7b5ab8affe8a98a129297a6df7ce6a955ea04771a1576d1ddfee0a369f49fba8` |
+| macOS arm64 app ZIP | `c2c6cd5effcb0cb4e694a3feb171928740f977302c135dcc51d493beb667ac5e` |
+| Linux x86_64 AppImage | `4c9363a1adbd49574142b0af5557bc3de1fb2d75678968e7ba2cd88157b8af22` |
+
+### Linux 精簡發行版系統函式庫（實測）
+
+2026-09-27 以 `ubuntu:22.04` 純淨容器對新 AppImage 做異發行版 smoke：
+解包、`--appimage-extract`、執行位與 manifest 檢查通過；`ldd` 僅缺兩件——
+`libX11.so.6` 與 `libasound.so.2`。glibc／loader 層可攜，缺的是桌面環境本來就有的
+X11 與 ALSA。結論：桌面版 Ubuntu／Debian 直接可跑；精簡／伺服器版需先裝
+`libx11-6` 與 `libasound2`。此為文件化已知事項，真機 smoke 仍保留為獨立 gate。
