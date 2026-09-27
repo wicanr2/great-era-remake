@@ -77,8 +77,8 @@ func TestEnglishAndJapanesePacksCoverRuntimeSurface(t *testing.T) {
 				t.Fatalf("%s source-fallback 正文數 = %d，預期 %d", language, biographies, translatedOverlayPeople)
 			}
 			p, ok := people.PersonAt(1, 1)
-			if !ok || p.Biography == "" || p.BiographyLanguage != language || p.BiographyStatus != "machine-draft" {
-				t.Fatalf("人物自傳 machine-draft 標記未明示：%+v", p)
+			if !ok || p.Biography == "" || p.BiographyLanguage != language || p.BiographyStatus != "wiki-sourced" {
+				t.Fatalf("人物自傳 wiki-sourced 標記未明示：%+v", p)
 			}
 			if _, ok := people.PersonAt(1, 274); ok {
 				t.Fatal("無省長排除槽不應因語系包複製而重新出現")

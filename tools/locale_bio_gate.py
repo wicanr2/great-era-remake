@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""驗證英／日人物自傳 overlay 的來源、數量、雜湊與審稿狀態。
+"""驗證英／日人物自傳 overlay 的來源、數量、雜湊與發行狀態。
 
 這個 gate 不翻譯正文，也不寫回 people.json。它只讓正式流程可重現：
-研究母稿 → locale overlay → 預覽／審稿 → 發行。machine-draft 可以通過預覽
-模式；加上 --release 時必須是 human-reviewed，避免把模型初稿冒充正式譯稿。
+研究母稿 → locale overlay → 發行。使用者決策（2026-09-27）刪除逐篇人審，
+英／日譯稿以 wiki 研究母稿為主：translation_status 為 wiki-sourced（含
+generated_from 雜湊溯源）即可通過 --release；human-reviewed 保留為相容狀態。
 """
 
 from __future__ import annotations
@@ -17,7 +18,7 @@ from pathlib import Path
 
 EXPECTED_TRANSLATED = 387
 ALLOWED_LANGUAGES = {"en", "ja"}
-ALLOWED_STATUSES = {"machine-draft", "human-reviewed"}
+ALLOWED_STATUSES = {"machine-draft", "human-reviewed", "wiki-sourced"}
 
 
 def read_json(path: Path):
@@ -160,13 +161,15 @@ def validate(root: Path, locale: str, overlay_path: Path, release: bool) -> None
         review_status = review.get("status")
         if status == "machine-draft" and review_status not in {"unreviewed", "in-review"}:
             raise SystemExit(f"id={person_id} machine-draft review status 無效")
+        if status == "wiki-sourced" and review_status != "unreviewed":
+            raise SystemExit(f"id={person_id} wiki-sourced 不得冒充已審稿")
         if status == "human-reviewed":
             if review_status != "human-reviewed":
                 raise SystemExit(f"id={person_id} 尚未標成 human-reviewed")
             if not review.get("reviewer") or not review.get("reviewed_at"):
                 raise SystemExit(f"id={person_id} 缺少 reviewer／reviewed_at")
-        if release and status != "human-reviewed":
-            raise SystemExit("正式發行 gate 只接受 human-reviewed")
+        if release and status not in {"human-reviewed", "wiki-sourced"}:
+            raise SystemExit("正式發行 gate 只接受 human-reviewed 或 wiki-sourced")
     print(f"locale bio gate 通過：{locale} {status} {len(people)} 篇")
 
 

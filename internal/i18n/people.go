@@ -68,8 +68,9 @@ type authoredProvenance struct {
 //
 // 它與 zh-Hant 的研究 overlay 分開：研究正文仍是來源，翻譯稿只覆蓋
 // Biography 與語系狀態；姓名、年代、派系與來源欄位一律沿用 locale base。
-// machine-draft 可以供預覽載入，但是否能發行由 tools/locale_bio_gate.py
-// 的 --release gate 決定。
+// translation_status 接受 machine-draft／human-reviewed／wiki-sourced；
+// wiki-sourced 以 wiki 研究母稿為主、可直接發行（使用者決策 2026-09-27
+// 刪除逐篇人審）。發行資格由 tools/locale_bio_gate.py 的 --release gate 決定。
 type translatedPeopleFile struct {
 	SchemaVersion     string                   `json:"schema_version"`
 	Language          string                   `json:"language"`
@@ -320,7 +321,8 @@ func applyTranslatedBiographyOverlay(path, language string, db *PeopleDB) error 
 	}
 	if overlay.SchemaVersion != "1" || overlay.Language != language ||
 		overlay.OverlayScope != "translated-biographies" ||
-		(overlay.TranslationStatus != "machine-draft" && overlay.TranslationStatus != "human-reviewed") {
+		(overlay.TranslationStatus != "machine-draft" && overlay.TranslationStatus != "human-reviewed" &&
+			overlay.TranslationStatus != "wiki-sourced") {
 		return fmt.Errorf("i18n: 人物翻譯 overlay 的 schema／語系／狀態無效")
 	}
 	if len(overlay.GeneratedFrom) == 0 {
@@ -365,6 +367,10 @@ func applyTranslatedBiographyOverlay(path, language string, db *PeopleDB) error 
 		if overlay.TranslationStatus == "machine-draft" {
 			if row.Review.Status != "unreviewed" && row.Review.Status != "in-review" {
 				return fmt.Errorf("i18n: 人物翻譯 overlay #%d machine-draft review 無效", row.ID)
+			}
+		} else if overlay.TranslationStatus == "wiki-sourced" {
+			if row.Review.Status != "unreviewed" {
+				return fmt.Errorf("i18n: 人物翻譯 overlay #%d wiki-sourced 不得冒充已審稿", row.ID)
 			}
 		} else if row.Review.Status != "human-reviewed" ||
 			strings.TrimSpace(row.Review.Reviewer) == "" || strings.TrimSpace(row.Review.ReviewedAt) == "" {

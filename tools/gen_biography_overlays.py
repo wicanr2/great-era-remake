@@ -15,7 +15,9 @@ import re
 from pathlib import Path
 
 
-TRANSLATION_STATUS = "machine-draft"
+# 使用者決策（2026-09-27）：刪除逐篇人審 gate，英／日譯稿以 wiki 研究母稿
+# 為主，狀態即為 wiki-sourced，可直接進正式發行鏈。
+TRANSLATION_STATUS = "wiki-sourced"
 
 # 由長到短套用；這些詞只描述常見制度／軍事用語，不覆蓋人物姓名。
 EN_PHRASES = {
@@ -388,14 +390,14 @@ def draft_biography(person: dict, language: str) -> str:
     translated = lexical_translation(source, language)
     if language == "en":
         return (
-            f"Machine translation draft. {fact_summary(person, language)} "
+            f"Wiki-based biography draft. {fact_summary(person, language)} "
             f"Source narrative (lexical draft): {translated} "
-            "[Proper names and unmatched historical terms remain in the source script; human review required.]"
+            "[Proper names and unmatched historical terms remain in the source script; unreviewed wiki-derived draft.]"
         )
     return (
-        f"機械翻訳草稿。{fact_summary(person, language)} "
+        f"ウィキ出典草稿。{fact_summary(person, language)} "
         f"原文語彙置換稿：{translated} "
-        "［固有名詞と未対応の歴史用語は原文表記を残す。人手確認が必要。］"
+        "［固有名詞と未対応の歴史用語は原文表記を残す。未確認草稿。］"
     )
 
 

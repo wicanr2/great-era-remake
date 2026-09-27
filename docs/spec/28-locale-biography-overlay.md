@@ -1,30 +1,30 @@
 # SPEC-28：英／日人物自傳 overlay 與發行流程
 
-狀態：**READY**（machine-draft 預覽；正式發行仍需 human-reviewed）  
-日期：2026-08-10
+狀態：**READY**（2026-09-27 修訂：`wiki-sourced` 即正式譯文，逐篇人審已刪除）  
+日期：2026-08-10，修訂 2026-09-27
 
 本規格把「研究正文」與「翻譯正文」分開。它不解除 DESIGN-22／SPEC-11 對繁中
-權威資料的保護；本輪接受 deterministic machine-draft 先行接入預覽，但不把它
-改標成正式 `translated`。
+權威資料的保護；英／日譯稿以 wiki 研究母稿為主（`wiki-sourced`），可直接進
+正式發行鏈，不再經過逐篇人審。
 
 ## 1. 目前狀態與決策閘
 
 - 繁中研究批次：417 個人物骨架、387 篇成文、30 筆 unknown；來源檔與正文雜湊
   已由 bio_gate 與 gen_authored_bios 驗證。
 - 英／日語系：417 筆人物資料可載入，並各有 387 筆可追溯的
-  `people-biography-overlay.json`；目前狀態為 `machine-draft`／`bio_language=en|ja`。
+  `people-biography-overlay.json`；目前狀態為 `wiki-sourced`／`bio_language=en|ja`。
 - 產生器使用固定片語詞表、日期規則與人物事實欄位，不呼叫外部翻譯服務；未命中的
-  專名保留原文並在正文末尾明示，供逐篇人審修訂。
-- `machine-draft` 只代表預覽鏈已接通，不代表 387 篇 human-reviewed；Modern `GEMF`
-  atlas 已覆蓋英／日正文，但日文禁則、長文版面與正式逐篇審稿仍未完成。
+  專名保留原文並在正文末尾明示（未審閱 wiki 衍生草稿，不冒充已審稿）。
+- `wiki-sourced` 代表發行鏈已接通且可發行；Modern `GEMF`
+  atlas 已覆蓋英／日正文，日文禁則、長文版面仍列版面工作（非審稿 gate）。
 
 ## 2. 來源與產物拓樸
 
     docs/reference/people/facts-*.json + bios-*.md
             │ 研究稿／來源雜湊（只讀）
             ▼
-    locale biography draft（en 或 ja，逐篇可追溯）
-            │ review_status：machine-draft → human-reviewed
+    locale biography overlay（en 或 ja，逐篇可追溯，wiki-sourced）
+            │ translation_status：wiki-sourced（逐篇人審已刪除）
             ▼
     translations/en/people-biography-overlay.json
     translations/ja/people-biography-overlay.json
@@ -79,25 +79,26 @@ overlay 只覆蓋同一 ID 的 biography 欄位與語系狀態，不覆蓋姓名
    387／30／#274 數量檢查。
 2. **翻譯稿 gate：** 每篇保留 source_bio_sha256；缺稿、重複 ID、姓名漂移、
    空正文或格式參數錯誤即整份失敗。
-3. **審稿 gate：** machine-draft 只能進預覽，不可進正式發行；正式包需要
-   human-reviewed，並留下 reviewer／reviewed_at／勘誤紀錄。
+3. **發行資格 gate（2026-09-27 修訂）：** `wiki-sourced`（含 generated_from 雜湊溯源、
+   review 維持 `unreviewed`、不冒充已審稿）可直接進正式發行；逐篇人審已刪除，
+   `human-reviewed` 僅保留為相容狀態。
 4. **語系 overlay gate：** 由產生器以暫存檔合併，先檢查 387 筆與所有雜湊，再
    原子替換 locale people.json；不得直接手改 base 或研究來源。
 5. **排版／字型 gate：** 英文比例字、斷詞、長文分頁；日文假名 glyph、比例字、
    禁則與行首行尾標點；各抽驗短／中／長文與 unknown fallback。
-6. **發行 gate：** `bio_status=machine-draft` 只能進預覽；正式 `translated` 只能出現在已通過人審與版面 gate 的
-   row；其餘保留 source-fallback 或 machine-draft，不得偽裝。
+6. **發行 gate（2026-09-27 修訂）：** `bio_status=wiki-sourced` 可進正式發行；
+   其餘保留 source-fallback 或 machine-draft（僅預覽），不得偽裝。
 
 ## 5. 與 runtime 的關係
 
-PeopleDB 會在存在 overlay 時以 fail-closed 方式套用 machine-draft／human-reviewed
-正文，仍沿用同一個 `Person.Biography` 欄位供 renderer 分頁，並讓
+PeopleDB 會在存在 overlay 時以 fail-closed 方式套用 machine-draft／human-reviewed／
+wiki-sourced 正文，仍沿用同一個 `Person.Biography` 欄位供 renderer 分頁，並讓
 `BiographyLanguage`／`BiographyStatus` 反映實際 row；載入器遇到 schema、
 語系、ID、姓名、雜湊或數量錯誤時整份 fail-closed。
 
-## 6. 本輪決定與後續 gate
+## 6. 本輪決定與後續 gate（2026-09-27 修訂）
 
-使用者已接受 machine translation 初稿，因此建立英／日兩份 387 篇 overlay，
-狀態固定為 `machine-draft`、review 狀態為 `unreviewed`。後續逐篇校訂、日文假名
-字型／比例版面與正式發行仍是獨立工作；`tools/locale_bio_gate.py --release`
-會在任何一筆尚未 `human-reviewed` 時 fail-closed。
+使用者刪除逐篇人審，英／日兩份 387 篇 overlay 狀態為 `wiki-sourced`、
+review 狀態為 `unreviewed`，可直接發行；`tools/locale_bio_gate.py --release`
+接受 `human-reviewed` 或 `wiki-sourced`。日文假名
+字型／比例版面仍是獨立版面工作（非審稿 gate）。
