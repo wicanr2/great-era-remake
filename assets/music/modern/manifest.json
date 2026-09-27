@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "version": "modern-music-tech-preview-2026-09-27",
+  "tracks": {
+    "modern_scene": {
+      "file": "modern_scene.ogg",
+      "loop_start": 0,
+      "loop_length": 0,
+      "author": "great-era-remake procedural generator (pure-Go original composition; formal composer credit and blind-listening QA pending)",
+      "license": "LicenseRef-RRSAL-1.0 (see repo LICENSE)",
+      "sha256": "23ab9127ce695b72dc60a4ff8ab2b8e5059066fbd2531154d8824795a42cd538"
+    },
+    "modern_strategy": {
+      "file": "modern_strategy.ogg",
+      "loop_start": 0,
+      "loop_length": 0,
+      "author": "great-era-remake procedural generator (pure-Go original composition; formal composer credit and blind-listening QA pending)",
+      "license": "LicenseRef-RRSAL-1.0 (see repo LICENSE)",
+      "sha256": "93104660f26994ac490da487113f45aae4e5898ef9748f2c88dbe898823cbfc1"
+    },
+    "modern_battle_a": {
+      "file": "modern_battle_a.ogg",
+      "loop_start": 0,
+      "loop_length": 0,
+      "author": "great-era-remake procedural generator (pure-Go original composition; formal composer credit and blind-listening QA pending)",
+      "license": "LicenseRef-RRSAL-1.0 (see repo LICENSE)",
+      "sha256": "d8c4265a516e0f3072b78aee06e8bb7dba3b87e3fa8542195dc83ded537aa390"
+    },
+    "modern_battle_b": {
+      "file": "modern_battle_b.ogg",
+      "loop_start": 0,
+      "loop_length": 0,
+      "author": "great-era-remake procedural generator (pure-Go original composition; formal composer credit and blind-listening QA pending)",
+      "license": "LicenseRef-RRSAL-1.0 (see repo LICENSE)",
+      "sha256": "0bb74b592491fa930a36d758e501b4ade2bf8c74185ca8541cee3dea1b8ad7c9"
+    },
+    "modern_story": {
+      "file": "modern_story.ogg",
+      "loop_start": 0,
+      "loop_length": 0,
+      "author": "great-era-remake procedural generator (pure-Go original composition; formal composer credit and blind-listening QA pending)",
+      "license": "LicenseRef-RRSAL-1.0 (see repo LICENSE)",
+      "sha256": "6d8cad2c06d03b79d09371abdae6fa64b3a8a4cb8b68971542d99d335ad54a26"
+    },
+    "modern_final": {
+      "file": "modern_final.ogg",
+      "loop_start": 0,
+      "loop_length": 0,
+      "author": "great-era-remake procedural generator (pure-Go original composition; formal composer credit and blind-listening QA pending)",
+      "license": "LicenseRef-RRSAL-1.0 (see repo LICENSE)",
+      "sha256": "b3968dd9b6dd37661f630971fd6f6dc5f1a233343aff076a1a515c0d75939f7c"
+    }
+  }
+}

@@ -28,7 +28,9 @@ else
   files=$(printf '%s\n%s\n' "$files" "$staged" | sort -u | sed '/^$/d')
 fi
 
-hits=$(printf '%s\n' "$files" | grep -E "$DENY_EXT|$DENY_AUDIO|$DENY_FONT|$DENY_DIR" || true)
+# 出貨 Ogg 白名單：assets/music/modern/ 的原創程序作曲（manifest 具 provenance，
+# tools/make_modern_ogg.sh 可重現），不是原版 .MUS/.TIM 衍生物。
+hits=$(printf '%s\n' "$files" | grep -E "$DENY_EXT|$DENY_AUDIO|$DENY_FONT|$DENY_DIR" | grep -vE '^assets/music/modern/[^/]+\.ogg$' || true)
 
 # ── 展示截圖的白名單（CLAUDE.md §9 的唯一例外）─────────────────────
 #

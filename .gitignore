@@ -38,6 +38,9 @@ ASCFONT.*
 *.wav
 *.snd
 *.bnk
+# 例外：assets/music/modern/ 是原創程序作曲的出貨 Ogg（tools/make_modern_ogg.sh
+# 可重現，manifest 具 author／license／SHA-256），不是原版衍生物，准許追蹤。
+!assets/music/modern/*.ogg
 
 # IDA / 反組譯產物
 *.i64

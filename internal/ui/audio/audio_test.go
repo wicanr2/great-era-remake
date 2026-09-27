@@ -450,3 +450,23 @@ func TestLoopReaderRepeatsDeclaredRange(t *testing.T) {
 		t.Fatalf("循環資料 = %q", got)
 	}
 }
+
+func TestShippedModernManifestLoads(t *testing.T) {
+	// 出貨 manifest＋Ogg（tools/make_modern_ogg.sh 產生）必須通過真正的載入器：
+	// schema、provenance、SHA-256 與六首 cue 齊全。解碼有效性另由 ffprobe 驗過。
+	dir := filepath.Join("..", "..", "..", "assets", "music", "modern")
+	set, err := LoadModernTracks(dir)
+	if err != nil {
+		t.Fatalf("出貨 manifest 載入失敗：%v", err)
+	}
+	for _, track := range []Track{TrackScene, TrackStrategy, TrackBattle1,
+		TrackBattle2, TrackWall, TrackFinal} {
+		src, ok := set.Sources[track]
+		if !ok {
+			t.Fatalf("出貨 manifest 缺 %v", track)
+		}
+		if len(src.OGG) < 4 || string(src.OGG[:4]) != "OggS" {
+			t.Fatalf("%v 不是有效 Ogg 容器", track)
+		}
+	}
+}

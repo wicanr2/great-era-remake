@@ -3223,3 +3223,15 @@ register parity，也不把這支單一 preview cue 擴大宣稱為六首 Modern
    ubuntu:22.04 解包 smoke 通過（僅缺 libX11／ALSA，與既往一致）。
 4. **誠實缺口（非自主可解）：** 正式 Ogg、人耳、Android、真機 smoke／簽署、
    Windows smoke（Wine 容器待補）、英日人審（已刪改 wiki）、29 篇待新史料。
+
+### 5.166 2026-09-27 Modern Ogg 轉換完成（tech-preview）
+
+1. **實作（confirmed-remake）：** 新增 `tools/make_modern_ogg.sh`（Docker 內
+   程序作曲 WAV → ffmpeg libvorbis q4／44.1kHz，全 Docker 可重現）；
+   `assets/music/modern/` 六首 cue＋`manifest.json`（schema 1、tech-preview
+   版本、誠實 author／RRSAL-1.0／SHA-256）；新增出貨 manifest 常駐測試；
+   `.gitignore`＋`deny_scan.sh` 加出貨 Ogg 白名單（僅該目錄）。
+2. **驗收：** ffprobe 六首皆 Vorbis／44100／stereo；常駐測試過真正載入器；
+   Xvfb 實機 `-audio modern` 無 manifest／解碼錯誤（僅缺容器音效卡，
+   Ebiten eager decode 已過）；Xvfb 全套綠；deny 687 檔零命中。
+3. **誠實邊界：** 技術預覽，非正式作曲署名／盲聽／人耳混音；SPEC-32 §3 已同步。

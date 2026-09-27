@@ -56,9 +56,12 @@ scene／strategy／battle_a／battle_b／story／final
 的 `.ogg` basename。`author`、`license` 與實際檔案 SHA-256 是必要 provenance，不能
 用空字串或「generated」代替。
 
-## 3. 目前尚未交付
+## 3. 交付狀態（2026-09-27 更新）
 
-- 儲存庫目前沒有任何 modern `.ogg`，也沒有假造的 placeholder 音檔。
+- `assets/music/modern/` 已有六首出貨 `.ogg`＋`manifest.json`
+ （`tools/make_modern_ogg.sh` 可重現：程序作曲 WAV → libvorbis q4／44.1kHz；
+  manifest 具 author／license／SHA-256，版本 `modern-music-tech-preview-*`）。
+  曲目為原創程序作曲的技術預覽，**不是**正式作曲署名、盲聽或人耳混音完成。
 - 新主題動機、MIDI sketch、分軌／音源 provenance、loop／響度／mono 人耳驗收尚未完成。
 - Windows／macOS／Android 真機音訊驗收與發行包仍是 release gate；Linux 測試通過不等於
   實機驗收。
