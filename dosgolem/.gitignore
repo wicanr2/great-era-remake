@@ -1,0 +1,14 @@
+# 測試語料：SingleStepTests/8088 v2 共 761 MB，不進版控。
+# 用 tools/fetch_cputests.sh 抓。
+/testdata/
+# docker 裡的 Go 快取
+/workplace/
+# 建置產物
+/dosgolem
+/bin/
+
+# go build ./cmd/probe 掉在根目錄的執行檔
+/probe
+# 對拍取樣器的預設輸出。**畫面是原版的**，不進版控。
+/shot.png
+/*.png
