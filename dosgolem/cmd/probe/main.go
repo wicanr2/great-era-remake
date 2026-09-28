@@ -1373,7 +1373,8 @@ func report(m *machine.Machine, d *dos.DOS, ring *ring, runErr error, limit uint
 			if k.Key >= 0x20 && k.Key < 0x7F {
 				ch = string(rune(k.Key))
 			}
-			fmt.Printf("  #%-11d %-11s %02X %s\n", k.Step, k.Via, k.Key, ch)
+			fmt.Printf("  #%-11d %-11s %02X %s  int16@%04X:%04X caller=%04X:%04X caller2=%04X:%04X\n",
+				k.Step, k.Via, k.Key, ch, k.CS, k.IP, k.CallerCS, k.CallerIP, k.Caller2CS, k.Caller2IP)
 		}
 		if len(d.Stdin) > 0 {
 			fmt.Printf("  ⚠ 沒人取走：% X —— 送進去的鍵不等於程式收到的鍵\n", d.Stdin)

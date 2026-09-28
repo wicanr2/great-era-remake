@@ -67,10 +67,21 @@ remake 對照：retro theme（`cmd/screenshot -theme retro`）。
   `02` §5A.4 明指由 WAR 反追；2xxxx 位址系）。
 - WAR.EXE 在 dosgolem 下可開車（SDFA 先駐＋`-adlib`，60M 步存活，14 檔：
   CONFIG／HEAD1.RGB／SCENE／1–4.15／EGAVGA.BGI／W.TPC／MARK.TPC／CHOOSE…；
-  策略框紅色邊框繪製中）。確認鍵追查轉往 WAR：quiz→15 指令→`欲派遣何將`→
-  `*` 迴圈，同一 dosgolem 方法（OnCall＋coverage＋截圖）繼續。
-  GRT 側新工具：`dosgolem/apps/grt/cmd/pollwatch`、`titlewatch`；
-  `oracle.Options.AdLib`（快照分支自加， upstream 無）。
+  EGA mode 10h 640×350，先前 320×200 解讀作廢）。
+- WAR 輸入鏈（2026-09-28，`confirmed`）：靜態 WAR.EXE 無 INT16 是因為 IDA 把
+  CRT 段收合了——`@READKEY$qv`（0x6245D：AH=0 阻塞讀，AL=0 擴展鍵暫存
+  `byte_7024D`）＋`@KEYPRESSED$qv`（0x6244B）＋讀後 `sub_62293` **清 buffer**
+ （Ctrl-C 經 int 23h）。4.15M 次 INT16 皆經此。dosgolem `Type`/`-keys` 走
+  Stdin 餵 INT16，`PressKey`/IRQ1 不需要。新工具 `tools/ida_range.idc`
+  可反組譯收合區（`ida_callers.idc` 姐妹作）。
+- 選單族（`confirmed`，靜態）：`sub_2B063`／`sub_2BA3A` 計數器選單——`4` 遞減、
+  其餘有效鍵遞增、`ESC` 直達目標值；`sub_2AFF1`／`sub_2B9B9` 驗鍵（`3` 常被拒）。
+  `sub_10AB5` 是換片提示（MARK-A/B/C，非 quiz）。
+- 實測開車到選擇屏（紅框＋✓遊標，CHOOSE31/32→CHOOSE.RGB/41/42 逐级載入）：
+  數字鍵絕對定位遊標（`1` 上／`2` 中），`CR`（0x0D）提交——`LF`（0x0A）無效，
+  早先 Enter/Space/Esc 無反應多半是送錯位元組。**每次 READKEY 後清 buffer，
+  必須一鍵一存檔分段餵**（batch 全被吃掉）。目前停在 s12（`war_s12.state`），
+  遊標經 `1/2/4` 多次移動，待繼續。檢查點鏈全在 /tmp（不進版控）。
 - 密碼 quiz：每局重抽（頁／行／字＋三選一）；`2＋Return` 兩次通過，
   誤答僅重出 quiz（未見鎖死）。答案需實體說明書，remake 無此關。
 
