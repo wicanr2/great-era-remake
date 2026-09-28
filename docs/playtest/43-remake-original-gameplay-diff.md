@@ -53,8 +53,24 @@ remake 對照：retro theme（`cmd/screenshot -theme retro`）。
   loader 在 #34 寫向量 0；那一次 AH=25h 未改變任何 IVT 項目。
   真正輸入路徑是 DOS stdin：`sub_11925`（全 EXE 唯一 `AH=0Bh`）查有無鍵，
   有鍵後走 `AH=3Fh` 讀（`Type` 通道；`PressKey`/IRQ1 對本作無效）。
-  已開車 logo→title（`\r`＋`2\r2\r`，80M 步，title 218 色確認），title 輸入迴圈在
-  `6BAF:xxxx`（AH=0B 回 AL=FF 實測）。`*` 切換迴圈與確認鍵仍待由 title 繼續開車。
+  已開車 logo→title（`\r`＋`2\r2\r`，80M 步，title 218 色確認）；title 迴圈在
+  `sub_1473D` 內（`0x14F8B`／`0x1508F` 輪詢＋動畫，鍵→`0x1509C`；OnCall 驗證
+  poll 18→20 次。先前「6BAF:xxxx」是 CallTrace ES:BX 誤讀，作廢）。
+- GRT title 後必退（2026-09-28 dosgolem＋靜態，`confirmed` 機制）：
+  title 鍵由 `sub_1173D` 讀（全 EXE 唯一 `AH=07h`，另吃 `byte_1817A/B` 注入槽；
+  先前「無 DOS 鍵盤功能」修正為「僅 AH=0B＋AH=07，無 INT16/60h/BDA」），讀完即棄，
+  再判 `word_182A2`（音效旗，開機 `sub_144A6` AdLib 388h 偵測＋`sub_1346C`
+  驗 SDFA 的 0x66 常駐簽章；dosgolem 無卡時為 0，有 `-adlib` 才過第一關，
+  `sub_1346C` 仍失敗）。兩分支最終都 `retf` 回 start stub → `AH=4Ch`。
+  SDFA 先駐＋`-adlib` 可把旗置 1（peek `lin:EBC2`＝01），但 title＋鍵仍退；
+  GRT 本來就是 intro／title 模組，**派將流程在 WAR.EXE**（`docs/re/29` 輸入檔、
+  `02` §5A.4 明指由 WAR 反追；2xxxx 位址系）。
+- WAR.EXE 在 dosgolem 下可開車（SDFA 先駐＋`-adlib`，60M 步存活，14 檔：
+  CONFIG／HEAD1.RGB／SCENE／1–4.15／EGAVGA.BGI／W.TPC／MARK.TPC／CHOOSE…；
+  策略框紅色邊框繪製中）。確認鍵追查轉往 WAR：quiz→15 指令→`欲派遣何將`→
+  `*` 迴圈，同一 dosgolem 方法（OnCall＋coverage＋截圖）繼續。
+  GRT 側新工具：`dosgolem/apps/grt/cmd/pollwatch`、`titlewatch`；
+  `oracle.Options.AdLib`（快照分支自加， upstream 無）。
 - 密碼 quiz：每局重抽（頁／行／字＋三選一）；`2＋Return` 兩次通過，
   誤答僅重出 quiz（未見鎖死）。答案需實體說明書，remake 無此關。
 

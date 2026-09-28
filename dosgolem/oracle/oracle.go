@@ -102,6 +102,10 @@ type Options struct {
 	// 640 寬的平面模式是 1。**0 當成 2**（沿用既有預設）。
 	MouseXScale uint16
 
+	// AdLib 打開 OPL2（埠 388h）存在偵測。預設關（開機快，見 machine.go）。
+	// GRT.EXE 這類開機偵測音效卡、無卡就直接退回 DOS 的程式要打開。
+	AdLib bool
+
 	// FontFull／FontHalf 是 DOS/V 字型服務要讀的全形／半形字模檔
 	// （`docs/spec/008` §3）。空字串沿用預設。
 	//
@@ -130,6 +134,9 @@ func LoadWith(exe, root string, opt Options) (*Oracle, error) {
 		return nil, fmt.Errorf("載入 %s：%w", exe, err)
 	}
 	d := dos.New(m, root)
+	if opt.AdLib {
+		m.SetAdLib(true)
+	}
 	if opt.MouseXScale != 0 {
 		d.Mouse.XScale = opt.MouseXScale
 	}
