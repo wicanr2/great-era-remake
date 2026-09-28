@@ -46,9 +46,15 @@ remake 對照：retro theme（`cmd/screenshot -theme retro`）。
   以上皆無鍵比較，`*` 切換迴圈不在此分支。
 - 關鍵否定發現（`confirmed`）：全 GRT.EXE 無 `int 16h`、無 DOS 鍵盤功能
  （49 處 `int 21h` 僅向量存取 AH=25h/35h 與檔案 3Ch/3Dh/3Eh/40h）、無 60h port
-  讀取。先前「鍵盤鏈」命名作廢，實為顯示棧。鍵盤疑走自掛 ISR
- （`sub_10394`＋無名 AH=25h setter；`sub_1473D` 讀 0x66 向量，安裝點未定位），
-  或在另一 EXE／模組。確認鍵維持 `unknown`，不得盲試升格。
+  讀取。先前「鍵盤鏈」命名作廢，實為顯示棧。確認鍵維持 `unknown`。
+- dosgolem 實測推翻「自掛鍵盤 ISR」假說（2026-09-28，分支 `exp/dosgolem-isr`，
+  `dosgolem/` 快照 d9c0c27；GRT.EXE＋原版目錄唯讀掛載）：
+  20M／30M／80M 步皆 `int 09h` 向量維持預設 `0080:0024`，IVT 0-400 唯一寫入是
+  loader 在 #34 寫向量 0；那一次 AH=25h 未改變任何 IVT 項目。
+  真正輸入路徑是 DOS stdin：`sub_11925`（全 EXE 唯一 `AH=0Bh`）查有無鍵，
+  有鍵後走 `AH=3Fh` 讀（`Type` 通道；`PressKey`/IRQ1 對本作無效）。
+  已開車 logo→title（`\r`＋`2\r2\r`，80M 步，title 218 色確認），title 輸入迴圈在
+  `6BAF:xxxx`（AH=0B 回 AL=FF 實測）。`*` 切換迴圈與確認鍵仍待由 title 繼續開車。
 - 密碼 quiz：每局重抽（頁／行／字＋三選一）；`2＋Return` 兩次通過，
   誤答僅重出 quiz（未見鎖死）。答案需實體說明書，remake 無此關。
 
