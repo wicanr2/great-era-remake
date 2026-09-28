@@ -36,6 +36,19 @@ remake 對照：retro theme（`cmd/screenshot -theme retro`）。
   已選標 `*`（實測 `10` 選中土府均）。確認鍵未知——已實測無效：
   Return／Space／0／Y／Tab／F1；Esc 為取消（退回下令選單，指令數不扣）。
   約 22 輪 DOSBox 盲試後暫收，需 IDA 找派將 input routine。
+- GRT.EXE 靜態爬梳（2026-09-28，`confirmed` 顯示棧／`unknown` 鍵盤路徑，
+  GRT.EXE.i64＋`tools/ida_callers.idc` code-xref，以上符號皆遠程函式）：
+  `sub_10FDD`＝INT 10h 顯示包裝；`sub_11A25`←`sub_11A59`←`sub_11B23` 是
+  螢幕字元讀寫＋數字輸入棧（ah=8 為讀螢幕字元，非鍵盤）；`sub_10D83`＝列表渲染，
+  呼叫端僅 `sub_10E56`／`sub_11799`／`sub_117EF`／`sub_11937(×2)`；
+  `sub_10E56` 唯一呼叫端是 `sub_119D4`（`seg000:11772` 靜態點）；
+  `sub_11B23` 呼叫端僅上述三填充迴圈；`sub_10DA8` 純算術無 I/O。
+  以上皆無鍵比較，`*` 切換迴圈不在此分支。
+- 關鍵否定發現（`confirmed`）：全 GRT.EXE 無 `int 16h`、無 DOS 鍵盤功能
+ （49 處 `int 21h` 僅向量存取 AH=25h/35h 與檔案 3Ch/3Dh/3Eh/40h）、無 60h port
+  讀取。先前「鍵盤鏈」命名作廢，實為顯示棧。鍵盤疑走自掛 ISR
+ （`sub_10394`＋無名 AH=25h setter；`sub_1473D` 讀 0x66 向量，安裝點未定位），
+  或在另一 EXE／模組。確認鍵維持 `unknown`，不得盲試升格。
 - 密碼 quiz：每局重抽（頁／行／字＋三選一）；`2＋Return` 兩次通過，
   誤答僅重出 quiz（未見鎖死）。答案需實體說明書，remake 無此關。
 
