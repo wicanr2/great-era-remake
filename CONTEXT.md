@@ -3303,3 +3303,14 @@ register parity，也不把這支單一 preview cue 擴大宣稱為六首 Modern
    誤答僅重出 quiz；答案需實體說明書。
 3. **下一步：** IDA 找派將 input routine 的確認鍵，或下輪繼續試鍵
    （0／Esc／Space／Y）。見 `docs/playtest/43` §4–§5。
+
+### 5.176 2026-09-28 IDA 派將確認鍵追查（輸入鏈已定位，未竟）
+
+1. **工具鏈修復（confirmed）：** `tools/ida.sh query` 因 `alpine:3.20` 缺席靜默失敗，
+   改 `debian:bookworm`；新增 `tools/ida_func_names.idc`（中途發現 IDC 須用
+   `get_func_qty`／`getn_func`，列舉另有坑，已記檔）。
+2. **輸入鏈（IDA linear address，GRT.EXE）：** `sub_10FDD` 中斷分發 →
+   `sub_11A25` ReadKey 包裝（DOS `ah=8`）→ `sub_11A59` 數字輸入 →
+   `sub_11B23` 分發 → 呼叫端僅三支：`sub_11799`／`sub_117EF`／`sub_11937`
+   （皆為顯示＋輸入薄包裝）。派將 `*` 切換／確認鍵在更高層命令分發，
+   本輪未達，需繼續由三呼叫端向上爬或由 `*` 寫入點反查。

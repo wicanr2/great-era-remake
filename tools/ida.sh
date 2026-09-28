@@ -36,7 +36,7 @@ cleanup_query_dir() {
   docker run --rm \
     --network none --memory 128m --cpus 1 --pids-limit 32 \
     -u "$(id -u):$(id -g)" \
-    -v "$dir:/task" alpine:3.20 sh -lc 'find /task -mindepth 1 -delete'
+    -v "$dir:/task" debian:bookworm sh -lc 'find /task -mindepth 1 -delete'
   rmdir "$dir"
 }
 
@@ -66,7 +66,7 @@ query() {
     --network none --memory 128m --cpus 1 --pids-limit 32 \
     -u "$(id -u):$(id -g)" \
     -v "$WORK/$exe:/input/$exe:ro" -v "$query_dir:/query" \
-    alpine:3.20 cp "/input/$exe" "/query/$exe"
+    debian:bookworm cp "/input/$exe" "/query/$exe"
 
   docker run --rm \
     --network none --memory 2g --cpus 2 --pids-limit 256 \
@@ -86,17 +86,17 @@ query() {
   docker run --rm \
     --network none --memory 128m --cpus 1 --pids-limit 32 \
     -u "$(id -u):$(id -g)" -v "$WORK:/out" \
-    alpine:3.20 mkdir -p /out/user-output
+    debian:bookworm mkdir -p /out/user-output
   docker run --rm \
     --network none --memory 128m --cpus 1 --pids-limit 32 \
     -u "$(id -u):$(id -g)" \
     -v "$query_dir:/query:ro" -v "$WORK/user-output:/out" \
-    alpine:3.20 sh -lc \
+    debian:bookworm sh -lc \
     'find /query -maxdepth 1 -type f -name "*.txt" -exec cp {} /out/ \;'
   docker run --rm \
     --network none --memory 128m --cpus 1 --pids-limit 32 \
     -u "$(id -u):$(id -g)" -v "$WORK/user-output:/out:ro" \
-    alpine:3.20 sh -lc 'find /out -maxdepth 1 -type f -exec stat -c "%u:%g %a %n" {} \;'
+    debian:bookworm sh -lc 'find /out -maxdepth 1 -type f -exec stat -c "%u:%g %a %n" {} \;'
   cleanup_query_dir "$query_dir"
   trap - EXIT
 }
