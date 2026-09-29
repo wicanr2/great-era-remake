@@ -90,7 +90,7 @@ remake 對照：retro theme（`cmd/screenshot -theme retro`）。
 - 原版戰鬥畫面同態對照（卡在派將確認鍵未知，需 IDA 找 input routine 或繼續試鍵）、
   整回合操作序列比對、音效／動畫時機。
 
-## 6. 查閱省畫面等待迴圈（2026-09-29 dosgolem ISR，退出鍵仍 unknown）
+## 6. 查閱省畫面等待迴圈（2026-09-29 dosgolem ISR；§7 有方法勘誤，本節部分結論已降級）
 
 - 畫面＝`sub_2A941` 省份查閱（靜態 `confirmed`，欄位順序對 `docs/re/27`），
   內容安徽省（司令／省長蔣中正，兵力 50000，將領數 4，忠誠度 46）＋右側中國地圖；
@@ -119,3 +119,32 @@ remake 對照：retro theme（`cmd/screenshot -theme retro`）。
 - 下一步：`scancode.go` 已擴（`F1`–`F12`、`CtrlC`，本輪實測全拒收）；
   剩餘只能靜讀 `386E:080A` 上層 dispatch（需執行期→IDA 段換算，目前無錨點），
   或懷疑此迴圈根本不是等鍵（但 `-block-after` 未觸發、鍵盤輪詢持續中）。
+
+## 7. 方法勘誤：調色盤分層＋AC 真相（2026-09-29 續輪，`confirmed`）
+
+- **§6 的「畫面零變化」結論作廢（觀測盲區）**：只比了 VRAM 色號與 DAC，
+  對 EGA 屬性控制器（AC）翻層失明。`writeEGA`（`-dump-at` PNG，走
+  色號→AC→DAC）才是完整真相；`-dump-palette` 只看 DAC。此後一律以
+  `-dump-at` PNG 為畫面依據，VRAM／DAC 只作輔助。
+- **`'4'` 翻到戰場進入層（AC flip，`confirmed`）**：同 VRAM 色號＋戰場 AC
+  ＝編號省份地圖＋日期（民國・秋）＋「進入戰場中」（`t4` 系列 PNG、
+  `proof_battle.png` 交叉渲染為證；226／256 DAC entries 差異是 AC 映射後
+  結果，不必逐項追）。`CR` 沒有翻回（`bf_c` 的省畫面是 DAC 渲染假象）。
+- 執行期 dispatch 位元組與 `sub_4D585` 逐指令同構（`cmp '1'／'6'／'0'／CR`＋
+  游標 `6AB64`／鍵盤 `6AB66`＋`sub_5544F` 驗鍵）；`sub_5544F` 吃掉不在呼叫端
+  字串內的鍵、`CR` 恆通過；現行有效集含 `1`–`6` 不含 `0`（`'7'` 慢是誤讀，
+  間隙屬於前一鍵；`'0'` 快拒、`'1'` 快、`'2'`–`'6'` 慢、`CR` 被接受（10 萬＋道 excursion：
+  `74A9` 68K＋`53F9` 15K）。
+- 按鍵盤＝`byte_6AB66`＝`ds:69B6`（`DSEG_BASE`＋執行期 `DI` 雙重確認）。
+  讀者普查：`sub_42056`、`sub_4D585`（呼叫端僅 `42566`／`4BA1E`／`4C9CC`）、
+  `sub_2B063`／`sub_2BA3A`、`sub_4B475`／`sub_4C33B`／`sub_4C3C4`／`sub_5375E`；
+  `sub_42487` 是純繪圖。CRT：`sub_62293`（清 buffer＋`int 23h`）、
+  `@READKEY 0x6245D`（`int 16h` 在 `+0xE`）。`sub_4C9CC` 有
+  「`< 0 > : <Enter> :`＋CR 離開」迴圈。無 `.OVR`，TPOV 不適用。
+- 戰場層試鍵（AC aware）：`CR`、`3`、`30`＋`CR`、`1` 皆無變化；卡點疑為無
+  作戰設定（`ds:B346h` 空）致載入停滯（假說）。`playtest/16` 正常流程 2–4 秒
+  進部署；此處零開檔停滯。
+- `-dump-at` 在恰等於 `-steps` 時不觸發（邊界 quirk；`steps＝目標＋餘量` 規避）。
+- 下一步：戰場層試 `2`／`5`／`6`／`7`／`8`／`9`／`ESC`／`SPACE`（AC aware），
+  或讀 `sub_4C9CC` 部署等待條件，或 `-poke` 填 `ds:B346h` 診斷觸發（非正常
+  玩家路徑，需標註）。
