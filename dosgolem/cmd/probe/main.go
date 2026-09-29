@@ -187,6 +187,10 @@ func main() {
 			"-steps／-clicks／-shots／-save-state 的數字都要用絕對步數，"+
 			"給「還要跑幾道」那種預算值會一道都不跑（而且不會報錯）")
 	keys := flag.String("keys", "", "先排進鍵盤佇列的按鍵（`\\n` 是 Enter）")
+	sendKeys := flag.String("sendkeys", "",
+		"逗號分隔的具名鍵（Up,Down,Left,Right,Home,End,PgUp,PgDn,Esc,Return,Space…），\n"+
+			"走 BDA／Keys 字組佇列（`int 16h` 先看這條）。方向鍵這類沒有 ASCII 的鍵只能走這條，\n"+
+			"`-keys` 送不出去（見 internal/dos/scancode.go）。")
 	biosKeys := flag.String("bios-keys", "",
 		"逐個送進 **BIOS 鍵盤緩衝區**（BDA 0040:001E）的字元（`\\n` ＝ Enter）。\n"+
 			"    -keys／-keys-at 走的是可重播的 Stdin 佇列與硬體 IRQ1；\n"+
@@ -400,6 +404,17 @@ func main() {
 	}
 	if *keys != "" {
 		feedKeys(m, d, []byte(strings.ReplaceAll(*keys, "\\n", "\n")))
+	}
+	if *sendKeys != "" {
+		for _, name := range strings.Split(*sendKeys, ",") {
+			name = strings.TrimSpace(name)
+			if name == "" {
+				continue
+			}
+			if !d.PushKeyNamed(name) {
+				die(fmt.Errorf("-sendkeys: 不認得按鍵 %q（見 internal/dos/scancode.go namedKeys）", name))
+			}
+		}
 	}
 	d.Stdin = append(d.Stdin, []byte(*typeText)...)
 

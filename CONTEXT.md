@@ -3330,3 +3330,17 @@ register parity，也不把這支單一 preview cue 擴大宣稱為六首 Modern
    確認鍵。詳見 `docs/playtest/43` §4。
 4. **工具（confirmed）：** 新增 `tools/ida_callers.idc`（code-xref 呼叫端查詢，
    與 `ida_xref.idc` 資料參考互補；本輪三次 query 皆經它）。
+
+### 5.178 2026-09-29 WAR 查閱省等待迴圈 ISR 測繪（退出鍵仍 unknown）
+
+1. **畫面定位（confirmed）：** `sub_2A941` 省份查閱（欄位順序對 `docs/re/27`），
+   安徽省＋右側地圖，迴圈經 `sub_2B0F4`（XREF `sub_2C351+2B0`）。執行期讀鍵鏈
+   `int16 AH=00 @43E3:01BE ← 386E:080A ← 4681:55xx` 輪詢。
+2. **按鍵行為（實測）：** `2`–`7` 首按慢路徑 34–35K（→`5558` 繪圖常式→`5709`→
+   `74A9` 音效模組，無 VRAM／開檔變化），重按轉快路徑；其餘 ASCII、方向鍵、
+   Home/End/PgUp/PgDn/Ins/Del/Tab/BS 全快路徑拒收；滑鼠零輪詢；IRQ1 死亡。
+   50 億＋道指令零畫面變化（僅 s22→s26 消息行 650px 自動清除）。
+3. **工具：** dosgolem 分支 `exp/dosgolem-isr` 加 `-sendkeys`（具名鍵走 BDA／Keys
+   佇列，已驗方向鍵送達 `int16-AH00-bda`），未提交。詳見 `docs/playtest/43` §6。
+4. **仍 unknown：** 退出鍵（`F1`–`F12`、`CtrlC` 已擴充實測全拒收，可送按鍵
+   空間耗盡；或靜讀 `386E:080A` 上層 dispatch，需執行期→IDA 段換算錨點）。
