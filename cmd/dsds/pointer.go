@@ -180,6 +180,9 @@ func (a *app) navigationY() int {
 }
 
 func (a *app) interactiveTargets() []actions.Target {
+	if a.roomVisible() {
+		return a.commandRoomTargets()
+	}
 	if a.screen == screenBattle {
 		return a.battlefieldTargets()
 	}
@@ -301,6 +304,9 @@ func (a *app) battlefieldTargets() []actions.Target {
 
 func (a *app) highModernBattlefieldTargets() []actions.Target {
 	l, err := uilayout.NewModernBattleLayout(uilayout.ModernDesignSurface())
+	if a.uiStyle().Textured {
+		l, err = uilayout.NewEarthBattleLayout(uilayout.ModernDesignSurface())
+	}
 	if err != nil || a.battle == nil || a.battle.finished {
 		return nil
 	}
@@ -379,7 +385,8 @@ func (a *app) highModernBattlefieldTargets() []actions.Target {
 			continue
 		}
 		out = append(out, actions.Target{Action: action,
-			Rect: actions.Rect{X: p.X, Y: p.Y, W: p.W, H: p.H}})
+			Rect:     actions.Rect{X: p.X, Y: p.Y, W: p.W, H: p.H},
+			Contains: func(x, y int) bool { return !l.Hex || l.CellContains(col, row, x, y) }})
 	}
 	if a.battle.mode == battleModeAttack {
 		for i, enemy := range attackTargets {
@@ -392,7 +399,8 @@ func (a *app) highModernBattlefieldTargets() []actions.Target {
 				continue
 			}
 			out = append(out, actions.Target{Action: actions.BattleAttackTarget(i + 1),
-				Rect: actions.Rect{X: p.X, Y: p.Y, W: p.W, H: p.H}})
+				Rect:     actions.Rect{X: p.X, Y: p.Y, W: p.W, H: p.H},
+				Contains: func(x, y int) bool { return !l.Hex || l.CellContains(col, row, x, y) }})
 		}
 	}
 	return out

@@ -80,7 +80,7 @@ func TestSetThemePreferenceFailsClosedWithoutModernHUDProvider(t *testing.T) {
 	if err := a.setThemePreference(uitheme.ModeModern); err == nil {
 		t.Fatal("缺少 modern HUD provider 時應拒絕切換")
 	}
-	if a.themeMode != uitheme.ModeRetro || a.preferences.Theme != string(uitheme.ModeRetro) || a.hudIcons != nil {
+	if a.themeMode != uitheme.ModeRetro || a.preferences != prefs.Default() || a.hudIcons != nil {
 		t.Fatalf("HUD provider 缺失時不應改變主題狀態：mode=%s prefs=%+v hud=%v",
 			a.themeMode, a.preferences, a.hudIcons)
 	}
@@ -109,7 +109,7 @@ func TestSetThemePreferenceFailsClosedWithoutUnitProvider(t *testing.T) {
 	if err := a.setThemePreference(uitheme.ModeModern); err == nil {
 		t.Fatal("缺少部隊圖示 provider 時應拒絕切換")
 	}
-	if a.themeMode != uitheme.ModeRetro || a.preferences.Theme != string(uitheme.ModeRetro) {
+	if a.themeMode != uitheme.ModeRetro || a.preferences != prefs.Default() {
 		t.Fatalf("失敗切換不應改變狀態：mode=%s prefs=%+v", a.themeMode, a.preferences)
 	}
 }

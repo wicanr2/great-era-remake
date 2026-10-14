@@ -98,7 +98,23 @@ func TestLocalizedWordingUsesAvailableEtenGlyphs(t *testing.T) {
 			t.Fatal(err)
 		}
 		missing := map[rune]bool{}
-		for _, entry := range catalog.Entries {
+		for key, entry := range catalog.Entries {
+			// Command-room labels are rendered only with the embedded Unicode
+			// font. Keep the Eten requirement for every existing legacy label.
+			if len(key) >= 5 && key[:5] == "room." {
+				font, fontErr := assets.EmbeddedModernFont()
+				if fontErr != nil {
+					t.Fatal(fontErr)
+				}
+				for _, text := range []string{entry.Original, entry.Plain} {
+					for _, r := range text {
+						if _, ok := font.Glyph(r); !ok {
+							t.Fatalf("%s %s 的新介面字型缺字 %q", language, key, r)
+						}
+					}
+				}
+				continue
+			}
 			for _, text := range []string{entry.Original, entry.Plain} {
 				for _, r := range text {
 					if r >= 0x20 && r <= 0x7e {

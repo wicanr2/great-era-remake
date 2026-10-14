@@ -9,14 +9,14 @@ import (
 
 func TestMissingPreferencesUseDefaults(t *testing.T) {
 	p, err := Load(filepath.Join(t.TempDir(), "missing.json"))
-	if err != nil || p.Theme != "retro" || p.Scale != 2 || p.Wording != "" || p.MessageTime != 5 {
+	if err != nil || p.Theme != "modern" || p.Layout != "command" || p.Resolution != "high" || p.Scale != 2 || p.Wording != "" || p.MessageTime != 5 {
 		t.Fatalf("預設偏好不符：%+v, %v", p, err)
 	}
 }
 
 func TestSaveLoadRoundTripAndPermissions(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "nested", "prefs.json")
-	want := Preferences{Theme: "retro", Wording: "plain", Scale: 2, MessageTime: 7}
+	want := Preferences{Theme: "retro", Layout: "command", Resolution: "high", Wording: "plain", Scale: 2, MessageTime: 7}
 	if err := Save(path, want); err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestThemeValidationFailsClosed(t *testing.T) {
 	if err := os.WriteFile(path, []byte(`{"theme":"neon"}`), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	if got, err := Load(path); err == nil || got.Theme != "retro" {
+	if got, err := Load(path); err == nil || got != Default() {
 		t.Fatalf("未知主題應回到預設：got=%+v err=%v", got, err)
 	}
 }

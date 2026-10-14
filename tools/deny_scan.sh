@@ -42,7 +42,7 @@ hits=$(printf '%s\n' "$files" | grep -E "$DENY_EXT|$DENY_AUDIO|$DENY_FONT|$DENY_
 # 其他任何地方冒出 PNG 一律報錯——包括 docs/ 的子目錄。這樣「例外」是
 # 一份白名單而不是一個漏洞：要新增展示圖必須放進那個目錄，
 # 想偷渡別的原版衍生物就會被擋下來。
-stray_png=$(printf '%s\n' "$files" | grep -E '\.png$' | grep -vE '^docs/images/[^/]+\.png$' || true)
+stray_png=$(printf '%s\n' "$files" | grep -E '\.png$' | grep -vE '^(docs/images/[^/]+\.png|internal/ui/hdart/(earth-kit|earth-units|materials)\.png)$' || true)
 
 n=$(printf '%s\n' "$hits" | sed '/^$/d' | wc -l)
 m=$(printf '%s\n' "$stray_png" | sed '/^$/d' | wc -l)
@@ -60,6 +60,18 @@ if [ "$m" -gt 0 ]; then
   echo "  → 若是 README 展示截圖，搬到 docs/images/；否則不該進版控。"
   exit 1
 fi
+
+
+# The three user-authorized generated atlases must match their reviewed hashes.
+python3 - <<'PY'
+from pathlib import Path
+import hashlib,json
+p=Path('docs/licenses/generated-hd-assets.json')
+if p.exists():
+    for name,digest in json.loads(p.read_text())['files'].items():
+        assert name in {'internal/ui/hdart/earth-kit.png','internal/ui/hdart/earth-units.png','internal/ui/hdart/materials.png'}
+        assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==digest,name
+PY
 
 shots=$(printf '%s\n' "$files" | grep -cE '^docs/images/[^/]+\.png$' || true)
 echo "[deny-scan] 掃描 $total 個檔案，原版資產零命中 ✓（展示截圖 $shots 張，位置合規）"

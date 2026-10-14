@@ -28,29 +28,98 @@
       "original": "Strategy commands",
       "plain": "Strategy commands"
     },
-    "battle.title": { "original": "Battle", "plain": "Battle" },
-    "battle.attacker": { "original": "Attacker", "plain": "Attacker" },
-    "battle.defender": { "original": "Defender", "plain": "Defender" },
-    "battle.attack": { "original": "Attack", "plain": "Attack" },
-    "battle.province": { "original": "Province", "plain": "Province" },
-    "battle.date": { "original": "Date", "plain": "Date" },
-    "battle.units": { "original": "Units", "plain": "Units" },
-    "battle.soldiers": { "original": "Soldiers", "plain": "Soldiers" },
-    "battle.gold": { "original": "Gold", "plain": "Gold" },
-    "battle.food": { "original": "Food", "plain": "Food" },
-    "battle.ammo": { "original": "Ammo", "plain": "Ammo" },
-    "battle.fuel": { "original": "Fuel", "plain": "Fuel" },
-    "battle.command.move": { "original": "Move", "plain": "Move" },
-    "battle.command.attack": { "original": "Attack", "plain": "Attack" },
-    "battle.command.retreat": { "original": "Retreat", "plain": "Retreat" },
-    "battle.command.garrison": { "original": "Garrison", "plain": "Garrison" },
-    "battle.command.inspect": { "original": "Inspect", "plain": "Inspect" },
-    "battle.control.attack": { "original": "Attack", "plain": "Attack" },
-    "battle.control.next": { "original": "Next unit", "plain": "Next unit" },
-    "battle.control.end": { "original": "End turn", "plain": "End turn" },
-    "battle.mode.retreat": { "original": "Retreat input", "plain": "Retreat destination" },
-    "battle.delete": { "original": "Delete", "plain": "Delete" },
-    "battle.submit": { "original": "Submit", "plain": "Submit" },
+    "battle.title": {
+      "original": "Battle",
+      "plain": "Battle"
+    },
+    "battle.attacker": {
+      "original": "Attacker",
+      "plain": "Attacker"
+    },
+    "battle.defender": {
+      "original": "Defender",
+      "plain": "Defender"
+    },
+    "battle.attack": {
+      "original": "Attack",
+      "plain": "Attack"
+    },
+    "battle.province": {
+      "original": "Province",
+      "plain": "Province"
+    },
+    "battle.date": {
+      "original": "Date",
+      "plain": "Date"
+    },
+    "battle.units": {
+      "original": "Units",
+      "plain": "Units"
+    },
+    "battle.soldiers": {
+      "original": "Soldiers",
+      "plain": "Soldiers"
+    },
+    "battle.gold": {
+      "original": "Gold",
+      "plain": "Gold"
+    },
+    "battle.food": {
+      "original": "Food",
+      "plain": "Food"
+    },
+    "battle.ammo": {
+      "original": "Ammo",
+      "plain": "Ammo"
+    },
+    "battle.fuel": {
+      "original": "Fuel",
+      "plain": "Fuel"
+    },
+    "battle.command.move": {
+      "original": "Move",
+      "plain": "Move"
+    },
+    "battle.command.attack": {
+      "original": "Attack",
+      "plain": "Attack"
+    },
+    "battle.command.retreat": {
+      "original": "Retreat",
+      "plain": "Retreat"
+    },
+    "battle.command.garrison": {
+      "original": "Garrison",
+      "plain": "Garrison"
+    },
+    "battle.command.inspect": {
+      "original": "Inspect",
+      "plain": "Inspect"
+    },
+    "battle.control.attack": {
+      "original": "Attack",
+      "plain": "Attack"
+    },
+    "battle.control.next": {
+      "original": "Next unit",
+      "plain": "Next unit"
+    },
+    "battle.control.end": {
+      "original": "End turn",
+      "plain": "End turn"
+    },
+    "battle.mode.retreat": {
+      "original": "Retreat input",
+      "plain": "Retreat destination"
+    },
+    "battle.delete": {
+      "original": "Delete",
+      "plain": "Delete"
+    },
+    "battle.submit": {
+      "original": "Submit",
+      "plain": "Submit"
+    },
     "settings.wording": {
       "original": "Wording",
       "plain": "Text style"
@@ -643,26 +712,273 @@
       "original": "Biography text: Traditional Chinese source",
       "plain": "Showing the Traditional Chinese source; a localized biography is pending"
     },
-    "panel.commander": { "original": "Commander", "plain": "Commander" },
-    "panel.governor": { "original": "Governor", "plain": "Governor" },
-    "panel.gold": { "original": "Gold", "plain": "Gold" },
-    "panel.food": { "original": "Food", "plain": "Food" },
-    "panel.ammo": { "original": "Ammunition", "plain": "Ammunition" },
-    "panel.fuel": { "original": "Fuel", "plain": "Fuel" },
-    "panel.coal": { "original": "Coal", "plain": "Coal" },
-    "panel.iron": { "original": "Iron", "plain": "Iron" },
-    "panel.land": { "original": "Land value", "plain": "Land value" },
-    "panel.population": { "original": "Population", "plain": "Population" },
-    "panel.cities": { "original": "Cities", "plain": "Cities" },
-    "panel.arsenal": { "original": "Arsenal", "plain": "Arsenal" },
-    "panel.force": { "original": "Forces", "plain": "Forces" },
-    "panel.generals": { "original": "Generals", "plain": "Generals" },
-    "panel.people": { "original": "People", "plain": "People" },
-    "panel.loyalty": { "original": "Loyalty", "plain": "Loyalty" },
-    "panel.commands": { "original": "Commands", "plain": "Actions" },
-    "panel.count": { "original": "Count", "plain": "Count" },
-    "panel.status.normal": { "original": "Normal", "plain": "Central control" },
-    "narrative.open": { "original": "News", "plain": "Historical news" },
-    "narrative.title": { "original": "News archive", "plain": "Historical news archive" }
+    "panel.commander": {
+      "original": "Commander",
+      "plain": "Commander"
+    },
+    "panel.governor": {
+      "original": "Governor",
+      "plain": "Governor"
+    },
+    "panel.gold": {
+      "original": "Gold",
+      "plain": "Gold"
+    },
+    "panel.food": {
+      "original": "Food",
+      "plain": "Food"
+    },
+    "panel.ammo": {
+      "original": "Ammunition",
+      "plain": "Ammunition"
+    },
+    "panel.fuel": {
+      "original": "Fuel",
+      "plain": "Fuel"
+    },
+    "panel.coal": {
+      "original": "Coal",
+      "plain": "Coal"
+    },
+    "panel.iron": {
+      "original": "Iron",
+      "plain": "Iron"
+    },
+    "panel.land": {
+      "original": "Land value",
+      "plain": "Land value"
+    },
+    "panel.population": {
+      "original": "Population",
+      "plain": "Population"
+    },
+    "panel.cities": {
+      "original": "Cities",
+      "plain": "Cities"
+    },
+    "panel.arsenal": {
+      "original": "Arsenal",
+      "plain": "Arsenal"
+    },
+    "panel.force": {
+      "original": "Forces",
+      "plain": "Forces"
+    },
+    "panel.generals": {
+      "original": "Generals",
+      "plain": "Generals"
+    },
+    "panel.people": {
+      "original": "People",
+      "plain": "People"
+    },
+    "panel.loyalty": {
+      "original": "Loyalty",
+      "plain": "Loyalty"
+    },
+    "panel.commands": {
+      "original": "Commands",
+      "plain": "Actions"
+    },
+    "panel.count": {
+      "original": "Count",
+      "plain": "Count"
+    },
+    "panel.status.normal": {
+      "original": "Normal",
+      "plain": "Central control"
+    },
+    "narrative.open": {
+      "original": "News",
+      "plain": "Historical news"
+    },
+    "narrative.title": {
+      "original": "News archive",
+      "plain": "Historical news archive"
+    },
+    "room.title": {
+      "original": "The Great Era",
+      "plain": "The Great Era"
+    },
+    "room.interface.command": {
+      "original": "UI: Command room",
+      "plain": "UI: Command room"
+    },
+    "room.interface.original": {
+      "original": "UI: Original",
+      "plain": "UI: Original"
+    },
+    "room.art.modern": {
+      "original": "Art: HD",
+      "plain": "Art: HD"
+    },
+    "room.art.retro": {
+      "original": "Art: Original",
+      "plain": "Art: Original"
+    },
+    "room.previous_province": {
+      "original": "Previous",
+      "plain": "Previous"
+    },
+    "room.next_province": {
+      "original": "Next",
+      "plain": "Next"
+    },
+    "room.people": {
+      "original": "Personnel archive",
+      "plain": "Personnel archive"
+    },
+    "room.narrative": {
+      "original": "Chronicle",
+      "plain": "Chronicle"
+    },
+    "room.save": {
+      "original": "Save game",
+      "plain": "Save game"
+    },
+    "room.end_turn": {
+      "original": "End month",
+      "plain": "End month"
+    },
+    "room.camera_hint": {
+      "original": "Wheel: zoom / Drag: pan",
+      "plain": "Wheel: zoom / Drag: pan"
+    },
+    "room.shortcuts": {
+      "original": "Art / UI switch",
+      "plain": "Art / UI switch"
+    },
+    "room.close": {
+      "original": "Close",
+      "plain": "Close"
+    },
+    "room.search": {
+      "original": "Search name or text",
+      "plain": "Search name or text"
+    },
+    "room.sources": {
+      "original": "Sources",
+      "plain": "Sources"
+    },
+    "room.political": {
+      "original": "Political",
+      "plain": "Political"
+    },
+    "room.terrain": {
+      "original": "Terrain",
+      "plain": "Terrain"
+    },
+    "room.zoom_out": {
+      "original": "-",
+      "plain": "-"
+    },
+    "room.zoom_in": {
+      "original": "+",
+      "plain": "+"
+    },
+    "room.pose": {
+      "original": "View angle",
+      "plain": "View angle"
+    },
+    "room.reset": {
+      "original": "Reset view",
+      "plain": "Reset view"
+    },
+    "room.saved": {
+      "original": "Game saved.",
+      "plain": "Game saved."
+    },
+    "room.save_unavailable": {
+      "original": "No source save is available.",
+      "plain": "No source save is available."
+    },
+    "room.tab.0": {
+      "original": "Politics",
+      "plain": "Politics"
+    },
+    "room.tab.1": {
+      "original": "Military",
+      "plain": "Military"
+    },
+    "room.tab.2": {
+      "original": "Industry",
+      "plain": "Industry"
+    },
+    "room.tab.3": {
+      "original": "Diplomacy",
+      "plain": "Diplomacy"
+    },
+    "room.tab.4": {
+      "original": "People",
+      "plain": "People"
+    },
+    "room.tab.5": {
+      "original": "Chronicle",
+      "plain": "Chronicle"
+    },
+    "room.battle_detail.mobility": {
+      "original": "Movement",
+      "plain": "Movement"
+    },
+    "room.battle_detail.experience": {
+      "original": "Experience",
+      "plain": "Experience"
+    },
+    "room.battle_detail.position": {
+      "original": "Position",
+      "plain": "Position"
+    },
+    "room.battle_detail.terrain": {
+      "original": "Terrain",
+      "plain": "Terrain"
+    },
+    "room.battle_terrain.1": {
+      "original": "Plain",
+      "plain": "Plain"
+    },
+    "room.battle_terrain.2": {
+      "original": "Hills",
+      "plain": "Hills"
+    },
+    "room.battle_terrain.3": {
+      "original": "Water",
+      "plain": "Water"
+    },
+    "room.battle_terrain.4": {
+      "original": "Forest",
+      "plain": "Forest"
+    },
+    "room.battle_terrain.5": {
+      "original": "City",
+      "plain": "City"
+    },
+    "room.battle_terrain.6": {
+      "original": "Mountain",
+      "plain": "Mountain"
+    },
+    "room.battle_terrain.7": {
+      "original": "Desert",
+      "plain": "Desert"
+    },
+    "room.battle_terrain.8": {
+      "original": "Bridge",
+      "plain": "Bridge"
+    },
+    "room.battle_terrain.9": {
+      "original": "Bridge",
+      "plain": "Bridge"
+    },
+    "room.battle_terrain.10": {
+      "original": "Plateau",
+      "plain": "Plateau"
+    },
+    "room.battle_terrain.11": {
+      "original": "Pass",
+      "plain": "Pass"
+    },
+    "room.battle_terrain.12": {
+      "original": "Great Wall",
+      "plain": "Great Wall"
+    }
   }
 }

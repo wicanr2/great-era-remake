@@ -721,22 +721,9 @@ func modernTextPixelWidth(s string, scale int) int {
 	if scale <= 0 {
 		return 0
 	}
-	modernFont, _ := assets.EmbeddedModernFont()
 	width := 0
 	for _, r := range s {
-		advance := 8
-		if r == ' ' {
-			advance = 8
-		} else if modernFont != nil {
-			if glyph, ok := modernFont.Glyph(r); ok && glyph.Advance() > 0 {
-				advance = glyph.Advance()
-			} else if textlayout.RuneHalfCells(r) > 1 {
-				advance = 16
-			}
-		} else if textlayout.RuneHalfCells(r) > 1 {
-			advance = 16
-		}
-		width += advance * scale
+		width += modernBiographyAdvance(r) * scale
 	}
 	return width
 }

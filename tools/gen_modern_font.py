@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import struct
+from functools import lru_cache
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -20,6 +21,7 @@ MAGIC = b"GEMF"
 VERSION = 2
 CELL_W = 32
 CELL_H = 32
+BASELINE = 24
 
 
 def collect_strings(value: object, out: set[str]) -> None:
@@ -53,11 +55,21 @@ def collect_runes(root: Path) -> list[int]:
     chars = {ord(ch) for text in strings for ch in text if ch not in "\r\n\t"}
     # ASCII 空白與可見字元是 Modern 狀態列、數字輸入與 debug 診斷的固定邊界。
     chars.update(range(0x20, 0x7F))
+    # Include the basic kana inventory, even when a character is absent from
+    # today's biographies. Search input must not depend on corpus accidents.
+    chars.update(range(0x3041, 0x3097))
+    chars.update(range(0x309B, 0x309F))
+    chars.update(range(0x30A1, 0x30FF))
     return sorted(chars)
 
 
 def pack_alpha(image: Image.Image) -> bytes:
     return image.tobytes()
+
+
+@lru_cache(maxsize=32)
+def sized_font(path: str, size: int, index: int):
+    return ImageFont.truetype(path, size, index=index)
 
 
 def render_glyph(font: ImageFont.FreeTypeFont, char: str) -> tuple[int, bytes]:
@@ -78,9 +90,19 @@ def render_glyph(font: ImageFont.FreeTypeFont, char: str) -> tuple[int, bytes]:
         font = resized
     draw = ImageDraw.Draw(image)
     bbox = draw.textbbox((0, 0), char, font=font)
-    # Modern renderer 以左上角定位字模，因此墨跡靠上；advance 仍保留
-    # 比例字距，使 Latin 與 CJK 可在同一行對齊。
-    draw.text((-bbox[0], -bbox[1]), char, font=font, fill=255)
+    # Keep the existing advances, but align ink to a shared baseline. Cropping
+    # each glyph to its own top made periods float and lowercase letters jump.
+    # https://pillow.readthedocs.io/en/stable/handbook/text-anchors.html
+    ink_font = font
+    for size in range(font.size, 7, -1):
+        ink_font = sized_font(str(font.path), size, getattr(font, "index", 0))
+        ink_bbox = draw.textbbox((0, BASELINE), char, font=ink_font, anchor="ls")
+        if ink_bbox[1] >= 0 and ink_bbox[3] <= CELL_H and ink_bbox[2]-ink_bbox[0] <= CELL_W:
+            break
+    else:
+        raise SystemExit(f"字模無法放入共同基線：U+{ord(char):04X}")
+    x = max(0, -ink_bbox[0])
+    draw.text((x, BASELINE), char, font=ink_font, fill=255, anchor="ls")
     advance = int(round(ImageDraw.Draw(Image.new("L", (1, 1))).textlength(char, font=font)))
     if char == " ":
         advance = max(4, advance)

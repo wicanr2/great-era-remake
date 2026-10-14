@@ -157,15 +157,16 @@ func (r Rect) Contains(x, y int) bool {
 }
 
 type Target struct {
-	Action Action
-	Rect   Rect
+	Contains func(int, int) bool
+	Action   Action
+	Rect     Rect
 }
 
 // Hit 依 renderer 公告的順序回傳第一個命中動作。命中區不應重疊；
 // 若後續版面必須重疊，這個順序就是可測的選擇優先序。
 func Hit(targets []Target, x, y int) Action {
 	for _, t := range targets {
-		if t.Rect.Contains(x, y) {
+		if t.Rect.Contains(x, y) && (t.Contains == nil || t.Contains(x, y)) {
 			return t.Action
 		}
 	}

@@ -1038,9 +1038,18 @@ func (a *app) drawModernBattle(c *render.Canvas) error {
 			numbers = append(numbers, i+1)
 		}
 	}
+	names := map[game.GeneralID]string{}
+	for _, group := range [][]*game.Combatant{b.sim.Attacker, b.sim.Defender} {
+		for _, u := range group {
+			if u != nil {
+				names[u.General] = a.generalDisplayName(u.General)
+			}
+		}
+	}
 	return c.DrawModernBattleSurface(render.ModernBattleSurfaceData{
-		Battlefield: bf,
-		Theme:       a.battlefieldTheme, Units: a.unitTheme,
+		GeneralNames: names,
+		Battlefield:  bf,
+		Theme:        a.battlefieldTheme, Units: a.unitTheme,
 		Attackers: b.sim.Attacker, Defenders: b.sim.Defender,
 		CurrentCell: currentCell, TargetCells: targets, TargetNums: numbers,
 		Panel: d, Labels: labels, Fonts: a.eten, Log: b.log, Style: a.uiStyle(),
@@ -1107,6 +1116,16 @@ func (a *app) modernBattleLabels() (render.ModernBattleLabels, error) {
 	}
 	if out.Submit, err = get("battle.submit"); err != nil {
 		return out, err
+	}
+	for i := 1; i <= 12; i++ {
+		if out.TerrainNames[i], err = get(fmt.Sprintf("room.battle_terrain.%d", i)); err != nil {
+			return out, err
+		}
+	}
+	for i, key := range []string{"room.battle_detail.mobility", "room.battle_detail.experience", "room.battle_detail.position", "room.battle_detail.terrain"} {
+		if out.Detail[i], err = get(key); err != nil {
+			return out, err
+		}
 	}
 	if a.battle != nil && a.battle.sim != nil {
 		if p, lookupErr := a.tbl.At(a.battle.sim.From); lookupErr == nil {

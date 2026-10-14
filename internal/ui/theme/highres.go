@@ -159,8 +159,10 @@ func fillHighRect(im *image.RGBA, x0, y0, x1, y1 int, c color.RGBA) {
 }
 func fillHighCircle(im *image.RGBA, cx, cy, r int, c color.RGBA) { fillHUDCircle(im, cx, cy, r, c) }
 func fillHighTerrain(im *image.RGBA, kind int, base, accent byte) {
+	fillTerrainPalette(im, kind, base, accent, modernPalette())
+}
+func fillTerrainPalette(im *image.RGBA, kind int, base, accent byte, pal assets.Palette) {
 	w, h := im.Bounds().Dx(), im.Bounds().Dy()
-	pal := modernPalette()
 	bc, ac := toHighRGBA(pal[base]), toHighRGBA(pal[accent])
 	for y := 0; y < h; y++ {
 		for x := 0; x < w; x++ {
@@ -170,12 +172,8 @@ func fillHighTerrain(im *image.RGBA, kind int, base, accent byte) {
 	// 原版致敬（SPEC-47 M2）： motif 色轉原版三色基準——深棕墨線、
 	// 暗紅點綴、米黃紙面，戰棋金銅退場。
 	// 套印地形色（SPEC-49 §1）：暖墨、灰苔、銀灰藍、雪灰白、赭黃、朱紅。
-	ink := color.RGBA{R: 0x2B, G: 0x26, B: 0x20, A: 255}
-	green := color.RGBA{R: 0x6E, G: 0x6B, B: 0x58, A: 255}
-	water := color.RGBA{R: 0x7A, G: 0x8A, B: 0x99, A: 255}
-	cream := color.RGBA{R: 0xEF, G: 0xE9, B: 0xDB, A: 255}
-	gold := color.RGBA{R: 0xC8, G: 0x9A, B: 0x2E, A: 255}
-	red := color.RGBA{R: 0xB0, G: 0x2A, B: 0x20, A: 255}
+	ink, green, water := toHighRGBA(pal[2]), toHighRGBA(pal[5]), toHighRGBA(pal[8])
+	cream, gold, red := toHighRGBA(pal[14]), toHighRGBA(pal[6]), toHighRGBA(pal[3])
 	cx, cy := w/2, h/2
 	stroke := maxHUD(highResolutionSamples, minHUD(w, h)/18)
 	switch {

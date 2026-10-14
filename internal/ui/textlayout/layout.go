@@ -1,7 +1,11 @@
 // Package textlayout 提供不依賴 Ebiten 的繁體中文斷行與分頁。
 package textlayout
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+	"unicode"
+)
 
 // Options 使用半格作為內部寬度單位；Columns 則仍以全形格表示。
 type Options struct {
@@ -131,9 +135,29 @@ type ProportionalOptions struct {
 	Advance func(rune) int
 }
 
-// LayoutProportional 依比例字距斷行與分頁，沿用既有中日文禁則：閉標點不落
-// 行首，開標點不落行尾。它不依賴任何字型套件，字型 atlas 的責任只在
-// Advance callback；未知 glyph 由呼叫端決定 fallback 或回報缺字。
+// Proportional text stays inside its reading column. JLREQ 3.1.7–3.1.10:
+// https://www.w3.org/TR/jlreq/#characters_not_starting_a_line
+// The original fixed-cell Layout retains its separate hanging-punctuation contract.
+const proportionalNoStart = "，。、；：！？.,;:!?)]}）］｝〕〉》」』】〙〗〟’”｠»・ー々ヽヾゝゞぁぃぅぇぉっゃゅょゎゕゖァィゥェォッャュョヮヵヶㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿ"
+const proportionalNoEnd = "([{（［｛〔〈《「『【〘〖〝‘“｟«"
+
+func westernWord(r rune) bool {
+	return unicode.In(r, unicode.Latin) || r >= '0' && r <= '9' || r == '\'' || r == '’'
+}
+
+func proportionalBreak(left, right rune, allowWordSplit bool) bool {
+	if strings.ContainsRune(proportionalNoEnd, left) || strings.ContainsRune(proportionalNoStart, right) {
+		return false
+	}
+	if left == right && (left == '…' || left == '—') {
+		return false
+	}
+	return allowWordSplit || !westernWord(left) || !westernWord(right)
+}
+
+// LayoutProportional uses measured advances, bounded lines and CJK prohibition
+// rules. A word that fits a line remains whole; a longer word or URL may wrap.
+// Newlines and all source characters are retained for full-document pagination.
 func LayoutProportional(text string, opt ProportionalOptions) (Document, error) {
 	if opt.Width <= 0 || opt.Rows <= 0 {
 		return Document{}, fmt.Errorf("textlayout: 比例 Width 與 Rows 必須大於 0")
@@ -142,46 +166,48 @@ func LayoutProportional(text string, opt ProportionalOptions) (Document, error) 
 		return Document{}, fmt.Errorf("textlayout: 比例排版缺少 Advance")
 	}
 	var lines []Line
-	var current []rune
-	width, halfWidth := 0, 0
-	flush := func(force bool) {
-		if len(current) == 0 && !force {
-			return
+	paragraphs := strings.Split(strings.ReplaceAll(text, "\r", ""), "\n")
+	for pi, paragraph := range paragraphs {
+		runes := []rune(paragraph)
+		if len(runes) == 0 {
+			if pi < len(paragraphs)-1 {
+				lines = append(lines, Line{})
+			}
+			continue
 		}
-		lines = append(lines, Line{Text: string(current), HalfCells: halfWidth, PixelWidth: width})
-		current, width, halfWidth = nil, 0, 0
+		pixels, halves := make([]int, len(runes)+1), make([]int, len(runes)+1)
+		for i, r := range runes {
+			advance := opt.Advance(r)
+			if advance <= 0 || advance > opt.Width {
+				return Document{}, fmt.Errorf("textlayout: U+%04X 字距無效或超出欄寬：%d", r, advance)
+			}
+			pixels[i+1] = pixels[i] + advance
+			halves[i+1] = halves[i] + RuneHalfCells(r)
+		}
+		for start := 0; start < len(runes); {
+			end := start
+			for end < len(runes) && pixels[end+1]-pixels[start] <= opt.Width {
+				end++
+			}
+			if end < len(runes) {
+				fit := end
+				for _, splitWord := range []bool{false, true} {
+					end = fit
+					for end > start && !proportionalBreak(runes[end-1], runes[end], splitWord) {
+						end--
+					}
+					if end > start {
+						break
+					}
+				}
+				if end == start {
+					return Document{}, fmt.Errorf("textlayout: 欄寬 %d 無法容納禁則字串", opt.Width)
+				}
+			}
+			lines = append(lines, Line{Text: string(runes[start:end]), PixelWidth: pixels[end] - pixels[start], HalfCells: halves[end] - halves[start]})
+			start = end
+		}
 	}
-	for _, r := range text {
-		if r == '\r' {
-			continue
-		}
-		if r == '\n' {
-			flush(true)
-			continue
-		}
-		rw := RuneHalfCells(r)
-		advance := opt.Advance(r)
-		if advance <= 0 {
-			return Document{}, fmt.Errorf("textlayout: U+%04X 字距無效：%d", r, advance)
-		}
-		if forbiddenLineEnd[r] && len(current) > 0 && width+advance >= opt.Width {
-			flush(false)
-		}
-		if width+advance > opt.Width {
-			flush(false)
-		}
-		if forbiddenLineStart[r] && len(current) == 0 && len(lines) > 0 {
-			last := &lines[len(lines)-1]
-			last.Text += string(r)
-			last.HalfCells += rw
-			last.PixelWidth += advance
-			continue
-		}
-		current = append(current, r)
-		width += advance
-		halfWidth += rw
-	}
-	flush(false)
 	if len(lines) == 0 {
 		lines = append(lines, Line{})
 	}

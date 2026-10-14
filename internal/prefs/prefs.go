@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/wicanr2/great-era-remake/internal/i18n"
+	"github.com/wicanr2/great-era-remake/internal/ui/layout"
 	uiresolution "github.com/wicanr2/great-era-remake/internal/ui/resolution"
 	uitheme "github.com/wicanr2/great-era-remake/internal/ui/theme"
 )
@@ -26,7 +27,9 @@ type Preferences struct {
 	MessageTime int    `json:"message_time,omitempty"`
 }
 
-func Default() Preferences { return Preferences{Theme: "retro", Scale: 2, MessageTime: 5} }
+func Default() Preferences {
+	return Preferences{Theme: "modern", Layout: "command", Resolution: "high", Scale: 2, MessageTime: 5}
+}
 
 // DefaultPath 遵循 XDG；os.UserConfigDir 在 Linux 會優先使用 XDG_CONFIG_HOME。
 func DefaultPath() (string, error) {
@@ -51,6 +54,18 @@ func Load(path string) (Preferences, error) {
 	var loaded Preferences
 	if err := json.Unmarshal(b, &loaded); err != nil {
 		return p, fmt.Errorf("prefs: 解析 %s：%w", path, err)
+	}
+	if loaded.Theme == "" {
+		loaded.Theme = p.Theme
+	}
+	if loaded.Layout == "" {
+		loaded.Layout = p.Layout
+	}
+	if loaded.Resolution == "" {
+		loaded.Resolution = p.Resolution
+	}
+	if !layout.ValidInterface(loaded.Layout) {
+		return p, fmt.Errorf("prefs: 未知介面 %q", loaded.Layout)
 	}
 	if loaded.Theme != "" {
 		if _, err := uitheme.ParseMode(loaded.Theme); err != nil {
@@ -78,6 +93,9 @@ func Load(path string) (Preferences, error) {
 
 // Save 以同目錄暫存檔 + rename 原子取代，避免程式中止留下半份 JSON。
 func Save(path string, p Preferences) (err error) {
+	if !layout.ValidInterface(p.Layout) {
+		return fmt.Errorf("prefs: 未知介面 %q", p.Layout)
+	}
 	if p.Theme != "" {
 		if _, err := uitheme.ParseMode(p.Theme); err != nil {
 			return fmt.Errorf("prefs: %w", err)

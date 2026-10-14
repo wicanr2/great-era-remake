@@ -1,0 +1,196 @@
+{
+  "schema": 1,
+  "version": "v.1.0.0-20261014",
+  "files": {
+    "internal/ui/hdart/earth-kit.png": "554bf71883334a2c4f41357f4c0f6d8f70143fa37b37aecd9beb42ad6a5ca56e",
+    "internal/ui/hdart/earth-units.png": "36316b25c3d182a1682e35f9468520247175a38237f947e2052feab8cd1144a5",
+    "internal/ui/hdart/materials.png": "780841a27a40f12a83454f7cf6a572c74b16c2782616e14f9aba09545080cf1a"
+  },
+  "license": "LicenseRef-RRSAL-1.0",
+  "origin": "project image_gen outputs and bounded project baking; not extracted original game pixels",
+  "user_authorization": "2026-10-14: publish Release after the explicitly listed three-image source whitelist, independent commit/push and host gh exceptions",
+  "sources": {
+    "materials.json": {
+      "bake": "bake-hd.go",
+      "generator": "built-in image_gen.imagegen",
+      "issue": "https://github.com/wicanr2/great-era-remake/issues/2",
+      "prompt": "material-prompt.txt",
+      "prompt_sha256": "e3f3f8d22381443bf9a3a03a343361e735c8fc0a99c7d8ff6593b3289dc7831f",
+      "runtime_atlas": "game/internal/ui/hdart/materials.png",
+      "runtime_bytes": 542564,
+      "runtime_sha256": "780841a27a40f12a83454f7cf6a572c74b16c2782616e14f9aba09545080cf1a",
+      "runtime_size": [
+        512,
+        512
+      ],
+      "source": "material-source.png",
+      "source_sha256": "499907d6922ee45f2ce74398aa697714ce6b3bd606d4818a5d9e9d51a250481e",
+      "source_size": [
+        1254,
+        1254
+      ],
+      "tile_count": 16,
+      "tile_size": [
+        128,
+        128
+      ]
+    },
+    "earth-kit-generation.json": {
+      "date": "2026-10-13",
+      "tool": "built-in image_gen",
+      "intent": "weathered earth, soot, worn iron and aged parchment; no green or washed-out gray",
+      "source": "earth-kit-source.png",
+      "source_sha256": "22b21117e712a235253c14cd2c8dd867496e4146b4119c92e6b1b1ff74a78de4",
+      "source_dimensions": [
+        1774,
+        887
+      ],
+      "source_mode": "RGBA",
+      "prompt": "earth-kit-prompt.txt",
+      "prompt_sha256": "f7bab6be9b09e8b9a729d0ecc617b09cb468cc05e4f0d020917595fec91977c8",
+      "references": [
+        {
+          "file": "steel-kit-source.png",
+          "sha256": "c96fa779ff0aa820fc433d167d468940e6d3ae0018cb0381dc85ac412b25c309"
+        }
+      ],
+      "rights": "local design draft; no public redistribution claim"
+    },
+    "earth-kit-bake.json": {
+      "alpha_preserved": true,
+      "artillery_faces": "same original six HexDir directions; [240,180,120,300,0,60] clockwise degrees from barrel-up",
+      "atlas": "earth-kit.png",
+      "atlas_bytes_decoded": 524288,
+      "columns": [
+        "helmet",
+        "horse-head",
+        "period tank",
+        "field gun"
+      ],
+      "index_source": "existing render.BranchIcon and game.HexDir; steel-blue/red trim retains original pair identity",
+      "maximum_image": [
+        512,
+        256
+      ],
+      "method": "pure Go 4x4 premultiplied box downsample; no creative edits",
+      "minimap_source": "earth-map-preview.png crop [1174,594,94,56], presentation reference only",
+      "outputs": {
+        "earth-active.png": {
+          "bytes": 28467,
+          "sha256": "eeeb12448f14f3557c975e9edba823692bf2fac4244fe0a0c6cfb60a05bf993e",
+          "size": [
+            128,
+            128
+          ]
+        },
+        "earth-button.png": {
+          "bytes": 29866,
+          "sha256": "644bb3dfee0ab2fcd416033fc8ea55e6e257ab42383e41c53054600b91b6bf7d",
+          "size": [
+            128,
+            128
+          ]
+        },
+        "earth-kit.png": {
+          "bytes": 186237,
+          "sha256": "554bf71883334a2c4f41357f4c0f6d8f70143fa37b37aecd9beb42ad6a5ca56e",
+          "size": [
+            512,
+            256
+          ]
+        },
+        "earth-minimap.png": {
+          "bytes": 7815,
+          "sha256": "ca4d30a8bc05f34a9f402ef7c68718bc169670fa588ff383733d51a6876dbf6c",
+          "size": [
+            94,
+            56
+          ]
+        },
+        "earth-panel.png": {
+          "bytes": 27706,
+          "sha256": "5ab59c3774bf56af3b75432d40905f484731f2adf797875a977ce31e6ac478be",
+          "size": [
+            128,
+            128
+          ]
+        },
+        "earth-paper.png": {
+          "bytes": 28936,
+          "sha256": "6377f4328844cc23d533780a3fcdd39f81ef7b4fd72b1a58152b6b1a40acabe4",
+          "size": [
+            128,
+            128
+          ]
+        },
+        "earth-steel-texture.png": {
+          "bytes": 7717,
+          "sha256": "7979de16be10b0f786a858d16ea40da3bed74ad297aa420f4cb2eb9e79eef928",
+          "size": [
+            64,
+            64
+          ]
+        },
+        "earth-units.png": {
+          "bytes": 49393,
+          "sha256": "36316b25c3d182a1682e35f9468520247175a38237f947e2052feab8cd1144a5",
+          "size": [
+            384,
+            192
+          ]
+        }
+      },
+      "panel_bytes_decoded": 262144,
+      "status": "prototype asset kit, not loaded by production game",
+      "steel_texture_bytes_decoded": 16384,
+      "unit_atlas": "earth-units.png",
+      "unit_bytes_decoded": 294912,
+      "unit_count": 18,
+      "unit_tile": [
+        64,
+        64
+      ]
+    },
+    "wu-peifu-source.json": {
+      "author": "原始照片作者不詳，採 Wikimedia Commons 2011 年留存版本",
+      "download_url": "https://upload.wikimedia.org/wikipedia/commons/archive/7/72/20111029061555%21Wu_Peifu.jpg",
+      "identity": "吳佩孚",
+      "license": "public-domain",
+      "license_url": "https://commons.wikimedia.org/wiki/Template:PD-China",
+      "person_id": 58,
+      "publication": "中國名人錄第三版，上海密勒氏評論報，1925 年，第 876 頁",
+      "reference_url": "https://www.wikidata.org/wiki/Q697046",
+      "retrieved_at": "2026-10-12",
+      "runtime_asset": "portraits/0058-wu-peifu-1925.jpg",
+      "runtime_bytes": 17344,
+      "runtime_sha256": "33945a2e928d02feb4ffb4283a4493736726fcf2514ea3a4628a661425b66b1d",
+      "runtime_size": [
+        192,
+        283
+      ],
+      "source_asset": "wu-peifu-source.jpg",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Wu_Peifu.jpg",
+      "source_sha256": "c7fbb0d70682817f79e290a26bfa0597b3c667e97efa122bc185a67468c47fd7"
+    },
+    "geography-sources.json": [
+      {
+        "file": "ne_50m_land.geojson",
+        "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_50m_land.geojson",
+        "version": "5.1.2",
+        "bytes": 1636166,
+        "sha256": "e874b27a51d146452be360cafb3cc50c86001074a67d534113e6534682f9826b",
+        "license": "public-domain",
+        "license_url": "https://www.naturalearthdata.com/about/terms-of-use/"
+      },
+      {
+        "file": "ne_50m_rivers_lake_centerlines.geojson",
+        "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_50m_rivers_lake_centerlines.geojson",
+        "version": "5.1.2",
+        "bytes": 827318,
+        "sha256": "f286e0ce978fde999ca2d7a78c764be08542e19b63cded52b05c12d5173ccc51",
+        "license": "public-domain",
+        "license_url": "https://www.naturalearthdata.com/about/terms-of-use/"
+      }
+    ]
+  }
+}

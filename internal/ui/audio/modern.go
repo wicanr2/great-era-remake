@@ -52,16 +52,18 @@ type ModernTrackSet struct {
 }
 
 var modernManifestTracks = map[string]Track{
-	"modern_scene":    TrackScene,
-	"modern_strategy": TrackStrategy,
-	"modern_battle_a": TrackBattle1,
-	"modern_battle_b": TrackBattle2,
-	"modern_story":    TrackWall,
-	"modern_final":    TrackFinal,
+	"modern_scene":      TrackScene,
+	"modern_strategy":   TrackStrategy,
+	"modern_main_theme": TrackMainTheme,
+	"modern_battle_a":   TrackBattle1,
+	"modern_battle_b":   TrackBattle2,
+	"modern_battle_alt": TrackBattleAlt,
+	"modern_story":      TrackWall,
+	"modern_final":      TrackFinal,
 }
 
 // LoadModernTracks 讀取並驗證一個 modern 音樂目錄。它不會掃描目錄或猜測
-// 檔名，只接受 manifest 明列的六個 cue；讀不到 optional cue 時保留 warning。
+// 檔名，只接受已定義的八個 cue；舊六曲清單相容，optional 缺檔保留 warning。
 func LoadModernTracks(dir string) (ModernTrackSet, error) {
 	var result ModernTrackSet
 	manifestData, err := os.ReadFile(filepath.Join(dir, "manifest.json"))

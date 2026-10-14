@@ -286,6 +286,7 @@ func NewModernFlowLayout(surface ModernSurface, count int) (ModernFlowLayout, er
 // 戰場，右側把資源、五項命令與三個大控制鍵分層。撤退時同一側改顯示 3×4
 // 數字鍵盤；規則與既有 BattleCommand／Digit action 不在 layout 層複製。
 type ModernBattleLayout struct {
+	Hex            bool
 	Surface        ModernSurface
 	Rail           Rect
 	Header         Rect
@@ -351,6 +352,9 @@ func NewModernBattleLayout(surface ModernSurface) (ModernBattleLayout, error) {
 }
 
 func (l ModernBattleLayout) MapCellRect(col, row int) (Rect, error) {
+	if l.Hex && col >= 0 && col < 14 && row >= 0 && row < 14 {
+		return l.EarthCellRect(col, row), nil
+	}
 	if col < 0 || col >= 14 || row < 0 || row >= 14 {
 		return Rect{}, fmt.Errorf("Modern 戰鬥格 (%d,%d) 超出 14×14", col, row)
 	}

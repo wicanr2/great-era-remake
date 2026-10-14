@@ -37,8 +37,9 @@ worklist）。對話被壓縮或新 session 接手時先讀它。本檔只放「
   是否修改由使用者決定。
 - 不散布原版執行檔、資料、美術、音樂、其旋律衍生物或倚天字型。公開產出只有
   引擎程式碼與翻譯文本；原版資料一律 gitignore。
-- 唯一圖像白名單是 `docs/images/*.png` 的成果展示截圖（渲染結果，不是資產本身；
-  使用者 2026-08-01 明示）；其他位置的 PNG 也會被拒絕清單擋下。
+- 展示截圖只放行 `docs/images/*.png`。使用者於 2026-10-14 另核准三張專案生成 HD 圖集：
+  `internal/ui/hdart/earth-kit.png`、`earth-units.png`、`materials.png`。精確雜湊、生成來源及授權見
+  `docs/licenses/generated-hd-assets.json`，由 `tools/deny_scan.sh` 核對。其他 PNG 與原版抽取素材仍拒絕。
 - 原始素材在 `workplace/orig/`，一律唯讀。存檔實驗使用副本或明確輸出目錄；
   測試存檔一律寫到 `/tmp` 或明確測試輸出目錄，不覆蓋原版存檔。
 

@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "sample_rate": 44100,
+  "tracks": [
+    {
+      "name": "scene",
+      "analysis": {
+        "sample_rate": 44100,
+        "channels": 2,
+        "frames": 2761043,
+        "duration_seconds": 62.60868480725624,
+        "peak_abs_sample": 14160,
+        "peak_normalized": 0.43212890625,
+        "rms": 0.09579093539631443,
+        "mono_rms": 0.09567870782874116,
+        "first_last_delta_abs": 0,
+        "clipped": false,
+        "non_silent": true,
+        "sha256": "35077991c6e6a1fb62846a24ea9f417de331e2a3bedb808d35bd38428b511aeb"
+      }
+    },
+    {
+      "name": "strategy",
+      "analysis": {
+        "sample_rate": 44100,
+        "channels": 2,
+        "frames": 2268000,
+        "duration_seconds": 51.42857142857143,
+        "peak_abs_sample": 17976,
+        "peak_normalized": 0.548583984375,
+        "rms": 0.10364610736739453,
+        "mono_rms": 0.10344845340675443,
+        "first_last_delta_abs": 0,
+        "clipped": false,
+        "non_silent": true,
+        "sha256": "5a877cc005041480e95d6b24f07757746ce40b08f2851e939cd4958f111f167d"
+      }
+    },
+    {
+      "name": "main-theme",
+      "analysis": {
+        "sample_rate": 44100,
+        "channels": 2,
+        "frames": 2268000,
+        "duration_seconds": 51.42857142857143,
+        "peak_abs_sample": 22248,
+        "peak_normalized": 0.678955078125,
+        "rms": 0.13538416992102884,
+        "mono_rms": 0.13502073007775606,
+        "first_last_delta_abs": 0,
+        "clipped": false,
+        "non_silent": true,
+        "sha256": "5742e13a8d18e981dfdcb7bf4d0ab7d70c0adeee2b9a1725c7475de81851cb40"
+      }
+    },
+    {
+      "name": "battle-1",
+      "analysis": {
+        "sample_rate": 44100,
+        "channels": 2,
+        "frames": 2268000,
+        "duration_seconds": 51.42857142857143,
+        "peak_abs_sample": 21461,
+        "peak_normalized": 0.654937744140625,
+        "rms": 0.13203128062546327,
+        "mono_rms": 0.1316948176941884,
+        "first_last_delta_abs": 0,
+        "clipped": false,
+        "non_silent": true,
+        "sha256": "c0aaaa763846557f824f7fa6f99333ea88c455b61c60fb6f36800e7d5c500789"
+      }
+    },
+    {
+      "name": "battle-2",
+      "analysis": {
+        "sample_rate": 44100,
+        "channels": 2,
+        "frames": 2268000,
+        "duration_seconds": 51.42857142857143,
+        "peak_abs_sample": 22677,
+        "peak_normalized": 0.692047119140625,
+        "rms": 0.13136405988013464,
+        "mono_rms": 0.13099589936831654,
+        "first_last_delta_abs": 0,
+        "clipped": false,
+        "non_silent": true,
+        "sha256": "cacd3d593f3387496fcf82ccc530404b161f91bb502bd215583cc59683b6a0cf"
+      }
+    },
+    {
+      "name": "battle-alt",
+      "analysis": {
+        "sample_rate": 44100,
+        "channels": 2,
+        "frames": 2268000,
+        "duration_seconds": 51.42857142857143,
+        "peak_abs_sample": 20092,
+        "peak_normalized": 0.6131591796875,
+        "rms": 0.11880936000588133,
+        "mono_rms": 0.1185407975520943,
+        "first_last_delta_abs": 0,
+        "clipped": false,
+        "non_silent": true,
+        "sha256": "60e2880b426223183b87a332ef141f5ab96a5e2602b3543094fdaa2db61e1968"
+      }
+    },
+    {
+      "name": "wall",
+      "analysis": {
+        "sample_rate": 44100,
+        "channels": 2,
+        "frames": 3097756,
+        "duration_seconds": 70.24390022675738,
+        "peak_abs_sample": 13336,
+        "peak_normalized": 0.406982421875,
+        "rms": 0.08703709659426814,
+        "mono_rms": 0.0869649171870003,
+        "first_last_delta_abs": 0,
+        "clipped": false,
+        "non_silent": true,
+        "sha256": "55d438bbd5ebd442082199bcb5f6826c6a78b5c53f763f89a6071111406b2331"
+      }
+    },
+    {
+      "name": "final",
+      "analysis": {
+        "sample_rate": 44100,
+        "channels": 2,
+        "frames": 2442462,
+        "duration_seconds": 55.384625850340136,
+        "peak_abs_sample": 25180,
+        "peak_normalized": 0.7684326171875,
+        "rms": 0.14268005822018398,
+        "mono_rms": 0.14223933230697064,
+        "first_last_delta_abs": 0,
+        "clipped": false,
+        "non_silent": true,
+        "sha256": "5330c667dd51f646eaa1505bb828f1394a30260dd47a4f8932be8f4bd8c1970a"
+      }
+    }
+  ],
+  "effects": []
+}

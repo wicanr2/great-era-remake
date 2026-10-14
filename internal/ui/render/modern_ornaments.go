@@ -10,6 +10,17 @@ import (
 // 只在 runtime 可用時疊上；否則仍以雙線與折角構成完整、可再散布的 fallback。
 func drawModernDecoratedControl(c *Canvas, r uilayout.Rect, style uitheme.UIStyle,
 	fill, border assets.RGB) {
+	if style.Textured {
+		kind := 1
+		if fill == style.Accent {
+			kind = 3
+		}
+		if earthFrame(c, r, kind) {
+			return
+		}
+		roomRect(c, r, fill, border)
+		return
+	}
 	c.fillRect(r.X, r.Y, r.W, r.H, fill)
 	c.strokeRect(r.X, r.Y, r.W, r.H, border)
 	if r.W > 8 && r.H > 8 {
@@ -43,6 +54,18 @@ func drawModernDecoratedControl(c *Canvas, r uilayout.Rect, style uitheme.UIStyl
 // drawModernDecoratedPanel 以 WARMENU 的原版外框遮罩強化 A2 面板，但不把
 // 原始點陣或調色盤寫入任何輸出資產。
 func drawModernDecoratedPanel(c *Canvas, r uilayout.Rect, style uitheme.UIStyle, fill assets.RGB) {
+	if style.Textured {
+		kind := 0
+		if fill.R > 150 && fill.G > 140 {
+			kind = 2
+		}
+		if earthFrame(c, r, kind) {
+			return
+		}
+		roomRect(c, r, fill, style.Muted)
+		roomRivets(c, r, style)
+		return
+	}
 	c.fillRect(r.X, r.Y, r.W, r.H, fill)
 	c.strokeRect(r.X, r.Y, r.W, r.H, style.Muted)
 	if r.W >= 40 && r.H >= 40 {

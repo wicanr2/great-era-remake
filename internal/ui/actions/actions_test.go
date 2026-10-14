@@ -26,8 +26,8 @@ func TestSurfaceToLogicalHandlesLetterboxAndPillarbox(t *testing.T) {
 
 func TestHitUsesHalfOpenEdgesAndStableOrder(t *testing.T) {
 	targets := []Target{
-		{Select1, Rect{10, 20, 30, 40}},
-		{Select2, Rect{40, 20, 30, 40}},
+		{Action: Select1, Rect: Rect{10, 20, 30, 40}},
+		{Action: Select2, Rect: Rect{40, 20, 30, 40}},
 	}
 	for _, p := range []struct {
 		x, y int

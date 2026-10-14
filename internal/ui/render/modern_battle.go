@@ -21,24 +21,27 @@ type ModernBattleLabels struct {
 	Controls                                          [3]string
 	Mode                                              string
 	Back, Delete, Submit                              string
+	Detail                                            [4]string
+	TerrainNames                                      [13]string
 }
 
 // ModernBattleSurfaceData 是 H1-c 的純呈現資料；所有 combatant 欄位由 cmd/dsds
 // 先整理，renderer 不執行移動、攻擊、AI 或存檔寫回。
 type ModernBattleSurfaceData struct {
-	Battlefield *game.Battlefield
-	Theme       uitheme.Theme
-	Units       uitheme.UnitProvider
-	Attackers   []*game.Combatant
-	Defenders   []*game.Combatant
-	CurrentCell game.CellIndex
-	TargetCells []game.CellIndex
-	TargetNums  []int
-	Panel       BattlePanelData
-	Labels      ModernBattleLabels
-	Fonts       *assets.EtenFonts
-	Log         string
-	Style       uitheme.UIStyle
+	Battlefield  *game.Battlefield
+	Theme        uitheme.Theme
+	Units        uitheme.UnitProvider
+	Attackers    []*game.Combatant
+	Defenders    []*game.Combatant
+	CurrentCell  game.CellIndex
+	GeneralNames map[game.GeneralID]string
+	TargetCells  []game.CellIndex
+	TargetNums   []int
+	Panel        BattlePanelData
+	Labels       ModernBattleLabels
+	Fonts        *assets.EtenFonts
+	Log          string
+	Style        uitheme.UIStyle
 }
 
 // DrawModernBattleSurface 畫 1280×720 戰鬥 HUD。地形／鐵路／部隊圖示沿用已驗證
@@ -49,6 +52,9 @@ func (c *Canvas) DrawModernBattleSurface(d ModernBattleSurfaceData) error {
 	}
 	if d.Battlefield == nil || d.Theme == nil || d.Units == nil {
 		return fmt.Errorf("Modern 戰鬥缺少 battlefield、theme 或 unit provider")
+	}
+	if d.Style.Textured {
+		return c.drawEarthBattle(d)
 	}
 	l, err := uilayout.NewModernBattleLayout(uilayout.ModernDesignSurface())
 	if err != nil {

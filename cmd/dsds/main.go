@@ -139,6 +139,7 @@ const (
 )
 
 type app struct {
+	room             commandRoomState
 	m                *game.Map
 	tbl              *game.ProvinceTable // 39 省的狀態（存檔或初始檔）
 	generals         []game.General      // 該期的將領表
@@ -382,6 +383,15 @@ func (a *app) Update() error {
 		return nil
 	}
 
+	if inpututil.IsKeyJustPressed(ebiten.KeyF4) {
+		if err := a.toggleInterface(); err != nil {
+			a.report(err.Error())
+		}
+		return nil
+	}
+	if a.updateCommandRoom() {
+		return nil
+	}
 	switch a.screen {
 	case screenQuit:
 		switch {
@@ -1925,7 +1935,7 @@ func (a *app) openBiography(back screen) {
 		return
 	}
 	pageCount := len(doc.Pages)
-	if a.resolution == uiresolution.ModeHigh && a.themeMode == uitheme.ModeModern {
+	if a.highInterface() {
 		// 高解析 H4 的比例字距、欄寬與復古 28 格版不同；必須使用 renderer
 		// 共用的頁數入口，否則 NextPage 可能指向畫面不存在的一頁。
 		pageCount, err = render.ModernBiographyPageCount(body)
@@ -1952,6 +1962,14 @@ func (a *app) wordingText(key string) (string, error) {
 // uiStyle 讓主題圖集與整個畫面外殼採同一份 style。若外部測試 provider
 // 尚未實作 StyleProvider，保留 retro-safe 預設，不因 UI polish 破壞窄測試。
 func (a *app) uiStyle() uitheme.UIStyle {
+	if a.commandInterface() {
+		if a.themeMode == uitheme.ModeModern {
+			return uitheme.CommandStyle()
+		}
+		s := uitheme.RetroStyle()
+		s.Name = uitheme.ModeModern
+		return s
+	}
 	if a != nil && a.battlefieldTheme != nil {
 		if provider, ok := a.battlefieldTheme.(uitheme.StyleProvider); ok {
 			return provider.Style()
@@ -1962,13 +1980,12 @@ func (a *app) uiStyle() uitheme.UIStyle {
 
 // highModernMap 開啟已完成 H1-a metrics 的地圖／資訊卡頁。
 func (a *app) highModernMap() bool {
-	return a != nil && a.resolution == uiresolution.ModeHigh &&
-		a.themeMode == uitheme.ModeModern && a.screen == screenMap
+	return a.highInterface() && a.screen == screenMap
 }
 
 // highModernPage 是已有專用 renderer 的文件／設定／戰鬥頁集合。
 func (a *app) highModernPage() bool {
-	if a == nil || a.resolution != uiresolution.ModeHigh || a.themeMode != uitheme.ModeModern {
+	if !a.highInterface() {
 		return false
 	}
 	switch a.screen {
@@ -1984,13 +2001,11 @@ func (a *app) highModernPage() bool {
 // 專用頁維持自己的 renderer，其餘頁面使用 ModernFlowSurface 與同一份
 // Selection／Digit／Confirm 命中契約，不再回退到 640×350 frame。
 func (a *app) highModernFlow() bool {
-	return a != nil && a.resolution == uiresolution.ModeHigh &&
-		a.themeMode == uitheme.ModeModern && a.screen != screenMap && a.screen != screenBattle
+	return a.highInterface() && a.screen != screenMap && a.screen != screenBattle
 }
 
 func (a *app) highModernBattle() bool {
-	return a != nil && a.resolution == uiresolution.ModeHigh &&
-		a.themeMode == uitheme.ModeModern && a.screen == screenBattle
+	return a.highInterface() && a.screen == screenBattle
 }
 
 func (a *app) highModernSurface() bool {
@@ -2229,6 +2244,8 @@ func (a *app) setThemePreference(mode uitheme.Mode) error {
 	}
 	a.preferences, a.themeMode = nextPrefs, parsed
 	a.battlefieldTheme, a.unitTheme, a.hudIcons = selected, selectedUnits, selectedHUD
+	a.refreshBiographyPages()
+	a.pointer.cancel()
 	a.dirty = true
 	fmt.Fprintf(os.Stderr, "顯示主題已切換為 %s（偏好：%s）\n", parsed, a.prefsPath)
 	return nil
@@ -2276,7 +2293,7 @@ func (a *app) toggleResolution() error {
 }
 
 func (a *app) applyWindowSize() {
-	if a.resolution == uiresolution.ModeHigh {
+	if a.commandInterface() || a.resolution == uiresolution.ModeHigh {
 		ebiten.SetWindowSize(uiresolution.HighWidth, uiresolution.HighHeight)
 		return
 	}
@@ -2476,6 +2493,9 @@ func writeFileAtomic(path string, data []byte, mode os.FileMode) (err error) {
 }
 
 func (a *app) compose() error {
+	if a.roomVisible() {
+		return a.composeCommandRoom()
+	}
 	highModernMap := a.highModernMap()
 	highModernPage := a.highModernPage()
 	highModernSurface := a.highModernSurface()
@@ -3660,7 +3680,7 @@ func (a *app) Draw(dst *ebiten.Image) {
 	if a.frame == nil {
 		return
 	}
-	if a.resolution == uiresolution.ModeHigh {
+	if a.commandInterface() || a.resolution == uiresolution.ModeHigh {
 		if bounds := a.frame.Bounds(); bounds.Dx() == uiresolution.HighWidth &&
 			bounds.Dy() == uiresolution.HighHeight {
 			// H1-a 地圖頁已直接以設計畫布合成，不再二次縮放。
@@ -3687,10 +3707,17 @@ func (a *app) Draw(dst *ebiten.Image) {
 }
 
 func (a *app) Layout(_, _ int) (int, int) {
+	if a.commandInterface() {
+		return 1280, 720
+	}
 	return a.resolution.Size()
 }
 
+// buildVersion is set by the isolated packaging tool; development builds remain explicit.
+var buildVersion = "development"
+
 func main() {
+	versionFlag := flag.Bool("version", false, "顯示程式版本並離開")
 	gameDir := flag.String("game", "workplace/orig/game", "原版素材目錄（唯讀）")
 	start := flag.Int("province", 26, "起始省編號（1-39），預設 26 = 湖北省")
 	// AGENTS.md §8：原版資產唯讀，存檔一律寫到別的地方。
@@ -3703,12 +3730,17 @@ func main() {
 	etenDir := flag.String("eten", "workplace/eten",
 		"使用者提供的倚天 STDFONT.15／SPCFONT.15／ASCFONT.15 目錄（不隨遊戲散布）")
 	wording := flag.String("wording", "", "顯示用語：original 或 plain；空白沿用 prefs.json")
+	interfaceFlag := flag.String("interface", "", "操作介面：command 或 original；空白沿用 prefs.json")
 	themeFlag := flag.String("theme", "", "圖形主題：retro 或 modern；空白沿用 prefs.json")
 	resolutionFlag := flag.String("resolution", "", "顯示解析度：original 或 high；空白沿用 prefs.json")
 	audioFlag := flag.String("audio", string(uiaudio.ModeOff), "音訊：off、retro 或 modern（retro 需玩家自備 MUS/TIM；modern 優先讀 manifest/Ogg，缺少時使用原創純 Go fallback）")
 	modernAudioDir := flag.String("modern-audio", "assets/music/modern", "Modern Ogg 音樂目錄（有通過 manifest 的 Ogg 時優先使用；缺檔安全退回原創純 Go loop）")
 	prefsFile := flag.String("prefs", "", "偏好檔路徑；空白使用 XDG_CONFIG_HOME/dsds/prefs.json")
 	flag.Parse()
+	if *versionFlag {
+		fmt.Println(buildVersion)
+		return
+	}
 	prefsPath := *prefsFile
 	if prefsPath == "" {
 		var err error
@@ -3721,6 +3753,13 @@ func main() {
 	preferences, prefsErr := userprefs.Load(prefsPath)
 	if prefsErr != nil {
 		fmt.Fprintf(os.Stderr, "偏好檔無效，使用內建預設：%v\n", prefsErr)
+	}
+	if *interfaceFlag != "" {
+		preferences.Layout = *interfaceFlag
+	}
+	if preferences.Layout != "command" && preferences.Layout != "original" {
+		fmt.Fprintln(os.Stderr, "未知介面：", preferences.Layout)
+		os.Exit(1)
 	}
 	wordingValue := preferences.Wording
 	if *wording != "" {
@@ -3852,6 +3891,19 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 	if err != nil {
 		return err
 	}
+	// Continue the player's writable copy on the next launch. All fields are
+	// validated again by buildSession before any live state is installed.
+	if savePath != "" {
+		if saved, loadErr := os.ReadFile(savePath); loadErr == nil {
+			tbl, err = game.ParseSaveProvinces(saved)
+			if err != nil {
+				return fmt.Errorf("讀取玩家存檔：%w", err)
+			}
+			origSave = saved
+		} else if !os.IsNotExist(loadErr) {
+			return loadErr
+		}
+	}
 	// 戰鬥副本與省份存檔分開載入。來源一律唯讀取自 gameDir；輸出路徑
 	// 則落在 -save 同目錄，避免把原版 SAVE(1).DT2／MEM_WAR.DAT 改掉。
 	var battleDT2 []byte
@@ -3936,8 +3988,8 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 	} else {
 		valid := true
 		for i, image := range decoded {
-			if image == nil || image.W != 215 || image.H != 16 {
-				fmt.Fprintf(os.Stderr, "NEWSDATA.DAT 圖像 #%d 尺寸不是 215x16（史事圖庫停用）\n", i)
+			if image == nil || (image.W != 209 && image.W != 215 && image.W != 216) || image.H != 16 {
+				fmt.Fprintf(os.Stderr, "NEWSDATA.DAT 圖像 #%d 不符合已驗證的新聞尺寸（史事圖庫停用）\n", i)
 				valid = false
 				break
 			}
@@ -3947,7 +3999,7 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 		}
 	}
 	retroTheme := render.NewRetroThemeWithIcons(ts, icons, assets.EGADefaultPalette)
-	modernTheme := uitheme.NewModern()
+	modernTheme := uitheme.NewCommandModern()
 	if ornaments, ornamentErr := uitheme.DecodeOriginalOrnaments(read); ornamentErr != nil {
 		fmt.Fprintf(os.Stderr, "原版介面裝飾載入失敗（Modern A2 改用程式化邊框）：%v\n", ornamentErr)
 	} else {
@@ -3975,13 +4027,14 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 	}
 
 	windowW, windowH := render.ModeBGIW*scale, render.ModeBGIH*scale
-	if resolutionMode == uiresolution.ModeHigh {
+	if preferences.Layout == "command" || resolutionMode == uiresolution.ModeHigh {
 		windowW, windowH = uiresolution.HighWidth, uiresolution.HighHeight
 	}
 	ebiten.SetWindowSize(windowW, windowH)
 	ebiten.SetWindowTitle("大時代的故事")
 	a := &app{
-		m: m, tbl: tbl, generals: generals, fonts: fonts, cmdFonts: cmdFonts, fan: fan,
+		room: commandRoomState{Mode: interfaceFromPreference(preferences.Layout)},
+		m:    m, tbl: tbl, generals: generals, fonts: fonts, cmdFonts: cmdFonts, fan: fan,
 		tiles: ts, icons: icons, origSave: origSave, savePath: savePath,
 		battleDT2: battleDT2, battleMemWar: battleMemWar,
 		battleDT2States: battleDT2States, battleMemStates: battleMemStates,
@@ -4157,7 +4210,7 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 	if a.semanticWording() && (a.wording == nil || a.eten == nil) {
 		return fmt.Errorf("英日語系／現代白話模式需要完整 wording.json 與倚天三套字庫")
 	}
-	if themeMode == uitheme.ModeModern && (a.wording == nil || a.eten == nil) {
+	if (themeMode == uitheme.ModeModern || a.commandInterface()) && (a.wording == nil || a.eten == nil) {
 		return fmt.Errorf("Modern 主題需要完整 wording.json 與倚天三套字庫；請以 -eten 提供玩家自備字庫")
 	}
 	if startupSession != nil {

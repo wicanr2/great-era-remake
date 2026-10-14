@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "version": "v.1.0.0-20261014",
+  "date": "2026-10-13",
+  "status": "user-accepted-mastered-music",
+  "user_answer": "已試聽正常，採用新版混音",
+  "question_scope": "以目前耳機或喇叭抽聽數首，確認音量、音色與循環接點，決定是否採用整套正式版配樂",
+  "human_listening": "user-reported normal; sampled listening, not an eight-track blind-listening claim",
+  "physical_device": "user current listening equipment; model and OS unspecified",
+  "all_platform_device_qa": "not claimed; Windows/macOS real-device checks remain separate",
+  "credit": "great-era-remake project; original pure-Go procedural composition",
+  "license": "LicenseRef-RRSAL-1.0; repository LICENSE",
+  "source_and_mix": "packaged assets/music/modern/provenance.json",
+  "packaged_pending_notices": "historical state at build and mastering time; this subsequent acceptance receipt is the current user listening decision",
+  "music_bytes_changed_after_listening": false,
+  "manifest_sha256": "9704062f67d19da006a20390b5d8ef37a93f6d88c149005c0c5e12ec4f1f5a35",
+  "tracks": {
+    "modern_scene": "1436268a11e7c6c99509194606b160a84b265c8e35f011b638dcb994bfa81393",
+    "modern_strategy": "784aafc82b745f7701260071d597e482e51f6cc3666da7fb7a1af87e0e6b220a",
+    "modern_main_theme": "632a14bf0a89729c7b64a3728dfdb212803bab2ccb4930417467a79a3c983cbf",
+    "modern_battle_a": "d156b1800c91792242cef8d338449065971c7b36e90ef8175322ed37bed23785",
+    "modern_battle_b": "be4cf4fca4c31b865db1bf315782f11ce7124eed7b27a418fdfb46ece6c3199b",
+    "modern_battle_alt": "9fcce655ee98fcf3ced92427a599374514aef16281d95ebda5ea4522577277b6",
+    "modern_story": "88c793b290673266918354d483824830d964dc3325d55baefbf477e3d6738772",
+    "modern_final": "b312394ef67d5bfc2bb07acac8ecdd92905713a26e5cfc521ab97e2de1a500e7"
+  },
+  "accepted_audio_version": "v.1.0.0-20261013",
+  "reissue_note": "same accepted eight audio hashes; date and notices updated"
+}

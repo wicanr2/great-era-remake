@@ -69,6 +69,7 @@ type HighResolutionTheme interface {
 // 亂數或命令流程。未提供 StyleProvider 的舊主題會由呼叫端採用 RetroStyle。
 type UIStyle struct {
 	Name        Mode
+	Textured    bool
 	Ink         assets.RGB
 	Paper       assets.RGB
 	Panel       assets.RGB
