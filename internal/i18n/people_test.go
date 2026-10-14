@@ -95,10 +95,10 @@ func TestAuthoredOverlayCompletesRuntimeBiographies(t *testing.T) {
 			withBiography++
 		}
 	}
-	if withBiography != 387 {
-		t.Fatalf("overlay 後正文數 = %d，預期 387", withBiography)
+	if withBiography != 392 {
+		t.Fatalf("overlay 後正文數 = %d，預期 392", withBiography)
 	}
-	for _, id := range []int{13, 19, 417} {
+	for _, id := range []int{13, 19, 36, 132, 140, 225, 416, 417} {
 		if db.people[id].Biography == "" {
 			t.Fatalf("新增人物 #%d 沒有接入自傳", id)
 		}

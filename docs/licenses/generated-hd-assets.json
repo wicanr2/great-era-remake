@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": "v.1.0.0-20261014",
+  "version": "v.1.0.1-20261014",
   "files": {
     "internal/ui/hdart/earth-kit.png": "554bf71883334a2c4f41357f4c0f6d8f70143fa37b37aecd9beb42ad6a5ca56e",
     "internal/ui/hdart/earth-units.png": "36316b25c3d182a1682e35f9468520247175a38237f947e2052feab8cd1144a5",
@@ -192,5 +192,6 @@
         "license_url": "https://www.naturalearthdata.com/about/terms-of-use/"
       }
     ]
-  }
+  },
+  "approved_asset_version": "v.1.0.0-20261014"
 }

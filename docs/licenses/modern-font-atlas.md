@@ -4,8 +4,8 @@ GEMF 字模來源為 Noto Sans／Serif CJK TC，face index 3。完整作者與�
 
 | 字模 | 字數 | 大小 | SHA-256 |
 |---|---:|---:|---|
-| sans | 2549 | 2630588 | `67df3186c31d149b62ecefdd8c9082223f25b36b5ef4be3e6538cef96307e3c6` |
-| serif | 2549 | 2630588 | `cf3a44a54614752d449c1b29479bffc04cbc6eb7fece3d450f89e3d9f949e0e4` |
+| sans | 2554 | 2635748 | `38689a918af30fa89e891ae1af236d667f0c60950e9a019d3699b7342bde3f99` |
+| serif | 2554 | 2635748 | `0e2daea86b2db3c260193ba5a8756b01e6bd67c6f98b471f81c272ff460ddf94` |
 
 原始來源：NotoSansCJK-Regular.ttc SHA-256 b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a；NotoSerifCJK-Regular.ttc SHA-256 a04178ec485dffdff7cc0c0c20e1fce9202d7e2160d805e8e44a4c8841c58481。
 

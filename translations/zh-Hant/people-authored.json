@@ -11,9 +11,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "5ec96752250adb4c3a85d52faa5b84489068fddbfc0b79cb269dfbf2d2832eab"
       }
     },
@@ -50,10 +50,23 @@
       "confidence": "high",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "f3239cf6ebdd19650dc7d338472985dbaa37431916b26cf2e0fb5ca8dbe69864"
+      }
+    },
+    {
+      "id": 36,
+      "name_ingame": "薛仰忠",
+      "bio_zh": "薛仰忠，生卒年與籍貫不詳。丁中江《北洋軍閥史話》第二四二章〈誓師北伐〉的網路轉錄，在國民革命軍第四軍編制中列其為炮兵營長。原書頁面尚待覆核，其餘經歷未詳。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
+        "bio_sha256": "3607556d97397da1ab68f5fc5ebdc254b0ab9de41760f2a748568af7434c536a"
       }
     },
     {
@@ -63,9 +76,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "07ce34a745b5f8fc3e24e305d01e1758bd5a4adacc52d8d3f9ea878651c9442f"
       }
     },
@@ -258,9 +271,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "fe3ed8173c09281d30cd16ca742529b50185d379b7f91853f42df86168b3db10"
       }
     },
@@ -271,9 +284,9 @@
       "confidence": "high",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "4869fa0ce75a4c6a989b6d5e5bbd4cf1b08586db513a56489e62876d2051bda1"
       }
     },
@@ -284,9 +297,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "f5bff1194c76ffcdcc0467ef5a611a378ec38dfe025dc7df8aba0b1b33c1f7d0"
       }
     },
@@ -297,9 +310,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "a18f929dcf79116df3e5d270c8dafd59c3bfd536de5b8b8ebc01d500fe7ea46d"
       }
     },
@@ -310,9 +323,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "449c463ff5e4beb7f75b1f9ff21fbbaa761899ddda115e62e19bcd896a228d81"
       }
     },
@@ -323,9 +336,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "2ad7f9cdc1973e80692e1f7ea4ff62947ae72bdf9cbe3950b8f6dac5f4a5e8e5"
       }
     },
@@ -336,9 +349,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "670b384e514b12795fc7979540bac9d3e34422027b9bddd861b17928f9f42f7c"
       }
     },
@@ -349,9 +362,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "326e9ecc219daac3d83252eab21e7da0466dbb1ae44fc63310f87e1f5bbc3395"
       }
     },
@@ -362,10 +375,23 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "3b2d0c5a30baa475b577072d6430ae8af62e0e669a99c863d79de2f4cc40d2c3"
+      }
+    },
+    {
+      "id": 132,
+      "name_ingame": "蘇珽",
+      "bio_zh": "蘇珽，生卒年與籍貫不詳。《北洋軍閥史》的網路轉錄人物志記載，蘇為周蔭人部屬，曾任陸軍第十二師旅長、第三十混成旅旅長及五省聯軍陸軍第十二師師長。原書頁面尚待覆核。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
+        "bio_sha256": "c1536b94b6d56fae897222c60284769e104ebf46ea13167ddeaecfc66f5e5b01"
       }
     },
     {
@@ -375,9 +401,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "2982782bf2dd17ab2692df04a7779a22f0419234a39e785e3cff0ac20898b51f"
       }
     },
@@ -388,10 +414,23 @@
       "confidence": "high",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "cb93e11b3d01d12342e1237ee8dba1a59a4bb41b4ed1a35e6c664eb0583dd404"
+      }
+    },
+    {
+      "id": 140,
+      "name_ingame": "何麓昆",
+      "bio_zh": "何麓昆，生卒年與籍貫不詳。北伐戰爭期間率部駐守福建建甌。1926年，國民革命軍第二軍第六師進抵建甌，何部繳械投降。其餘經歷未查得可靠記載。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU3.json",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
+        "bios": "docs/reference/people/bios-batchU3.md",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
+        "bio_sha256": "d43647492efb60d25218f46168ba84eb740de4f0841e15bfc9516dee310a18a1"
       }
     },
     {
@@ -401,9 +440,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "b5a3d54e9de9e378a2693bd271c14edf572f4eb91f23729cc85f0803b2547967"
       }
     },
@@ -414,9 +453,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "f902b87847d8f65b07b3d9d88cda877ea2260d0c0d94a958ae0be36aa3833e56"
       }
     },
@@ -427,9 +466,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "97024ae24fff546d93c15974e3e55fddbccacbea09d24cadfe93c5fa446ea3f9"
       }
     },
@@ -440,9 +479,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "a2169e008c4fc577b192ab77feb5157275950d7c2f646f701998a65777a7f989"
       }
     },
@@ -453,9 +492,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "542697de0896d7115356476c0034c0d99523c18ba69696557e9dd38b13f81d7f"
       }
     },
@@ -466,9 +505,9 @@
       "confidence": "high",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "dbe520840923e2190e30bfb803e93ab3c85147ca797d7b2601ffe902a49f3d5c"
       }
     },
@@ -479,9 +518,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "72c2b9bf33ea5501e638ea57471ea9b3164867ae4ab49bf38376057c65788409"
       }
     },
@@ -492,9 +531,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "021385773311012fd5186355a64ac1bd5ad2b8d5cefef43d74b864cb8014c153"
       }
     },
@@ -505,9 +544,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "fd4a52faea7c2466f43a76d8a51f63710c9fabdc8c0cd0b24b209aba81e00968"
       }
     },
@@ -518,9 +557,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "7e9c8a1e1aec105ead70b7d7625300caa0e6d5f1f9491a2cdedad1fb6ac9915f"
       }
     },
@@ -531,10 +570,23 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "06b96004facea77b73587ca1fb789bb8b00c49ec484e2c66d2349320361c4bc7"
+      }
+    },
+    {
+      "id": 225,
+      "name_ingame": "吳希賢",
+      "bio_zh": "吳希賢，生卒年與籍貫不詳。《北洋軍閥史》的網路轉錄人物志記載，吳屬吳俊陞部，曾任黑龍江第一軍軍長。原書頁面尚待覆核，其餘經歷未詳。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU1.json",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
+        "bios": "docs/reference/people/bios-batchU1.md",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
+        "bio_sha256": "c6213cc530b9473af195cbf040d54a7016742e48c847d3461a0ef86c8ab50387"
       }
     },
     {
@@ -544,9 +596,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "f95f8c17387af9de9b3337eee5935cfe447a1f723b5f3e1640c7302cb689517d"
       }
     },
@@ -557,9 +609,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "efb331fd9afe728116be950652dd528598894ff421e589b65ad2a7899ac452d6"
       }
     },
@@ -570,9 +622,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "43a335f2cd3332b3ab5c56722d24160977b9b8c68d6c1e4a79b23d929eead330"
       }
     },
@@ -583,9 +635,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "8a62d8e65da10982c2d8ae7d742dddb393e19793bf212d1503be5232d1d6aec9"
       }
     },
@@ -596,9 +648,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "c2b7c9b1d994dfecc7206929caef0906ccb5caff9908940aeba6cf8fac6432c3"
       }
     },
@@ -609,9 +661,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "4c25aa8fc4a9990454e6cc75f4049e390a9194b2c7b80ea622b4e3c7bdfbde52"
       }
     },
@@ -622,9 +674,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU1.json",
-        "facts_sha256": "58cd2679349adaca3ed12c8cab2927b58430b645c7dc108c0733b2d4984ccd96",
+        "facts_sha256": "6630f0ce4efcf65d31fcb08fcc74eb23d0ffc97e3d14b43eb06f8e0fd39a83d9",
         "bios": "docs/reference/people/bios-batchU1.md",
-        "bios_sha256": "52fab83d4478304246fb89024024900a3f5cc3d7c3eebccaeb821bc6c443eeec",
+        "bios_sha256": "6108e7150416e69395b847487c5fded1b989d060f556e2e786aeacf7bc4915be",
         "bio_sha256": "30c42a32cb3edd43b3f01c6aa1f65bf73f1fd6e185ce3f0bfb3a01907b15088e"
       }
     },
@@ -635,9 +687,9 @@
       "confidence": "high",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "b659ea1fc5efcff8578bcaca09b2d353a0ade964aef280bc87b8b0892e624a3c"
       }
     },
@@ -648,9 +700,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "6596dcf9c85e1c0b38c6066b89bae963e068a5904af4199210f449df9d4d5ff0"
       }
     },
@@ -661,9 +713,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "7fe5495d9f053b9ea7e238179ab3a64ac950fef41699ebf93a69a6f3fb743178"
       }
     },
@@ -674,9 +726,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "86727a6dcf2cc4e4d310f2db725f7c04723a88049212e6a108338027340e2450"
       }
     },
@@ -687,9 +739,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU3.json",
-        "facts_sha256": "a674efb534139ee52151abb30ab92a6310e2a43f51aa6bbe5ea62b9e4dee97bc",
+        "facts_sha256": "e6e60909557eaa67982c07809d1baa9e0cd697d8b3f625021a67ae8da8d9cbd5",
         "bios": "docs/reference/people/bios-batchU3.md",
-        "bios_sha256": "edda85775020fda77a4c2147015af7a36e2a0822f8bb730b3ba6350d4417353f",
+        "bios_sha256": "956ff3397a7871f89fe2755c7324ebbcca3c0a4d04224e9b92f157284dc8f7ce",
         "bio_sha256": "419f5d05eba6984ad63652524edfdead14447497fe0ef4a66812eb0a13deaba0"
       }
     },
@@ -700,9 +752,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "5dbca67e7534d821fe10ac56d2b5af3276c007c5928488b05ebe8896b13fd98e"
       }
     },
@@ -713,9 +765,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "bf628a07ab2eb16f1272d70560d44abaeee3be044ebbf0e7906d6243d19f42c2"
       }
     },
@@ -726,9 +778,9 @@
       "confidence": "high",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "ef27cee0ac685ea17cd616a71401a087205b6206a4a9a430d647a2e4751ac0dd"
       }
     },
@@ -739,9 +791,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "51623cfd40ca4f93ad7c1e193c9d4f3aeb39f0528818f58d7f38a50f097c3b2e"
       }
     },
@@ -752,9 +804,9 @@
       "confidence": "high",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "9ea9479ea643c258681b3ca375f6dd2c3397440cd838af3d99336d0357b905c9"
       }
     },
@@ -765,9 +817,9 @@
       "confidence": "medium",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "b7891663758f786447e5e5554654200dbebf7197a02ebc8015d1948f5d31060c"
       }
     },
@@ -778,10 +830,23 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "5a09f4f3d2ed46e7ed70fdf787fa4b033e30635498e8fef9768cb53a298716a0"
+      }
+    },
+    {
+      "id": 416,
+      "name_ingame": "博郎",
+      "bio_zh": "博郎，生卒年與籍貫不詳。何應欽《八年抗戰之經過》的駐印軍序列記載，博郎任戰車指揮官，轄戰車第一、第二營。其外文姓名與其餘經歷尚待查證。",
+      "confidence": "low",
+      "provenance": {
+        "facts": "docs/reference/people/facts-batchU4.json",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
+        "bios": "docs/reference/people/bios-batchU4.md",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
+        "bio_sha256": "4f1dfc06a79d2982626b68f392c9099574746476fe14442298e12e8548218536"
       }
     },
     {
@@ -791,9 +856,9 @@
       "confidence": "low",
       "provenance": {
         "facts": "docs/reference/people/facts-batchU4.json",
-        "facts_sha256": "9e1b09ab1343d97ee9d2943cef7444ea5e2c58009fe4dcd1f4daae9aff6e20a8",
+        "facts_sha256": "2068b276711f9d3fb75b65d8647924952ff1b9b49a8b300c4fb2f48f04c9317f",
         "bios": "docs/reference/people/bios-batchU4.md",
-        "bios_sha256": "14d3e5e58f1b7290756bc6a969f981b092c872e907e45bcce801cf1404763031",
+        "bios_sha256": "ae9f50527fb6fe9a524f98a72066a0e3174187f290f2c5bb1e51ccb95f7de4f2",
         "bio_sha256": "10c820f2fa09c6818707dd4c792d56a2c0a5517aeecadea4492f5e89e28857a0"
       }
     }

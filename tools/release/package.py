@@ -187,16 +187,18 @@ def prepare(version):
             source=runtime/record['file'];assert sha(source)==record['sha256']
             target=common/'docs/licenses/appimage'/source.name
             target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
-        (common/'LOCAL-ONLY.txt').write_text('本機完整版，含原版遊戲資料與倚天字庫。未取得公開散布權，不可上傳或公開分享。\n配樂為專案原創八曲 Ogg 混音，技術驗收通過；新混音人耳及實體裝置驗收未執行。\n遊戲資料唯讀使用；玩家進度寫系統使用者目錄。\n')
+        (common/'LOCAL-ONLY.txt').write_text('本機完整版，含原版遊戲資料與倚天字庫。未取得公開散布權，不可上傳或公開分享。\n配樂為專案原創八曲 Ogg，使用者已抽聽採用；其他平台真機仍未驗收。\n人物正文392篇，24位維持史料待考；英日為未審譯稿。\n遊戲資料唯讀使用；玩家進度寫系統使用者目錄。\n')
     write_json(STAGE/'private-inputs.json',private)
     source={}
     for name in ['cmd','internal','translations','docs/licenses','docs/release','tools/release','assets/music/modern','go.mod','go.sum','LICENSE','tools/package.sh']:
         path=ROOT/name
         for f in sorted(path.rglob('*')) if path.is_dir() else [path]:
             if f.is_file() and not f.is_symlink():source[f.relative_to(ROOT).as_posix()]=sha(f)
-    write_json(STAGE/'source.json',{'version':version,'files':source,
+    source_commit=os.environ.get('DSDS_SOURCE_COMMIT','')
+    assert re.fullmatch(r'[0-9a-f]{40}',source_commit), 'Require a clean committed release source'
+    write_json(STAGE/'source.json',{'version':version,'files':source,'source_commit':source_commit,
         'tool_images':{x:os.environ[x] for x in ['DSDS_GO_IMAGE','DSDS_MAC_IMAGE','DSDS_APPIMAGE_IMAGE']},
-        'dirty_source_snapshot':True,'package_kind':PACKAGE_DIR,'release_channel':RELEASE_CHANNEL,'private_input_files':private,
+        'dirty_source_snapshot':False,'package_kind':PACKAGE_DIR,'release_channel':RELEASE_CHANNEL,'private_input_files':private,
         'original_game_inputs':[name for name in private if name.startswith('data/')], 'project_original_music':owned_audio})
 
 
@@ -340,7 +342,9 @@ def verify(version):
         report['appimage_runtime']='not included in public engine ZIP'
     report['archives'][image.name]={'bytes':image.stat().st_size,'sha256':sha(image),'extraction':'passed'}
     report['open_checks']=['Windows physical device','macOS physical device','signing and notarization',
-                           'multiple Linux distributions','new-mix human and physical-device listening','public promotion image rights']
+                           'Linux physical desktop and FUSE','original game image redistribution clearance']
+    if (STAGE/'reuse-proof.json').exists():
+        report['build_reuse_proof']=json.loads((STAGE/'reuse-proof.json').read_text())
     for f in ['full-tests.log','no-cgo.log','linux-version.txt']:
         target=f if FULL_LOCAL else 'patch-'+f
         shutil.copy2(STAGE/f,OUT/'smoke'/target)

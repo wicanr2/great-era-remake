@@ -10,7 +10,7 @@
 
 DESIGN-22 仍是 DRAFT，因此本工具刻意沒有直接改寫 people.json 或 translations 的
 模式。預設輸出只包含自傳、信心度與來源雜湊，供研究索引使用；`--overlay` 是
-SPEC-11 READY 的增量產物，只輸出目前執行期沒有正文的 61 筆，供 `PeopleDB` 填入
+SPEC-11 READY 的增量產物，只輸出目前執行期沒有正文的 66 筆，供 `PeopleDB` 填入
 空白欄位。兩種模式都不覆寫既有 `people.json`。
 """
 
@@ -185,14 +185,14 @@ def build_document() -> tuple[dict, dict]:
         missing = sorted(set(range(1, 418)) - set(facts_by_id))
         raise InputError(f"研究骨架未完整覆蓋 1..417，缺 {missing}")
     authored.sort(key=lambda row: row["id"])
-    if len(authored) != 387:
-        raise InputError(f"自撰正文應為 387 篇，實際 {len(authored)}")
+    if len(authored) != 392:
+        raise InputError(f"自撰正文應為 392 篇，實際 {len(authored)}")
 
     old_nonempty = {i for i, row in canonical.items() if (row.get("bio_zh") or "").strip()}
     authored_ids = {row["id"] for row in authored}
     newly_available = sorted(authored_ids - old_nonempty)
     unknown = sorted(set(canonical) - authored_ids)
-    if len(old_nonempty) != 326 or len(newly_available) != 61 or len(unknown) != 30:
+    if len(old_nonempty) != 326 or len(newly_available) != 66 or len(unknown) != 25:
         raise InputError(
             f"基準漂移：舊正文 {len(old_nonempty)}、新增 {len(newly_available)}、unknown {len(unknown)}"
         )
@@ -214,11 +214,11 @@ def build_document() -> tuple[dict, dict]:
 
 
 def make_overlay(document: dict, summary: dict) -> dict:
-    """只保留執行期目前缺正文的 61 筆，供 SPEC-11 additive merge 使用。"""
+    """只保留執行期目前缺正文的 66 筆，供 SPEC-11 additive merge 使用。"""
     wanted = set(summary["newly_available"])
     rows = [row for row in document["people"] if row["id"] in wanted]
-    if len(rows) != len(wanted) or len(rows) != 61:
-        raise InputError(f"overlay 應恰有 61 筆新增正文，實際 {len(rows)}")
+    if len(rows) != len(wanted) or len(rows) != 66:
+        raise InputError(f"overlay 應恰有 66 筆新增正文，實際 {len(rows)}")
     return {
         "schema_version": "1",
         "language": "zh-Hant",
@@ -234,7 +234,7 @@ def main() -> int:
     parser.add_argument(
         "--overlay",
         action="store_true",
-        help="只輸出目前 people.json 缺少正文的 61 筆（需搭配 --output）",
+        help="只輸出目前 people.json 缺少正文的 66 筆（需搭配 --output）",
     )
     parser.add_argument("--output", type=pathlib.Path, help="明確寫出索引；不得指向產品 people.json")
     args = parser.parse_args()

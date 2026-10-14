@@ -3,16 +3,17 @@
 漢堂國際資訊《大時代的故事》(1992, MS-DOS) 的逆向、引擎重寫與多語系專案。
 在 Go / Ebiten 上重寫一套跨平台引擎，還原原版繁體中文文本，另做英文與日文語系。
 
-## 正式發行 v.1.0.0-20261014
+## 正式發行 v.1.0.1-20261014
 
-[GitHub Release](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.0.0-20261014)提供 Windows amd64、macOS arm64 與 Linux x86_64 引擎及八曲原創 Ogg 配樂。
-公開包不含原版遊戲資料、倚天字庫及玩家存檔。自備合法副本後，使用包內啟動器並以 `-game`、`-eten` 指定資料目錄；詳見[執行說明](docs/release/README.md)。
+[GitHub Release](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.0.1-20261014)提供 Windows amd64、macOS arm64 與 Linux x86_64 引擎及八曲原創 Ogg 配樂。
+公開包需自備合法原版遊戲資料與倚天字庫，詳見[執行說明](docs/release/README.md)。完整版與含原版畫面的比較影片保留本機，集中於專案根目錄 `dist-all/v.1.0.1-20261014/`。
 
-預設為大地色俯視六角戰場與磨損鋼鐵 HD。`F2` 切換美術，`F4` 切換介面，滾輪縮放、拖曳地圖，人物全文可搜尋及翻頁。
-八曲採 44.1 kHz 雙聲道 Ogg，約 -18 LUFS，已經使用者抽聽採用。`-audio off` 可關閉配樂。
+預設為大地色俯視六角戰場與磨損鋼鐵 HD。`F2` 切美術，`F4` 切介面，滾輪縮放並拖曳地圖。鐵路維持原版圖形與連接。
+人物檔案含392篇中文正文，英日各392篇 machine-draft，24位維持史料待考。新增何麓昆、蘇珽、吳希賢、博郎及薛仰忠五篇來源限定短傳；轉錄與紙本覆核限制保留。使用者已停止剩餘考證。
 
-19 個 Go 套件、Debian／Ubuntu／Wine 正常玩家路徑與存讀檔已驗證；Windows／macOS 真機、簽署及公證尚未驗收。英日自傳保留 machine-draft，29 位史料待考人物明示未知，不宣稱原版全等價。
-現況見 [CONTEXT.md](CONTEXT.md)、[整合規格](docs/spec/48-hd-release-integration.md)與 [Issue #7](https://github.com/wicanr2/great-era-remake/issues/7)。素材來源及精確白名單見 [生成圖集紀錄](docs/licenses/generated-hd-assets.json)，完整字型授權見 [OFL](docs/licenses/OFL-1.1.txt)。
+八曲沿用2026年10月13日已試聽採用的混音，44.1kHz雙聲道 Ogg，音訊位元組不變。`-audio off` 可關閉配樂。
+驗收範圍為 Go 套件、純 Go、封包內容與架構、Linux及Wine正常操作、人物閱讀與存讀檔。具體結果見Release驗證附件。Windows／macOS真機、簽署及公證尚未驗收；不宣稱原版全等價。
+現況見[CONTEXT.md](CONTEXT.md)、[整合規格](docs/spec/48-hd-release-integration.md)及[Issue #7](https://github.com/wicanr2/great-era-remake/issues/7)。素材來源見[生成圖集紀錄](docs/licenses/generated-hd-assets.json)，字型授權見[OFL](docs/licenses/OFL-1.1.txt)。
 
 1992 年 10 月，漢堂出了這款以民國初年為背景的回合制戰棋。它扭轉了前作《隋唐群雄傳》
 的評價，也是《天外聖劍錄》《炎龍騎士團》之前的那一部。三十四年過去，原始碼沒有留下來，

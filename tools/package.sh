@@ -20,6 +20,15 @@ package_modules="$package_project/workplace/.gocache/pkg"
 package_go=logh3-hd-preview:20261011-r1
 package_mac=hr-osxcross:1.26.7-15.5-r1
 package_appimage=hr-appimage:runtime-recovery-r1
+package_reuse_full="${DSDS_PACKAGE_REUSE_FULL:-0}"
+case "$package_reuse_full" in 0|1) ;; *) exit 2 ;; esac
+if [ "$package_reuse_full" = 1 ]; then
+  test "$package_kind" = patch
+  test -f "$package_out/SHA256SUMS.json"
+  test -d "$package_out/full-local"
+fi
+package_source_commit="$(git -C "$package_root" rev-parse HEAD)"
+test -z "$(git -C "$package_root" status --porcelain)"
 package_user="$(id -u):$(id -g)"
 test -d "$package_modules"
 test -f "$package_root/tools/release/package.py"
@@ -39,11 +48,24 @@ trap cleanup_package EXIT
 package_go_id="$(docker image inspect "$package_go" --format '{{.Id}}')"
 package_mac_id="$(docker image inspect "$package_mac" --format '{{.Id}}')"
 package_appimage_id="$(docker image inspect "$package_appimage" --format '{{.Id}}')"
+if [ "$package_reuse_full" = 1 ]; then
+timeout 90 docker run --rm --network none --memory 2g --cpus 2 --pids-limit 192 \
+  --label dsds.task=release-20261014-r2 --user "$package_user" \
+  -v "$package_root:/work:ro" -v "$package_project:/src:ro" -v "$package_stage:/stage:rw" \
+  -v "$package_out:/output:ro" -w /work -e DSDS_PACKAGE_FULL_LOCAL=0 \
+  -e DSDS_PACKAGE_RELEASE_CHANNEL="$package_channel" -e DSDS_SOURCE_COMMIT="$package_source_commit" \
+  -e DSDS_GO_IMAGE="$package_go_id" -e DSDS_MAC_IMAGE="$package_mac_id" \
+  -e DSDS_APPIMAGE_IMAGE="$package_appimage_id" --entrypoint /bin/bash "$package_go" -c '
+    set -euo pipefail
+    python3 tools/release/package.py prepare "$1"
+    python3 tools/release/reuse_build.py "$1"
+  ' bash "$package_version"
+else
 timeout 360 docker run --rm --network none --memory 4g --cpus 4 --pids-limit 512 \
   --user "$package_user" -v "$package_root:/work:ro" -v "$package_project:/src:ro" -v "$package_modules:/go/pkg:ro" \
   -v "$package_project/workplace/orig:/work/workplace/orig:ro" -v "$package_project/workplace/eten:/work/workplace/eten:ro" \
   -v "$package_stage:/stage:rw" -w "$package_source" -e GOCACHE=/tmp/package-go-cache -e GOPROXY=off \
-  -e DSDS_VERSION="$package_version" -e DSDS_GO_IMAGE="$package_go_id" \
+  -e DSDS_VERSION="$package_version" -e DSDS_GO_IMAGE="$package_go_id" -e DSDS_SOURCE_COMMIT="$package_source_commit" \
   -e DSDS_REFERENCE_VERSION="$package_reference" \
   -e DSDS_PACKAGE_FULL_LOCAL="$package_full" \
   -e DSDS_PACKAGE_RELEASE_CHANNEL="$package_channel" \
@@ -87,6 +109,7 @@ timeout 360 docker run --rm --network none --memory 3g --cpus 3 --pids-limit 512
       -o /stage/build/dsds-macos ./cmd/dsds
     file /stage/build/dsds-macos
   '
+fi
 timeout 60 docker run --rm --network none --memory 2g --cpus 2 --pids-limit 128 \
   --user "$package_user" -v "$package_root:/work:ro" -v "$package_stage:/stage:rw" \
   -v "$package_modules:/go/pkg:ro" \

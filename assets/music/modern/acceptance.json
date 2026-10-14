@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": "v.1.0.0-20261014",
+  "version": "v.1.0.1-20261014",
   "date": "2026-10-13",
   "status": "user-accepted-mastered-music",
   "user_answer": "已試聽正常，採用新版混音",
@@ -13,7 +13,7 @@
   "source_and_mix": "packaged assets/music/modern/provenance.json",
   "packaged_pending_notices": "historical state at build and mastering time; this subsequent acceptance receipt is the current user listening decision",
   "music_bytes_changed_after_listening": false,
-  "manifest_sha256": "9704062f67d19da006a20390b5d8ef37a93f6d88c149005c0c5e12ec4f1f5a35",
+  "manifest_sha256": "a16c7fb0c20eb48f6bd96269a47588a274bf2c1ba2ea7b94b1e4d269a7bd5fb3",
   "tracks": {
     "modern_scene": "1436268a11e7c6c99509194606b160a84b265c8e35f011b638dcb994bfa81393",
     "modern_strategy": "784aafc82b745f7701260071d597e482e51f6cc3666da7fb7a1af87e0e6b220a",

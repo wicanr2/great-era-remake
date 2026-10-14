@@ -123,11 +123,11 @@ type personSlot struct{ period, slot int }
 
 const authoredOverlayFile = "people-authored.json"
 
-// SPEC-11 固定的增量產物大小。這不是把 387 篇硬編進規則，而是防止產生器
+// SPEC-11 固定的增量產物大小。這不是把 392 篇硬編進規則，而是防止產生器
 // 輸出範圍漂移後，載入器意外覆蓋既有產品正文。
-const authoredOverlayPeople = 61
+const authoredOverlayPeople = 66
 
-const translatedOverlayPeople = 387
+const translatedOverlayPeople = 392
 
 // PeopleDB 接合語系人物資料與不隨語系改變的期別槽位表。
 type PeopleDB struct {
@@ -298,7 +298,7 @@ func validateAuthoredProvenance(p authoredProvenance) error {
 	return nil
 }
 
-// applyTranslatedBiographyOverlay 以 fail-closed 方式套用英／日 387 篇自傳。
+// applyTranslatedBiographyOverlay 以 fail-closed 方式套用英／日 392 篇自傳。
 //
 // 沒有 overlay 時維持 source-fallback，讓目前的英／日包仍可啟動；一旦檔案
 // 存在，則整份驗證完才修改 db，避免半份翻譯悄悄進入遊戲。這裡不把

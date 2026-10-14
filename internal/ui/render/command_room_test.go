@@ -115,7 +115,7 @@ func testRoomArchivePreservesAllBiographyText(t *testing.T, language string) {
 			}
 		}
 	}
-	if full != 387 || unknown != 29 {
+	if full != 392 || unknown != 24 {
 		t.Fatalf("coverage %d full / %d unknown", full, unknown)
 	}
 }
