@@ -17,6 +17,7 @@ package_out="$package_project/dist-all/$package_version"
 package_channel="${DSDS_PACKAGE_RELEASE_CHANNEL:-candidate}"
 case "$package_channel" in candidate|stable) ;; *) echo '發行管道須為 candidate 或 stable。' >&2; exit 2 ;; esac
 package_modules="$package_project/workplace/.gocache/pkg"
+package_cache="$package_project/workplace/.gocache/build"
 package_go=logh3-hd-preview:20261011-r1
 package_mac=hr-osxcross:1.26.7-15.5-r1
 package_appimage=hr-appimage:runtime-recovery-r1
@@ -31,6 +32,7 @@ package_source_commit="$(git -C "$package_root" rev-parse HEAD)"
 test -z "$(git -C "$package_root" status --porcelain)"
 package_user="$(id -u):$(id -g)"
 test -d "$package_modules"
+test -d "$package_cache"
 test -f "$package_root/tools/release/package.py"
 test ! -e "$package_out/$package_kind"
 test -d "$package_project/workplace/orig"
@@ -64,7 +66,7 @@ else
 timeout 360 docker run --rm --network none --label dsds.task=release-20261014-r2 --memory 4g --cpus 4 --pids-limit 512 \
   --user "$package_user" -v "$package_root:/work:ro" -v "$package_project:/src:ro" -v "$package_modules:/go/pkg:ro" \
   -v "$package_project/workplace/orig:/work/workplace/orig:ro" -v "$package_project/workplace/eten:/work/workplace/eten:ro" \
-  -v "$package_stage:/stage:rw" -w "$package_source" -e GOCACHE=/tmp/package-go-cache -e GOPROXY=off \
+  -v "$package_stage:/stage:rw" -v "$package_cache:/go-build:rw" -w "$package_source" -e GOCACHE=/go-build -e GOPROXY=off \
   -e DSDS_VERSION="$package_version" -e DSDS_GO_IMAGE="$package_go_id" -e DSDS_SOURCE_COMMIT="$package_source_commit" \
   -e DSDS_REFERENCE_VERSION="$package_reference" \
   -e DSDS_PACKAGE_FULL_LOCAL="$package_full" \
@@ -94,7 +96,7 @@ timeout 360 docker run --rm --network none --label dsds.task=release-20261014-r2
   '
 timeout 360 docker run --rm --network none --label dsds.task=release-20261014-r2 --memory 3g --cpus 3 --pids-limit 512 \
   --user "$package_user" -v "$package_root:/work:ro" -v "$package_modules:/go/pkg:ro" \
-  -v "$package_stage:/stage:rw" -w /work -e GOCACHE=/tmp/package-mac-cache -e GOPROXY=off \
+  -v "$package_stage:/stage:rw" -v "$package_cache:/go-build:rw" -w /work -e GOCACHE=/go-build -e GOPROXY=off \
   -e DSDS_VERSION="$package_version" -e MACOSX_DEPLOYMENT_TARGET=12.0 \
   -e DSDS_REFERENCE_VERSION="$package_reference" \
   --entrypoint /bin/bash "$package_mac" -c '

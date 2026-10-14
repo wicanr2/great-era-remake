@@ -50,6 +50,6 @@ for name in ['full-tests.log', 'no-cgo.log', 'linux-version.txt']:
     proof['logs'][name] = sha(source)
 assert (stage / 'linux-version.txt').read_text().strip() == version
 testlog = (stage / 'full-tests.log').read_text()
-assert testlog.count('ok\t') == 19 and 'FAIL' not in testlog
+assert sum(line.startswith('ok') and '\t' in line for line in testlog.splitlines()) == 19 and 'FAIL' not in testlog
 (stage / 'reuse-proof.json').write_text(json.dumps(proof, ensure_ascii=False, indent=2) + '\n')
 print('Public package reuses three verified binaries and the same-source 19-package regression.')
