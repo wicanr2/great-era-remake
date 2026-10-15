@@ -5,13 +5,13 @@
 | 項目 | 現況與入口 |
 |---|---|
 | 主要分支 | GitHub 僅保留 `master`；已整併正式版、前版發行與研究分支全部提交，其餘三個遠端分支依使用者要求移除；整理見 [Issue #9](https://github.com/wicanr2/great-era-remake/issues/9)，清理見 [Issue #10](https://github.com/wicanr2/great-era-remake/issues/10) |
-| 正式版 | [v.1.0.2-20261015](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.0.2-20261015)，來源提交 `87934a41e8447b02080103b6536eb132edf4fd9f`；五份公開附件雜湊核對相符，舊 tag、Release 與附件保留 |
+| 正式版 | [v.1.0.3-20261015](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.0.3-20261015)，來源提交 `60bc1521ae0de7135ed07ef3bd276a4b0ea75c10`；五份公開附件雜湊核對相符，舊 tag、Release 與附件保留 |
 | 呈現與音訊 | 大地色指揮介面、俯視六角戰場與原版鐵路，原版／HD 美術及介面可獨立切換；八曲沿用[已採用混音](assets/music/modern/acceptance.json) |
-| 本版修正 | 全國地圖改用連續地表配色，消除固定經緯度造成的矩形明暗斷層；開發頁加入墾地、兵工廠及金礦插圖，原版切換與既有指令保留；實作見 [Issue #13](https://github.com/wicanr2/great-era-remake/issues/13)，重新發行見 [Issue #14](https://github.com/wicanr2/great-era-remake/issues/14) |
+| 本版修正 | 常駐五欄工具列加入 HD／原版／靜音、自動／八首選曲及偏好保存；完整版零參數啟動自行定位資料，存檔寫使用者目錄；見 [Issue #17](https://github.com/wicanr2/great-era-remake/issues/17)及 [SPEC-51](docs/spec/51-live-music-startup.md) |
 | 人物 | 416 筆檔案、392 篇中文正文；24 位待考依使用者決定停止研究，#3 以 not planned 關閉；英日各 392 篇保留 machine-draft |
-| 驗證 | 19 個 Go 套件；Linux 容器及 Windows／Wine 的完整包、公開包正常操作、開發插圖切換、存讀檔與重啟通過，四份存檔一致並經 Go parser 核對及原位元組寫回；[公開收據](https://github.com/wicanr2/great-era-remake/releases/download/v.1.0.2-20261015/RELEASE-VERIFICATION.json) |
-| 交付與權利 | 公開三平台引擎 ZIP、八曲原創配樂與驗證附件；本機六包及 93.534 秒 DOS／重製原版／HD 比較片集中在 `dist-all/v.1.0.2-20261015/`，新版重製段重新錄製，DOS 段保留當日原實錄來源；完整版、原版資料、倚天字庫及影片不公開上傳 |
-| 主線可玩預覽 | [Issue #16](https://github.com/wicanr2/great-era-remake/issues/16)：常駐工具列已接回，並增加音樂欄，美術／介面獨立切換、現有 AI 說明、輸入偏好、右鍵返回及滾輪支援完成。[SPEC-50](docs/spec/50-permanent-toolbar.md)已達 CONFORMED；19 個 Go 套件、seed 1 的 40 張正常操作實錄及存讀檔重啟通過，Windows／macOS 限交叉建置。本機入口為 `workplace/hoi4-ui-prototype/play.sh`；變更尚未提交或重新發行 |
+| 驗證 | 19 個 Go 套件、seed 1 的 40 張正常操作實錄、25 條 Linux 音訊路徑；Linux／Wine 完整包零參數啟動及公開包匯入、切換、存檔重啟通過，四份存檔一致並經 Go parser 與原位元組寫回核對；[公開收據](https://github.com/wicanr2/great-era-remake/releases/download/v.1.0.3-20261015/RELEASE-VERIFICATION.json) |
+| 交付與權利 | 三平台本機完整版、三份公開引擎及驗收集中於 `dist-all/v.1.0.3-20261015/`；公開附件含八曲原創配樂；完整版、原版資料及倚天字庫不公開上傳。比較影片保留於前版目錄，見交付頁的影片入口 |
+| 正式工具列 | [SPEC-50](docs/spec/50-permanent-toolbar.md)及 [SPEC-51](docs/spec/51-live-music-startup.md)達 CONFORMED，已收入本版；美術／介面／音樂獨立切換、現有 AI 說明、輸入偏好、右鍵返回及滾輪支援完成。本機預覽 `workplace/hoi4-ui-prototype/play.sh` 已接同版正式 Linux 執行檔；Windows／macOS 真機驗收另由 #7 追蹤 |
 | 後續 | [Issue #6](https://github.com/wicanr2/great-era-remake/issues/6)續追 Android；[Issue #7](https://github.com/wicanr2/great-era-remake/issues/7)續追 Windows／macOS 真機、簽署、公證及 Linux FUSE；原版未知行為維持既有證據限制 |
 
 現行工作由 [GitHub 總 Issue #1](https://github.com/wicanr2/great-era-remake/issues/1)與子 Issue 追蹤。文件分工：[README](README.md)為穩定入口，[WORKLOG](WORKLOG.md)保存整理後的工作歷程；本檔保存現況及有效文件索引，不重新啟用舊待辦。
@@ -33,7 +33,7 @@
 | 玩家執行方式 | [公開引擎](docs/release/README.md)、[本機完整版](docs/release/FULL-LOCAL.md) |
 | 現行 HD 契約 | [SPEC-48](docs/spec/48-hd-release-integration.md) |
 | 常駐工具列與滑鼠 | [SPEC-50](docs/spec/50-permanent-toolbar.md)，含已採用原型與正常操作驗收範圍 |
-| 即時音樂與雙擊啟動 | [SPEC-51](docs/spec/51-live-music-startup.md)，操作已驗證，封包重新發行由 [Issue #17](https://github.com/wicanr2/great-era-remake/issues/17)追蹤；本機收據入口為 workplace/hoi4-ui-prototype/audio-default-20261015/README.md |
+| 即時音樂與雙擊啟動 | [SPEC-51](docs/spec/51-live-music-startup.md)，已驗證並正式發行；本機收據入口為 `workplace/hoi4-ui-prototype/audio-default-20261015/README.md` |
 | 規則及忠實度限制 | [機制索引](docs/mechanics/00-index.md)、[SPEC-30](docs/spec/30-approximate-validation-m2.md) |
 | 人物撰寫與整合 | [撰寫規格](docs/design/21-biography-authoring-spec.md)、[SPEC-11](docs/spec/11-authored-biography-overlay-p2c.md) |
 | 原版證據定位 | [函式索引](docs/re/00-function-index.md)、[玩法紀錄](docs/playtest/43-remake-original-gameplay-diff.md) |

@@ -2,6 +2,8 @@
 
 狀態：CONFORMED。使用者於 2026-10-15 採用已展示的四欄原型，指定常駐、不收合，保留現有 AI，只做工具列與滑鼠。規格先達 READY，再接入並完成下列主線預覽驗收。追蹤：[Issue #16](https://github.com/wicanr2/great-era-remake/issues/16)。
 
+現行五欄與音樂擴充以 [SPEC-51](51-live-music-startup.md) 為準；本規格保存四欄原型及首次整合驗收，功能已收入 v.1.0.3-20261015。
+
 ## 依據與範圍
 
 定稿畫面：[常駐工具列原型](../images/toolbar-approved-20261015.png)，SHA-256 `6315c9e3f879093ade30c9c36f5cc7044bb603d5533e9849d01adbf280be4f31`。互動原型位於 `workplace/hoi4-ui-prototype/toolbar-20261015.html`，SHA-256 `efee85dfe6b3fcb303bde611060be4867cad068e217c9306910ed459bf0c2bb0`。原型下方是遊戲實錄截圖，沒有獨立玩法或規則。
@@ -35,11 +37,11 @@
 - 固定 seed 1，由正常入口以滑鼠切換四種介面／美術組合、開啟人物與翻頁、地圖拖曳／縮放、開發選單、數字輸入及取消；純鍵盤切回、戰術命令與返回、F10 確認／取消、存讀檔與重啟抽樣驗證。
 - 同初始狀態比較工具列切換前後存檔，核對切換不消耗命令。保護輸入雜湊見本機 `workplace/hoi4-ui-prototype/toolbar-20261015/baseline.json`。
 
-驗收只宣稱正常玩家路徑的重製操作，沒有新原版 oracle、跨平台真機或人耳驗收。本次不打包或改動已發布 Release；公開展示圖沿既有截圖白名單，原版資料、字庫與完整本機素材不公開。
+驗收只宣稱正常玩家路徑的重製操作，沒有新原版 oracle、跨平台真機或人耳驗收。首次整合範圍不含打包；後續發行見 SPEC-51。公開展示圖沿既有截圖白名單，原版資料、字庫與完整本機素材不公開。
 
-## 主線可玩預覽驗收
+## 首次主線可玩預覽驗收
 
-目前本機預覽由 `workplace/hoi4-ui-prototype/play.sh` 啟動 `toolbar-20261015/dsds`，SHA-256 `bd1af94407486a0a9ebd5e39b393d7a719d5bcf3fed3eaef88b698c60aabc7f4`。工具與收據由該工作區 README 索引，整合產物位於 `workplace/hoi4-ui-prototype/toolbar-20261015/`，正式發行包保持原狀。
+首次整合由 `workplace/hoi4-ui-prototype/play.sh` 啟動 `toolbar-20261015/dsds`，SHA-256 `bd1af94407486a0a9ebd5e39b393d7a719d5bcf3fed3eaef88b698c60aabc7f4`。工具與收據由該工作區 README 索引，整合產物位於 `workplace/hoi4-ui-prototype/toolbar-20261015/`，該次未另行發行；目前本機入口已接 SPEC-51 的正式版。
 
 | 驗收 | 證據與範圍 |
 |---|---|
@@ -51,4 +53,4 @@
 | 平台 | Linux 容器正常操作；Windows amd64 與 macOS arm64 完成交叉建置及格式檢查，見 `cross-builds.json`。後兩者不宣稱真機執行或音訊驗收。 |
 | 完整性 | `final-check.json`：325 份受保護輸入不變，兩個字模包只新增六字，所有舊字模位元組相同。八曲音訊、原始資料、規則與 AI 實作未改。1,402 檔素材拒絕掃描零命中，純 Go 閘門通過，新增輸出由使用者擁有。 |
 
-實際可玩畫面：[常駐工具列](../images/toolbar-playable-20261015.png)，SHA-256 `dd33ec63837b7ecdd9be9dea73162373213c37dbfdaa69406244f8876276b0eb`。本次驗收限於這份本機主線建置，尚未提交或重新發行。
+首次四欄實錄保留於 `workplace/hoi4-ui-prototype/toolbar-20261015/capture-r3/05-hd-art-command-ui.png`，SHA-256 `dd33ec63837b7ecdd9be9dea73162373213c37dbfdaa69406244f8876276b0eb`。現行[五欄工具列畫面](../images/toolbar-playable-20261015.png)，SHA-256 `dae57ea1eae9d7431f1b7599573778c88e8827c1140435a149b5781808b24b4c`，由 SPEC-51 的驗收及正式發行承接。
