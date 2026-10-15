@@ -50,7 +50,7 @@
 
 ## v.1.0.1-20261014 人物資料發行封存
 
-狀態：READY。使用者於2026年10月14日確認本版號，要求正式Release、三平台完整版與推廣影片，停止剩餘24位考證。
+狀態：CONFORMED。使用者於2026年10月14日確認本版號，要求正式Release、三平台完整版與推廣影片，停止剩餘24位考證。發行及公開附件已完成，收據見本文件最後的主要分支整併記錄；已發布 tag 內的原規格保持不動。
 
 - 輸入為前版發行來源，以及已驗收392篇正文的18份增量。來源限定短傳、未審譯稿與待考標示保留，不補身份或生平。
 - 原有玩法、介面、美術與八曲混音沿用。原始資料唯讀；公開包與本機完整包維持既定權利界線。
@@ -58,3 +58,18 @@
 - 驗收包括來源拒絕掃描、純Go、語系來源、封包架構及逐檔雜湊、Linux／Wine正常操作與存讀檔、代表新短傳閱讀、影音完整解碼及抽幀。macOS限交叉建置與靜態檢查。
 - 影片保留DOS原版與重製原版／HD比較，新重製段由本版封包錄製；沿用DOS輔助實錄時明記原錄製來源，不宣稱同態或原版規則對拍。
 - 已發布tag、Release與附件不移動或覆寫。新版本通過上述檢查後建立獨立提交、tag與Release，交付根目錄為`dist-all/v.1.0.1-20261014/`。
+
+## 主要分支整併與展示收據
+
+2026-10-15 依使用者要求，將已發布來源及其提交歷史整併至 `master`。正式版仍為 [v.1.0.1-20261014](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.0.1-20261014)，來源 `85ed56095117134fd3fdbf64efd7a5411eaeabf7`。三平台公開包與遠端附件、392 篇正文、八曲配樂、19 個 Go 套件及四條正常操作驗收見[公開收據](https://github.com/wicanr2/great-era-remake/releases/download/v.1.0.1-20261014/RELEASE-VERIFICATION.json)。
+
+展示截圖沿用 v.1.0.1-20261014 的實際 Linux 遊戲視窗，固定種子 1，原尺寸 1280×720，沒有加工。指揮畫面來自正常封包啟動；戰術畫面來自正常出兵流程，未注入座標、勝利或資源。範圍是介面與美術展示，不能由圖片宣稱原版戰損或規則等價。
+
+| 展示圖片 | 原始本機收據路徑 | PNG SHA-256 |
+|---|---|---|
+| `docs/images/command-v.1.0.1-20261014.png` | `dist-all/v.1.0.1-20261014/smoke/linux/01-command-hd.png` | `26d1e69e3eee5b9e13c946a7ce221f4ffbc2ef7cfa4c3275467248a7b23b032c` |
+| `docs/images/battle-v.1.0.1-20261014.png` | `dist-all/v.1.0.1-20261014/smoke/promo-capture/15-battle.png` | `12108c6b23a0c1a4e25f5bfde687a7a55d42bfc7fafaa0e101057b2360127f7b` |
+
+指揮畫面的 `smoke/linux/gui-report.json` SHA-256 為 `cf847193bee4d3e0e7b0b850d2b3d4bb899589668afed1f86f588d3749b3df88`；影片擷取收據 `promo/capture.json` SHA-256 為 `185e29f49cf1c27742afeb8223da1dc7946c07d6bb8fb6308e4dd39e2376f827`。兩份收據由本機正式版交付保存，圖片符合既有 `docs/images/*.png` 公開展示白名單。
+
+主要分支整理沒有修改遊戲程式、語系資料、圖集、音訊或授權。後續真機及簽署仍由 [Issue #7](https://github.com/wicanr2/great-era-remake/issues/7)追蹤；分支與文件整理見 [Issue #9](https://github.com/wicanr2/great-era-remake/issues/9)。

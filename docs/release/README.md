@@ -1,5 +1,7 @@
 # 新 HD 三平台引擎與配樂包
 
+[正式下載](https://github.com/wicanr2/great-era-remake/releases/latest)提供三平台引擎包。現行發行版為 [v.1.0.1-20261014](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.0.1-20261014)，各包雜湊及驗收範圍見[公開驗證附件](https://github.com/wicanr2/great-era-remake/releases/download/v.1.0.1-20261014/RELEASE-VERIFICATION.json)。主要分支為 `master`，發行來源固定在同名 tag。
+
 公開引擎包使用本文件。本機資源完整包另見 [FULL-LOCAL.md](FULL-LOCAL.md)，
 兩種封包的素材範圍、啟動預設及散布狀態分開記錄。
 
@@ -28,7 +30,7 @@
 可加 `-locale translations/en` 或 `-locale translations/ja` 切換語系。
 可用 `-save` 指定另一個可寫存檔位置；偏好設定沿用系統使用者設定目錄。
 Go 1.26 的系統需求為 Windows 10 或 Windows Server 2016 以上、macOS 12 以上，見
-[Go 官方最低需求](https://go.dev/wiki/MinimumRequirements)。macOS 候選為 Apple Silicon，封包與 Mach-O 均宣告 12.0。
+[Go 官方最低需求](https://go.dev/wiki/MinimumRequirements)。macOS 封包為 Apple Silicon，封包與 Mach-O 均宣告 12.0。
 Linux 需要 glibc 2.34 以上、桌面 X11、OpenGL 與 ALSA 函式庫；
 glibc 需求由執行檔的實際符號版本核對。公開引擎 ZIP 不包含 AppImage runtime，也不需要 FUSE。
 
@@ -37,7 +39,7 @@ glibc 需求由執行檔的實際符號版本核對。公開引擎 ZIP 不包含
 圖形、美術與音訊選項彼此獨立。
 
 `-version` 顯示完整版號。每包的 `RELEASE-MANIFEST.json` 保存版本、平台及逐檔雜湊；
-候選根目錄的 `SHA256SUMS.json` 保存三個封包的大小、雜湊、來源與建置工具。
+發行輸出根目錄的 `SHA256SUMS.json` 保存封包的大小、雜湊、來源與建置工具。
 
 在隔離專案根目錄重建：
 
@@ -45,7 +47,7 @@ glibc 需求由執行檔的實際符號版本核對。公開引擎 ZIP 不包含
 DSDS_PACKAGE_RELEASE_CHANNEL=stable bash tools/package.sh v.1.0.1-20261014 patch
 ```
 
-輸出固定在 `dist-all/<版本>/patch/`，驗證記錄放 `smoke/`。腳本拒絕覆蓋既有候選，
+輸出固定在 `dist-all/<版本>/patch/`，驗證記錄放 `smoke/`。腳本拒絕覆蓋既有輸出，
 全程使用受限、無網路、目前使用者身分的 Docker。版本識別不建立 tag 或公開 Release。
 Linux 容器與 Wine 的啟動結果分別記錄；它們不能代替 Windows／macOS 真機聆聽或簽署。
 ## 重建來源

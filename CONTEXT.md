@@ -1,18 +1,30 @@
 # CONTEXT — 專案脈絡與文件索引
 
-## 現行發行來源 v.1.0.1-20261014
+## 目前狀態（2026-10-15）
 
-使用者確認新版本收錄392篇正文，24位維持史料待考，停止其餘考證。五篇增量與字型已在本機正常閱讀驗收，本分支納入相同18份檔案。英日譯稿維持 machine-draft，紙本及身份限制保留。
+| 項目 | 現況與入口 |
+|---|---|
+| 主要分支 | `master`，已整併 `release/v.1.0.1-20261014`、前版發行與 `exp/dosgolem-isr` 的提交歷史；本輪整理見 [Issue #9](https://github.com/wicanr2/great-era-remake/issues/9) |
+| 正式版 | [v.1.0.1-20261014](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.0.1-20261014)，來源提交 `85ed56095117134fd3fdbf64efd7a5411eaeabf7`；已發布 tag、Release 與附件保留 |
+| 呈現與音訊 | 大地色指揮介面、俯視六角戰場與原版鐵路，原版／HD 美術及介面可獨立切換；八曲沿用[已採用混音](assets/music/modern/acceptance.json) |
+| 人物 | 416 筆檔案、392 篇中文正文；24 位待考依使用者決定停止研究，#3 以 not planned 關閉；英日各 392 篇保留 machine-draft |
+| 驗證 | 19 個 Go 套件；Linux 容器及 Windows／Wine 的完整包、公開包正常操作、存讀檔與重啟通過，四份存檔一致並經 Go parser 核對；[公開收據](https://github.com/wicanr2/great-era-remake/releases/download/v.1.0.1-20261014/RELEASE-VERIFICATION.json) |
+| 交付與權利 | 公開三平台引擎 ZIP、八曲原創配樂與驗證附件；本機六包及 119 秒 DOS／重製原版／HD 比較片集中在 `dist-all/v.1.0.1-20261014/`，完整版、原版資料、倚天字庫及影片不公開上傳 |
+| 後續 | [Issue #6](https://github.com/wicanr2/great-era-remake/issues/6)續追 Android；[Issue #7](https://github.com/wicanr2/great-era-remake/issues/7)續追 Windows／macOS 真機、簽署、公證及 Linux FUSE；原版未知行為維持既有證據限制 |
 
-公開三平台引擎包含既有生成圖集、字型及八曲已採用原創 Ogg；原版資料、倚天字庫、完整版及含原版畫面的影片留本機。已發布的v.1.0.0-20261014保留。新版本的提交、標籤及Release由使用者本輪選定授權，工作集中[Issue #7](https://github.com/wicanr2/great-era-remake/issues/7)。
+現行工作由 [GitHub 總 Issue #1](https://github.com/wicanr2/great-era-remake/issues/1)與子 Issue 追蹤。文件分工：[README](README.md)為穩定入口，[WORKLOG](WORKLOG.md)保存整理後的工作歷程；本檔開頭保存目前真相，其餘章節保留歷史與逆向索引，不重新啟用舊待辦。
 
-發行契約見[整合規格](docs/spec/48-hd-release-integration.md)的本版本區段；由本來源乾淨打包與正常入口驗收。Windows／macOS真機、簽署、公證仍未驗收。下列舊章節為歷史，不能推翻本段現況。
+發行契約及現行展示收據見[整合規格](docs/spec/48-hd-release-integration.md)，平台使用方式見[發行文件](docs/release/README.md)。主要分支的文件整理沒有修改正式版遊戲程式、資料、音訊、圖集或授權。
+
+## 歷史脈絡與逆向索引
+
+以下日期化敘述與早期狀態表保存研究過程。數量、完成度與待辦以本檔開頭及遠端 Issue 為準；歷史記錄中的「未發行」「配樂未完成」及 387 篇正文不再代表現況。
 
 > **這份是全專案的單一入口。** 對話被壓縮、或換一個新 session 接手時，先讀這份，
 > 就能重建完整全局，再依索引跳到需要的文件。硬規則與工作紀律在
 > [`AGENTS.md`](./AGENTS.md)。
 >
-> 最後更新：2026-08-12（H4 全域指揮室的軍事衛星作戰室 M1 已接：主地圖、共用外殼、人物檔案高解析閱讀欄與既有 action 同義命中區均有針對性回歸；人物肖像採 A+B 離線、可驗證來源政策並有第一筆公有領域資料；640×350 modern UI、英／日 semantic 面板、17 張 NEWSDATA 敘事畫廊與 #0／#9 caption、純 Go OPL2／AdLib 情境音訊、Modern Ogg runtime、外交／停火／戰鬥世界結算／人物自傳 M2、DT2 欄位搬運與 block10 明確存檔入口均已接；原版全等價、H4 各流程頁細節、Android 實機、英日人審譯稿、日文假名字型、Modern 音樂內容與正式發行仍未完成）
+> 此段為 2026-08-12 的歷史定位。當時的未完成項已有後續實作與發行，請先讀本檔「目前狀態」，不要以這份快照重開已結束工作。
 >
 > ### ⚡ 每一輪都要做的事：機制歸檔
 >
@@ -34,7 +46,7 @@
 
 ---
 
-## 2. 現況一覽
+## 2. 早期狀態快照
 
 | 領域 | 狀態 |
 |---|---|
