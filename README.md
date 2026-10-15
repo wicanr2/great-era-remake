@@ -41,11 +41,19 @@
 
 「DOS 原版」由原始程式執行；「重製原版」與「重製 HD」是同一重製版的兩種顯示方式。以下都是實際遊戲畫面，DOS 與重製版使用不同遊戲進度。點選圖片可查看原尺寸。
 
+HD 地圖與開發頁為目前主線預覽，正式下載內容以發行頁為準。
+
 ### 全國地圖與軍政介面
 
 | DOS 原版 | 重製原版 | 重製 HD |
 |---|---|---|
-| ![DOS 原版的全國地圖與指令選單](docs/images/dos-original-20261015.png) | ![重製版的原版地圖與操作介面](docs/images/command-original-20261015.png) | ![HD 指揮介面與全國地圖](docs/images/command-hd-20261015.png) |
+| ![DOS 原版的全國地圖與指令選單](docs/images/dos-original-20261015.png) | ![重製版的原版地圖與操作介面](docs/images/command-original-20261015.png) | ![HD 指揮介面與全國地圖](docs/images/command-hd-20261015-r2.png) |
+
+### 開發與建設
+
+墾地、建兵工廠與挖金礦使用獨立場景插圖，以土褐、煙塵及磨損鋼鐵呈現年代感。可點選卡片，也可使用數字鍵下令。
+
+![HD 開發頁的墾地、兵工廠與金礦插圖](docs/images/development-hd-20261015.png)
 
 ### 人物自傳
 

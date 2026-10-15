@@ -7,9 +7,50 @@ import (
 	"github.com/wicanr2/great-era-remake/internal/i18n"
 	"github.com/wicanr2/great-era-remake/internal/ui/actions"
 	uiaudio "github.com/wicanr2/great-era-remake/internal/ui/audio"
+	"github.com/wicanr2/great-era-remake/internal/ui/hdart"
 	uiresolution "github.com/wicanr2/great-era-remake/internal/ui/resolution"
 	uitheme "github.com/wicanr2/great-era-remake/internal/ui/theme"
 )
+
+func TestDevelopmentIllustrationsFollowArtThemeWithoutChangingActions(t *testing.T) {
+	a := &app{wording: loadTraditionalWordingForModernFlowTest(t), wordingMode: i18n.WordingOriginal,
+		resolution: uiresolution.ModeHigh, themeMode: uitheme.ModeModern, screen: screenDevelop}
+	hd, err := a.modernFlowData()
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []hdart.DevelopmentIllustration{hdart.DevelopmentReclaim, hdart.DevelopmentArsenal, hdart.DevelopmentGoldMine}
+	if len(hd.Illustrations) != len(want) {
+		t.Fatalf("HD 開發插圖=%v", hd.Illustrations)
+	}
+	targets := a.pointerTargets()
+	for i, kind := range want {
+		if hd.Illustrations[i] != kind || targets[i].Action != actions.Selection(i+1) {
+			t.Fatalf("插圖與原有指令不一致：%d", i)
+		}
+	}
+	a.themeMode = uitheme.ModeRetro
+	retro, err := a.modernFlowData()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(retro.Illustrations) != 0 {
+		t.Fatal("原版美術不應載入 HD 插圖")
+	}
+	for i := range hd.Options {
+		if hd.Options[i] != retro.Options[i] {
+			t.Fatal("美術切換改變了選項")
+		}
+	}
+	a.themeMode, a.screen = uitheme.ModeModern, screenRecruitAction
+	other, err := a.modernFlowData()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(other.Illustrations) != 0 {
+		t.Fatal("開發插圖不應影響其他選單")
+	}
+}
 
 func loadTraditionalWordingForModernFlowTest(t *testing.T) *i18n.WordingCatalog {
 	t.Helper()

@@ -5,6 +5,33 @@ import (
 	"testing"
 )
 
+// These seams were visible through otherwise continuous province polygons.
+// Check the actual unpainted surface so faction borders cannot hide a step.
+func TestNationalSurfaceHasNoRectangularPaletteSeams(t *testing.T) {
+	m, err := New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range []struct {
+		name string
+		a, b Point
+	}{
+		{"western longitude", Point{100.88, 46}, Point{101.12, 46}},
+		{"southern latitude", Point{113, 31.88}, Point{113, 32.12}},
+		{"northeastern longitude", Point{123.88, 46}, Point{124.12, 46}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			a := m.surfaceAt(tc.a[0], tc.a[1], false, &[39]int{})
+			b := m.surfaceAt(tc.b[0], tc.b[1], false, &[39]int{})
+			for channel := range a {
+				if step := math.Abs(a[channel] - b[channel]); step > 6 {
+					t.Fatalf("geographic palette seam: channel %d changes %.2f across adjacent land", channel, step)
+				}
+			}
+		})
+	}
+}
+
 func TestLiveCameraAndRenderBudget(t *testing.T) {
 	m, err := New()
 	if err != nil {

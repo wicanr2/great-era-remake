@@ -4,7 +4,8 @@
   "files": {
     "internal/ui/hdart/earth-kit.png": "554bf71883334a2c4f41357f4c0f6d8f70143fa37b37aecd9beb42ad6a5ca56e",
     "internal/ui/hdart/earth-units.png": "36316b25c3d182a1682e35f9468520247175a38237f947e2052feab8cd1144a5",
-    "internal/ui/hdart/materials.png": "780841a27a40f12a83454f7cf6a572c74b16c2782616e14f9aba09545080cf1a"
+    "internal/ui/hdart/materials.png": "780841a27a40f12a83454f7cf6a572c74b16c2782616e14f9aba09545080cf1a",
+    "internal/ui/hdart/development.png": "f95fd3b3e0616d5d3c5063eae32d609073c92aaafaa46211f379bd9dbc9598ac"
   },
   "license": "LicenseRef-RRSAL-1.0",
   "origin": "project image_gen outputs and bounded project baking; not extracted original game pixels",
@@ -191,7 +192,76 @@
         "license": "public-domain",
         "license_url": "https://www.naturalearthdata.com/about/terms-of-use/"
       }
-    ]
+    ],
+    "development-generation-20261015": {
+      "date": "2026-10-15",
+      "tool": "built-in image_gen.imagegen",
+      "sources": [
+        {
+          "kind": "reclaim",
+          "file": "reclaim-source.png",
+          "sha256": "db42725ff990ddf9921d31c105d2b427de45d11a644c03041ec4435eccd2087b",
+          "size": [
+            1942,
+            809
+          ],
+          "prompt": "reclaim-prompt.txt",
+          "prompt_sha256": "ed65b6741989b2cce9f24dd911d71465c7f7b200276c2c9b094595c33d679600",
+          "prompt_text": "Use case: historical-scene. Asset type: original raster illustration for a 1926–1941 Chinese military strategy game's development menu. Create a single wide landscape scene, approximately 2.4:1. Strong, serious, weathered battlefield-era oil-painted realism, tangible aged iron, dust, brick and soil; crisp readable silhouettes suitable for a small 384x160 runtime image. Earth brown, dark iron, sandstone, muted oxblood accents and warm old-gold highlights, no green palette, no pale washed-out look. Diffuse overcast illumination, restrained contrast, substantial worn materials. Composition: primary action and objects clearly readable in the central 80%; keep the bottom 20% quiet for a separately drawn game label. Full image bleed to edges. No text, numbers, lettering, UI, frame, border, logos, flags, watermarks, modern objects or fantasy elements. This is a new original illustration, do not copy any existing game's artwork. Subject: reclaiming farmland in rural China during the 1920s–1930s. Two small period-clothed farm workers operating a traditional wooden plough with an ox, dark freshly turned earth in the foreground, terraced dry fields, mature ochre grain and a simple worn earth-walled farmhouse in the distance. Convey hard practical labor and rebuilding, with brown soil and gold grain rather than lush green vegetation.\n"
+        },
+        {
+          "kind": "arsenal",
+          "file": "arsenal-source.png",
+          "sha256": "faa186b6af8dffba15fe4b59ccc2fa4b2ab6451fc58fd852c0c430d84a6c9d4a",
+          "size": [
+            1942,
+            809
+          ],
+          "prompt": "arsenal-prompt.txt",
+          "prompt_sha256": "a4a57d6eb2103fee88df6b077db9ae6fea46dd5ee73669af45abecb718a4d679",
+          "prompt_text": "Use case: historical-scene. Asset type: original raster illustration for a 1926–1941 Chinese military strategy game's development menu. Create a single wide landscape scene, approximately 2.4:1. Strong, serious, weathered battlefield-era oil-painted realism, tangible aged iron, dust, brick and soil; crisp readable silhouettes suitable for a small 384x160 runtime image. Earth brown, dark iron, sandstone, muted oxblood accents and warm old-gold highlights, no green palette, no pale washed-out look. Diffuse overcast illumination, restrained contrast, substantial worn materials. Composition: primary action and objects clearly readable in the central 80%; keep the bottom 20% quiet for a separately drawn game label. Full image bleed to edges. No text, numbers, lettering, UI, frame, border, logos, flags, watermarks, modern objects or fantasy elements. This is a new original illustration, do not copy any existing game's artwork. Subject: building and working in a 1920s–1930s Chinese arsenal. Broad view into a brick-and-iron industrial workshop with a belt-driven metal lathe, steel machine housings, neat unfinished field-gun barrels on benches and one small period-clothed machinist. Coal dust, worn timber, warm restrained furnace light and aged steel. Read as a historic weapons manufacturing facility, not a futuristic factory or a combat scene.\n"
+        },
+        {
+          "kind": "goldmine",
+          "file": "goldmine-source.png",
+          "sha256": "e7ca7f86fe2ea419e83726b49fe9c25632c9027b60fed543dd3eb8918ea5a76c",
+          "size": [
+            1942,
+            809
+          ],
+          "prompt": "goldmine-prompt.txt",
+          "prompt_sha256": "35afd00bf860f909d116b8dced4738f9f65682c5c8102f365aaf21233b49adc9",
+          "prompt_text": "Use case: historical-scene. Asset type: original raster illustration for a 1926–1941 Chinese military strategy game's development menu. Create a single wide landscape scene, approximately 2.4:1. Strong, serious, weathered battlefield-era oil-painted realism, tangible aged iron, dust, brick and soil; crisp readable silhouettes suitable for a small 384x160 runtime image. Earth brown, dark iron, sandstone, muted oxblood accents and warm old-gold highlights, no green palette, no pale washed-out look. Diffuse overcast illumination, restrained contrast, substantial worn materials. Composition: primary action and objects clearly readable in the central 80%; keep the bottom 20% quiet for a separately drawn game label. Full image bleed to edges. No text, numbers, lettering, UI, frame, border, logos, flags, watermarks, modern objects or fantasy elements. This is a new original illustration, do not copy any existing game's artwork. Subject: gold mining in 1920s–1930s inland China. Large weathered timber-supported mine entrance cut into a rocky brown hillside, short narrow-gauge rails and one iron ore cart in the foreground, two small period-clothed miners working beside realistic dull gold-bearing rock and wooden sorting trays. Dust, chipped rock and substantial dark iron; no exaggerated treasure or glowing fantasy gold.\n"
+        }
+      ],
+      "intent": "三幅原創開發選單插圖，既有大地鋼鐵風格；無品牌、旗幟、文字或原版抽取素材",
+      "user_request": "開發選單能放上 HD 插圖嗎",
+      "runtime": {
+        "file": "internal/ui/hdart/development.png",
+        "sha256": "f95fd3b3e0616d5d3c5063eae32d609073c92aaafaa46211f379bd9dbc9598ac",
+        "size": [
+          384,
+          480
+        ],
+        "bytes": 383434,
+        "decoded_rgba_bytes": 737280,
+        "tile_count": 3,
+        "tile_size": [
+          384,
+          160
+        ]
+      },
+      "bake": {
+        "script": "tools/bake_development_art.go",
+        "method": "pure Go standard library 4x4 premultiplied box reduction; technical resize only",
+        "source_directory": "workplace/hoi4-ui-prototype/map-development-20261015",
+        "runtime_originals": "full generated sources stay local; only bounded atlas embedded",
+        "script_sha256": "087d69a2ac9dc22d9b52da456da23f2ae74e11806e783ce33b0226f7d61e142f"
+      },
+      "release_status": "master development; not part of published v.1.0.1-20261014",
+      "issue": "https://github.com/wicanr2/great-era-remake/issues/13"
+    }
   },
-  "approved_asset_version": "v.1.0.0-20261014"
+  "approved_asset_version": "v.1.0.0-20261014",
+  "development_authorization": "2026-10-15: user explicitly requested HD illustrations in the existing development menu; scope is three original scenes and the exact development.png whitelist"
 }

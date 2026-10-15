@@ -6,8 +6,10 @@ import (
 
 	"github.com/wicanr2/great-era-remake/internal/game"
 	"github.com/wicanr2/great-era-remake/internal/ui/actions"
+	"github.com/wicanr2/great-era-remake/internal/ui/hdart"
 	uilayout "github.com/wicanr2/great-era-remake/internal/ui/layout"
 	"github.com/wicanr2/great-era-remake/internal/ui/render"
+	uitheme "github.com/wicanr2/great-era-remake/internal/ui/theme"
 )
 
 // strategyCommand* 是十五項實際政略卡的選單序號。Modern 流程頁只能引用
@@ -100,6 +102,9 @@ func (a *app) modernFlowData() (render.ModernFlowSurfaceData, error) {
 	switch a.screen {
 	case screenDevelop:
 		d.Title, d.Options = commandTitle(strategyCommandDevelop), []string{text("develop.reclaim"), text("develop.arsenal"), text("develop.mine")}
+		if a.themeMode == uitheme.ModeModern {
+			d.Illustrations = []hdart.DevelopmentIllustration{hdart.DevelopmentReclaim, hdart.DevelopmentArsenal, hdart.DevelopmentGoldMine}
+		}
 	case screenTransferMode:
 		d.Title, d.Options = commandTitle(strategyCommandTransfer), []string{text("transfer.mode.partial"), text("transfer.mode.all")}
 	case screenTransferTarget:

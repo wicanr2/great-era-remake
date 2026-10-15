@@ -200,38 +200,7 @@ func (m *Map) prepareSurface() {
 			lon := m.geo.Bounds[0] + float64(x)/(maskW-1)*(m.geo.Bounds[1]-m.geo.Bounds[0])
 			lat := m.geo.Bounds[3] - float64(y)/(maskH-1)*(m.geo.Bounds[3]-m.geo.Bounds[2])
 			e := m.Elevation(lon, lat)
-			dx := (m.Elevation(lon+.08, lat) - m.Elevation(lon-.08, lat)) / .16
-			dy := (m.Elevation(lon, lat+.08) - m.Elevation(lon, lat-.08)) / .16
-			shade := 1.0
-			_, _ = dx, dy // Approved HD map: no directional terrain shadow.
-			kind := hdart.Plain
-			base := [3]float64{151, 124, 88}
-			if lon < 101 {
-				kind = hdart.Desert
-				base = [3]float64{181, 149, 103}
-			}
-			if e > .16 {
-				kind = hdart.Mountain
-				base = [3]float64{134, 116, 96}
-			}
-			if lon > 104 && lat < 32 && e < .30 {
-				kind = hdart.Forest
-				base = [3]float64{101, 85, 66}
-			}
-			if lon > 124 && lat > 40 {
-				kind = hdart.Forest
-				base = [3]float64{115, 96, 75}
-			}
-			if e > .52 {
-				kind = hdart.Snow
-				base = [3]float64{192, 183, 161}
-			}
-			p := hdart.Sample(kind, int(lon*37), int(lat*37))
-			grain := (float64(p.R)+float64(p.G)+float64(p.B))/3 - 110
-			macro := (noise(lon*.5, lat*.5) - .5) * 10
-			for k := range base {
-				base[k] = math.Max(0, math.Min(255, (base[k]+grain*.18+macro)*shade))
-			}
+			base := terrainColor(lon, lat, e)
 			// Presentation-only regions use the existing province anchors. Their
 			// approximate outline does not determine adjacency or battlefield terrain.
 			wx, wy := lon+(noise(lon*.7, lat*.7)-.5)*.9, lat+(noise(lon*.6+14, lat*.6)-.5)*.7
@@ -252,6 +221,42 @@ func (m *Map) prepareSurface() {
 			m.surface[i].border = m.surface[i+1].province != p || m.surface[i+maskW].province != p
 		}
 	}
+}
+
+func smoothStep(low, high, value float64) float64 {
+	t := clamp((value - low) / (high - low))
+	return t * t * (3 - 2*t)
+}
+
+// A shared diffuse base keeps biome pigment from looking like a rectangular
+// shadow. Blend both pigment and texture across the old geographic boundaries;
+// province tint, actual elevation and camera geometry are applied separately.
+func terrainColor(lon, lat, elevation float64) [3]float64 {
+	sample := func(kind int, base [3]float64) [3]float64 {
+		p := hdart.Sample(kind, int(lon*37), int(lat*37))
+		grain := (float64(p.R)+float64(p.G)+float64(p.B))/3 - 110
+		for k := range base {
+			base[k] += grain * .18
+		}
+		return base
+	}
+	rgb := sample(hdart.Plain, [3]float64{151, 124, 88})
+	blend := func(kind int, base [3]float64, weight float64) {
+		if weight > 0 {
+			rgb = mix(rgb, sample(kind, base), weight*.45)
+		}
+	}
+	blend(hdart.Desert, [3]float64{181, 149, 103}, 1-smoothStep(99.5, 102.5, lon))
+	blend(hdart.Mountain, [3]float64{134, 116, 96}, smoothStep(.12, .20, elevation))
+	south := smoothStep(102.5, 105.5, lon) * (1 - smoothStep(30.5, 33.5, lat)) * (1 - smoothStep(.26, .34, elevation))
+	blend(hdart.Forest, [3]float64{101, 85, 66}, south)
+	blend(hdart.Forest, [3]float64{115, 96, 75}, smoothStep(122.5, 125.5, lon)*smoothStep(38.5, 41.5, lat))
+	blend(hdart.Snow, [3]float64{192, 183, 161}, smoothStep(.48, .56, elevation))
+	macro := (noise(lon*.5, lat*.5) - .5) * 10
+	for k := range rgb {
+		rgb[k] = math.Max(0, math.Min(255, rgb[k]+macro))
+	}
+	return rgb
 }
 func (m *Map) surfaceAt(lon, lat float64, political bool, factions *[39]int) [3]float64 {
 	x := clamp((lon-m.geo.Bounds[0])/(m.geo.Bounds[1]-m.geo.Bounds[0])) * (maskW - 1)

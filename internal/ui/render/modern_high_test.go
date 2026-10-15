@@ -1,6 +1,7 @@
 package render
 
 import (
+	"bytes"
 	"image"
 	"image/color"
 	"path/filepath"
@@ -9,9 +10,33 @@ import (
 	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/game"
 	"github.com/wicanr2/great-era-remake/internal/i18n"
+	"github.com/wicanr2/great-era-remake/internal/ui/hdart"
 	uilayout "github.com/wicanr2/great-era-remake/internal/ui/layout"
 	uitheme "github.com/wicanr2/great-era-remake/internal/ui/theme"
 )
+
+func TestDevelopmentArtFallbackKeepsOriginalTextCards(t *testing.T) {
+	d := ModernFlowSurfaceData{Title: "開發", Options: []string{"墾地", "建兵工廠", "挖金礦"},
+		Fonts: loadBiographyTestFonts(t), Style: uitheme.NewModern().Style()}
+	plain, fallback, illustrated := NewCanvas(1280, 720), NewCanvas(1280, 720), NewCanvas(1280, 720)
+	if err := plain.DrawModernFlowSurface(d); err != nil {
+		t.Fatal(err)
+	}
+	d.Illustrations = []hdart.DevelopmentIllustration{-1, 99, -1}
+	if err := fallback.DrawModernFlowSurface(d); err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(plain.img.Pix, fallback.img.Pix) {
+		t.Fatal("無效插圖應保留原有文字卡")
+	}
+	d.Illustrations = []hdart.DevelopmentIllustration{hdart.DevelopmentReclaim, hdart.DevelopmentArsenal, hdart.DevelopmentGoldMine}
+	if err := illustrated.DrawModernFlowSurface(d); err != nil {
+		t.Fatal(err)
+	}
+	if bytes.Equal(plain.img.Pix, illustrated.img.Pix) {
+		t.Fatal("有效插圖沒有繪入選單")
+	}
+}
 
 func modernHighFixture() (game.Battlefield, PanelData) {
 	var bf game.Battlefield

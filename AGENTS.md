@@ -39,6 +39,8 @@
 - 展示截圖只放行 `docs/images/*.png`。使用者於 2026-10-14 另核准三張專案生成 HD 圖集：
   `internal/ui/hdart/earth-kit.png`、`earth-units.png`、`materials.png`。精確雜湊、生成來源及授權見
   `docs/licenses/generated-hd-assets.json`，由 `tools/deny_scan.sh` 核對。其他 PNG 與原版抽取素材仍拒絕。
+  使用者於 2026-10-15 要求開發選單加入 HD 插圖，另放行原創圖集
+  `internal/ui/hdart/development.png`；來源、提示詞雜湊及尺寸同樣記入上述紀錄。
 - 原始素材在 `workplace/orig/`，一律唯讀。存檔實驗使用副本或明確輸出目錄；
   測試存檔一律寫到 `/tmp` 或明確測試輸出目錄，不覆蓋原版存檔。
 

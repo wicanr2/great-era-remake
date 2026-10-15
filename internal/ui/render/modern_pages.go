@@ -9,6 +9,7 @@ import (
 
 	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/i18n"
+	"github.com/wicanr2/great-era-remake/internal/ui/hdart"
 	uilayout "github.com/wicanr2/great-era-remake/internal/ui/layout"
 	"github.com/wicanr2/great-era-remake/internal/ui/textlayout"
 	uitheme "github.com/wicanr2/great-era-remake/internal/ui/theme"
@@ -37,21 +38,22 @@ type ModernOptionSurfaceData struct {
 // ModernFlowSurfaceData 是高解析度政略流程頁的共用資料邊界。它涵蓋選項清單、
 // 數字輸入與只讀詳情；Action／規則仍由 cmd/dsds 維護，renderer 只負責畫面。
 type ModernFlowSurfaceData struct {
-	Title     string
-	Prompt    string
-	Input     string
-	Hint      string
-	Options   []string
-	Selected  int
-	InputMode bool
-	Fonts     *assets.EtenFonts
-	Style     uitheme.UIStyle
-	Back      string
-	Previous  string
-	Next      string
+	Title         string
+	Prompt        string
+	Input         string
+	Hint          string
+	Options       []string
+	Illustrations []hdart.DevelopmentIllustration
+	Selected      int
+	InputMode     bool
+	Fonts         *assets.EtenFonts
+	Style         uitheme.UIStyle
+	Back          string
+	Previous      string
+	Next          string
 }
 
-// DrawModernFlowSurface 把尚未需要專用插圖的政略／查閱流程統一放進
+// DrawModernFlowSurface 把政略／查閱流程及其可選插圖統一放進
 // 1280×720 Modern metrics。選項順序與 input 欄位由呼叫端依既有 screen state
 // 提供；本函式不執行規則、不自行改寫語系或存檔。
 func (c *Canvas) DrawModernFlowSurface(d ModernFlowSurfaceData) error {
@@ -84,6 +86,10 @@ func (c *Canvas) DrawModernFlowSurface(d ModernFlowSurfaceData) error {
 			}
 			drawModernDecoratedControl(c, card, d.Style, fill, border)
 			c.fillRect(card.X, card.Y, 6, card.H, d.Style.FactionTint[i%len(d.Style.FactionTint)])
+			illustrated := false
+			if i < len(d.Illustrations) {
+				illustrated = c.drawModernDevelopmentScene(card, d.Illustrations[i])
+			}
 			label := strconv.Itoa(i+1) + "  " + d.Options[i]
 			maxHalf := (card.W - 44) / 8
 			if maxHalf < 8 {
@@ -92,6 +98,12 @@ func (c *Canvas) DrawModernFlowSurface(d ModernFlowSurfaceData) error {
 			scale, y := 1, card.Y+(card.H-15)/2
 			if modernTextHalfCells(label) <= (card.W-44)/16 {
 				scale, y, maxHalf = 2, card.Y+(card.H-30)/2, (card.W-44)/16
+			}
+			if illustrated {
+				captionY := card.Bottom() - 52
+				c.fillRect(card.X+12, captionY, card.W-24, 40, fill)
+				c.fillRect(card.X+12, captionY, card.W-24, 1, border)
+				y = captionY + (40-15*scale)/2
 			}
 			drawModernTextScaledInto(c, d.Fonts, label, ink, card.X+22, y, scale, maxHalf, missing)
 		}
@@ -128,6 +140,27 @@ func (c *Canvas) DrawModernFlowSurface(d ModernFlowSurfaceData) error {
 		return fmt.Errorf("Modern 流程頁缺字：%q", string(chars))
 	}
 	return nil
+}
+
+func (c *Canvas) drawModernDevelopmentScene(card uilayout.Rect, kind hdart.DevelopmentIllustration) bool {
+	src := hdart.DevelopmentScene(kind)
+	if src == nil || card.W < 80 || card.H < 96 {
+		return false
+	}
+	dst := uilayout.Rect{X: card.X + 12, Y: card.Y + 12, W: card.W - 24, H: card.H - 24}
+	crop := src.Bounds()
+	// Cover the existing card without stretching workers or machinery.
+	if crop.Dx()*dst.H > crop.Dy()*dst.W {
+		width := crop.Dy() * dst.W / dst.H
+		crop.Min.X += (crop.Dx() - width) / 2
+		crop.Max.X = crop.Min.X + width
+	} else {
+		height := crop.Dx() * dst.H / dst.W
+		crop.Min.Y += (crop.Dy() - height) / 2
+		crop.Max.Y = crop.Min.Y + height
+	}
+	drawSampledImage(c.img, dst, src, crop)
+	return true
 }
 
 // DrawModernCommandSurface 以 H4 的 5×3 指令矩陣呈現既有 15 項政略指令。
