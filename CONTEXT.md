@@ -37,4 +37,4 @@
 
 過去的現況表、已停止工作清單及被後續方案取代的設計文件不再放在目前工作樹。其完整內容由 Git 提交歷史保存，入口集中於 WORKLOG；原始研究輸入、獨有證據與已發布交付物不因去重刪除。文件去重與引用核對見 [Issue #11](https://github.com/wicanr2/great-era-remake/issues/11)。
 
-README 現為故事背景、玩法及 HD 特色介紹，使用八張 DOS／原版模式／HD 畫面，地圖與開發頁已收錄於正式版。最新影片為本機 `promo/great-era-remake-promo-comparison-v.1.0.2-20261015.mp4`，由該版本交付頁提供；舊版原片、影片與發行附件保留。來源、展示範圍及驗證見 [SPEC-48](docs/spec/48-hd-release-integration.md#v102-20261015-呈現修正重新發行)及 [Issue #14](https://github.com/wicanr2/great-era-remake/issues/14)。
+README 以北伐與抗戰故事推廣文開場，介紹玩法、HD 特色、遊戲中即時切換及正式啟動器的配樂預設，保留八張 DOS／原版模式／HD 畫面；地圖與開發頁已收錄於正式版。文案見 [Issue #15](https://github.com/wicanr2/great-era-remake/issues/15)。最新影片為本機 `promo/great-era-remake-promo-comparison-v.1.0.2-20261015.mp4`，由該版本交付頁提供；舊版原片、影片與發行附件保留。來源、展示範圍及驗證見 [SPEC-48](docs/spec/48-hd-release-integration.md#v102-20261015-呈現修正重新發行)及 [Issue #14](https://github.com/wicanr2/great-era-remake/issues/14)。
