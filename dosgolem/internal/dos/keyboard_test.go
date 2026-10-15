@@ -109,3 +109,37 @@ func TestArrowKeysHaveNoASCII(t *testing.T) {
 		}
 	}
 }
+
+func TestNamedDigitsReachBIOSInOrder(t *testing.T) {
+	d, c := newKeyboardDOS(t)
+	names := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Return", "KP2"}
+	want := []uint16{0x0B30, 0x0231, 0x0332, 0x0433, 0x0534, 0x0635,
+		0x0736, 0x0837, 0x0938, 0x0A39, 0x1C0D, 0x5000}
+	for _, name := range names {
+		if !d.PushKeyNamed(name) {
+			t.Fatalf("拒絕具名鍵 %q", name)
+		}
+	}
+	for i, word := range want {
+		call16(c, d, 0x01)
+		if c.Flags&cpu.ZF != 0 || c.R[cpu.AX] != word || d.KeysConsumed != i {
+			t.Fatalf("查詢 %q：AX=%04X，取走=%d", names[i], c.R[cpu.AX], d.KeysConsumed)
+		}
+		call16(c, d, 0x00)
+		if c.R[cpu.AX] != word {
+			t.Fatalf("讀取 %q：AX=%04X，要 %04X", names[i], c.R[cpu.AX], word)
+		}
+	}
+	if d.KeysPending() != 0 || d.KeysConsumed != len(want) {
+		t.Fatalf("讀完後仍有 %d 鍵，取走=%d", d.KeysPending(), d.KeysConsumed)
+	}
+}
+
+func TestNamedUnknownDigitsDoNotQueue(t *testing.T) {
+	d, _ := newKeyboardDOS(t)
+	for _, name := range []string{"", "10", "１", "A", "KP99"} {
+		if d.PushKeyNamed(name) || d.KeysPending() != 0 {
+			t.Fatalf("未知具名鍵 %q 不應排入佇列", name)
+		}
+	}
+}

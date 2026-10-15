@@ -4,7 +4,7 @@
 
 | 項目 | 現況與入口 |
 |---|---|
-| 主要分支 | `master`，已整併 `release/v.1.0.1-20261014`、前版發行與 `exp/dosgolem-isr` 的提交歷史；本輪整理見 [Issue #9](https://github.com/wicanr2/great-era-remake/issues/9) |
+| 主要分支 | GitHub 僅保留 `master`；已整併正式版、前版發行與研究分支全部提交，其餘三個遠端分支依使用者要求移除；整理見 [Issue #9](https://github.com/wicanr2/great-era-remake/issues/9)，清理見 [Issue #10](https://github.com/wicanr2/great-era-remake/issues/10) |
 | 正式版 | [v.1.0.1-20261014](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.0.1-20261014)，來源提交 `85ed56095117134fd3fdbf64efd7a5411eaeabf7`；已發布 tag、Release 與附件保留 |
 | 呈現與音訊 | 大地色指揮介面、俯視六角戰場與原版鐵路，原版／HD 美術及介面可獨立切換；八曲沿用[已採用混音](assets/music/modern/acceptance.json) |
 | 人物 | 416 筆檔案、392 篇中文正文；24 位待考依使用者決定停止研究，#3 以 not planned 關閉；英日各 392 篇保留 machine-draft |
@@ -15,6 +15,8 @@
 現行工作由 [GitHub 總 Issue #1](https://github.com/wicanr2/great-era-remake/issues/1)與子 Issue 追蹤。文件分工：[README](README.md)為穩定入口，[WORKLOG](WORKLOG.md)保存整理後的工作歷程；本檔開頭保存目前真相，其餘章節保留歷史與逆向索引，不重新啟用舊待辦。
 
 發行契約及現行展示收據見[整合規格](docs/spec/48-hd-release-integration.md)，平台使用方式見[發行文件](docs/release/README.md)。主要分支的文件整理沒有修改正式版遊戲程式、資料、音訊、圖集或授權。
+
+未提交變更審查已補存研究工具的主鍵盤數字具名鍵功能，沿用同一字元轉換與掃描碼表，DOS 服務、probe 與 oracle 三套件回歸通過。兩段舊筆記保存於[玩法差異文件](docs/playtest/43-remake-original-gameplay-diff.md#未提交研究紀錄補存)，等級為 `historical-unreviewed`，不重開原版研究或據此修改規則。本機 README 的舊版說明及 CONTEXT 的發行摘要已由目前主線與 Issue 取代，原工作樹仍保留，沒有整份覆蓋或丟棄。
 
 ## 歷史脈絡與逆向索引
 

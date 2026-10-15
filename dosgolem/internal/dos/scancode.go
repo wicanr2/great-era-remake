@@ -94,6 +94,10 @@ var digitScan = map[byte]uint8{
 // KeyNamed 查一個有名字的鍵。查不到就回 false——**不要回一個看起來合理的
 // 預設值**，那會讓「名字打錯」變成「原版行為不同」。
 func KeyNamed(name string) (Key, bool) {
+	// 主鍵盤數字沿用既有字元轉換；KP0..KP9 仍走擴充鍵名稱。
+	if len(name) == 1 && name[0] >= '0' && name[0] <= '9' {
+		return KeyForRune(rune(name[0]))
+	}
 	k, ok := namedKeys[name]
 	return k, ok
 }

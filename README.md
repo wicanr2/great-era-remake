@@ -71,7 +71,7 @@
 | [譯名表](translations/glossary.md) | 多語系名稱對照 |
 | [第三方告知](docs/licenses/THIRD-PARTY-NOTICES.md) | 字型、生成圖集、照片及軟體來源 |
 
-`dosgolem/` 保存研究時使用的獨立工具源碼快照，不是遊戲引擎依賴。能力與來源見其 [README](dosgolem/README.md)及[匯入紀錄](WORKLOG.md)。
+`dosgolem/` 保存研究時使用的獨立工具源碼快照及本專案必要的鍵盤補丁，不是遊戲引擎依賴。能力與來源見其 [README](dosgolem/README.md)及[匯入紀錄](WORKLOG.md)。
 
 ## 授權與致謝
 
