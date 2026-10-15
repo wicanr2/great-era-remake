@@ -32,3 +32,38 @@ README 整理為正式下載、現行畫面、操作、驗證限制及文件導�
 只改獨立研究工具、測試及文件，不修改遊戲引擎或重建正式封包。原工作樹四份差異保留；不把私人交付路徑、過期首頁與未覆核假說直接當成現行公開聲明。公開完成證據、素材掃描、推送與容器收尾集中 [Issue #10](https://github.com/wicanr2/great-era-remake/issues/10)。
 
 提交前檢查 342 份遊戲程式、資料、配樂及授權逐檔不變，原工作樹差異逐位元組相同。38 個文件相對連結、Go 格式、純 Go 與 1,408 檔素材拒絕掃描通過；兩個已發布 Release 與全部附件的識別、大小及雜湊與整併前一致。GitHub 分支 API 已確認僅剩 `master`，本機原稿及工作樹不刪除。
+
+
+## 2026-10-15 文件去重與唯一入口
+
+依使用者要求移除過期工作清單、失效人物狀態表、被後續介面取代的方案及舊設計草稿。CONTEXT 僅留現況與有效索引，README、AGENTS、語系與發行文件不再各自維護正文數量及待辦。CLAUDE 入口直接匯入 AGENTS。歷史內容由下列既有 Git 提交保存，沒有再複製到另一份文件。
+
+## 已退役文件與歷史入口
+
+| 內容 | Git 歷史 |
+|---|---|
+| 舊 CONTEXT 完整脈絡 | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/CONTEXT.md) |
+| WORKLIST.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/WORKLIST.md) |
+| docs/reference/people/02-status.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) |
+| docs/design/10-visual-modernization.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/10-visual-modernization.md) |
+| docs/design/20-biography-system.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/20-biography-system.md) |
+| docs/design/22-biography-integration.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/22-biography-integration.md) |
+| docs/design/30-audio-direction.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/30-audio-direction.md) |
+| docs/design/32-modern-music-direction.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/32-modern-music-direction.md) |
+| docs/spec/41-modern-satellite-command-center-h4-m1.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/spec/41-modern-satellite-command-center-h4-m1.md) |
+| docs/spec/42-modern-command-matrix-h4-m1.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/spec/42-modern-command-matrix-h4-m1.md) |
+| docs/spec/43-modern-bright-ochre-a2-m1.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/spec/43-modern-bright-ochre-a2-m1.md) |
+| docs/spec/44-modern-cartographic-theme-m2.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/spec/44-modern-cartographic-theme-m2.md) |
+| docs/spec/45-republic-wargame-theme-m1.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/spec/45-republic-wargame-theme-m1.md) |
+| docs/spec/47-original-homage-theme-m1.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/spec/47-original-homage-theme-m1.md) |
+| docs/spec/48-ink-wash-theme-m1.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/spec/48-ink-wash-theme-m1.md) |
+| docs/spec/49-photo-overprint-theme-m1.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/spec/49-photo-overprint-theme-m1.md) |
+| docs/spec/46-biography-full-coverage-r1.md | [歷史版本](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/spec/46-biography-full-coverage-r1.md) |
+
+獨有原始研究、事實表、音訊及圖集來源、正常操作收據和已發布交付物保留。舊工作樹的必要修正已在 `fae3845` 保存；本輪將根工作樹統一至 master，臨時主線副本移除。刪除清單、引用、雜湊與驗證由 [Issue #11](https://github.com/wicanr2/great-era-remake/issues/11)追蹤。
+
+本輪移除 16 份已失效文件；完整內容均可由上述既有提交還原。另刪除 16 份本機 Issue 草稿，刪除前逐字核對完整正文已刊登於遠端 Issue 或留言，獨有草稿保留。原預覽首頁的獨有歷程移入既有 WORKLOG，首頁只保留入口。
+
+Docker 驗證 87 個文件相對引用零失效，1,126 份受保護程式、資料、授權及史料輸入逐檔雜湊一致；人物正文與 provenance 檢查、純 Go 閘門及兩份 Python 工具語法樹等價檢查通過。Android 的有效畫布、輸入、平台與驗收契約保留。素材拒絕掃描及推送後核對由 Issue #11 記錄。遊戲執行期未改，不重建或覆寫已發布封包。
+
+根目錄原有四筆未提交內容的必要修正已在 `fae3845` 保存；完整原稿另存本機 Git stash，再將根目錄切回 master。兩份正式版來源工作樹只作凍結驗證輸入，不維護現況。

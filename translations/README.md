@@ -1,5 +1,7 @@
 # 語系資料
 
+本文只維護語系格式與載入方式；目前正文數量及審閱狀態統一見 [CONTEXT.md](../CONTEXT.md)。
+
 `AGENTS.md` §6 的兩條要求：
 
 > 所有玩家看得到的文字都在語系資料檔，不進 Go 原始碼。
@@ -15,10 +17,10 @@ translations/
   zh-Hant/wording.json     原典／現代白話的穩定語意鍵
   zh-Hant/narrative.json   17 張 NEWSDATA 來源圖像的 caption／fallback catalog
   zh-Hant/people.json      可發行人物資料 ← tools/gen_people.py
-  zh-Hant/people-authored.json  新增 61 篇自撰傳記 overlay ← tools/gen_authored_bios.py --overlay
+  zh-Hant/people-authored.json  自撰傳記 overlay ← tools/gen_authored_bios.py --overlay
   zh-Hant/people-unmapped.md  人物文字正規化帳本
-  en/                  英文 UI／省名與 387 篇 machine-draft 人物 overlay
-  ja/                  日文漢字優先 UI／省名與 387 篇 machine-draft 人物 overlay
+  en/                  英文 UI／省名與 machine-draft 人物 overlay
+  ja/                  日文漢字優先 UI／省名與 machine-draft 人物 overlay
   shared/roster-slots.json 三期將領槽位 → 人物 id（不隨語系改變）
 ```
 
@@ -125,4 +127,4 @@ tools/py.sh tools/gen_authored_bios.py --overlay \
 
 ⚠️ 譯名一律走 `glossary.md`。人名有 22 筆遊戲寫法與通行寫法不同
 （閰錫山／閻錫山…），**繁中母本保留原版寫法**，英日文版才用通行寫法
-（`docs/reference/people/02-status.md` §2）。
+（[02-status](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) §2）。

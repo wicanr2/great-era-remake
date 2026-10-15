@@ -46,7 +46,7 @@
 `MAN115` 的 `#50 龐炳勛` 與 `MAN215` 的 `#23 龐炳勳` 是同一個人
 （`勛`／`勳`）。三期的姓名資料**不是同一份來源**，所以
 **跨期去重不能只做字串比對**。已知的異體字對照表在
-`docs/reference/people/02-status.md`（22 筆）。
+[02-status](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md)（22 筆）。
 
 同樣地，「期內序號 → 人」也不是一對一：`田鎮南` 在抗戰前期同時佔
 第 81 與第 105 兩個槽。
@@ -503,7 +503,7 @@ offset + 2 命中 15/15  [94 53 41 59 44 50 61 57 68 60 63 43 41 65 41]
 ### 這是「字模索引」機制的確鑿實例
 
 `CLAUDE.md` §5 的核心假說是「文字以字模索引儲存」。
-`CONTEXT.md` §5.1 推翻過它——對**文本**而言確實是定長槽位的字模序列，
+[歷史 CONTEXT](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/CONTEXT.md) §5.1 推翻過它——對**文本**而言確實是定長槽位的字模序列，
 不是索引。**但番號是真的索引式的**：資料裡存的是槽位編號，
 畫面上的字是查 `FAN(1).15` 畫出來的。
 

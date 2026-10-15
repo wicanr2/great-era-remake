@@ -6,16 +6,16 @@
 
 ## 正式版
 
-目前發行版本為 [v.1.0.1-20261014](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.0.1-20261014)。主要分支為 `master`，已整併正式版與既有研究分支的提交歷史。發行版固定在同名 tag，後續文件整理不改動已發布封包。
+目前版本、內容數量、驗收結果與尚待確認的範圍統一記錄在 [CONTEXT.md](CONTEXT.md)。下載使用 [GitHub 最新正式版](https://github.com/wicanr2/great-era-remake/releases/latest)，已發布來源固定在對應 tag。
 
 遊戲以民國初年的北伐與抗戰為背景。玩家管理省份資源、人事、外交與軍事，進入戰術畫面指揮部隊。重製版沿用已建立的規則與存檔實作，呈現改動及原版行為未知項保留於[發行規格](docs/spec/48-hd-release-integration.md)與[玩法驗證邊界](docs/playtest/43-remake-original-gameplay-diff.md)。
 
 - 大地色指揮介面、可縮放及拖曳的全國地圖、俯視六角戰場與原版鐵路形狀。
 - 美術與操作介面獨立切換，保留可操作的原版介面。
-- 416 筆人物檔案，392 篇中文正文可搜尋及翻頁。24 位保留待考；英日各 392 篇自傳為機器初稿。
-- 八曲專案原創 Ogg 配樂，沿用已試聽採用的混音，保存[來源紀錄](assets/music/modern/provenance.json)與[試聽確認](assets/music/modern/acceptance.json)。
+- 人物檔案可搜尋與翻頁，保留來源及待考標示；英日自傳的審閱狀態見專案現況。
+- 專案原創 Ogg 配樂，沿用已試聽採用的混音，保存[來源紀錄](assets/music/modern/provenance.json)與[試聽確認](assets/music/modern/acceptance.json)。
 
-19 個 Go 套件與資產拒絕掃描通過；Linux 容器及 Windows／Wine 的完整包、公開包已驗證正常操作、存讀檔及重啟。macOS 已完成交叉建置與靜態檢查。Windows／macOS 真機、簽署、公證及 Android 仍待驗收。不宣稱原版完整規則對拍。驗證收據見 [Release 附件](https://github.com/wicanr2/great-era-remake/releases/download/v.1.0.1-20261014/RELEASE-VERIFICATION.json)。
+正常玩家路徑、平台驗證及原版忠實度的聲明，以 [CONTEXT.md](CONTEXT.md)連結的實際收據為準。
 
 ## 遊戲畫面
 

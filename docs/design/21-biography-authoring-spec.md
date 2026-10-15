@@ -1,9 +1,9 @@
 # DESIGN-21 人物小傳自撰規格
 
-> **狀態：READY（撰寫作業）／DRAFT（落地整合）**
+> **狀態：READY（人物撰寫準則）**
 >
 > §2–§7 的 schema、模板、判準、派工格式已在 10 篇試寫中檢驗過，可據以派工撰寫。
-> §9 的落地整合（怎麼寫回 `people.json`、怎麼產生語系檔）仍未定案，**先不要動**。
+> 落地整合以 SPEC-11、SPEC-28 與目前生成工具為準。本文件不維護整合進度或後續工作清單，後段批次紀錄僅作來源判準的歷史依據。
 >
 > 上游：`DESIGN-20 人物自傳系統` §3.6a（裁決與自撰流程初稿）、§6.1（編輯方針五原則）、
 > §5.1–§5.4（版面與字元可畫性）。
@@ -418,7 +418,7 @@ for text in bios:                       # 每篇正文
 
 剩餘 **395 篇**（416 個槽位 − 已試寫 10 − `unknown` 91 篇不寫傳 … 實際待寫量見下）。
 
-按 `02-status.md` 的分佈重算：
+按 [歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) 的分佈重算：
 
 | 類別 | 筆數 | 每篇成本 | 建議批量 |
 |---|---:|---|---:|
@@ -478,7 +478,7 @@ for text in bios:                       # 每篇正文
 | G4 | **§3.6a 的模板沒有「兩批記載可能不是同一人」的表達方式。** 這不是罕見情形——`partial` 那 96 筆多半靠部隊沿革拼出來，接合本來就是推定 | §4.5 新增待考句 S5b | 建議補 |
 | G5 | **§3.6a 說「長度區間也要定」，但 §5.2 的半形半格規則使字數失去意義。** 355 字只占 330 格 | §4.6 改以**格數**定義 | 建議把 §2.2 的長度統計加註「字數 ≠ 格數」 |
 | G6 | **§2.4 的 4 個簡體殘留（`鲁 献 荣 钟`）源於既有掃描的過濾器有洞。** 本規格的品質閘用 `big5_to_font()` 逐字檢查，不用「簡體字表」比對——**這才是正對照**（`~/diagnosis-notes` 02 的同一類問題） | §6 檢查 2 | 建議把 §10 的 U5 標成「新資料已由 DESIGN-21 §6 擋住，只剩既有 326 篇要修」 |
-| G7 | **`02-status.md` §4 說「7 筆來源不可靠」，實際上更嚴重的問題是「其中 5 筆的內容在可靠來源裡查得到，只是沒人去查」。** 試寫的 5 筆有 4 筆從 gpost 拿到帶公報日期的任免令 | §3.1 第 3 條：gpost 列為每篇強制查詢 | 建議把「gpost 未被使用」記進 `02-status.md` §5 的方法紀錄，供重跑 |
+| G7 | **[歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) §4 說「7 筆來源不可靠」，實際上更嚴重的問題是「其中 5 筆的內容在可靠來源裡查得到，只是沒人去查」。** 試寫的 5 筆有 4 筆從 gpost 拿到帶公報日期的任免令 | §3.1 第 3 條：gpost 列為每篇強制查詢 | 建議把「gpost 未被使用」記進 [歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) §5 的方法紀錄，供重跑 |
 
 **另外兩點與 `DESIGN-20` 無關，但派工前要知道：**
 
@@ -497,8 +497,8 @@ for text in bios:                       # 每篇正文
 | # | 項目 | 需要什麼才能決定 |
 |---|---|---|
 | **V1** | **自撰版本怎麼寫回 `people.json`**：整批取代 `bio_zh`，還是另存一份 `bios/` 由 `gen_people.py` 合併？ | 使用者裁決。本規格傾向後者——原檔保留可對照，且 `people.json` 是研究素材、不該被覆寫 |
-| **V2** | **`unknown` 那 91 筆重跑 gpost 之後，救回來的人要不要改期別統計**（`02-status.md` §1 的三段表）| 等第一批 `unknown` 跑完看命中率 |
-| **V3** | **`#274 無省長` 何時從名冊移出**（`02-status.md` 已建議）| 屬 `docs/formats/` 的邊界條件，不是本規格範圍 |
+| **V2** | **`unknown` 那 91 筆重跑 gpost 之後，救回來的人要不要改期別統計**（[歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) §1 的三段表）| 等第一批 `unknown` 跑完看命中率 |
+| **V3** | **`#274 無省長` 何時從名冊移出**（[歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) 已建議）| 屬 `docs/formats/` 的邊界條件，不是本規格範圍 |
 | **V4** | **要不要為 `low` 的人物在版面上加更明顯的標示**（`DESIGN-20` §10 U8 的延伸）| 本規格產出的 `low` 比例會比預期高（試寫 10 篇裡有 2 篇），到時再看 |
 | **V5** | **`verified_by` 要不要進發行包**（`DESIGN-20` §3.6a 說要放一份參考書目）| 等 §7 全部跑完，看來源總表有多大 |
 
@@ -800,7 +800,7 @@ batch05 用原版名冊的排序當 identity 旁證（#173–#187 與直魯聯�
 |---|---|---|
 | `G-03-1` | gpost 的**異體字寫法要逐個都查**，零命中與真的沒有長得一樣 | 併入 §11.2 的派工 prompt 必含項 |
 | `G-03-3` | 來源**自己並列兩說**時已標明未定論，不該再套退粒度 | 照辦：原樣轉述，記 `conflicts`，不降級 |
-| `G-03-5` | 期別是北伐、材料全在 1930–37（`#56 孫長勝`）時怎麼取捨 | 照 §4.7 以遊戲期別為軸，期外材料寫進骨架不進正文。**反向問題更值得追**：遊戲把他放進北伐名冊的依據是什麼？記進 `02-status.md` 的待查 |
+| `G-03-5` | 期別是北伐、材料全在 1930–37（`#56 孫長勝`）時怎麼取捨 | 照 §4.7 以遊戲期別為軸，期外材料寫進骨架不進正文。**反向問題更值得追**：遊戲把他放進北伐名冊的依據是什麼？記進 [歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) 的待查 |
 | `G-05-4` | 同一來源同一欄位**重複**（方永昌兩筆「授陸軍中將」）| 照辦：取範圍（只寫年）|
 | `G-05-6` | 維基 **HTML 註解**算不算來源 | 算 Tier B，但要註明「出自註解」。⚠️ 這對 §9.6 建議的 `prop=wikitext` 抓法很重要——它**會把註解一起抓回來**，`prop=extracts` 不會 |
 | `G-03-2`／`G-03-4` | 「全部都不是本人」需要表達方式 | 照辦：`identity.disambiguation` 記「全數排除」，`confidence` 上限 `medium` |
@@ -836,7 +836,7 @@ batch02 回報了一件比它自己說的更重要的事：
 
 ⚠️ **這條的殺傷力被低估了**：`unknown` 那 91 筆的結論**全部建立在「查了沒有」上**。
 若當初有任何一次是限流造成的，那個結論就是假的。
-`02-status.md` §1 的三段表在 91 筆重跑完之前不可引用。
+[歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) §1 的三段表在 91 筆重跑完之前不可引用。
 
 ### 12.2 ⭐ `G-02-2` 的附帶發現：**Tier C 從不貢獻 `high`**
 
@@ -1191,7 +1191,7 @@ batch08 交件，**`partial` 那 96 筆全部寫完**。連同 sample 裡的 4 �
    **是唯一「不需要先有線索」的路徑**。
 
 **建議先做 `unknown`**：它有明確的方法（名冊反查），而且做完才知道
-`02-status.md` §1 的三段表要不要重寫。
+[歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) §1 的三段表要不要重寫。
 
 ---
 
@@ -1201,7 +1201,7 @@ batch08 交件，**`partial` 那 96 筆全部寫完**。連同 sample 裡的 4 �
 相異字 570、不可畫 0、禁用詞 0）。
 
 **23 個真人裡救回 15 個（65%）**，`high` 2／`medium` 11／`low` 2／`unknown` 8。
-（`#274 無省長` 是 UI 佔位詞不是人物，依 §5.3 不建骨架——`02-status.md` §V3 的建議由此坐實。）
+（`#274 無省長` 是 UI 佔位詞不是人物，依 §5.3 不建骨架——[歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) §V3 的建議由此坐實。）
 
 ### 17.1 ⛔ 我在 §13.1 下修的預期，**對這一組是錯的**
 
@@ -1429,7 +1429,7 @@ U2 也有五個同型（`陳德麟`／`王都庆`／`刘自珍`／`王相贤`／
 兩者都做完才能寫「查無」
 ```
 
-⚠️ 這直接影響 `02-status.md` §1 那張三段表的可信度：
+⚠️ 這直接影響 [歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) §1 那張三段表的可信度：
 **當初的 91 筆 `unknown` 兩件事都沒做。** U2、U3、U4 合計 63 人裡救回 46 人（73%），
 就是最直接的證據。
 
@@ -1502,7 +1502,7 @@ U4 的實測：**13 筆事實，成本 7 次下載**。
 
 **自撰累計 190 篇**：`high` 55／`medium` 73／`low` 33／`unknown` 29。
 
-> ⛔ **`02-status.md` §1 的三段統計表就此作廢。** 原本記 91 筆 `unknown`，
+> ⛔ **[歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) §1 的三段統計表就此作廢。** 原本記 91 筆 `unknown`，
 > 實際只有 **29 筆**是真的查無——**三分之二是查法造成的**。
 
 原因在 §19.2 已經定案，這裡只補一句：**兩件事都沒做**
@@ -1599,7 +1599,7 @@ U1 的實測把這件事釘死了：
 ### 21.1 ⭐⭐⭐ `G-C3-1`：**`confirmed` 標籤不保證那個維基專條是 Tier B**
 
 `#6 譚曙卿` 的專條掛 `{{unreferenced}}`、`#25 譚道源` 的 10 處引註**全指向非出版網頁**
-——兩者依 §14.5／§13.3 都是 **Tier C**，卻都被 `02-status.md` 計入 `confirmed` 池。
+——兩者依 §14.5／§13.3 都是 **Tier C**，卻都被 [歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) 計入 `confirmed` 池。
 
 > ⛔ **`confirmed` 當初的判準是「有沒有個人專條」，不是「那個專條可不可信」。**
 > 這與 `unknown` 那 91 筆是**同一種病的兩面**：一邊把查不到當成不存在（§20.1），
@@ -1609,7 +1609,7 @@ U1 的實測把這件事釘死了：
 `{{unreferenced}}` 等維護模板 + `<ref` 計數 + 引註目標是否為已出版來源。
 掃出來的 Tier C 專條，其人物的 `confidence` 上限降為 `medium`。
 
-⚠️ 在掃描完成之前，**`02-status.md` 的 `confirmed` 230 這個數字也不可引用**
+⚠️ 在掃描完成之前，**[歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) 的 `confirmed` 230 這個數字也不可引用**
 ——它與已作廢的 `unknown` 91 是同一張表。
 
 ### 21.2 ⭐⭐ 「不寫評價」最難的不是用詞，是**材料的結構**
@@ -2089,12 +2089,12 @@ gpost 786 命中 → 341 採用 → 302 進正文。以下六件裁決。
 | Tier C 14 筆 | 支撐不足 | **每一筆在 gpost 都有同名任免令** |
 | Tier B 78 筆 | 二手來源 | **另有 gpost 一手佐證，位階更高** |
 
-三次都指向：**`02-status.md` 量的不是「查不查得到」，是「當初查得夠不夠仔細」。**
+三次都指向：**[歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) 量的不是「查不查得到」，是「當初查得夠不夠仔細」。**
 
 這與我在 §13.1／§17.1／§18.2 犯的「把測量誤差當成母體特性」是同一個錯誤——
 差別只在那三次寫在我的預測裡，這次寫在資料裡，而且被當成事實引用了好幾個月。
 
-**裁決**：`02-status.md` 的三段分類**整張作廢**。往後判一個人查不查得到，
+**裁決**：[歷史狀態表](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) 的三段分類**整張作廢**。往後判一個人查不查得到，
 只認 `facts-*.json` 的 `verified_by` 與 `04-confirmed-audit.md`。
 
 ### 26.4 併發時要讓出額度，不要搶

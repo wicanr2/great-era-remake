@@ -20,7 +20,7 @@ P0 要先讓復古圖形與主題介面共存；P1 再提供一套可散布、�
   因此切換只會改顏色／紋理／筆畫，不會改移動成本、可通行性、路網連接或
   存檔 bytes。
 - P1 尚不涵蓋部隊圖示、資源圖示、向量字型、寬版面或完整設定選單；這些仍
-  是 `docs/design/10-visual-modernization.md` 的後續 DRAFT。
+  是 [10-visual-modernization](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/10-visual-modernization.md) 的後續 DRAFT。
 
 ## 2. 已證實的輸入契約
 

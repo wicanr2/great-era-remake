@@ -1,11 +1,13 @@
 # Modern Ogg 執行期接線 M1
 
-狀態：**READY／runtime slice 已實作；音樂內容仍未交付**  
+狀態：**READY（Ogg 載入、驗證與後備契約）**
+
+配樂內容、試聽與平台驗收只維護在 [CONTEXT.md](../../CONTEXT.md)，不在此重複列進度。
 日期：2026-08-11
 
 本規格只處理 `audio=modern` 的安全載入與播放邊界，不決定作曲風格，也不把
 MIDI 草稿或原版 `.MUS`／`.TIM` 轉成發行素材。創作 brief、3–5 音新動機、授權與
-混音 QA 仍以 [`docs/design/32-modern-music-direction.md`](../design/32-modern-music-direction.md)
+混音 QA 仍以 [[32-modern-music-direction](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/32-modern-music-direction.md)](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/32-modern-music-direction.md)
 為準。
 
 ## 1. 已接通的垂直鏈

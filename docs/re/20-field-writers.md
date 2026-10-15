@@ -91,7 +91,7 @@ add     [di-6223h], cl                  ; 加座數
 
 > 這是「零寫入」型的結論：**掃不到就是真的沒有**，
 > 前提是 pattern 涵蓋所有寫法（`mov`／`add`／`sub`／`inc`／`dec`）。
-> 與 `CONTEXT.md` §5.17「用不存在的工具去量得到 0」不同——
+> 與 [歷史 CONTEXT](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/CONTEXT.md) §5.17「用不存在的工具去量得到 0」不同——
 > 那次是量測器有洞，這次 pattern 在其他欄位上都命中了，工具是好的。
 
 ---

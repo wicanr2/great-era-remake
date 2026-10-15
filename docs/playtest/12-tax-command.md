@@ -42,7 +42,7 @@
 - 人口、地價、城市數都不變
 
 > 忠誠度掉這麼重，等於**徵稅不能連著用**。這也回頭解釋了為什麼
-> 省份 `+32` bit 2 一度被猜成「已徵過稅」（`CONTEXT.md` §5.16）——
+> 省份 `+32` bit 2 一度被猜成「已徵過稅」（[歷史 CONTEXT](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/CONTEXT.md) §5.16）——
 > 徵稅每月一次的節奏是真的，只是那個旗標不是它。
 
 ---

@@ -4,15 +4,14 @@
 與舊 `AGENTS.md` 合併而成（2026-09-26）。面向使用者與撰寫文件，預設一律使用
 繁體中文；程式識別字、命令、API、工具、產品與檔名保留原文，並以完整中文句型包覆。
 
-`CONTEXT.md` 是全專案的狀態單一入口（現況、文件索引、術語表、已被推翻的斷言、
-worklist）。對話被壓縮或新 session 接手時先讀它。本檔只放「不論做什麼都要遵守」
+`CONTEXT.md` 是全專案的狀態單一入口（現況、有效決策與證據索引）。對話被壓縮或新 session 接手時先讀它。本檔只放「不論做什麼都要遵守」
 的目標、原則與硬規則；考證細節留在 `docs/`，此處只保留結論與指向。
 
 ## 1. 每輪開工順序
 
-1. 先讀 `CONTEXT.md` 的現況、已被推翻的斷言與 worklist。
+1. 先讀 `CONTEXT.md` 的現況及證據索引，再讀 GitHub 總 Issue。
 2. 再讀本檔的硬規則，以及與任務直接相關的 `docs/spec/`、`docs/re/`、
-   `docs/mechanics/` 或 `docs/playtest/`；交接時另讀 `WORKLIST.md`。
+   `docs/mechanics/` 或 `docs/playtest/`；交接時核對 [GitHub Issues](https://github.com/wicanr2/great-era-remake/issues)。
 3. 需求涉及老遊戲、中文化、remake、逆向、開發環境、打包、配樂、字型或實機試玩時，
    先讀 `~/.codex/knowledge-base/knowledge-router.md` 的「復古遊戲路由」，再只載入一份
    任務入口與必要 reference。找不到時要明說，不能假裝已讀。
@@ -21,7 +20,7 @@ worklist）。對話被壓縮或新 session 接手時先讀它。本檔只放「
    第一動作是 grep `docs/`、程式碼、攻略、譯名表，不是讀組合語言。
 
 狀態來源有衝突時，以可重現的原版實測、IDA 證據、目前程式與實際測試結果為準，並訂正文件。
-`CONTEXT.md` 其中部分早期狀態列會被同檔後文推翻，不能只讀表格單列。
+歷史結論以原始證據與後續勘誤核對，不單讀過去的狀態表。
 
 ## 2. 專案目的、定位與邊界
 
@@ -96,7 +95,7 @@ worklist）。對話被壓縮或新 session 接手時先讀它。本檔只放「
 
 Oracle 優先序：固定狀態的 DOSBox 原版實測 > IDA Pro 9.4 反組譯 >
 官方說明書／當年資料 > 社群資料。社群資料與修改版只能當搜尋線索。
-衝突時記入 `CONTEXT.md`「已被推翻的斷言」區，寫清誰推翻誰、憑什麼；
+衝突時將勘誤記入 `WORKLOG.md`，寫清誰推翻誰、憑什麼，並更新 `CONTEXT.md` 的有效結論；
 推翻舊結論時保留原證據索引，不可抹去歷史。
 
 - 反組譯一律先用 IDA Pro 9.4（`.i64` 的交叉參照、函式邊界、資料流），Ghidra 只作交叉驗證。
@@ -145,7 +144,7 @@ Turbo Pascal 的 `for` 入口跳不經過 `inc`；不要用 `grep -v` 過濾組�
 - 英文版需重算排版（640×350 全形版面換比例字後字寬、行高、對話框全變）；
   排版層必須先抽離。譯名表 `translations/glossary.md` 是唯一真相。
 - 日文版可沿點陣字路線（先確認 `JAPAN1.15` 內容）。英／日人物自傳 overlay 目前為
-  `machine-draft`，不得當成 `human-reviewed`；正式人審、假名／比例字型仍是 release gate。
+  `machine-draft`，不得當成 `human-reviewed`；審查等級依語系資料記錄，現行發行決策見 `CONTEXT.md`。
 
 ## 7. 遊戲機制文件化
 
@@ -204,33 +203,13 @@ M0／M1 沒完成之前不碰 M4 以後。
 `internal/ui/` 呈現層、`cmd/` 可執行程式、`tools/` 容器包裝與稽核腳本、
 `workplace/orig/` 原版素材（gitignore，唯讀）、`workplace/ida/` 解包與 IDA database（gitignore）。
 
-## 9. 進度基線（歷史快照，現況以 `CONTEXT.md` 為準）
+## 9. 現況入口
 
-2026-08-11 經本工作樹校準：M0 完成；M1 完成；M5 remake 核心完成；
-M2／M3／M4／M6 進行中；M7 Linux 預覽包完成。當時 `go test -count=1 ./...` 通過，
-`tools/deny_scan.sh --all` 646 檔零命中（展示圖 6 張合規）。
+目前版本、驗收與有效決策只維護在 [CONTEXT.md](CONTEXT.md)。歷史研究及被推翻的結論由該檔的證據索引與 [WORKLOG.md](WORKLOG.md)定位，不在本檔複製進度快照。
 
-後續勘誤與範圍決策（DT1 區塊位移、SDFA 改純 Go 直接播放、不以 register parity
-阻塞玩家路徑、machine-draft 自傳、SPEC-30 近似驗證口徑、DOSBox 取樣暫停）以
-`CONTEXT.md` §5.85 起、`WORKLIST.md` 53 起與 `docs/spec/30-approximate-validation-m2.md`
-為準，不在此重複貼上。本檔的快照日期是歷史基準，不是狀態來源。
+## 10. 工作追蹤
 
-## 10. 目前優先順序
-
-1. 維持戰鬥世界結算／兵力鏡像／攻擊目標標號，以及遠程戰鬥／`.DT1` 分支 writer／
-   音訊快取的 Docker 回歸；以 SPEC-30 差分遮罩與 deterministic trace 作近似 remake gate。
-2. 以非破壞性 writer、未解 sentinel 與 fail-closed 分支維持 `.DT1`／`.DT2` 安全；
-   區塊 2 剩餘欄位、勢力表 `+2`／尾端、block10 自動同步與 `.DT2` live 時機列為
-   `unknown` 研究項，不阻塞近似交付。
-3. 維持第二層六鍵選單 1..5 handler 的已知副作用近似、`battle.command.6` 拒絕、
-   撤退／部署 fallback 與 AI deterministic trace；不把第 6 鍵語意、完整資源／動畫／
-   音效時機或逐回合 AI 提升成 parity。
-4. 維持純 Go OPL2／AdLib 直接播放與 `-audio=off`；正式 Ogg provenance／人耳／裝置 QA
-   另列 release gate；SDFA register parity 不列為 remake 播放前置條件。
-5. DOSBox oracle 取樣依使用者指示暫停；後續只處理逐篇人審、正式 Ogg provenance／盲聽、
-   Android 實機與跨平台發行，不倒灌成已完成 remake 核心的循環研究。
-
-`SDFA.EXE` 可作獨立精度研究，但不得重新變成 remake 播放的前置條件。
+後續工作只維護在 [GitHub 總 Issue #1](https://github.com/wicanr2/great-era-remake/issues/1)與子 Issue。已停止的原版研究及人物考證不因讀到歷史規格而重新啟動；規則與存檔的安全限制仍依前述硬規則及現行規格辦理。
 
 ## 11. 常用驗證
 
@@ -251,4 +230,4 @@ tools/deny_scan.sh --all
 §4 oracle → §5；§4.1 IDA → §5；§5 文本鏈 → §6；§6 多語系 → §6；
 §6.5 機制文件化 → §7；§7 教訓 → §5 末；§8 里程碑 → §8 末；
 §9 硬規則 → §8；§10 工作紀律 → §1＋§8；§11 目錄 → §8 末。
-舊 `AGENTS.md` §6 長篇快照收攏為 §9 基線，現況以 `CONTEXT.md` 為準。
+舊進度快照由 Git 歷史保存；現況只以 `CONTEXT.md` 為準。

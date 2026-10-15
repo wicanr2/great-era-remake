@@ -4,7 +4,7 @@
 > SHA-256：`11dbfcf24686ab7765f788b38514cefd2039d0f60b6bd517d89fb5a84c068015`
 
 `docs/re/12` 的結論是「**這是玩家主動制的戰棋，戰爭只能由玩家發動**」，
-並寫進 `CONTEXT.md` §2 標成 confirmed。
+並寫進 [歷史 CONTEXT](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/CONTEXT.md) §2 標成 confirmed。
 
 **那個結論作廢。** 電腦會出兵——它填的是與玩家派將完全同一張表。
 
@@ -130,7 +130,7 @@ mov     word ptr [bp+var_A+2], ds
 
 | 舊斷言 | 出處 | 現況 |
 |---|---|---|
-| 電腦不會攻打，**這是玩家主動制的戰棋** | `docs/re/12` §6、`CONTEXT.md` §2 | **作廢**——電腦會填參戰部隊表 |
+| 電腦不會攻打，**這是玩家主動制的戰棋** | `docs/re/12` §6、[歷史 CONTEXT](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/CONTEXT.md) §2 | **作廢**——電腦會填參戰部隊表 |
 | 規則層**不該**有「電腦決定攻打」這件事 | `docs/re/12` §6 | **作廢**——`cmd/aisim` 的 `-fight` 反而更接近原版 |
 | `ds:A358h` 是一張「補給消耗量表」 | `docs/re/28` §3 | **訂正**——是參戰部隊記錄，讀寫同一張 |
 | 電腦回合子樹不呼叫戰鬥主函式 | `docs/re/12` | **仍然成立**，只是推不出上面那條 |

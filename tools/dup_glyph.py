@@ -5,7 +5,7 @@
 反查就永遠取到排前面的那一個——後面那個碼點會**系統性地查不到**，
 而且症狀是「查得到、但是錯字」，比查不到還難發現。
 
-`docs/reference/people/02-status.md` 列出 22 筆「遊戲寫法 vs 通行寫法」
+[02-status](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) 列出 22 筆「遊戲寫法 vs 通行寫法」
 的差異（閰/閻、勛/勳、爛/斕…），其中一部分有可能就是這個原因造成的，
 不是遊戲真的用了異體字。這支把風險量出來。
 

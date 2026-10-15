@@ -393,7 +393,7 @@
 | `sub_5088C` | 1. ⭐⭐ **騎兵不耗燃料**（`sub_5088C` 對兵種 6 直接寫 0）。**馬不吃油。** | `docs/re/31-battle-ai-chain.md`（另 1 份） | 3 |
 | `sub_50905` | 3. ⭐⭐ **走鐵路的燃料消耗除以 3**。`sub_50905` 呼叫 `sub_4FEF0(格)` | `docs/re/31-battle-ai-chain.md`（另 1 份） | 4 |
 | `sub_50992` | caller 是 `sub_4ABFD+0x4B121` 的玩家移動路徑；`sub_50992` 讀 `+12` 後只做 | `docs/mechanics/70-ai.md`（另 1 份） | 3 |
-| `sub_50FF5` | 戰場六角格排列：`x = col×32`、`y = row×24 + (奇數欄 +12)`，整場 448×348 \| `docs/re/07` §3，出自 `sub_50FF5` \| **保存**（幾何是規則，見 … | `docs/design/10-visual-modernization.md`（另 4 份） | 13 |
+| `sub_50FF5` | 戰場六角格排列：`x = col×32`、`y = row×24 + (奇數欄 +12)`，整場 448×348 \| `docs/re/07` §3，出自 `sub_50FF5` \| **保存**（幾何是規則，見 … | [10-visual-modernization](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/10-visual-modernization.md)（另 4 份） | 13 |
 | `sub_510E0` | 位移表由 `sub_4E65C` 填、邊界規則在 `sub_510E0`（`docs/re/07` §6）： | `docs/mechanics/30-combat.md`（另 3 份） | 20 |
 | `sub_51399` | 2. `sub_51399`：傳入 `arg_0=0` 的戰損呈現鏈； | `docs/re/44-combat-handler-helper-boundary.md`（另 1 份） | 2 |
 | `sub_517BE` | sub_53428（0x53428..0x534FF） \| 呼叫 sub_51D68 五次，套用雙方損失，收尾呼叫 sub_517BE／sub_52EEA \| strong inference：五次正規戰損切片；h… | `docs/re/41-block10-attack-dispatch.md`（另 2 份） | 5 |

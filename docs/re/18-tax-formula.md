@@ -90,7 +90,7 @@ sub  [di-6222h], cl         ; ← 再扣「剩餘 ÷ 5」
 
 ## 3c. ✅ `+32` bit 7 = 「已徵過稅」 — confirmed
 
-`CONTEXT.md` §5.16 推翻「bit 2 = 已徵過稅」時留了一句：
+[歷史 CONTEXT](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/CONTEXT.md) §5.16 推翻「bit 2 = 已徵過稅」時留了一句：
 
 > 「已徵過稅」那個詞條仍然存在，只是對應的旗標在別處，還沒找到。
 

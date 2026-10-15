@@ -155,7 +155,7 @@ STDFONT.15: 392820 B → 13094 字
 
 ### 這條驗證換來什麼
 
-`docs/reference/people/02-status.md` 整理將領名冊時發現 **22 筆**
+[02-status](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/reference/people/02-status.md) 整理將領名冊時發現 **22 筆**
 遊戲寫法與通行寫法不同（閰錫山／閻錫山、龐炳勛／龐炳勳、周爛／周斕、
 謬培南／繆培南…）。當時有兩種解釋：
 

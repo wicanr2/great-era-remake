@@ -44,7 +44,7 @@
 
 舊測試把 14606 的四個 runtime byte 當成外債，並把 14656 的 `02 01` 當成
 信用度／區塊 10；該結論已由上述兩份樣本與讀寫函式共同推翻。舊證據保留在
-`CONTEXT.md`／`WORKLIST.md` 的歷史條目，新的位移以本文件與 `FMT-07` 為準。
+`CONTEXT.md`／[WORKLIST](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/WORKLIST.md) 的歷史條目，新的位移以本文件與 `FMT-07` 為準。
 
 ## 3. remake 接線邊界
 

@@ -1,6 +1,6 @@
 # 新 HD 三平台引擎與配樂包
 
-[正式下載](https://github.com/wicanr2/great-era-remake/releases/latest)提供三平台引擎包。現行發行版為 [v.1.0.1-20261014](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.0.1-20261014)，各包雜湊及驗收範圍見[公開驗證附件](https://github.com/wicanr2/great-era-remake/releases/download/v.1.0.1-20261014/RELEASE-VERIFICATION.json)。主要分支為 `master`，發行來源固定在同名 tag。
+[正式下載](https://github.com/wicanr2/great-era-remake/releases/latest)提供三平台引擎包。現行版號、驗收及公開收據統一見 [CONTEXT.md](../../CONTEXT.md)。
 
 公開引擎包使用本文件。本機資源完整包另見 [FULL-LOCAL.md](FULL-LOCAL.md)，
 兩種封包的素材範圍、啟動預設及散布狀態分開記錄。

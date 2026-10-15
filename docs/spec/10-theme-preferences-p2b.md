@@ -61,6 +61,6 @@ pointer／touch 命中使用。命中區不得與返回按鈕重疊；拖曳放�
 
 ## 5. 已知限制
 
-這是可發現性與主題偏好切片，不是完整 modern UI。`docs/design/10-visual-modernization.md`
+這是可發現性與主題偏好切片，不是完整 modern UI。[10-visual-modernization](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/10-visual-modernization.md)
 仍維持 DRAFT；P2c 之後才處理資源／指令 icon 與寬版面，三平台封裝仍受 Ebiten backend
 工具鏈限制，不能由本規格宣稱完成。

@@ -87,7 +87,7 @@ mov     [bp+var_237], 1         ; ← 兵多但沒錢
 
 ⚠️ 這是**第二個** 32-bit 兵力總和門檻（第一個是出兵閘門的 260,000，
 `docs/re/30` §5d）。兩個都曾經被誤讀成「兩個獨立欄位各比一次」，
-`CONTEXT.md` §5.26 記了那次訂正。**看到相鄰位址各比一次就要先想 32-bit。**
+[歷史 CONTEXT](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/CONTEXT.md) §5.26 記了那次訂正。**看到相鄰位址各比一次就要先想 32-bit。**
 
 ## 3. 已知的子函式
 

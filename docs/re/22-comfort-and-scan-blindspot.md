@@ -36,7 +36,7 @@ add     byte ptr es:[di+1Dh], 0Ah   ; ← 偏移是純粹的 +1Dh
 
 ### 這與「用不存在的工具去量」是同一類錯
 
-`CONTEXT.md` §5.17 記過：`xmodmap` 不存在，輸出 0 行，
+[歷史 CONTEXT](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/CONTEXT.md) §5.17 記過：`xmodmap` 不存在，輸出 0 行，
 被當成「keymap 是空的」。
 
 這次是**過濾器本身有洞**：pattern 在其他欄位上都命中了

@@ -336,7 +336,7 @@ def _fit(pcs: Counter[int], scale: list[int]) -> tuple[float, int]:
 
 
 def cmd_style() -> None:
-    """調式與編制分析——`docs/design/30-audio-direction.md` §1 那幾張表的來源。"""
+    """調式與編制分析——[30-audio-direction](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/30-audio-direction.md) §1 那幾張表的來源。"""
     print(f"{'曲名':<10}{'秒':>7}{'BPM':>5}{'模式':>5}{'聲部':>5}{'音色':>5}  編制")
     for song in SONGS:
         m = parse_mus((AUDIO / f"{song}.MUS").read_bytes())

@@ -84,7 +84,7 @@ jmp     loc_1802B                       ; 跳過整條決策鏈 A
 
 ### `byte_6FFCA` bit 1 的兩個用途 — **新解**
 
-`CONTEXT.md` §6d 原本記「bit 1／3／7 未見使用」。bit 1 有兩個用途，都在本函式：
+[歷史 CONTEXT](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/CONTEXT.md) §6d 原本記「bit 1／3／7 未見使用」。bit 1 有兩個用途，都在本函式：
 
 | 位置 | 作用 |
 |---|---|

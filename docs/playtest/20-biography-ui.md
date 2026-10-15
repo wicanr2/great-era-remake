@@ -44,4 +44,4 @@ ESC／B：回到進入前的將領清單或詳細頁
 ## 性質
 
 人物自傳是原版沒有的 remake 新功能。它只讀人物語系資料，不寫回規則層、回合狀態或
-存檔；版面座標、B 鍵入口與半形 10 px 字距均登記於 `docs/design/20-biography-system.md`。
+存檔；版面座標、B 鍵入口與半形 10 px 字距均登記於 [20-biography-system](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/20-biography-system.md)。

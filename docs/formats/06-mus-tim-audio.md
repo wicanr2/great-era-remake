@@ -364,7 +364,7 @@ tick 速率 = `tempo / 60 × tickBeat`；秒數 = `totalTick / tick 速率`。
   INT 66h 也只有 0–3 四個功能碼（沒有播音效的介面）。
 
 所以遊戲本體（政略 + 戰鬥）**全程只有背景音樂，一個音效都沒有**。這對 remake 是設計決定點，
-不是缺漏（見 `docs/design/30-audio-direction.md` §6）。
+不是缺漏（見 [30-audio-direction](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/30-audio-direction.md) §6）。
 
 ---
 
@@ -420,7 +420,7 @@ type Song struct {
 }
 ```
 
-- 呈現層要能切「復古 / 現代」兩條路（見 `docs/design/30-audio-direction.md` §5）。
+- 呈現層要能切「復古 / 現代」兩條路（見 [30-audio-direction](https://github.com/wicanr2/great-era-remake/blob/fae384579b8f63e974f5c0c6f6b701f800ce6b36/docs/design/30-audio-direction.md) §5）。
   復古路徑吃的就是上面這個結構，直接餵軟體 OPL2 合成器。
 - **不要在規則層碰音訊**。`internal/game` 只發「請播第 N 首 / 停」這種訊號。
 - 原版 `.MUS` / `.TIM` 不進版控、不打包（`CLAUDE.md` §9）。
