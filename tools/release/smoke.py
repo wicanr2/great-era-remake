@@ -96,6 +96,7 @@ try:
         ARGS=[str(binary)];PREF=Path(ENV['XDG_CONFIG_HOME'])/'dsds/prefs.json';SAVE=Path(ENV['XDG_DATA_HOME'])/'GreatEraRemake/Saves/SAVE(1).DT1'
     else:
         (Path(ENV['HOME'])/'.asoundrc').write_text('pcm.!default { type null }\nctl.!default { type hw card 0 }\n')
+        Path(ENV['WINEPREFIX']).mkdir(mode=0o700)
         cmd('wineboot','-u',timeout=75)
         cmd('wine','reg','add',r'HKCU\Software\Wine\Drivers','/v','Audio','/d','alsa','/f')
         local=cmd('wine','cmd','/c','echo','%LOCALAPPDATA%');roaming=cmd('wine','cmd','/c','echo','%APPDATA%')
