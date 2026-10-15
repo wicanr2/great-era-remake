@@ -9,7 +9,7 @@
 | 呈現與音訊 | 大地色指揮介面、俯視六角戰場與原版鐵路，原版／HD 美術及介面可獨立切換；八曲沿用[已採用混音](assets/music/modern/acceptance.json) |
 | 人物 | 416 筆檔案、392 篇中文正文；24 位待考依使用者決定停止研究，#3 以 not planned 關閉；英日各 392 篇保留 machine-draft |
 | 驗證 | 19 個 Go 套件；Linux 容器及 Windows／Wine 的完整包、公開包正常操作、存讀檔與重啟通過，四份存檔一致並經 Go parser 核對；[公開收據](https://github.com/wicanr2/great-era-remake/releases/download/v.1.0.1-20261014/RELEASE-VERIFICATION.json) |
-| 交付與權利 | 公開三平台引擎 ZIP、八曲原創配樂與驗證附件；本機六包及 119 秒 DOS／重製原版／HD 比較片集中在 `dist-all/v.1.0.1-20261014/`，完整版、原版資料、倚天字庫及影片不公開上傳 |
+| 交付與權利 | 公開三平台引擎 ZIP、八曲原創配樂與驗證附件；本機六包及 92.5 秒 DOS／重製原版／HD 重新實錄比較片集中在 `dist-all/v.1.0.1-20261014/`，完整版、原版資料、倚天字庫及影片不公開上傳 |
 | 後續 | [Issue #6](https://github.com/wicanr2/great-era-remake/issues/6)續追 Android；[Issue #7](https://github.com/wicanr2/great-era-remake/issues/7)續追 Windows／macOS 真機、簽署、公證及 Linux FUSE；原版未知行為維持既有證據限制 |
 
 現行工作由 [GitHub 總 Issue #1](https://github.com/wicanr2/great-era-remake/issues/1)與子 Issue 追蹤。文件分工：[README](README.md)為穩定入口，[WORKLOG](WORKLOG.md)保存整理後的工作歷程；本檔保存現況及有效文件索引，不重新啟用舊待辦。
@@ -35,3 +35,5 @@
 | 原版證據定位 | [函式索引](docs/re/00-function-index.md)、[玩法紀錄](docs/playtest/43-remake-original-gameplay-diff.md) |
 
 過去的現況表、已停止工作清單及被後續方案取代的設計文件不再放在目前工作樹。其完整內容由 Git 提交歷史保存，入口集中於 WORKLOG；原始研究輸入、獨有證據與已發布交付物不因去重刪除。文件去重與引用核對見 [Issue #11](https://github.com/wicanr2/great-era-remake/issues/11)。
+
+README 現為故事背景、玩法及 HD 特色介紹，使用七張重新擷取的 DOS／原版模式／HD 對照圖。最新影片為本機 `promo/great-era-remake-promo-comparison-v.1.0.1-20261014-20261015.mp4`，由該版本交付頁提供；原片與既有發行附件保留。來源、展示範圍及驗證見 [SPEC-48](docs/spec/48-hd-release-integration.md#readme-遊戲介紹與重新拍攝的展示)及 [Issue #12](https://github.com/wicanr2/great-era-remake/issues/12)。

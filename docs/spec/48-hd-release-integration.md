@@ -67,9 +67,33 @@
 
 | 展示圖片 | 原始本機收據路徑 | PNG SHA-256 |
 |---|---|---|
-| `docs/images/command-v.1.0.1-20261014.png` | `dist-all/v.1.0.1-20261014/smoke/linux/01-command-hd.png` | `26d1e69e3eee5b9e13c946a7ce221f4ffbc2ef7cfa4c3275467248a7b23b032c` |
-| `docs/images/battle-v.1.0.1-20261014.png` | `dist-all/v.1.0.1-20261014/smoke/promo-capture/15-battle.png` | `12108c6b23a0c1a4e25f5bfde687a7a55d42bfc7fafaa0e101057b2360127f7b` |
+| [command-v.1.0.1-20261014.png](https://github.com/wicanr2/great-era-remake/blob/6d58705096c9ada9dd7f525647401655e96d4e33/docs/images/command-v.1.0.1-20261014.png) | `dist-all/v.1.0.1-20261014/smoke/linux/01-command-hd.png` | `26d1e69e3eee5b9e13c946a7ce221f4ffbc2ef7cfa4c3275467248a7b23b032c` |
+| [battle-v.1.0.1-20261014.png](https://github.com/wicanr2/great-era-remake/blob/6d58705096c9ada9dd7f525647401655e96d4e33/docs/images/battle-v.1.0.1-20261014.png) | `dist-all/v.1.0.1-20261014/smoke/promo-capture/15-battle.png` | `12108c6b23a0c1a4e25f5bfde687a7a55d42bfc7fafaa0e101057b2360127f7b` |
 
 指揮畫面的 `smoke/linux/gui-report.json` SHA-256 為 `cf847193bee4d3e0e7b0b850d2b3d4bb899589668afed1f86f588d3749b3df88`；影片擷取收據 `promo/capture.json` SHA-256 為 `185e29f49cf1c27742afeb8223da1dc7946c07d6bb8fb6308e4dd39e2376f827`。兩份收據由本機正式版交付保存，圖片符合既有 `docs/images/*.png` 公開展示白名單。
 
 主要分支整理沒有修改遊戲程式、語系資料、圖集、音訊或授權。後續真機及簽署仍由 [Issue #7](https://github.com/wicanr2/great-era-remake/issues/7)追蹤；分支與文件整理見 [Issue #9](https://github.com/wicanr2/great-era-remake/issues/9)。
+
+## README 遊戲介紹與重新拍攝的展示
+
+2026-10-15 依使用者要求將首頁改為故事背景、玩法與 HD 特色，移除工程紀錄及舊展示圖。工作見 [Issue #12](https://github.com/wicanr2/great-era-remake/issues/12)。以下圖片來自重新擷取的實際視窗。重製版由正式公開 Linux 引擎 ZIP 啟動，種子 1；DOS 由唯讀原版資料副本在 DOSBox-X 執行，只作輔助視覺展示。
+
+人物原版模式從正常查閱選單進入自傳，HD 模式保留同一人物。介面切換會關閉指揮室的閱讀視窗，因此以重新開啟後的真實頁面取代初次示意截圖，不改遊戲程式。原版與 HD 的字距及欄寬不同，頁數也可能不同。
+
+| 現行展示圖 | 來源與範圍 | PNG SHA-256 |
+|---|---|---|
+| [dos-original-20261015.png](../../docs/images/dos-original-20261015.png) | DOS 原版，DOSBox-X 輔助畫面 | `2f32bb66d2365f902b057b3ab5991f9d1e93485f975aaf11b10334f033c48d0f` |
+| [command-original-20261015.png](../../docs/images/command-original-20261015.png) | 重製原版軍政介面 | `ebcdb854c86306fa3fe0a4d61119e01014974eab877e6f135275a5d9986ee60e` |
+| [command-hd-20261015.png](../../docs/images/command-hd-20261015.png) | 重製 HD 指揮介面 | `26d1e69e3eee5b9e13c946a7ce221f4ffbc2ef7cfa4c3275467248a7b23b032c` |
+| [biography-original-20261015.png](../../docs/images/biography-original-20261015.png) | 重製原版人物自傳 | `44f63d0dc185b78715274200fc593a1bc9ed8d1890962e2a1765af8584efe91d` |
+| [biography-hd-20261015.png](../../docs/images/biography-hd-20261015.png) | 重製 HD 人物自傳 | `9bb30b6c27b97a27dff502f20fd2d21cea482e38db7de417f6ffecc1b5a1590b` |
+| [battle-original-20261015.png](../../docs/images/battle-original-20261015.png) | 重製原版戰場 | `884a71119e8ac50e118e7277503c77f5cfec9a5b2ff5262645002d18a301a553` |
+| [battle-hd-20261015.png](../../docs/images/battle-hd-20261015.png) | 重製 HD 六角戰場 | `12108c6b23a0c1a4e25f5bfde687a7a55d42bfc7fafaa0e101057b2360127f7b` |
+
+重製畫面為 1280×720 原始 PNG，未加工；DOS 圖為 640×350，只裁掉模擬器的視窗邊框。DOS 與重製版使用不同遊戲進度，不宣稱同狀態或規則對拍。11 張舊圖由 Git 歷史保存，早期 renderer 及前次展示收據的連結已改到固定歷史版本。原片、正常輸入、版本及來源雜湊保存在本機 `workplace/hoi4-ui-prototype/readme-promo-20261015/`，驗證結果由 Issue #12 收錄。
+
+首頁三個時期的起點對照 `internal/game/scenario.go` 的既有 `Scenarios`：1926 年 7 月、1937 年 7 月及 1941 年 12 月。沒有新增劇情、推導人物生平或改動規則。
+
+本次推廣片為 92.5 秒、1280×720、30 fps，DOS 與重製版全部片段於本輪重新錄製，不沿用舊影片片段。涵蓋原版／HD 介面、地圖縮放拖曳、自傳、開發、徵稅、實際六角格移動、攻擊選單及撤退。配樂使用已採用的原創 `modern_main_theme.ogg`，未使用 DOS 原音。
+
+成片為本機 `dist-all/v.1.0.1-20261014/promo/great-era-remake-promo-comparison-v.1.0.1-20261014-20261015.mp4`，SHA-256 `317e7469db0b7bdd5289189b1a9cddd034bf84d3598e1ba50f1be61c50925d2d`。影音、來源、字幕及抽幀驗證保存在同目錄的 `reshoot-20261015-verification.json`、`reshoot-20261015-captures.json`、`reshoot-20261015-rights.json` 與獨立 `reshoot-20261015-SHA256SUMS.json`。新版只更新本機交付頁的影片入口，不覆寫既有封包、影片、正式 manifest、tag 或 Release 附件。

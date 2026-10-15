@@ -44,11 +44,11 @@ BattleSim／battleState
 - render 測試：1280×720 可畫出戰場／面板，缺 UnitProvider 時 fail-closed；
 - cmd/dsds：高解析戰鬥命中中央轉回既有 Action，既有全 repo 回歸通過；
 - `cmd/screenshot -theme modern -resolution high -battle -province 26`：以同一份
-  `BattleSim` deployment snapshot 產生 `docs/images/high-modern-battle-26.png`
+  `BattleSim` deployment snapshot 產生 [high-modern-battle-26.png](https://github.com/wicanr2/great-era-remake/blob/6d58705096c9ada9dd7f525647401655e96d4e33/docs/images/high-modern-battle-26.png)
   （1280×720）。展示工具只讀 `BattleSim`／語系／資源資料，不回寫規則或存檔；本圖是
   remake renderer 證據，不是原版逐像素 oracle。
 - 同一個展示工具以 `-theme modern -resolution high -biography -province 26` 由
   `PeopleDB`／`DrawModernBiographySurface` 產生
-  `docs/images/high-modern-biography-058-01.png`（1280×720），人物自傳資料與翻頁
+  [high-modern-biography-058-01.png](https://github.com/wicanr2/great-era-remake/blob/6d58705096c9ada9dd7f525647401655e96d4e33/docs/images/high-modern-biography-058-01.png)（1280×720），人物自傳資料與翻頁
   狀態不另造副本。
 - 原版 oracle、Android 實機 48 dp／背景恢復、音訊裝置與三平台封裝仍屬獨立 gate。
