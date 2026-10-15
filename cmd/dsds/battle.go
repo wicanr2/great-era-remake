@@ -425,7 +425,7 @@ func (a *app) updateBattle() error {
 	if err := a.syncBattleForces(); err != nil {
 		return err
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+	if a.actionPressed(actions.Back, ebiten.KeyEscape) {
 		if b.mode != battleModeCommand {
 			b.mode = battleModeCommand
 			b.log = "返回戰鬥指令選單"

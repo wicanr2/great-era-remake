@@ -99,9 +99,10 @@ func TestLocalizedWordingUsesAvailableEtenGlyphs(t *testing.T) {
 		}
 		missing := map[rune]bool{}
 		for key, entry := range catalog.Entries {
-			// Command-room labels are rendered only with the embedded Unicode
-			// font. Keep the Eten requirement for every existing legacy label.
-			if len(key) >= 5 && key[:5] == "room." {
+			// Command-room and permanent-toolbar labels always use the embedded
+			// Unicode font, including above the original interface. Existing
+			// legacy labels must still be covered by Eten.
+			if (len(key) >= 5 && key[:5] == "room.") || (len(key) >= 8 && key[:8] == "toolbar.") {
 				font, fontErr := assets.EmbeddedModernFont()
 				if fontErr != nil {
 					t.Fatal(fontErr)

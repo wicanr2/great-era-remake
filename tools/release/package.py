@@ -77,7 +77,7 @@ def manifest(folder, version, platform, entry):
         'platform':platform,'entrypoint':entry,'contains_original_game_data':FULL_LOCAL,
         'contains_original_audio_or_font':FULL_LOCAL,'requires_user_supplied_legal_game_data':not FULL_LOCAL,
         'distribution':'local use only; original game data/font not cleared for redistribution' if FULL_LOCAL else 'engine and project-original music; legal original data/font must be supplied by user',
-        'audio':'eight project-original mastered Ogg cues enabled; user listening accepted; other platform devices unverified; -audio off disables',
+        'audio':'HD Ogg default; live HD/original/mute and automatic/eight-track selection; remembered preferences; other platform devices unverified',
         'device_validation':'pending; container and Wine checks are recorded separately',
         'source_manifest':'SHA256SUMS.json in release root','files':inventory(folder)})
 
@@ -210,7 +210,7 @@ def assemble(version):
     windows=STAGE/'assemble/GreatEraRemake'
     copy_common(windows)
     shutil.copy2(STAGE/'build/dsds.exe',windows/'dsds.exe')
-    bundled=('-game data/game -eten data/eten ' if FULL_LOCAL else '')+'-modern-audio assets/music/modern -audio modern -locale translations/zh-Hant '
+    bundled=('-game data/game -eten data/eten ' if FULL_LOCAL else '')+'-modern-audio assets/music/modern -locale translations/zh-Hant '
     (windows/'launch.cmd').write_text('@echo off\r\nsetlocal\r\ncd /d "%~dp0"\r\n'
         'set "DSDS_SAVES=%LOCALAPPDATA%\\GreatEraRemake\\Saves"\r\n'
         'if not exist "%DSDS_SAVES%" mkdir "%DSDS_SAVES%"\r\n'

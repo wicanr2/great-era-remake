@@ -60,3 +60,33 @@ func TestModernLocalAssetsRepeatThreeLoops(t *testing.T) {
 		})
 	}
 }
+
+func TestModernLoopMetadataResamplesToSharedOutputRate(t *testing.T) {
+	dir := "../../../assets/music/modern"
+	if _, err := os.Stat(filepath.Join(dir, "manifest.json")); os.IsNotExist(err) {
+		t.Skip("local music unavailable")
+	}
+	set, err := LoadModernTracks(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	source := set.Sources[TrackScene]
+	native, err := decodeModernStream(source.OGG, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	source.LoopStart = int64(native.SampleRate())
+	source.LoopLength = int64(native.SampleRate() * 2)
+	stream, scaled, err := decodeModernSource(source, 48000)
+	if err != nil || scaled.LoopStart != 48000 || scaled.LoopLength != 96000 || stream.SampleRate() != 48000 {
+		t.Fatalf("resampled=%+v %v", scaled, err)
+	}
+	loop, err := newLoopReader(stream, scaled)
+	if err != nil {
+		t.Fatal(err)
+	}
+	buf := make([]byte, 96000*4*3)
+	if _, err := io.ReadFull(loop, buf); err != nil {
+		t.Fatal(err)
+	}
+}

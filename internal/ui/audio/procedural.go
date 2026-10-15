@@ -10,8 +10,6 @@ import (
 	"errors"
 	"io"
 	"math"
-
-	ebitenaudio "github.com/hajimehoshi/ebiten/v2/audio"
 )
 
 const defaultModernSampleRate = 48000
@@ -31,14 +29,14 @@ func NewModernProceduralTracks(sampleRate int) (*Manager, error) {
 	if sampleRate < 8000 || sampleRate > 192000 {
 		return nil, errors.New("audio: modern sample rate 必須在 8000..192000")
 	}
-	ctx := ebitenaudio.NewContext(sampleRate)
+	ctx := outputContext(sampleRate)
 	return &Manager{
 		mode:               ModeModern,
 		ctx:                ebitenContext{ctx: ctx},
 		pcmByTrack:         make(map[Track][]byte),
 		proceduralFallback: true,
 		current:            TrackScene,
-		sampleRateValue:    sampleRate,
+		sampleRateValue:    ctx.SampleRate(),
 		volume:             0.7,
 	}, nil
 }

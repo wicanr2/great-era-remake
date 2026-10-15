@@ -156,6 +156,7 @@ type app struct {
 	audioMode        uiaudio.Mode
 	audioTrack       uiaudio.Track
 	audioWarned      map[uiaudio.Track]bool
+	music            musicState
 	// battleDT2／battleMemWar 是原始戰鬥狀態的副本；只在戰鬥結束時以
 	// internal/game 的非破壞性 writer 寫到 savePath 同目錄，絕不碰原版素材。
 	battleDT2         []byte
@@ -248,6 +249,7 @@ type app struct {
 	saveErr           error  // 存檔失敗就不離開
 	dirty             bool
 	frame             *ebiten.Image
+	toolbar           *toolbarState
 }
 
 // desiredAudioTrack 把畫面情境映射到可選的曲目。它只描述外殼情境，
@@ -304,7 +306,10 @@ func (a *app) syncAudioForScreen() {
 	if a.audioWarned == nil {
 		a.audioWarned = make(map[uiaudio.Track]bool)
 	}
-	want := a.desiredAudioTrack()
+	want := uiaudio.Track(a.preferences.MusicTrack)
+	if want == "" {
+		want = a.desiredAudioTrack()
+	}
 	if want == "" || want == a.audioTrack || !a.audio.HasTrack(want) {
 		if want != "" && want != a.audioTrack && !a.audio.HasTrack(want) && !a.audioWarned[want] {
 			fmt.Fprintf(os.Stderr, "音訊曲目 %q 未提供，沿用 %q\n", want, a.audioTrack)
@@ -356,14 +361,19 @@ func (a *app) Update() error {
 		}
 		return nil
 	}
+	a.pointerAction = actions.None
+	// F10 是唯一的離開鍵，而且要先確認（AGENTS.md §8）。
+	if inpututil.IsKeyJustPressed(ebiten.KeyF10) && a.screen != screenQuit {
+		a.closeToolbar()
+		a.quitBack, a.screen, a.dirty = a.screen, screenQuit, true
+		return nil
+	}
+	if a.updateToolbar() {
+		return nil
+	}
 	a.pointerAction = a.collectPointerAction()
 	if a.pointerAction != actions.None {
 		a.playInputEffect(a.pointerAction)
-	}
-	// F10 是唯一的離開鍵，而且要先確認（AGENTS.md §8）。
-	if inpututil.IsKeyJustPressed(ebiten.KeyF10) && a.screen != screenQuit {
-		a.quitBack, a.screen, a.dirty = a.screen, screenQuit, true
-		return nil
 	}
 	// F2 是 remake 外殼捷徑：只交換已完整建好的 Theme 指標，不碰規則層、
 	// 亂數或存檔 bytes；偏好另存於 prefs.json。
@@ -2293,11 +2303,12 @@ func (a *app) toggleResolution() error {
 }
 
 func (a *app) applyWindowSize() {
-	if a.commandInterface() || a.resolution == uiresolution.ModeHigh {
-		ebiten.SetWindowSize(uiresolution.HighWidth, uiresolution.HighHeight)
-		return
+	w, h := a.gameSurfaceSize()
+	h += a.toolbarHeight()
+	if !a.commandInterface() && a.resolution != uiresolution.ModeHigh {
+		w, h = w*scale, h*scale
 	}
-	ebiten.SetWindowSize(uiresolution.OriginalWidth*scale, uiresolution.OriginalHeight*scale)
+	ebiten.SetWindowSize(w, h)
 }
 
 func (a *app) setMessageTimePreference(units int) error {
@@ -3669,6 +3680,11 @@ func (a *app) compose() error {
 }
 
 func (a *app) Draw(dst *ebiten.Image) {
+	a.drawGame(dst)
+	a.drawToolbar(dst)
+}
+
+func (a *app) drawGame(dst *ebiten.Image) {
 	if a.dirty || a.frame == nil {
 		if err := a.compose(); err != nil {
 			fmt.Fprintln(os.Stderr, "合成失敗:", err)
@@ -3684,7 +3700,9 @@ func (a *app) Draw(dst *ebiten.Image) {
 		if bounds := a.frame.Bounds(); bounds.Dx() == uiresolution.HighWidth &&
 			bounds.Dy() == uiresolution.HighHeight {
 			// H1-a 地圖頁已直接以設計畫布合成，不再二次縮放。
-			dst.DrawImage(a.frame, nil)
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(0, float64(a.toolbarHeight()))
+			dst.DrawImage(a.frame, op)
 			return
 		}
 		// H0 過渡橋接：先把既有 640×350 frame 等比放進 1280×720 設計畫布，
@@ -3698,43 +3716,44 @@ func (a *app) Draw(dst *ebiten.Image) {
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Scale(float64(drawnW)/float64(uiresolution.OriginalWidth),
 			float64(drawnH)/float64(uiresolution.OriginalHeight))
-		op.GeoM.Translate(float64(offX), float64(offY))
+		op.GeoM.Translate(float64(offX), float64(offY+a.toolbarHeight()))
 		op.Filter = ebiten.FilterLinear
 		dst.DrawImage(a.frame, op)
 		return
 	}
-	dst.DrawImage(a.frame, nil)
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(0, float64(a.toolbarHeight()))
+	dst.DrawImage(a.frame, op)
 }
 
 func (a *app) Layout(_, _ int) (int, int) {
-	if a.commandInterface() {
-		return 1280, 720
-	}
-	return a.resolution.Size()
+	w, h := a.gameSurfaceSize()
+	return w, h + a.toolbarHeight()
 }
 
 // buildVersion is set by the isolated packaging tool; development builds remain explicit.
 var buildVersion = "development"
 
 func main() {
+	defaults := defaultStartupPaths()
 	versionFlag := flag.Bool("version", false, "顯示程式版本並離開")
-	gameDir := flag.String("game", "workplace/orig/game", "原版素材目錄（唯讀）")
+	gameDir := flag.String("game", defaults.game, "原版素材目錄（唯讀）")
 	start := flag.Int("province", 26, "起始省編號（1-39），預設 26 = 湖北省")
 	// AGENTS.md §8：原版資產唯讀，存檔一律寫到別的地方。
-	savePath := flag.String("save", "workplace/saves/SAVE(1).DT1",
+	savePath := flag.String("save", defaults.save,
 		"離開時自動存檔的路徑（**不會**覆蓋原版）")
 	// 固定亂數種子是 AGENTS.md §8 的硬規則：截圖驗收要能重現。
 	seed := flag.Uint("seed", 1, "亂數種子（原版 LCG，docs/re/17）")
-	localeDir := flag.String("locale", "translations/zh-Hant",
+	localeDir := flag.String("locale", defaults.locale,
 		"語系資料目錄。換一個目錄就換一種語言（AGENTS.md §6）")
-	etenDir := flag.String("eten", "workplace/eten",
+	etenDir := flag.String("eten", defaults.eten,
 		"使用者提供的倚天 STDFONT.15／SPCFONT.15／ASCFONT.15 目錄（不隨遊戲散布）")
 	wording := flag.String("wording", "", "顯示用語：original 或 plain；空白沿用 prefs.json")
 	interfaceFlag := flag.String("interface", "", "操作介面：command 或 original；空白沿用 prefs.json")
 	themeFlag := flag.String("theme", "", "圖形主題：retro 或 modern；空白沿用 prefs.json")
 	resolutionFlag := flag.String("resolution", "", "顯示解析度：original 或 high；空白沿用 prefs.json")
-	audioFlag := flag.String("audio", string(uiaudio.ModeOff), "音訊：off、retro 或 modern（retro 需玩家自備 MUS/TIM；modern 優先讀 manifest/Ogg，缺少時使用原創純 Go fallback）")
-	modernAudioDir := flag.String("modern-audio", "assets/music/modern", "Modern Ogg 音樂目錄（有通過 manifest 的 Ogg 時優先使用；缺檔安全退回原創純 Go loop）")
+	audioFlag := flag.String("audio", "", "音訊：off、retro 或 modern（retro 需玩家自備 MUS/TIM；modern 優先讀 manifest/Ogg，缺少時使用原創純 Go fallback）")
+	modernAudioDir := flag.String("modern-audio", defaults.music, "Modern Ogg 音樂目錄（有通過 manifest 的 Ogg 時優先使用；缺檔安全退回原創純 Go loop）")
 	prefsFile := flag.String("prefs", "", "偏好檔路徑；空白使用 XDG_CONFIG_HOME/dsds/prefs.json")
 	flag.Parse()
 	if *versionFlag {
@@ -3802,7 +3821,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "偏好檔的解析度無效，使用 original：%v\n", resolutionErr)
 		resolutionMode = uiresolution.ModeOriginal
 	}
-	audioMode, audioErr := uiaudio.ParseMode(*audioFlag)
+	if *audioFlag != "" {
+		preferences.Audio = *audioFlag
+	}
+	audioMode, audioErr := uiaudio.ParseMode(preferences.Audio)
 	if audioErr != nil {
 		fmt.Fprintln(os.Stderr, "錯誤:", audioErr)
 		os.Exit(1)
@@ -4026,15 +4048,11 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 		}
 	}
 
-	windowW, windowH := render.ModeBGIW*scale, render.ModeBGIH*scale
-	if preferences.Layout == "command" || resolutionMode == uiresolution.ModeHigh {
-		windowW, windowH = uiresolution.HighWidth, uiresolution.HighHeight
-	}
-	ebiten.SetWindowSize(windowW, windowH)
 	ebiten.SetWindowTitle("大時代的故事")
 	a := &app{
-		room: commandRoomState{Mode: interfaceFromPreference(preferences.Layout)},
-		m:    m, tbl: tbl, generals: generals, fonts: fonts, cmdFonts: cmdFonts, fan: fan,
+		toolbar: newToolbarState(),
+		room:    commandRoomState{Mode: interfaceFromPreference(preferences.Layout)},
+		m:       m, tbl: tbl, generals: generals, fonts: fonts, cmdFonts: cmdFonts, fan: fan,
 		tiles: ts, icons: icons, origSave: origSave, savePath: savePath,
 		battleDT2: battleDT2, battleMemWar: battleMemWar,
 		battleDT2States: battleDT2States, battleMemStates: battleMemStates,
@@ -4051,113 +4069,16 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 		rng:      game.NewRand(seed),
 		messages: newMessageQueue(preferences.MessageTime),
 	}
-	if audioMode == uiaudio.ModeRetro {
-		// SCENE 是策略畫面的初始曲目；其他曲目存在就加入延遲切換庫，
-		// 缺少時沿用目前曲目並列印一次診斷，不把玩家自備素材誤當必要檔。
-		trackStems := []struct {
-			track uiaudio.Track
-			stem  string
-		}{
-			{uiaudio.TrackScene, "SCENE"},
-			{uiaudio.TrackStrategy, "STRATEGY"},
-			{uiaudio.TrackMainTheme, "MAINTHEM"},
-			{uiaudio.TrackBattle1, "BATTLE1"},
-			{uiaudio.TrackBattle2, "BATTLE2"},
-			{uiaudio.TrackBattleAlt, "BT02"},
-			{uiaudio.TrackWall, "WALL"},
-			{uiaudio.TrackFinal, "FINAL"},
-		}
-		sources := make(map[uiaudio.Track]uiaudio.TrackSource)
-		for _, item := range trackStems {
-			musData, musErr := read(item.stem + ".MUS")
-			timData, timErr := read(item.stem + ".TIM")
-			if musErr != nil || timErr != nil {
-				if item.track == uiaudio.TrackScene {
-					if musErr != nil {
-						return fmt.Errorf("retro 音訊需要 SCENE.MUS：%w", musErr)
-					}
-					return fmt.Errorf("retro 音訊需要 SCENE.TIM：%w", timErr)
-				}
-				fmt.Fprintf(os.Stderr, "音訊曲目 %s 缺少 MUS/TIM，略過\n", item.stem)
-				continue
-			}
-			sources[item.track] = uiaudio.TrackSource{MUS: musData, TIM: timData}
-		}
-		manager, err := uiaudio.NewRetroTracks(sources, uiaudio.TrackScene, 0)
-		if err != nil {
-			return err
-		}
-		a.audio = manager
-		a.audioMode = audioMode
-		a.audioTrack = uiaudio.TrackScene
-		a.audioWarned = make(map[uiaudio.Track]bool)
-		defer manager.Close()
-		if err := manager.Start(0.7); err != nil {
-			return err
-		}
+	a.applyWindowSize()
+	a.music = musicState{read: read, dir: modernAudioDir}
+	if err := a.setMusic(audioMode, uiaudio.Track(preferences.MusicTrack), false); err != nil {
+		return err
 	}
-	if audioMode == uiaudio.ModeModern {
-		set, loadErr := uiaudio.LoadModernTracks(modernAudioDir)
-		if loadErr != nil {
-			// Modern 音樂是新增外殼；缺少尚未清權的 Ogg 不應讓玩家無聲。
-			// 這裡改用原創純 Go loop，並保留 manifest 失敗原因，避免把
-			// technical reference 誤當成可發行音檔。
-			fmt.Fprintf(os.Stderr, "modern manifest 未載入（%v），改用原創純 Go 音樂 fallback\n", loadErr)
-			manager, managerErr := uiaudio.NewModernProceduralTracks(0)
-			if managerErr != nil {
-				return fmt.Errorf("建立 modern 純 Go 音訊：%w", managerErr)
-			}
-			a.audio = manager
-			a.audioMode = audioMode
-			a.audioTrack = uiaudio.TrackScene
-			a.audioWarned = make(map[uiaudio.Track]bool)
-			defer manager.Close()
-			if startErr := manager.Start(0.7); startErr != nil {
-				return fmt.Errorf("啟動 modern 純 Go 音訊：%w", startErr)
-			}
-		} else {
-			for _, warning := range set.Warnings {
-				fmt.Fprintln(os.Stderr, "modern 音訊：", warning)
-			}
-			manager, managerErr := uiaudio.NewModernTracks(set.Sources, uiaudio.TrackScene)
-			if managerErr != nil {
-				fmt.Fprintf(os.Stderr, "modern Ogg 不可播放（%v），改用原創純 Go 音樂 fallback\n", managerErr)
-				manager, fallbackErr := uiaudio.NewModernProceduralTracks(0)
-				if fallbackErr != nil {
-					return fmt.Errorf("建立 modern 純 Go 音訊：%w", fallbackErr)
-				}
-				a.audio = manager
-				a.audioMode = audioMode
-				a.audioTrack = uiaudio.TrackScene
-				a.audioWarned = make(map[uiaudio.Track]bool)
-				defer manager.Close()
-				if startErr := manager.Start(0.7); startErr != nil {
-					return fmt.Errorf("啟動 modern 純 Go 音訊：%w", startErr)
-				}
-			} else {
-				a.audio = manager
-				a.audioMode = audioMode
-				a.audioTrack = uiaudio.TrackScene
-				a.audioWarned = make(map[uiaudio.Track]bool)
-				defer manager.Close()
-				if startErr := manager.Start(0.7); startErr != nil {
-					fmt.Fprintf(os.Stderr, "modern Ogg 啟動失敗（%v），改用原創純 Go 音樂 fallback\n", startErr)
-					fallback, fallbackErr := uiaudio.NewModernProceduralTracks(0)
-					if fallbackErr != nil {
-						return fmt.Errorf("建立 modern 純 Go 音訊：%w", fallbackErr)
-					}
-					_ = manager.Close()
-					a.audio = fallback
-					a.audioMode = audioMode
-					a.audioTrack = uiaudio.TrackScene
-					defer fallback.Close()
-					if fallbackErr = fallback.Start(0.7); fallbackErr != nil {
-						return fmt.Errorf("啟動 modern 純 Go 音訊：%w", fallbackErr)
-					}
-				}
-			}
+	defer func() {
+		if a.audio != nil {
+			_ = a.audio.Close()
 		}
-	}
+	}()
 	if startupSession != nil {
 		a.factions, a.factionLeaders, a.factionOf, a.warRecords = startupSession.factions, startupSession.leaders, startupSession.factionOf, startupSession.warRecords
 		a.world, a.cmdBudget = startupSession.world, startupSession.cmdBudget

@@ -979,6 +979,130 @@
     "room.battle_terrain.12": {
       "original": "Great Wall",
       "plain": "Great Wall"
+    },
+    "toolbar.art": {
+      "original": "Art",
+      "plain": "Art"
+    },
+    "toolbar.interface": {
+      "original": "Interface",
+      "plain": "Interface"
+    },
+    "toolbar.ai": {
+      "original": "AI",
+      "plain": "AI"
+    },
+    "toolbar.input": {
+      "original": "Input",
+      "plain": "Input"
+    },
+    "toolbar.art.original": {
+      "original": "Original",
+      "plain": "Original"
+    },
+    "toolbar.art.hd": {
+      "original": "HD",
+      "plain": "HD"
+    },
+    "toolbar.interface.original": {
+      "original": "Original UI",
+      "plain": "Original UI"
+    },
+    "toolbar.interface.command": {
+      "original": "Command UI",
+      "plain": "Command UI"
+    },
+    "toolbar.ai.current.long": {
+      "original": "Current remake AI",
+      "plain": "Current remake AI"
+    },
+    "toolbar.input.mouse": {
+      "original": "Keyboard + mouse",
+      "plain": "Keyboard + mouse"
+    },
+    "toolbar.input.keyboard": {
+      "original": "Keyboard only",
+      "plain": "Keyboard only"
+    },
+    "toolbar.ai.current": {
+      "original": "Current AI",
+      "plain": "Current AI"
+    },
+    "toolbar.input.note": {
+      "original": "The toolbar still accepts mouse input in keyboard-only mode so you can switch back.",
+      "plain": "The toolbar still accepts mouse input in keyboard-only mode so you can switch back."
+    },
+    "toolbar.ai.note.1": {
+      "original": "Uses the existing domestic, transfer, attack and tactical defender decisions.",
+      "plain": "Uses the existing domestic, transfer, attack and tactical defender decisions."
+    },
+    "toolbar.ai.note.2": {
+      "original": "This update preserves the current strategy and difficulty.",
+      "plain": "This update preserves the current strategy and difficulty."
+    },
+    "toolbar.ai.note.3": {
+      "original": "Full original AI equivalence is unverified.",
+      "plain": "Full original AI equivalence is unverified."
+    },
+    "toolbar.music": {
+      "original": "Music",
+      "plain": "Music"
+    },
+    "toolbar.music.hd": {
+      "original": "HD",
+      "plain": "HD"
+    },
+    "toolbar.music.original": {
+      "original": "Original",
+      "plain": "Original"
+    },
+    "toolbar.music.off": {
+      "original": "Mute",
+      "plain": "Mute"
+    },
+    "toolbar.music.auto": {
+      "original": "Automatic by screen",
+      "plain": "Automatic by screen"
+    },
+    "toolbar.music.scene": {
+      "original": "Opening",
+      "plain": "Opening"
+    },
+    "toolbar.music.strategy": {
+      "original": "Strategy",
+      "plain": "Strategy"
+    },
+    "toolbar.music.main-theme": {
+      "original": "Main theme",
+      "plain": "Main theme"
+    },
+    "toolbar.music.battle-1": {
+      "original": "Battle I",
+      "plain": "Battle I"
+    },
+    "toolbar.music.battle-2": {
+      "original": "Battle II",
+      "plain": "Battle II"
+    },
+    "toolbar.music.battle-alt": {
+      "original": "Battle III",
+      "plain": "Battle III"
+    },
+    "toolbar.music.wall": {
+      "original": "Biography",
+      "plain": "Biography"
+    },
+    "toolbar.music.final": {
+      "original": "Finale",
+      "plain": "Finale"
+    },
+    "toolbar.music.note": {
+      "original": "Mode and track are selected separately and remembered.",
+      "plain": "Mode and track are selected separately and remembered."
+    },
+    "toolbar.music.unavailable": {
+      "original": "Original MUS/TIM for this track is unavailable. Current music retained.",
+      "plain": "Original MUS/TIM for this track is unavailable. Current music retained."
     }
   }
 }

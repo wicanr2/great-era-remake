@@ -979,6 +979,130 @@
     "room.battle_terrain.12": {
       "original": "長城",
       "plain": "長城"
+    },
+    "toolbar.art": {
+      "original": "美術",
+      "plain": "美術"
+    },
+    "toolbar.interface": {
+      "original": "画面",
+      "plain": "画面"
+    },
+    "toolbar.ai": {
+      "original": "AI",
+      "plain": "AI"
+    },
+    "toolbar.input": {
+      "original": "操作",
+      "plain": "操作"
+    },
+    "toolbar.art.original": {
+      "original": "原版",
+      "plain": "原版"
+    },
+    "toolbar.art.hd": {
+      "original": "HD",
+      "plain": "HD"
+    },
+    "toolbar.interface.original": {
+      "original": "原版画面",
+      "plain": "原版画面"
+    },
+    "toolbar.interface.command": {
+      "original": "司令部画面",
+      "plain": "司令部画面"
+    },
+    "toolbar.ai.current.long": {
+      "original": "現在のリメイク AI",
+      "plain": "現在のリメイク AI"
+    },
+    "toolbar.input.mouse": {
+      "original": "キーボード＋マウス",
+      "plain": "キーボード＋マウス"
+    },
+    "toolbar.input.keyboard": {
+      "original": "キーボードのみ",
+      "plain": "キーボードのみ"
+    },
+    "toolbar.ai.current": {
+      "original": "現在の AI",
+      "plain": "現在の AI"
+    },
+    "toolbar.input.note": {
+      "original": "キーボードのみでもツールバーはマウスで操作でき、元に戻せます。",
+      "plain": "キーボードのみでもツールバーはマウスで操作でき、元に戻せます。"
+    },
+    "toolbar.ai.note.1": {
+      "original": "現在の内政、移動、出兵と戦術守備側の判断を使用します。",
+      "plain": "現在の内政、移動、出兵と戦術守備側の判断を使用します。"
+    },
+    "toolbar.ai.note.2": {
+      "original": "今回は戦略や難易度を変更しません。",
+      "plain": "今回は戦略や難易度を変更しません。"
+    },
+    "toolbar.ai.note.3": {
+      "original": "原版 AI との完全な一致は未確認です。",
+      "plain": "原版 AI との完全な一致は未確認です。"
+    },
+    "toolbar.music": {
+      "original": "音楽",
+      "plain": "音楽"
+    },
+    "toolbar.music.hd": {
+      "original": "HD",
+      "plain": "HD"
+    },
+    "toolbar.music.original": {
+      "original": "原版",
+      "plain": "原版"
+    },
+    "toolbar.music.off": {
+      "original": "消音",
+      "plain": "消音"
+    },
+    "toolbar.music.auto": {
+      "original": "画面に合わせて自動",
+      "plain": "画面に合わせて自動"
+    },
+    "toolbar.music.scene": {
+      "original": "序幕",
+      "plain": "序幕"
+    },
+    "toolbar.music.strategy": {
+      "original": "政略",
+      "plain": "政略"
+    },
+    "toolbar.music.main-theme": {
+      "original": "主題曲",
+      "plain": "主題曲"
+    },
+    "toolbar.music.battle-1": {
+      "original": "戦闘一",
+      "plain": "戦闘一"
+    },
+    "toolbar.music.battle-2": {
+      "original": "戦闘二",
+      "plain": "戦闘二"
+    },
+    "toolbar.music.battle-alt": {
+      "original": "戦闘三",
+      "plain": "戦闘三"
+    },
+    "toolbar.music.wall": {
+      "original": "人物",
+      "plain": "人物"
+    },
+    "toolbar.music.final": {
+      "original": "終幕",
+      "plain": "終幕"
+    },
+    "toolbar.music.note": {
+      "original": "音楽モードと曲を別々に選択。設定を保存します。",
+      "plain": "音楽モードと曲を別々に選択。設定を保存します。"
+    },
+    "toolbar.music.unavailable": {
+      "original": "この曲の原版 MUS/TIM がありません。現在の音楽を維持します。",
+      "plain": "この曲の原版 MUS/TIM がありません。現在の音楽を維持します。"
     }
   }
 }

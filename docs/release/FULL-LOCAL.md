@@ -8,15 +8,15 @@
 
 | 平台 | 啟動方式 | 存檔位置 |
 |---|---|---|
-| Windows amd64 | 解壓縮後執行 `GreatEraRemake/launch.cmd` | `%LOCALAPPDATA%\GreatEraRemake\Saves` |
+| Windows amd64 | 解壓縮後執行 `GreatEraRemake/dsds.exe 或 launch.cmd` | `%LOCALAPPDATA%\GreatEraRemake\Saves` |
 | macOS arm64 | 解壓縮後開啟 `GreatEraRemake.app` | `~/Library/Application Support/GreatEraRemake/Saves` |
 | Linux x86_64 | 賦予 AppImage 執行權限後開啟；無 FUSE 時先解包，再執行 `squashfs-root/AppRun` | `$XDG_DATA_HOME/GreatEraRemake/Saves`，未設定時使用 `~/.local/share/GreatEraRemake/Saves` |
 
-入口會自動指定包內資料、字庫與配樂，不需另設 `-game` 或 `-eten`。
+完整版的執行檔會自行尋找包內資料、字庫、語系與配樂。即使從其他工作目錄直接執行，也不需另設 `-game` 或 `-eten`。
 原版 EXE、備份壓縮包與玩家進度不放入封包。`data/game/SAVE(1)`、`SAVE(2)` 是唯讀初始資料。
 玩家進度與偏好寫使用者目錄，遊戲不改寫包內資料。
 
-預設採指揮介面、HD 美術與現有 modern 配樂。`F2` 切換美術，`F4` 切換介面，
+首次啟動預設採指揮介面、HD 美術、滑鼠及 HD 配樂。常駐工具列可即時切換美術、介面、HD／原版／靜音及自動或八首指定曲目，並保存偏好。`F6` 可用鍵盤操作工具列，AI 沿用現況。`F2` 切換美術，`F4` 切換介面，
 滑鼠滾輪縮放，拖曳地圖。「人物檔案」可搜尋與翻頁。`ESC` 返回；`F10` 後按 `Y` 儲存離開。
 配樂沿用使用者確認的專案原創程序作曲，八曲統一至約 -18 LUFS，以 44.1 kHz 雙聲道 Ogg 播放。
 曲目來源與固定增益混音記錄在包內 `assets/music/modern/provenance.json`。使用者已確認目前設備試聽正常；其他平台真機仍待驗收。
@@ -41,8 +41,10 @@ RRSAL-1.0 適用於有權授權的 remake 程式碼，不授予原版素材或�
 從專案根目錄建置正式版：
 
 ```sh
-DSDS_PACKAGE_RELEASE_CHANNEL=stable bash tools/package.sh v.1.0.2-20261015 full-local
+DSDS_PACKAGE_RELEASE_CHANNEL=stable bash tools/package.sh v.1.0.3-20261015 full-local
 ```
 
 輸出固定為專案根目錄的 `dist-all/<版本>/full-local/`。腳本拒絕覆寫既有封包，所有工作在受限 Docker 中執行。
 推廣影片另存 `promo/`，不放進遊戲封包。工作追蹤見 [Issue #7](https://github.com/wicanr2/great-era-remake/issues/7)。
+
+零參數啟動與音樂回歸工具為 [tools/release/smoke.py](../../tools/release/smoke.py)，只在有界 Docker 中執行；依檔頭使用方式傳入版本、平台及封包種類。

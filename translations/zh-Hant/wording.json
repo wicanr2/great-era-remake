@@ -979,6 +979,130 @@
     "room.battle_terrain.12": {
       "original": "長城",
       "plain": "長城"
+    },
+    "toolbar.art": {
+      "original": "美術",
+      "plain": "美術"
+    },
+    "toolbar.interface": {
+      "original": "介面",
+      "plain": "介面"
+    },
+    "toolbar.ai": {
+      "original": "AI",
+      "plain": "AI"
+    },
+    "toolbar.input": {
+      "original": "操作",
+      "plain": "操作"
+    },
+    "toolbar.art.original": {
+      "original": "原版",
+      "plain": "原版"
+    },
+    "toolbar.art.hd": {
+      "original": "HD",
+      "plain": "HD"
+    },
+    "toolbar.interface.original": {
+      "original": "原版介面",
+      "plain": "原版介面"
+    },
+    "toolbar.interface.command": {
+      "original": "指揮介面",
+      "plain": "指揮介面"
+    },
+    "toolbar.ai.current.long": {
+      "original": "現有重製 AI",
+      "plain": "現有重製 AI"
+    },
+    "toolbar.input.mouse": {
+      "original": "鍵盤＋滑鼠",
+      "plain": "鍵盤＋滑鼠"
+    },
+    "toolbar.input.keyboard": {
+      "original": "純鍵盤",
+      "plain": "純鍵盤"
+    },
+    "toolbar.ai.current": {
+      "original": "現有 AI",
+      "plain": "現有 AI"
+    },
+    "toolbar.input.note": {
+      "original": "純鍵盤模式仍可用滑鼠操作工具列，方便切回。",
+      "plain": "純鍵盤模式仍可用滑鼠操作工具列，方便切回。"
+    },
+    "toolbar.ai.note.1": {
+      "original": "沿用目前的內政、調動與出兵決策，以及戰術守方 AI。",
+      "plain": "沿用目前的內政、調動與出兵決策，以及戰術守方 AI。"
+    },
+    "toolbar.ai.note.2": {
+      "original": "這次不增加強化難度，策略與遊戲規則維持現況。",
+      "plain": "這次不增加強化難度，策略與遊戲規則維持現況。"
+    },
+    "toolbar.ai.note.3": {
+      "original": "原版完整 AI 一致性尚未證實。",
+      "plain": "原版完整 AI 一致性尚未證實。"
+    },
+    "toolbar.music": {
+      "original": "音樂",
+      "plain": "音樂"
+    },
+    "toolbar.music.hd": {
+      "original": "HD",
+      "plain": "HD"
+    },
+    "toolbar.music.original": {
+      "original": "原版",
+      "plain": "原版"
+    },
+    "toolbar.music.off": {
+      "original": "靜音",
+      "plain": "靜音"
+    },
+    "toolbar.music.auto": {
+      "original": "自動依畫面選曲",
+      "plain": "自動依畫面選曲"
+    },
+    "toolbar.music.scene": {
+      "original": "序幕",
+      "plain": "序幕"
+    },
+    "toolbar.music.strategy": {
+      "original": "政略",
+      "plain": "政略"
+    },
+    "toolbar.music.main-theme": {
+      "original": "主題曲",
+      "plain": "主題曲"
+    },
+    "toolbar.music.battle-1": {
+      "original": "戰鬥一",
+      "plain": "戰鬥一"
+    },
+    "toolbar.music.battle-2": {
+      "original": "戰鬥二",
+      "plain": "戰鬥二"
+    },
+    "toolbar.music.battle-alt": {
+      "original": "戰鬥三",
+      "plain": "戰鬥三"
+    },
+    "toolbar.music.wall": {
+      "original": "人物",
+      "plain": "人物"
+    },
+    "toolbar.music.final": {
+      "original": "終幕",
+      "plain": "終幕"
+    },
+    "toolbar.music.note": {
+      "original": "音樂模式與選曲分別勾選，立即生效並記住設定。",
+      "plain": "音樂模式與選曲分別勾選，立即生效並記住設定。"
+    },
+    "toolbar.music.unavailable": {
+      "original": "未提供這首原版 MUS/TIM，保留目前音樂。",
+      "plain": "未提供這首原版 MUS/TIM，保留目前音樂。"
     }
   }
 }

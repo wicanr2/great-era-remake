@@ -87,6 +87,21 @@ func (c ebitenContext) NewPlayer(src io.Reader) (Player, error) {
 	return c.ctx.NewPlayer(src)
 }
 
+// All live modes share Ebiten's single output device and sample rate.
+func outputContext(rate int) *ebitenaudio.Context {
+	if ctx := ebitenaudio.CurrentContext(); ctx != nil {
+		return ctx
+	}
+	return ebitenaudio.NewContext(rate)
+}
+
+func outputRate(rate int) int {
+	if ctx := ebitenaudio.CurrentContext(); ctx != nil {
+		return ctx.SampleRate()
+	}
+	return rate
+}
+
 // Manager 管理目前 BGM 與 bounded crossfade 期間的 outgoing player。retro 只保留
 // 已產生的 PCM 副本；modern 的 Ogg bytes 由 manifest loader 複製後延遲解碼。
 type Manager struct {
@@ -133,14 +148,15 @@ func NewRetroTracks(sources map[Track]TrackSource, initial Track, sampleRate int
 	if !ok {
 		return nil, fmt.Errorf("audio: 缺少初始曲目 %q", initial)
 	}
+	if sampleRate == 0 {
+		sampleRate = opl2.DefaultSampleRate
+	}
+	sampleRate = outputRate(sampleRate)
 	pcm, err := renderTrack(source, sampleRate)
 	if err != nil {
 		return nil, fmt.Errorf("audio: 產生曲目 %q：%w", initial, err)
 	}
-	if sampleRate == 0 {
-		sampleRate = opl2.DefaultSampleRate
-	}
-	ctx := ebitenaudio.NewContext(sampleRate)
+	ctx := outputContext(sampleRate)
 	copySources := make(map[Track]TrackSource, len(sources))
 	for track, value := range sources {
 		copySources[track] = TrackSource{MUS: append([]byte(nil), value.MUS...), TIM: append([]byte(nil), value.TIM...)}
@@ -211,11 +227,11 @@ func (m *Manager) PlayTrackWithFade(track Track, volume float64, fadeFrames int)
 	}
 	if m.mode == ModeModern {
 		if source, ok := m.modernSources[track]; ok {
-			stream, err := decodeModernStream(source.OGG, m.sampleRate())
+			stream, loopSource, err := decodeModernSource(source, m.sampleRate())
 			if err != nil {
 				return fmt.Errorf("audio: 解碼 modern 曲目 %q：%w", track, err)
 			}
-			reader, err := newLoopReader(stream, source)
+			reader, err := newLoopReader(stream, loopSource)
 			if err != nil {
 				return fmt.Errorf("audio: modern 曲目 %q 的循環點無效：%w", track, err)
 			}
@@ -410,6 +426,17 @@ func (m *Manager) Update() {
 // TransitionActive 回報是否仍有兩個情境 player 在交叉淡化。
 func (m *Manager) TransitionActive() bool {
 	return m != nil && m.outgoing != nil
+}
+
+// SetVolume commits a prepared silent player without reopening its stream.
+func (m *Manager) SetVolume(volume float64) {
+	if m == nil || m.closed {
+		return
+	}
+	m.volume = max(0, min(1, volume))
+	if m.player != nil {
+		m.player.SetVolume(m.volume)
+	}
 }
 
 // Stop 暫停並關閉目前 player；重複呼叫安全。

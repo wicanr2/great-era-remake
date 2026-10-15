@@ -17,18 +17,21 @@ import (
 // MessageTime 已接玩家功能。
 // 空字串表示沿用 preset／內建預設，不把尚未實作的軸假裝成可用。
 type Preferences struct {
-	Theme       string `json:"theme,omitempty"`
-	Icons       string `json:"icons,omitempty"`
-	Typography  string `json:"typography,omitempty"`
-	Layout      string `json:"layout,omitempty"`
-	Wording     string `json:"wording,omitempty"`
-	Scale       int    `json:"scale,omitempty"`
-	Resolution  string `json:"resolution,omitempty"`
-	MessageTime int    `json:"message_time,omitempty"`
+	Theme        string `json:"theme,omitempty"`
+	Icons        string `json:"icons,omitempty"`
+	Typography   string `json:"typography,omitempty"`
+	Layout       string `json:"layout,omitempty"`
+	Wording      string `json:"wording,omitempty"`
+	Scale        int    `json:"scale,omitempty"`
+	Resolution   string `json:"resolution,omitempty"`
+	MessageTime  int    `json:"message_time,omitempty"`
+	KeyboardOnly bool   `json:"keyboard_only,omitempty"`
+	Audio        string `json:"audio,omitempty"`
+	MusicTrack   string `json:"music_track,omitempty"`
 }
 
 func Default() Preferences {
-	return Preferences{Theme: "modern", Layout: "command", Resolution: "high", Scale: 2, MessageTime: 5}
+	return Preferences{Theme: "modern", Layout: "command", Resolution: "high", Audio: "modern", Scale: 2, MessageTime: 5}
 }
 
 // DefaultPath 遵循 XDG；os.UserConfigDir 在 Linux 會優先使用 XDG_CONFIG_HOME。
@@ -57,6 +60,12 @@ func Load(path string) (Preferences, error) {
 	}
 	if loaded.Theme == "" {
 		loaded.Theme = p.Theme
+	}
+	if loaded.Audio == "" {
+		loaded.Audio = p.Audio
+	}
+	if err := validateAudio(loaded); err != nil {
+		return p, err
 	}
 	if loaded.Layout == "" {
 		loaded.Layout = p.Layout
@@ -93,6 +102,9 @@ func Load(path string) (Preferences, error) {
 
 // Save 以同目錄暫存檔 + rename 原子取代，避免程式中止留下半份 JSON。
 func Save(path string, p Preferences) (err error) {
+	if err := validateAudio(p); err != nil {
+		return err
+	}
 	if !layout.ValidInterface(p.Layout) {
 		return fmt.Errorf("prefs: 未知介面 %q", p.Layout)
 	}
@@ -142,4 +154,16 @@ func Save(path string, p Preferences) (err error) {
 		return fmt.Errorf("prefs: 原子取代：%w", err)
 	}
 	return nil
+}
+
+func validateAudio(p Preferences) error {
+	if p.Audio != "" && p.Audio != "modern" && p.Audio != "retro" && p.Audio != "off" {
+		return fmt.Errorf("prefs: 未知音樂模式 %q", p.Audio)
+	}
+	switch p.MusicTrack {
+	case "", "scene", "strategy", "main-theme", "battle-1", "battle-2", "battle-alt", "wall", "final":
+		return nil
+	default:
+		return fmt.Errorf("prefs: 未知曲目 %q", p.MusicTrack)
+	}
 }

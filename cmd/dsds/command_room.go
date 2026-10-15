@@ -325,7 +325,7 @@ func (a *app) updateCommandRoom() bool {
 	action := string(a.pointerAction)
 	key := strings.TrimPrefix(action, "room.")
 	if a.room.Archive {
-		if key == "close" || inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		if key == "close" || a.actionPressed(actions.Back, ebiten.KeyEscape) {
 			a.room.Archive = false
 			a.room.Searching = false
 			a.dirty = true
@@ -391,6 +391,9 @@ func (a *app) updateCommandRoom() bool {
 			}
 		}
 		_, wheel := ebiten.Wheel()
+		if _, _, ok := a.gameCursorPosition(); !ok {
+			wheel = 0
+		}
 		if wheel != 0 {
 			if wheel > 0 {
 				a.roomPage(-1)
@@ -527,14 +530,14 @@ func (a *app) updateCommandRoom() bool {
 		return true
 	}
 	// Pointer coordinates are the logical 1280×720 surface, independent of window size.
-	x, y := ebiten.CursorPosition()
-	inside := l.RoomMapContains(x, y)
+	x, y, mouseEnabled := a.gameCursorPosition()
+	inside := mouseEnabled && l.RoomMapContains(x, y)
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) && inside {
 		a.room.Drag = true
 		a.room.DragX = x
 		a.room.DragY = y
 	}
-	if !ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+	if !mouseEnabled || !ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		a.room.Drag = false
 	}
 	if a.room.Drag {
@@ -547,6 +550,9 @@ func (a *app) updateCommandRoom() bool {
 		}
 	}
 	_, wheel := ebiten.Wheel()
+	if !mouseEnabled {
+		wheel = 0
+	}
 	if x >= 18 && x <= 358 && y >= 320 && y <= 628 && wheel != 0 {
 		if wheel > 0 {
 			a.scrollRoomCommands(-1)

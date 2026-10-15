@@ -16,7 +16,7 @@
 
 | 平台 | 入口 | 預設存檔目錄 |
 |---|---|---|
-| Windows amd64 | `GreatEraRemake/launch.cmd` | `%LOCALAPPDATA%\GreatEraRemake\Saves` |
+| Windows amd64 | `GreatEraRemake/dsds.exe 或 launch.cmd` | `%LOCALAPPDATA%\GreatEraRemake\Saves` |
 | macOS arm64 | `GreatEraRemake.app/Contents/MacOS/launch` | `~/Library/Application Support/GreatEraRemake/Saves` |
 | Linux x86_64 | 解壓縮 ZIP 後的 `AppDir/AppRun` | `$XDG_DATA_HOME/GreatEraRemake/Saves`，未設定時使用 `~/.local/share/GreatEraRemake/Saves` |
 
@@ -34,7 +34,7 @@ Go 1.26 的系統需求為 Windows 10 或 Windows Server 2016 以上、macOS 12 
 Linux 需要 glibc 2.34 以上、桌面 X11、OpenGL 與 ALSA 函式庫；
 glibc 需求由執行檔的實際符號版本核對。公開引擎 ZIP 不包含 AppImage runtime，也不需要 FUSE。
 
-啟動器預設以 `-audio modern` 播放八首原創 Ogg 混音；`-audio off` 關閉。
+首次啟動預設播放 HD Ogg；工具列可即時切換 HD／原版／靜音、自動選曲或八首指定曲目。選擇保存在 prefs.json，啟動器沿用已保存偏好；明示 `-audio` 參數優先。
 地圖及替代戰鬥已有 Ogg，程序生成只作缺檔後備。使用者已試聽確認採用；其他平台真機仍待驗收。
 圖形、美術與音訊選項彼此獨立。
 
@@ -44,7 +44,7 @@ glibc 需求由執行檔的實際符號版本核對。公開引擎 ZIP 不包含
 在隔離專案根目錄重建：
 
 ```sh
-DSDS_PACKAGE_RELEASE_CHANNEL=stable bash tools/package.sh v.1.0.2-20261015 patch
+DSDS_PACKAGE_RELEASE_CHANNEL=stable bash tools/package.sh v.1.0.3-20261015 patch
 ```
 
 輸出固定在 `dist-all/<版本>/patch/`，驗證記錄放 `smoke/`。腳本拒絕覆蓋既有輸出，
@@ -53,3 +53,5 @@ Linux 容器與 Wine 的啟動結果分別記錄；它們不能代替 Windows／
 ## 重建來源
 
 `tools/package.sh <版本> full-local` 在Docker內執行一次Go回歸及三平台編譯。接著以`DSDS_PACKAGE_REUSE_FULL=1 tools/package.sh <版本> patch`產生公開包，`tools/release/reuse_build.py`核對相同來源提交、工具映像、逐檔雜湊與三份二進位後重用。兩種包各自驗證內容、架構與啟動器。
+
+零參數啟動與音樂回歸工具為 [tools/release/smoke.py](../../tools/release/smoke.py)，只在有界 Docker 中執行；依檔頭使用方式傳入版本、平台及封包種類。

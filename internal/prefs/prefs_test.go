@@ -16,7 +16,7 @@ func TestMissingPreferencesUseDefaults(t *testing.T) {
 
 func TestSaveLoadRoundTripAndPermissions(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "nested", "prefs.json")
-	want := Preferences{Theme: "retro", Layout: "command", Resolution: "high", Wording: "plain", Scale: 2, MessageTime: 7}
+	want := Preferences{Theme: "retro", Audio: "modern", Layout: "command", Resolution: "high", Wording: "plain", Scale: 2, MessageTime: 7}
 	if err := Save(path, want); err != nil {
 		t.Fatal(err)
 	}
@@ -90,5 +90,29 @@ func TestDefaultPathUsesXDGConfigHome(t *testing.T) {
 	}
 	if !strings.HasPrefix(path, dir+string(os.PathSeparator)) || filepath.Base(path) != "prefs.json" {
 		t.Fatalf("XDG path = %q", path)
+	}
+}
+
+func TestKeyboardOnlyPreferencePreservesLegacyDefaults(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "prefs.json")
+	if err := os.WriteFile(path, []byte(`{"theme":"modern"}`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	p, err := Load(path)
+	if err != nil || p.KeyboardOnly {
+		t.Fatalf("legacy mouse input disabled: %+v %v", p, err)
+	}
+	p.KeyboardOnly = true
+	if err := Save(path, p); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := Load(path); err != nil || got != p {
+		t.Fatalf("input round trip: %+v %v", got, err)
+	}
+	if err := os.WriteFile(path, []byte(`{"keyboard_only":"yes"}`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := Load(path); err == nil || got != Default() {
+		t.Fatal("malformed input preference partially loaded")
 	}
 }

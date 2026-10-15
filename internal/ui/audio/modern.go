@@ -13,7 +13,6 @@ import (
 	"sort"
 	"strings"
 
-	ebitenaudio "github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 )
 
@@ -145,8 +144,8 @@ func validateModernMeta(id string, meta ModernManifestTrack) error {
 	return nil
 }
 
-// NewModernTracks 驗證初始 Ogg，依其取樣率建立 Ebiten audio.Context；其餘
-// 曲目延遲到切換時解碼。解碼器是 Ebiten 內建的純 Go Vorbis 路徑，不使用 cgo。
+// NewModernTracks 驗證初始 Ogg，沿用現有裝置；首次使用時依 Ogg 取樣率
+// 建立裝置。其他曲目延遲解碼，必要時換算至裝置取樣率，不使用 cgo。
 func NewModernTracks(sources map[Track]ModernTrackSource, initial Track) (*Manager, error) {
 	if len(sources) == 0 {
 		return nil, errors.New("audio: 至少需要一首 modern 曲目")
@@ -165,7 +164,7 @@ func NewModernTracks(sources map[Track]ModernTrackSource, initial Track) (*Manag
 	if stream.SampleRate() <= 0 {
 		return nil, fmt.Errorf("audio: modern 曲目 %q 沒有有效取樣率", initial)
 	}
-	ctx := ebitenaudio.NewContext(stream.SampleRate())
+	ctx := outputContext(stream.SampleRate())
 	copySources := make(map[Track]ModernTrackSource, len(sources))
 	for track, value := range sources {
 		copySources[track] = ModernTrackSource{
@@ -180,7 +179,7 @@ func NewModernTracks(sources map[Track]ModernTrackSource, initial Track) (*Manag
 		modernSources:      copySources,
 		proceduralFallback: true,
 		current:            initial,
-		sampleRateValue:    stream.SampleRate(),
+		sampleRateValue:    ctx.SampleRate(),
 		volume:             0.7,
 	}, nil
 }
@@ -193,6 +192,20 @@ func decodeModernStream(data []byte, sampleRate int) (*vorbis.Stream, error) {
 		return vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(data))
 	}
 	return vorbis.DecodeWithoutResampling(bytes.NewReader(data))
+}
+
+func decodeModernSource(source ModernTrackSource, rate int) (*vorbis.Stream, ModernTrackSource, error) {
+	stream, err := decodeModernStream(source.OGG, 0)
+	if err != nil {
+		return nil, source, err
+	}
+	if rate > 0 && rate != stream.SampleRate() {
+		native := int64(stream.SampleRate())
+		source.LoopStart = source.LoopStart * int64(rate) / native
+		source.LoopLength = source.LoopLength * int64(rate) / native
+		stream, err = decodeModernStream(source.OGG, rate)
+	}
+	return stream, source, err
 }
 
 // loopReader 把已解碼的 Ogg 串流限制在宣告的 loop 範圍，讀到尾端後 seek

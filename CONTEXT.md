@@ -11,6 +11,7 @@
 | 人物 | 416 筆檔案、392 篇中文正文；24 位待考依使用者決定停止研究，#3 以 not planned 關閉；英日各 392 篇保留 machine-draft |
 | 驗證 | 19 個 Go 套件；Linux 容器及 Windows／Wine 的完整包、公開包正常操作、開發插圖切換、存讀檔與重啟通過，四份存檔一致並經 Go parser 核對及原位元組寫回；[公開收據](https://github.com/wicanr2/great-era-remake/releases/download/v.1.0.2-20261015/RELEASE-VERIFICATION.json) |
 | 交付與權利 | 公開三平台引擎 ZIP、八曲原創配樂與驗證附件；本機六包及 93.534 秒 DOS／重製原版／HD 比較片集中在 `dist-all/v.1.0.2-20261015/`，新版重製段重新錄製，DOS 段保留當日原實錄來源；完整版、原版資料、倚天字庫及影片不公開上傳 |
+| 主線可玩預覽 | [Issue #16](https://github.com/wicanr2/great-era-remake/issues/16)：常駐工具列已接回，並增加音樂欄，美術／介面獨立切換、現有 AI 說明、輸入偏好、右鍵返回及滾輪支援完成。[SPEC-50](docs/spec/50-permanent-toolbar.md)已達 CONFORMED；19 個 Go 套件、seed 1 的 40 張正常操作實錄及存讀檔重啟通過，Windows／macOS 限交叉建置。本機入口為 `workplace/hoi4-ui-prototype/play.sh`；變更尚未提交或重新發行 |
 | 後續 | [Issue #6](https://github.com/wicanr2/great-era-remake/issues/6)續追 Android；[Issue #7](https://github.com/wicanr2/great-era-remake/issues/7)續追 Windows／macOS 真機、簽署、公證及 Linux FUSE；原版未知行為維持既有證據限制 |
 
 現行工作由 [GitHub 總 Issue #1](https://github.com/wicanr2/great-era-remake/issues/1)與子 Issue 追蹤。文件分工：[README](README.md)為穩定入口，[WORKLOG](WORKLOG.md)保存整理後的工作歷程；本檔保存現況及有效文件索引，不重新啟用舊待辦。
@@ -31,6 +32,8 @@
 | 作業規範 | [AGENTS.md](AGENTS.md)；CLAUDE 入口直接匯入同一份 |
 | 玩家執行方式 | [公開引擎](docs/release/README.md)、[本機完整版](docs/release/FULL-LOCAL.md) |
 | 現行 HD 契約 | [SPEC-48](docs/spec/48-hd-release-integration.md) |
+| 常駐工具列與滑鼠 | [SPEC-50](docs/spec/50-permanent-toolbar.md)，含已採用原型與正常操作驗收範圍 |
+| 即時音樂與雙擊啟動 | [SPEC-51](docs/spec/51-live-music-startup.md)，操作已驗證，封包重新發行由 [Issue #17](https://github.com/wicanr2/great-era-remake/issues/17)追蹤；本機收據入口為 workplace/hoi4-ui-prototype/audio-default-20261015/README.md |
 | 規則及忠實度限制 | [機制索引](docs/mechanics/00-index.md)、[SPEC-30](docs/spec/30-approximate-validation-m2.md) |
 | 人物撰寫與整合 | [撰寫規格](docs/design/21-biography-authoring-spec.md)、[SPEC-11](docs/spec/11-authored-biography-overlay-p2c.md) |
 | 原版證據定位 | [函式索引](docs/re/00-function-index.md)、[玩法紀錄](docs/playtest/43-remake-original-gameplay-diff.md) |

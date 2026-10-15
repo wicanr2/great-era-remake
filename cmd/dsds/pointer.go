@@ -39,6 +39,25 @@ func withinClick(start pointerPress, x, y int, s screen) bool {
 // retro／非 Modern 高解析頁面沿用 640×350 命中矩形並扣除上下安全邊界；Modern
 // 高解析 renderer 直接使用 1280×720 layout。兩條路徑都只送同一套 Action 識別碼。
 func (a *app) collectPointerAction() actions.Action {
+	if !a.gameMouseEnabled() {
+		a.pointer.cancel()
+		return actions.None
+	}
+	if _, _, ok := a.gameCursorPosition(); ok {
+		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
+			a.pointer.cancel()
+			return a.pointerBackAction()
+		}
+		if a.screen == screenBiography || a.screen == screenNarrative {
+			_, wheel := ebiten.Wheel()
+			if wheel > 0 {
+				return actions.PreviousPage
+			}
+			if wheel < 0 {
+				return actions.NextPage
+			}
+		}
+	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
 		if x, y, ok := a.basePointerPosition(x, y); ok {
@@ -83,6 +102,10 @@ func (a *app) collectPointerAction() actions.Action {
 }
 
 func (a *app) basePointerPosition(x, y int) (int, int, bool) {
+	x, y, ok := a.gameSurfacePosition(x, y)
+	if !ok {
+		return 0, 0, false
+	}
 	if a.highModernSurface() {
 		// 高解析 Modern 頁面直接使用 1280×720 設計座標；retro 或非 Modern
 		// 頁面才走下面的 Surface→640×350 反算。
@@ -92,6 +115,17 @@ func (a *app) basePointerPosition(x, y int) (int, int, bool) {
 		return uiresolution.SurfaceToBase(x, y, uiresolution.HighWidth, uiresolution.HighHeight)
 	}
 	return x, y, true
+}
+
+// Right click follows the same return/cancel route as Esc, including dialogs.
+func (a *app) pointerBackAction() actions.Action {
+	switch a.screen {
+	case screenQuit, screenTransferConfirm, screenRecruitConfirm, screenTrainConfirm,
+		screenSaveConfirm, screenLoadConfirm:
+		return actions.Cancel
+	default:
+		return actions.Back
+	}
 }
 
 func (a *app) navigationActions() []actions.Action {
