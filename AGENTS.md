@@ -218,7 +218,7 @@ M0／M1 沒完成之前不碰 M4 以後。
 下列命令代表專案慣例，但實際執行仍須遵守本檔的 Docker 資源限制與網路隔離：
 
 ```sh
-tools/go.sh test ./...
+tools/go.sh test ./cmd/... ./internal/... ./tools/...
 tools/py.sh tools/dump_func.py sub_XXXXX
 tools/py.sh tools/addr.py -6221h
 tools/ida.sh raw idat -A "-S/work/tools/ida_xref.idc <symbol>" WAR.EXE.i64
