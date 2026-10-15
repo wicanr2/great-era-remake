@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": "v.1.0.1-20261014",
+  "version": "v.1.0.2-20261015",
   "files": {
     "internal/ui/hdart/earth-kit.png": "554bf71883334a2c4f41357f4c0f6d8f70143fa37b37aecd9beb42ad6a5ca56e",
     "internal/ui/hdart/earth-units.png": "36316b25c3d182a1682e35f9468520247175a38237f947e2052feab8cd1144a5",
@@ -258,7 +258,7 @@
         "runtime_originals": "full generated sources stay local; only bounded atlas embedded",
         "script_sha256": "087d69a2ac9dc22d9b52da456da23f2ae74e11806e783ce33b0226f7d61e142f"
       },
-      "release_status": "master development; not part of published v.1.0.1-20261014",
+      "release_status": "Included in v.1.0.2-20261015",
       "issue": "https://github.com/wicanr2/great-era-remake/issues/13"
     }
   },

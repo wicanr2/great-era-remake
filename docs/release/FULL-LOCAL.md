@@ -41,7 +41,7 @@ RRSAL-1.0 適用於有權授權的 remake 程式碼，不授予原版素材或�
 從專案根目錄建置正式版：
 
 ```sh
-DSDS_PACKAGE_RELEASE_CHANNEL=stable bash tools/package.sh v.1.0.1-20261014 full-local
+DSDS_PACKAGE_RELEASE_CHANNEL=stable bash tools/package.sh v.1.0.2-20261015 full-local
 ```
 
 輸出固定為專案根目錄的 `dist-all/<版本>/full-local/`。腳本拒絕覆寫既有封包，所有工作在受限 Docker 中執行。

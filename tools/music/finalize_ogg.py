@@ -13,7 +13,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[2]
 GAME = ROOT
 OUT = GAME / "assets/music/modern"
-VERSION = "v.1.0.1-20261014"
+VERSION = "v.1.0.2-20261015"
 RATE = 44100
 TARGET = -18.0
 CUES = {

@@ -8,6 +8,7 @@
 | 正式版 | [v.1.0.1-20261014](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.0.1-20261014)，來源提交 `85ed56095117134fd3fdbf64efd7a5411eaeabf7`；已發布 tag、Release 與附件保留 |
 | 呈現與音訊 | 大地色指揮介面、俯視六角戰場與原版鐵路，原版／HD 美術及介面可獨立切換；八曲沿用[已採用混音](assets/music/modern/acceptance.json) |
 | 主線新增 | 全國地圖改用連續地表配色，消除固定經緯度造成的矩形明暗斷層；開發頁加入墾地、兵工廠及金礦插圖，原版切換與既有指令保留；詳見 [Issue #13](https://github.com/wicanr2/great-era-remake/issues/13)，尚未收錄於上述正式版 |
+| 進行中的發行 | 使用者要求重新打包，`v.1.0.2-20261015` 收錄主線呈現修正；三平台完整版、公開包及重新錄製的比較片由 [Issue #14](https://github.com/wicanr2/great-era-remake/issues/14)追蹤，驗證完成後發布 |
 | 人物 | 416 筆檔案、392 篇中文正文；24 位待考依使用者決定停止研究，#3 以 not planned 關閉；英日各 392 篇保留 machine-draft |
 | 驗證 | 19 個 Go 套件；Linux 容器及 Windows／Wine 的完整包、公開包正常操作、存讀檔與重啟通過，四份存檔一致並經 Go parser 核對；[公開收據](https://github.com/wicanr2/great-era-remake/releases/download/v.1.0.1-20261014/RELEASE-VERIFICATION.json) |
 | 交付與權利 | 公開三平台引擎 ZIP、八曲原創配樂與驗證附件；本機六包及 92.5 秒 DOS／重製原版／HD 重新實錄比較片集中在 `dist-all/v.1.0.1-20261014/`，完整版、原版資料、倚天字庫及影片不公開上傳 |

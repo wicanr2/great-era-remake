@@ -44,7 +44,7 @@ glibc 需求由執行檔的實際符號版本核對。公開引擎 ZIP 不包含
 在隔離專案根目錄重建：
 
 ```sh
-DSDS_PACKAGE_RELEASE_CHANNEL=stable bash tools/package.sh v.1.0.1-20261014 patch
+DSDS_PACKAGE_RELEASE_CHANNEL=stable bash tools/package.sh v.1.0.2-20261015 patch
 ```
 
 輸出固定在 `dist-all/<版本>/patch/`，驗證記錄放 `smoke/`。腳本拒絕覆蓋既有輸出，

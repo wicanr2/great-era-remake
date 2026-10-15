@@ -117,3 +117,14 @@
 目前展示：[修正後地圖](../images/command-hd-20261015-r2.png)、[HD 開發頁](../images/development-hd-20261015.png)，SHA-256 分別為 `9ed15adb908a46da1f62062ab746fc9ef66097129ea5137685094ccc2ca4496d`、`995c5ffeddf1cd648def18c5ca527f37ac22e17af68d0ecac4f65950c1e56e73`。上節原發行畫面的來源收據與舊圖雜湊保留，地圖圖片改連固定 Git 歷史。
 
 本機可玩預覽、比較頁與收據集中於 `workplace/hoi4-ui-prototype/map-development-20261015/`，入口由該父目錄的 README 索引。預覽 binary SHA-256 為 `fb80e4e398ff59b794bad574338e99955364adc32ba90e818aa99fce6fce4658`；`capture.json` 保存正常輸入及截圖，`actions.json` 保存六次正式版／主線指令操作與存檔，`integrity.json` 保存保護雜湊與素材重製結果。
+
+## v.1.0.2-20261015 呈現修正重新發行
+
+狀態：READY。使用者要求重新打包完整版、Release 與推廣影片，工作由 [Issue #14](https://github.com/wicanr2/great-era-remake/issues/14)追蹤。
+
+- 從乾淨 `master` 提交建立固定來源，收錄上述地圖配色修正與三幅開發插圖。保留 392 篇中文正文、24 位待考、英日 machine-draft 及八曲已採用 Ogg；只更新版本與相關告知，音訊位元組不變。
+- 版號為 `v.1.0.2-20261015`。三平台同批二進位分裝本機完整版與公開引擎包，集中於 `dist-all/v.1.0.2-20261015/`。公開仍為 Windows amd64、macOS arm64、Linux x86_64 ZIP；原版資料、倚天字庫、AppImage runtime 與含原版畫面的影片留本機。既有 tag、Release、封包與影片不改。
+- 打包入口為 [`tools/package.sh`](../../tools/package.sh)，正式 Go 套件範圍為 `./cmd/... ./internal/... ./tools/...`，避免本機私人草稿被當成正式套件。完整包先重建三平台，公開包核對相同來源後重用本次二進位，不重用舊正式版程式。
+- 逐包核對版本、平台架構、CRC、內容雜湊、來源、配樂與第三方告知；Linux／Wine 經正常入口驗證介面、美術、開發插圖、人物、存讀檔與重啟。macOS 限交叉建置及靜態檢查，不擴張真機驗收聲明。
+- 推廣片保留 DOS 原版、重製原版與 HD 比較。重製畫面從本版正式封包重新錄製，明確展示地圖及開發插圖；沿用 DOS 輔助原片時保留原錄製來源。配樂沿用使用者已採用的原創混音，依既有決定不改用 DOS 原曲。
+- 影片驗證完整解碼、視訊及音訊、時長、非靜音、黑幀、長時間凍結、字幕邊界與抽幀來源。完成後建立新 tag 與 Release，核對遠端附件雜湊，再更新唯一現況與本機交付首頁。

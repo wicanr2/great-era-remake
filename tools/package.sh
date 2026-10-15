@@ -79,7 +79,7 @@ timeout 360 docker run --rm --network none --label dsds.task=release-20261014-r2
     package_xvfb_pid=$!
     trap '\''kill "$package_xvfb_pid" 2>/dev/null || true'\'' EXIT
     export DISPLAY=:93
-    go test -count=1 ./... > /stage/full-tests.log 2>&1
+    go test -count=1 ./cmd/... ./internal/... ./tools/... > /stage/full-tests.log 2>&1
     bash tools/check_no_cgo.sh > /stage/no-cgo.log
     if [ -n "$DSDS_REFERENCE_VERSION" ]; then
       CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -trimpath -buildvcs=false \
