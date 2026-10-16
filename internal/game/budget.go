@@ -1,5 +1,7 @@
 package game
 
+import "fmt"
+
 // 每個省的**指令數上限**（`docs/re/13` §2）。
 //
 // 原版：`sub_13D23` 算 `將領數 ÷ 8 + 1` 存進 `狀態[-232h]`，
@@ -32,7 +34,18 @@ func NewCommandBudgetFunc(f func(ProvinceID) int) *CommandBudget {
 	return &CommandBudget{commandsFor: f}
 }
 
-// Remaining 回傳某省剩餘的指令數。
+// Peek reads a displayed budget without freezing a previously unvisited province.
+func (b *CommandBudget) Peek(p ProvinceID) int {
+	if n, ok := b.left[p]; ok {
+		return n
+	}
+	if b.commandsFor != nil {
+		return b.commandsFor(p)
+	}
+	return 0
+}
+
+// Remaining 回傳某省剩餘的指令數，並固定本月首次執行時的上限。
 func (b *CommandBudget) Remaining(p ProvinceID) int {
 	if b.left == nil {
 		b.left = map[ProvinceID]int{}
@@ -40,10 +53,7 @@ func (b *CommandBudget) Remaining(p ProvinceID) int {
 	if n, ok := b.left[p]; ok {
 		return n
 	}
-	n := 0
-	if b.commandsFor != nil {
-		n = b.commandsFor(p)
-	}
+	n := b.Peek(p)
 	b.left[p] = n
 	return n
 }
@@ -69,4 +79,26 @@ func (b *CommandBudget) Spend(p ProvinceID) bool {
 // 「每月限一次」也在那裡（`docs/re/18`），兩者節奏一致——**標為推論**。
 func (b *CommandBudget) Reset() {
 	b.left = nil
+}
+
+// Snapshot 保留已查詢省份的剩餘數，不把尚未查詢的省份具體化。
+func (b *CommandBudget) Snapshot() map[ProvinceID]int {
+	out := make(map[ProvinceID]int, len(b.left))
+	for p, n := range b.left {
+		out[p] = n
+	}
+	return out
+}
+
+// Restore 在驗證後一次替換，保留原有的規則 callback。
+func (b *CommandBudget) Restore(left map[ProvinceID]int, provinceLimit int) error {
+	out := make(map[ProvinceID]int, len(left))
+	for p, n := range left {
+		if !p.Valid() || int(p) > provinceLimit || n < 0 || n > SaveGeneralCount/8+1 {
+			return fmt.Errorf("game: 不合法的指令預算 %d/%d", p, n)
+		}
+		out[p] = n
+	}
+	b.left = out
+	return nil
 }

@@ -9,7 +9,7 @@ import (
 
 func TestMissingPreferencesUseDefaults(t *testing.T) {
 	p, err := Load(filepath.Join(t.TempDir(), "missing.json"))
-	if err != nil || p.Theme != "modern" || p.Layout != "command" || p.Resolution != "high" || p.Scale != 2 || p.Wording != "" || p.MessageTime != 5 {
+	if err != nil || p.Theme != "modern" || p.Layout != "modern" || p.Resolution != "high" || p.Scale != 2 || p.Wording != "" || p.MessageTime != 5 {
 		t.Fatalf("預設偏好不符：%+v, %v", p, err)
 	}
 }

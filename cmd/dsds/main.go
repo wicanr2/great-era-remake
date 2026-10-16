@@ -42,6 +42,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"flag"
 	"fmt"
 	"os"
@@ -136,9 +137,18 @@ const (
 	screenDisplayOptions                   // remake 新增：顯示設定（由指令 15 區域進入）
 	screenResolutionOptions                // remake 新增：原版／高解析畫布
 	screenQuit                             // 離開確認
+	screenArmory                           // SPEC-55: expansion procurement
+	screenReorganizeCancel
 )
 
 type app struct {
+	desk             modernDeskState
+	armory           *game.Armory
+	armoryView       armoryView
+	opening          *openingState
+	campaign         *campaignIdentity
+	dataRead         func(string) ([]byte, error)
+	initialSeed      uint32
 	room             commandRoomState
 	m                *game.Map
 	tbl              *game.ProvinceTable // 39 省的狀態（存檔或初始檔）
@@ -306,10 +316,7 @@ func (a *app) syncAudioForScreen() {
 	if a.audioWarned == nil {
 		a.audioWarned = make(map[uiaudio.Track]bool)
 	}
-	want := uiaudio.Track(a.preferences.MusicTrack)
-	if want == "" {
-		want = a.desiredAudioTrack()
-	}
+	want := a.musicPlaybackTrack(a.audioMode, uiaudio.Track(a.preferences.MusicTrack))
 	if want == "" || want == a.audioTrack || !a.audio.HasTrack(want) {
 		if want != "" && want != a.audioTrack && !a.audio.HasTrack(want) && !a.audioWarned[want] {
 			fmt.Fprintf(os.Stderr, "音訊曲目 %q 未提供，沿用 %q\n", want, a.audioTrack)
@@ -371,6 +378,9 @@ func (a *app) Update() error {
 	if a.updateToolbar() {
 		return nil
 	}
+	if a.opening != nil && a.screen != screenQuit {
+		return a.updateOpening()
+	}
 	a.pointerAction = a.collectPointerAction()
 	if a.pointerAction != actions.None {
 		a.playInputEffect(a.pointerAction)
@@ -378,6 +388,7 @@ func (a *app) Update() error {
 	// F2 是 remake 外殼捷徑：只交換已完整建好的 Theme 指標，不碰規則層、
 	// 亂數或存檔 bytes；偏好另存於 prefs.json。
 	if inpututil.IsKeyJustPressed(ebiten.KeyF2) {
+		a.cancelGamePointer()
 		if err := a.toggleTheme(); err != nil {
 			a.report("主題切換失敗：" + err.Error())
 		}
@@ -387,6 +398,7 @@ func (a *app) Update() error {
 	// 它只改呈現／輸入座標，不碰規則、亂數或存檔 bytes；觸控裝置則
 	// 由「其他選項 → 解析度」進入同一個 setter。
 	if inpututil.IsKeyJustPressed(ebiten.KeyF3) {
+		a.cancelGamePointer()
 		if err := a.toggleResolution(); err != nil {
 			a.report("解析度切換失敗：" + err.Error())
 		}
@@ -394,10 +406,21 @@ func (a *app) Update() error {
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyF4) {
+		a.cancelGamePointer()
 		if err := a.toggleInterface(); err != nil {
 			a.report(err.Error())
 		}
 		return nil
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyF7) && (a.screen == screenMap || a.screen == screenCommand) {
+		a.openArmory()
+		return nil
+	}
+	if a.screen == screenArmory {
+		return a.updateArmory()
+	}
+	if handled, err := a.updateModernDesk(); handled || err != nil {
+		return err
 	}
 	if a.updateCommandRoom() {
 		return nil
@@ -425,6 +448,16 @@ func (a *app) Update() error {
 		// ESC 只退回上一層。
 		if a.actionPressed(actions.Back, ebiten.KeyEscape) {
 			a.screen, a.dirty = screenMap, true
+			return nil
+		}
+		if a.activeBattle() && !a.actionPressed(actions.Select6, ebiten.KeyDigit6) && !a.actionPressed(actions.Select15, ebiten.KeyO) {
+			a.resumeBattle()
+			return nil
+		}
+		if !a.ownsProvince(a.current) && !a.actionPressed(actions.Select6, ebiten.KeyDigit6) && !a.actionPressed(actions.Select15, ebiten.KeyO) && !inpututil.IsKeyJustPressed(ebiten.KeyE) {
+			if a.pointerAction != actions.None || len(inpututil.AppendJustPressedKeys(nil)) > 0 {
+				a.report(a.openingText("enemy.readonly"))
+			}
 			return nil
 		}
 		// A：對第一個可攻打的鄰省開戰。攻打候選的規則見
@@ -923,8 +956,11 @@ func (a *app) Update() error {
 
 	case screenReorganizeTarget:
 		if a.actionPressed(actions.Back, ebiten.KeyEscape) {
-			if a.reorganization.CanFinish() {
-				a.finishReorganization()
+			if a.reorganization.Changed() || a.reorganization.Remaining() > 0 {
+				a.screen, a.dirty = screenReorganizeCancel, true
+			} else {
+				a.reorganization = nil
+				a.screen, a.dirty = screenCommand, true
 			}
 			return nil
 		}
@@ -956,6 +992,19 @@ func (a *app) Update() error {
 				a.reorganizeID = targets[int(a.reorganizeInput)-1]
 				a.reorganizeInput = 0
 				a.screen, a.dirty = screenReorganizeAmount, true
+			}
+		}
+		return nil
+
+	case screenReorganizeCancel:
+		if a.actionPressed(actions.Cancel, ebiten.KeyN, ebiten.KeyEscape) {
+			a.screen, a.dirty = screenReorganizeTarget, true
+		} else if a.actionPressed(actions.Confirm, ebiten.KeyY) {
+			if a.reorganization != nil && !a.reorganization.CanCancel() {
+				a.quitBack, a.screen, a.dirty = screenReorganizeTarget, screenQuit, true
+			} else if err := a.cancelReorganization(); err != nil {
+				a.report(err.Error())
+				a.screen, a.dirty = screenReorganizeTarget, true
 			}
 		}
 		return nil
@@ -1693,7 +1742,7 @@ func (a *app) Update() error {
 			return nil
 		}
 		if a.actionPressed(actions.Select1, ebiten.KeyDigit1) {
-			if a.savePath == "" || a.origSave == nil {
+			if !a.canSaveSession() {
 				a.report("目前沒有可寫回的存檔基底")
 				return nil
 			}
@@ -1799,7 +1848,14 @@ func (a *app) Update() error {
 				return nil
 			}
 			a.report("遊戲已載入")
-			a.screen, a.dirty = screenCommand, true
+			if a.battle != nil && !a.battle.paused {
+				a.screen = screenBattle
+			} else if a.reorganization != nil {
+				a.screen = screenReorganizeTarget
+			} else {
+				a.screen = screenCommand
+			}
+			a.dirty = true
 		case a.actionPressed(actions.Cancel, ebiten.KeyN, ebiten.KeyEscape):
 			a.screen, a.dirty = screenOtherOptions, true
 		}
@@ -1856,7 +1912,11 @@ func (a *app) Update() error {
 		}
 		a.narrativeBack, a.narrativePage, a.screen, a.dirty = screenMap, 0, screenNarrative, true
 	case a.actionPressed(actions.OpenCommands, ebiten.KeyEnter, ebiten.KeyKPEnter):
-		a.screen, a.dirty = screenCommand, true
+		if a.activeBattle() {
+			a.resumeBattle()
+		} else {
+			a.screen, a.dirty = screenCommand, true
+		}
 	case inpututil.IsKeyJustPressed(ebiten.KeyRight):
 		a.current++
 		if a.current > game.ProvinceCount {
@@ -2051,6 +2111,9 @@ func (a *app) panelLabels() (render.PanelLabels, error) {
 }
 
 func (a *app) generalDisplayName(id game.GeneralID) string {
+	if a != nil && a.stage > 1 && id == 107 {
+		return a.openingText("japan")
+	}
 	if a != nil && a.people != nil {
 		if person, ok := a.people.PersonAt(a.stage, int(id)); ok && person != nil {
 			return person.NameInGame
@@ -2305,7 +2368,7 @@ func (a *app) toggleResolution() error {
 func (a *app) applyWindowSize() {
 	w, h := a.gameSurfaceSize()
 	h += a.toolbarHeight()
-	if !a.commandInterface() && a.resolution != uiresolution.ModeHigh {
+	if !a.armorySurface() && !a.commandInterface() && a.resolution != uiresolution.ModeHigh {
 		w, h = w*scale, h*scale
 	}
 	ebiten.SetWindowSize(w, h)
@@ -2336,6 +2399,12 @@ func (a *app) setMessageTimePreference(units int) error {
 // 不覆蓋原版的 SAVE(1).DT1。寫回是「改寫」不是「重建」——
 // 未解區域一個 byte 都不動（internal/game/save.go）。
 func (a *app) autosave() error {
+	if a.opening != nil {
+		return nil
+	}
+	if a.campaign != nil {
+		return a.saveCampaign()
+	}
 	if a.savePath == "" || a.origSave == nil {
 		return nil // 沒有存檔來源（用初始檔開的），不寫
 	}
@@ -2504,6 +2573,12 @@ func writeFileAtomic(path string, data []byte, mode os.FileMode) (err error) {
 }
 
 func (a *app) compose() error {
+	if a.modernDeskVisible() {
+		return a.composeModernDesk()
+	}
+	if a.armorySurface() {
+		return a.composeArmory()
+	}
 	if a.roomVisible() {
 		return a.composeCommandRoom()
 	}
@@ -2532,6 +2607,14 @@ func (a *app) compose() error {
 		if err := a.drawBattle(c); err != nil {
 			return err
 		}
+		if a.battle != nil && a.battle.mode == battleModeInspect {
+			if a.frame != nil {
+				a.frame.Dispose()
+			}
+			a.frame = ebiten.NewImageFromImage(c.Image())
+			a.dirty = false
+			return nil
+		}
 	} else {
 		bf, err := a.m.Battlefield(a.current)
 		if err != nil {
@@ -2555,7 +2638,7 @@ func (a *app) compose() error {
 		Province: p,
 		Force:    game.ForceOf(a.generals, a.current),
 		Generals: game.CountOf(a.generals, a.current),
-		Commands: a.cmdBudget.Remaining(a.current),
+		Commands: a.cmdBudget.Peek(a.current),
 		Icons:    a.hudIcons,
 		Style:    style,
 	}
@@ -3595,8 +3678,14 @@ func (a *app) compose() error {
 		if err := checkWordingGlyphs("訊息時間", missing); err != nil {
 			return err
 		}
-	case screenSaveConfirm, screenLoadConfirm:
+	case screenSaveConfirm, screenLoadConfirm, screenReorganizeCancel:
 		key := "other.save.confirm"
+		if a.screen == screenReorganizeCancel {
+			key = "desk.reorganize.cancel.terms"
+			if a.reorganization != nil && !a.reorganization.CanCancel() {
+				key = "desk.reorganize.legacy.terms"
+			}
+		}
 		if a.screen == screenLoadConfirm {
 			key = "other.load.confirm"
 		}
@@ -3685,6 +3774,16 @@ func (a *app) Draw(dst *ebiten.Image) {
 }
 
 func (a *app) drawGame(dst *ebiten.Image) {
+	if a.opening != nil {
+		if a.dirty || a.frame == nil {
+			a.frame = ebiten.NewImageFromImage(render.DrawOpening(a.openingData()).Image())
+			a.dirty = false
+		}
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(0, float64(a.toolbarHeight()))
+		dst.DrawImage(a.frame, op)
+		return
+	}
 	if a.dirty || a.frame == nil {
 		if err := a.compose(); err != nil {
 			fmt.Fprintln(os.Stderr, "合成失敗:", err)
@@ -3696,7 +3795,13 @@ func (a *app) drawGame(dst *ebiten.Image) {
 	if a.frame == nil {
 		return
 	}
-	if a.commandInterface() || a.resolution == uiresolution.ModeHigh {
+	if a.modernDeskVisible() {
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(0, float64(a.toolbarHeight()))
+		dst.DrawImage(a.frame, op)
+		return
+	}
+	if a.armorySurface() || a.commandInterface() || a.resolution == uiresolution.ModeHigh {
 		if bounds := a.frame.Bounds(); bounds.Dx() == uiresolution.HighWidth &&
 			bounds.Dy() == uiresolution.HighHeight {
 			// H1-a 地圖頁已直接以設計畫布合成，不再二次縮放。
@@ -3742,6 +3847,8 @@ func main() {
 	// AGENTS.md §8：原版資產唯讀，存檔一律寫到別的地方。
 	savePath := flag.String("save", defaults.save,
 		"離開時自動存檔的路徑（**不會**覆蓋原版）")
+	importDT1 := flag.String("import-dt1", "", "匯入原版 DT1，保存為重製戰役；須以 -stage 指定劇本")
+	stageFlag := flag.Uint("stage", 1, "DT1 匯入或舊入口的劇本期別 1..3")
 	// 固定亂數種子是 AGENTS.md §8 的硬規則：截圖驗收要能重現。
 	seed := flag.Uint("seed", 1, "亂數種子（原版 LCG，docs/re/17）")
 	localeDir := flag.String("locale", defaults.locale,
@@ -3749,7 +3856,7 @@ func main() {
 	etenDir := flag.String("eten", defaults.eten,
 		"使用者提供的倚天 STDFONT.15／SPCFONT.15／ASCFONT.15 目錄（不隨遊戲散布）")
 	wording := flag.String("wording", "", "顯示用語：original 或 plain；空白沿用 prefs.json")
-	interfaceFlag := flag.String("interface", "", "操作介面：command 或 original；空白沿用 prefs.json")
+	interfaceFlag := flag.String("interface", "", "操作介面：modern 或 original；command 相容 Modern；空白沿用 prefs.json")
 	themeFlag := flag.String("theme", "", "圖形主題：retro 或 modern；空白沿用 prefs.json")
 	resolutionFlag := flag.String("resolution", "", "顯示解析度：original 或 high；空白沿用 prefs.json")
 	audioFlag := flag.String("audio", "", "音訊：off、retro 或 modern（retro 需玩家自備 MUS/TIM；modern 優先讀 manifest/Ogg，缺少時使用原創純 Go fallback）")
@@ -3776,7 +3883,7 @@ func main() {
 	if *interfaceFlag != "" {
 		preferences.Layout = *interfaceFlag
 	}
-	if preferences.Layout != "command" && preferences.Layout != "original" {
+	if preferences.Layout != "command" && preferences.Layout != "modern" && preferences.Layout != "original" {
 		fmt.Fprintln(os.Stderr, "未知介面：", preferences.Layout)
 		os.Exit(1)
 	}
@@ -3830,8 +3937,38 @@ func main() {
 		os.Exit(1)
 	}
 
+	legacyStart := false
+	saveExplicit, stageExplicit := false, false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "save" {
+			saveExplicit = true
+		}
+		if f.Name == "stage" {
+			stageExplicit = true
+		}
+		if f.Name == "province" || (f.Name == "save" && strings.EqualFold(filepath.Ext(*savePath), ".dt1")) {
+			legacyStart = true
+		}
+	})
+	if *importDT1 != "" && !stageExplicit {
+		fmt.Fprintln(os.Stderr, "DT1 不記錄期別，匯入時須明示 -stage 1、2 或 3")
+		os.Exit(1)
+	}
+	if legacyStart && *importDT1 == "" {
+		if !saveExplicit {
+			*savePath = filepath.Join(filepath.Dir(*savePath), "SAVE(1).DT1")
+		}
+		if !strings.EqualFold(filepath.Ext(*savePath), ".dt1") {
+			fmt.Fprintln(os.Stderr, "舊省份入口使用 .DT1；轉為 .gesave 請用 -import-dt1 並明示 -stage")
+			os.Exit(1)
+		}
+	}
+	if *stageFlag < 1 || *stageFlag > 3 {
+		fmt.Fprintln(os.Stderr, "劇本期別須為 1..3")
+		os.Exit(1)
+	}
 	if err := run(*gameDir, game.ProvinceID(*start), *savePath, uint32(*seed),
-		*localeDir, *etenDir, wordingMode, themeMode, resolutionMode, audioMode, *modernAudioDir, prefsPath, preferences); err != nil {
+		*localeDir, *etenDir, wordingMode, themeMode, resolutionMode, audioMode, *modernAudioDir, prefsPath, preferences, legacyStart, *importDT1, uint8(*stageFlag)); err != nil {
 		fmt.Fprintln(os.Stderr, "錯誤:", err)
 		os.Exit(1)
 	}
@@ -3840,7 +3977,7 @@ func main() {
 func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 	localeDir, etenDir string, wordingMode i18n.WordingMode,
 	themeMode uitheme.Mode, resolutionMode uiresolution.Mode, audioMode uiaudio.Mode,
-	modernAudioDir string, prefsPath string, preferences userprefs.Preferences) error {
+	modernAudioDir string, prefsPath string, preferences userprefs.Preferences, legacyStart bool, importDT1 string, importStage uint8) error {
 	if !start.Valid() {
 		return fmt.Errorf("省編號 %d 超出 1..%d", start, game.ProvinceCount)
 	}
@@ -3881,7 +4018,15 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 	if err != nil {
 		return err
 	}
-	gnames, err := read("MAN115")
+	stage := uint8(1)
+	if legacyStart || importDT1 != "" {
+		stage = importStage
+	}
+	sc, err := game.ScenarioByStage(stage)
+	if err != nil {
+		return err
+	}
+	gnames, err := read(fmt.Sprintf("MAN%d15", stage))
 	if err != nil {
 		return err
 	}
@@ -3899,7 +4044,7 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 		return err
 	}
 	cmdFonts := render.CommandFonts{W2: fonts.W2, W4: w4f}
-	fanData, err := read("FAN(1).15")
+	fanData, err := read(fmt.Sprintf("FAN(%d).15", stage))
 	if err != nil {
 		return err
 	}
@@ -3908,14 +4053,31 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 		return fmt.Errorf("解析 FAN(1).15: %w", err)
 	}
 
-	// 省份狀態：優先讀存檔，沒有就用第一期的初始檔。
-	tbl, origSave, err := loadProvinces(read)
-	if err != nil {
-		return err
+	var tbl *game.ProvinceTable
+	var origSave []byte
+	if importDT1 != "" {
+		origSave, err = os.ReadFile(importDT1)
+		if err != nil {
+			return err
+		}
+	} else if legacyStart {
+		tbl, origSave, err = loadProvinces(read)
+		if err != nil {
+			return err
+		}
+	} else {
+		town, e := read("TOWN(1).DAT")
+		if e != nil {
+			return e
+		}
+		tbl, err = game.ParseTownFile(town)
+		if err != nil {
+			return err
+		}
 	}
 	// Continue the player's writable copy on the next launch. All fields are
 	// validated again by buildSession before any live state is installed.
-	if savePath != "" {
+	if legacyStart && importDT1 == "" && savePath != "" {
 		if saved, loadErr := os.ReadFile(savePath); loadErr == nil {
 			tbl, err = game.ParseSaveProvinces(saved)
 			if err != nil {
@@ -3933,41 +4095,45 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 	var battleDT2States [game.ProvinceCount]game.BattleState
 	var battleMemStates [game.ProvinceCount]game.BattleState
 	battleDT2Path, battleMemWarPath := "", ""
-	if savePath != "" {
+	if legacyStart && importDT1 == "" && savePath != "" {
 		battleDT2Path = filepath.Join(filepath.Dir(savePath), battleSourceName(savePath))
 		battleMemWarPath = filepath.Join(filepath.Dir(savePath), "MEM_WAR.DAT")
 	}
-	if data, states, _, loadErr := loadBattleRecord(read, battleDT2Path,
-		battleSourceName(savePath), "SAVE(1).DT2"); loadErr != nil {
-		fmt.Fprintf(os.Stderr, "DT2 載入略過（戰鬥結算將不寫回）：%v\n", loadErr)
-	} else {
-		battleDT2, battleDT2States = data, states
-	}
-	if data, states, _, loadErr := loadBattleRecord(read, battleMemWarPath,
-		"MEM_WAR.DAT", ""); loadErr != nil {
-		fmt.Fprintf(os.Stderr, "MEM_WAR.DAT 載入略過（戰鬥結算將不寫回）：%v\n", loadErr)
-	} else {
-		battleMemWar, battleMemStates = data, states
+	if legacyStart && importDT1 == "" {
+		if data, states, _, loadErr := loadBattleRecord(read, battleDT2Path,
+			battleSourceName(savePath), "SAVE(1).DT2"); loadErr != nil {
+			fmt.Fprintf(os.Stderr, "DT2 載入略過（戰鬥結算將不寫回）：%v\n", loadErr)
+		} else {
+			battleDT2, battleDT2States = data, states
+		}
+		if data, states, _, loadErr := loadBattleRecord(read, battleMemWarPath,
+			"MEM_WAR.DAT", ""); loadErr != nil {
+			fmt.Fprintf(os.Stderr, "MEM_WAR.DAT 載入略過（戰鬥結算將不寫回）：%v\n", loadErr)
+		} else {
+			battleMemWar, battleMemStates = data, states
+		}
 	}
 
-	mandat, err := read("MAN(1).DAT")
+	mandat, err := read(fmt.Sprintf("MAN(%d).DAT", stage))
 	if err != nil {
 		return err
 	}
 	// ⛔ 筆數**不能以名表為準**。名表（`MAN215` 106 個名字）比程式實際
 	// 會掃到的筆數少——第二、三期是 191（`word_6BC4A`），
-	// 第 107..191 筆是**沒有姓名的番號部隊**（勢力名 `+28` = 0）。
+	// 第 107..191 筆不在 MAN 名表；另有 85 槽日本姓名表，
+	// 其全域 ID 映射仍待確認，不能因勢力名 `+28` = 0 就稱沒有姓名。
 	// 照名表解會靜默丟掉 85 支部隊。
-	sc, err := game.ScenarioByStage(1)
-	if err != nil {
-		return err
-	}
 	var generals []game.General
 	var startupSession *gameSession
 	if origSave != nil {
 		// 存檔必須在純記憶體快照中一次解完；不得像舊路徑那樣
 		// 勢力表或停火表壞掉時只印警告、卻繼續帶著半套狀態運行。
 		startupSession, err = buildSession(origSave, sc, start, 0)
+		if err == nil {
+			tbl, generals, start = startupSession.tbl, startupSession.generals, startupSession.current
+		}
+	} else if !legacyStart {
+		startupSession, _, err = newCampaignSession(read, 1, game.LeaderChiang)
 		if err == nil {
 			tbl, generals, start = startupSession.tbl, startupSession.generals, startupSession.current
 		}
@@ -4050,6 +4216,7 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 
 	ebiten.SetWindowTitle("大時代的故事")
 	a := &app{
+		dataRead: read, initialSeed: seed,
 		toolbar: newToolbarState(),
 		room:    commandRoomState{Mode: interfaceFromPreference(preferences.Layout)},
 		m:       m, tbl: tbl, generals: generals, fonts: fonts, cmdFonts: cmdFonts, fan: fan,
@@ -4071,7 +4238,7 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 	}
 	a.applyWindowSize()
 	a.music = musicState{read: read, dir: modernAudioDir}
-	if err := a.setMusic(audioMode, uiaudio.Track(preferences.MusicTrack), false); err != nil {
+	if err := a.startMusic(audioMode, uiaudio.Track(preferences.MusicTrack)); err != nil {
 		return err
 	}
 	defer func() {
@@ -4138,6 +4305,16 @@ func run(dir string, start game.ProvinceID, savePath string, seed uint32,
 		a.year, a.month = startupSession.year, startupSession.month
 	} else if tbl.Date != nil {
 		a.year, a.month = tbl.Date.Year, tbl.Date.Month
+	}
+	if importDT1 != "" {
+		if strings.EqualFold(filepath.Ext(savePath), ".dt1") {
+			return fmt.Errorf("DT1 匯入的保存目標須使用 .gesave")
+		}
+		a.campaign = &campaignIdentity{Mode: "original", Stage: stage, Player: a.playerCommander, SourceSHA256: map[string]string{"legacy.dt1": fmt.Sprintf("%x", sha256.Sum256(origSave))}}
+	} else if !legacyStart {
+		if err := a.prepareOpening(); err != nil {
+			return err
+		}
 	}
 	return ebiten.RunGame(a)
 }

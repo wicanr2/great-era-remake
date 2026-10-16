@@ -77,7 +77,7 @@ def manifest(folder, version, platform, entry):
         'platform':platform,'entrypoint':entry,'contains_original_game_data':FULL_LOCAL,
         'contains_original_audio_or_font':FULL_LOCAL,'requires_user_supplied_legal_game_data':not FULL_LOCAL,
         'distribution':'local use only; original game data/font not cleared for redistribution' if FULL_LOCAL else 'engine and project-original music; legal original data/font must be supplied by user',
-        'audio':'HD Ogg default; live HD/original/mute and automatic/eight-track selection; remembered preferences; other platform devices unverified',
+        'audio':('Eight complete DOS melody HD arrangements and three military songs; local-only' if FULL_LOCAL else 'Eight project-original cues; military arrangements excluded')+'; live HD/original/mute and automatic/manual selection; remembered preferences; other platform devices unverified',
         'device_validation':'pending; container and Wine checks are recorded separately',
         'source_manifest':'SHA256SUMS.json in release root','files':inventory(folder)})
 
@@ -160,6 +160,31 @@ def prepare(version):
     write_json(STAGE/'owned-audio.json',owned_audio)
     private={}
     if FULL_LOCAL:
+        # Private arrangements replace the eight public cues only in full-local.
+        # Never carry public-original provenance beside derivative audio bytes.
+        local_music=Path('/src/workplace/hoi4-ui-prototype/original-hd-music-20261015/full-20261017/runtime')
+        local_manifest=json.loads((local_music/'manifest.json').read_text())
+        local_provenance=json.loads((local_music/'provenance.json').read_text())
+        assert local_manifest['version']==version and len(local_manifest['tracks'])==11
+        assert local_provenance['status']=='full-cues-technical-qa-passed'
+        assert local_provenance['distribution']=='local-only'
+        assert set(local_manifest['tracks'])==set(music_manifest['tracks'])|{'modern_huan_wo_he_shan','modern_national_revolution','modern_eight_hundred_heroes'}
+        target_music=common/'assets/music/modern'
+        shutil.rmtree(target_music)
+        target_music.mkdir()
+        local_names=['manifest.json','provenance.json','acceptance.json','audio-qa.json','FluidR3-LICENSE.txt']
+        for record in local_manifest['tracks'].values():
+            name=record['file'];assert Path(name).name==name and name.endswith('.ogg')
+            assert sha(local_music/name)==record['sha256']
+            local_names.append(name)
+        for name in local_names:
+            source=local_music/name;assert source.is_file() and not source.is_symlink()
+            target=target_music/name;shutil.copy2(source,target)
+            private[target.relative_to(common).as_posix()]={'sha256':sha(source),'bytes':source.stat().st_size,
+                'source':str(source),'rights':'original or historical melody arrangement; local-only; redistribution not cleared',
+                'role':'full original-HD music or provenance'}
+        owned_audio={}
+        write_json(STAGE/'owned-audio.json',owned_audio)
         game_source=Path('/src/workplace/orig/game')
         font_source=Path('/src/workplace/eten')
         assert game_source.is_dir() and font_source.is_dir()
@@ -187,7 +212,7 @@ def prepare(version):
             source=runtime/record['file'];assert sha(source)==record['sha256']
             target=common/'docs/licenses/appimage'/source.name
             target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
-        (common/'LOCAL-ONLY.txt').write_text('本機完整版，含原版遊戲資料與倚天字庫。未取得公開散布權，不可上傳或公開分享。\n配樂為專案原創八曲 Ogg，使用者已抽聽採用；其他平台真機仍未驗收。\n人物正文392篇，24位維持史料待考；英日為未審譯稿。\n遊戲資料唯讀使用；玩家進度寫系統使用者目錄。\n')
+        (common/'LOCAL-ONLY.txt').write_text('本機完整版，含原版遊戲資料、倚天字庫、八首原曲 HD 與三首軍歌。未取得公開散布權，不可上傳或公開分享。\n配器方向已採用；全曲技術驗收與人耳確認分別記錄。其他平台真機仍未驗收。\n人物正文392篇，24位維持史料待考；英日為未審譯稿。\n遊戲資料唯讀使用；玩家進度為使用者目錄 campaign.gesave。\n')
     write_json(STAGE/'private-inputs.json',private)
     source={}
     for name in ['cmd','internal','translations','docs/licenses','docs/release','tools/release','assets/music/modern','go.mod','go.sum','LICENSE','tools/package.sh']:
@@ -209,12 +234,14 @@ def assemble(version):
     (OUT/'smoke').mkdir(exist_ok=True)
     windows=STAGE/'assemble/GreatEraRemake'
     copy_common(windows)
+    running=(windows/'RUNNING.md').read_text().replace('\r\n','\n')
+    (windows/'README.txt').write_bytes(b'\xef\xbb\xbf'+running.replace('\n','\r\n').encode('utf-8'))
     shutil.copy2(STAGE/'build/dsds.exe',windows/'dsds.exe')
     bundled=('-game data/game -eten data/eten ' if FULL_LOCAL else '')+'-modern-audio assets/music/modern -locale translations/zh-Hant '
     (windows/'launch.cmd').write_text('@echo off\r\nsetlocal\r\ncd /d "%~dp0"\r\n'
         'set "DSDS_SAVES=%LOCALAPPDATA%\\GreatEraRemake\\Saves"\r\n'
         'if not exist "%DSDS_SAVES%" mkdir "%DSDS_SAVES%"\r\n'
-        'dsds.exe '+bundled+'-save "%DSDS_SAVES%\\SAVE(1).DT1" %*\r\n',encoding='utf-8',newline='')
+        'dsds.exe '+bundled+'-save "%DSDS_SAVES%\\campaign.gesave" %*\r\n',encoding='utf-8',newline='')
     manifest(windows,version,'windows-amd64','launch.cmd')
     zip_tree(windows,OUT/PACKAGE_DIR/f'great-era-remake-windows-amd64{PACKAGE_SUFFIX}-{version}.zip')
     app=STAGE/'assemble/GreatEraRemake.app'
@@ -223,7 +250,7 @@ def assemble(version):
     shutil.copy2(STAGE/'build/dsds-macos',mac/'dsds')
     (mac/'launch').write_text('#!/bin/sh\nset -eu\ncd "$(dirname "$0")/../Resources"\n'
         'dsds_data="$HOME/Library/Application Support/GreatEraRemake/Saves"\n'
-        'mkdir -p "$dsds_data"\nexec ../MacOS/dsds '+bundled+'-save "$dsds_data/SAVE(1).DT1" "$@"\n')
+        'mkdir -p "$dsds_data"\nexec ../MacOS/dsds '+bundled+'-save "$dsds_data/campaign.gesave" "$@"\n')
     (mac/'launch').chmod(0o755)
     core=version[2:].split('-')[0]
     with (app/'Contents/Info.plist').open('wb') as f:
@@ -242,7 +269,7 @@ def assemble(version):
         'dsds_app="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"\n'
         'cd "$dsds_app/usr/share/great-era"\n'
         'dsds_data="${XDG_DATA_HOME:-$HOME/.local/share}/GreatEraRemake/Saves"\n'
-        'mkdir -p "$dsds_data"\nexec "$dsds_app/usr/bin/dsds" '+bundled+'-save "$dsds_data/SAVE(1).DT1" "$@"\n')
+        'mkdir -p "$dsds_data"\nexec "$dsds_app/usr/bin/dsds" '+bundled+'-save "$dsds_data/campaign.gesave" "$@"\n')
     (appdir/'AppRun').chmod(0o755)
     manifest(appdir,version,'linux-amd64','AppRun')
     if not FULL_LOCAL:
@@ -321,6 +348,11 @@ def verify(version):
             z.extractall(dest)
         folder=dest/entry
         verify_manifest(folder)
+        if kind=='windows':
+            readme=(folder/'README.txt').read_bytes()
+            assert readme.startswith(b'\xef\xbb\xbf') and b'\n' not in readme.replace(b'\r\n',b'')
+            launcher=(folder/'launch.cmd').read_bytes();launcher.decode('ascii')
+            assert b'\n' not in launcher.replace(b'\r\n',b'')
         if kind=='macos':
             with (folder/'Contents/Info.plist').open('rb') as f:info=plistlib.load(f)
             assert info['LSMinimumSystemVersion']=='12.0'

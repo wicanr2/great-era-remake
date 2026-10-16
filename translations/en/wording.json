@@ -1009,8 +1009,8 @@
       "plain": "Original UI"
     },
     "toolbar.interface.command": {
-      "original": "Command UI",
-      "plain": "Command UI"
+      "original": "Modern",
+      "plain": "Modern"
     },
     "toolbar.ai.current.long": {
       "original": "Current remake AI",
@@ -1097,12 +1097,1120 @@
       "plain": "Finale"
     },
     "toolbar.music.note": {
-      "original": "Mode and track are selected separately and remembered.",
-      "plain": "Mode and track are selected separately and remembered."
+      "original": "Selections are remembered. Local HD military songs use scene music in Retro and resume in HD.",
+      "plain": "Selections are remembered. Local HD military songs use scene music in Retro and resume in HD."
     },
     "toolbar.music.unavailable": {
-      "original": "Original MUS/TIM for this track is unavailable. Current music retained.",
-      "plain": "Original MUS/TIM for this track is unavailable. Current music retained."
+      "original": "This track is unavailable. Current music retained.",
+      "plain": "This track is unavailable. Current music retained."
+    },
+    "opening.eyebrow": {
+      "original": "CAMPAIGN PREPARATION",
+      "plain": "CAMPAIGN PREPARATION"
+    },
+    "opening.title": {
+      "original": "Choose your era and faction",
+      "plain": "Choose your era and faction"
+    },
+    "opening.intro": {
+      "original": "Start from scenario data. Arrows: faction; 1–3: scenario; M: mode; Enter: start.",
+      "plain": "Start from scenario data. Arrows: faction; 1–3: scenario; M: mode; Enter: start."
+    },
+    "opening.original": {
+      "original": "Original campaign",
+      "plain": "Original campaign"
+    },
+    "opening.original.hint": {
+      "original": "Original rules",
+      "plain": "Original rules"
+    },
+    "opening.resistance": {
+      "original": "After unification",
+      "plain": "After unification"
+    },
+    "opening.resistance.hint": {
+      "original": "Northeast invasion after unification",
+      "plain": "Northeast invasion after unification"
+    },
+    "opening.factions": {
+      "original": "Factions · %d",
+      "plain": "Factions · %d"
+    },
+    "opening.source": {
+      "original": "New games use original scenario data and retain every territorial faction.",
+      "plain": "New games use original scenario data and retain every territorial faction."
+    },
+    "opening.provinces": {
+      "original": "Provinces",
+      "plain": "Provinces"
+    },
+    "opening.generals": {
+      "original": "Generals",
+      "plain": "Generals"
+    },
+    "opening.force": {
+      "original": "Troops / 10,000",
+      "plain": "Troops / 10,000"
+    },
+    "opening.start": {
+      "original": "Start campaign",
+      "plain": "Start campaign"
+    },
+    "opening.save.hint": {
+      "original": "One .gesave stores your progress. Change art, interface and music in game.",
+      "plain": "One .gesave stores your progress. Change art, interface and music in game."
+    },
+    "opening.continue": {
+      "original": "Continue [C]",
+      "plain": "Continue [C]"
+    },
+    "opening.quit": {
+      "original": "Quit? Y: confirm / N: return",
+      "plain": "Quit? Y: confirm / N: return"
+    },
+    "opening.stage.1": {
+      "original": "Northern Expedition",
+      "plain": "Northern Expedition"
+    },
+    "opening.stage.2": {
+      "original": "Early Resistance",
+      "plain": "Early Resistance"
+    },
+    "opening.stage.3": {
+      "original": "Late Resistance",
+      "plain": "Late Resistance"
+    },
+    "opening.date": {
+      "original": "%d / %d",
+      "plain": "%d / %d"
+    },
+    "opening.japan": {
+      "original": "Japanese forces",
+      "plain": "Japanese forces"
+    },
+    "opening.leader": {
+      "original": "Leader %d",
+      "plain": "Leader %d"
+    },
+    "opening.original.only": {
+      "original": "Original only",
+      "plain": "Original only"
+    },
+    "opening.summary": {
+      "original": "%d generals · %d provinces",
+      "plain": "%d generals · %d provinces"
+    },
+    "opening.home": {
+      "original": "Starting province: %s",
+      "plain": "Starting province: %s"
+    },
+    "opening.original.note": {
+      "original": "Campaign rules are separate. Japan is playable in original campaigns.",
+      "plain": "Campaign rules are separate. Japan is playable in original campaigns."
+    },
+    "opening.resistance.pending": {
+      "original": "Armament preparation is playable; the Japanese invasion remains in development. F7 opens the armory.",
+      "plain": "Armament preparation is playable; the Japanese invasion remains in development. F7 opens the armory."
+    },
+    "opening.japan.note": {
+      "original": "Japan is playable in original campaigns; this expansion is for Chinese factions.",
+      "plain": "Japan is playable in original campaigns; this expansion is for Chinese factions."
+    },
+    "opening.enemy.readonly": {
+      "original": "This province belongs to another faction. Inspection only.",
+      "plain": "This province belongs to another faction. Inspection only."
+    },
+    "armory.kicker": {
+      "original": "INDUSTRY AND EQUIPMENT",
+      "plain": "INDUSTRY AND EQUIPMENT"
+    },
+    "armory.title": {
+      "original": "ARMAMENT BUREAU",
+      "plain": "ARMAMENT BUREAU"
+    },
+    "armory.intro": {
+      "original": "Research designs, allocate factories, then equip your troops.",
+      "plain": "Research designs, allocate factories, then equip your troops."
+    },
+    "armory.mode": {
+      "original": "Expansion · preparation preview",
+      "plain": "Expansion · preparation preview"
+    },
+    "armory.factories": {
+      "original": "Factories %d / %d",
+      "plain": "Factories %d / %d"
+    },
+    "armory.categories": {
+      "original": "Equipment",
+      "plain": "Equipment"
+    },
+    "armory.sidebar.note": {
+      "original": "Completed research does not automatically equip troops.\n\nMountain, field and antitank guns serve different roles.",
+      "plain": "Completed research does not automatically equip troops.\n\nMountain, field and antitank guns serve different roles."
+    },
+    "armory.artillery.note": {
+      "original": "Mountain support, field firepower and antitank branches.",
+      "plain": "Mountain support, field firepower and antitank branches."
+    },
+    "armory.catalog.note": {
+      "original": "Generic designs. Equipment groups are abstract organization units.",
+      "plain": "Generic designs. Equipment groups are abstract organization units."
+    },
+    "armory.capacity": {
+      "original": "Actual factories %d · assigned %d",
+      "plain": "Actual factories %d · assigned %d"
+    },
+    "armory.production.locked": {
+      "original": "Research a design in this category first.",
+      "plain": "Research a design in this category first."
+    },
+    "armory.production.note": {
+      "original": "Only completed output consumes materials; shortages keep the line.",
+      "plain": "Only completed output consumes materials; shortages keep the line."
+    },
+    "armory.stock.note": {
+      "original": "Select equipment, then issue it on the equipment page. Old gear is reusable.",
+      "plain": "Select equipment, then issue it on the equipment page. Old gear is reusable."
+    },
+    "armory.selected.stock": {
+      "original": "Selected: %s · stock %d groups",
+      "plain": "Selected: %s · stock %d groups"
+    },
+    "armory.unit": {
+      "original": "groups",
+      "plain": "groups"
+    },
+    "armory.issue": {
+      "original": "Issue available gear",
+      "plain": "Issue available gear"
+    },
+    "armory.previous": {
+      "original": "Previous",
+      "plain": "Previous"
+    },
+    "armory.next": {
+      "original": "Next",
+      "plain": "Next"
+    },
+    "armory.pages": {
+      "original": "Page %d / %d",
+      "plain": "Page %d / %d"
+    },
+    "armory.units.empty": {
+      "original": "No eligible units of your faction in this category.",
+      "plain": "No eligible units of your faction in this category."
+    },
+    "armory.equipment.note": {
+      "original": "Partial refits return replaced gear. Recruits need equipment.",
+      "plain": "Partial refits return replaced gear. Recruits need equipment."
+    },
+    "armory.months.progress": {
+      "original": "%d / %d months",
+      "plain": "%d / %d months"
+    },
+    "armory.output": {
+      "original": "%d groups/month",
+      "plain": "%d groups/month"
+    },
+    "armory.research.start": {
+      "original": "Start research",
+      "plain": "Start research"
+    },
+    "armory.research.pause": {
+      "original": "Pause research",
+      "plain": "Pause research"
+    },
+    "armory.production.open": {
+      "original": "Assign production",
+      "plain": "Assign production"
+    },
+    "armory.stock.open": {
+      "original": "View stock",
+      "plain": "View stock"
+    },
+    "armory.month": {
+      "original": "Advance one month  ▶",
+      "plain": "Advance one month  ▶"
+    },
+    "armory.footer": {
+      "original": "F7 armory · 1–4 pages · up/down categories · E next month · ESC back",
+      "plain": "F7 armory · 1–4 pages · up/down categories · E next month · ESC back"
+    },
+    "armory.save": {
+      "original": "Save",
+      "plain": "Save"
+    },
+    "armory.load": {
+      "original": "Load",
+      "plain": "Load"
+    },
+    "armory.back": {
+      "original": "Back to map",
+      "plain": "Back to map"
+    },
+    "armory.quit": {
+      "original": "Save progress and exit?\nY yes · N / ESC back",
+      "plain": "Save progress and exit?\nY yes · N / ESC back"
+    },
+    "armory.date": {
+      "original": "%d / %02d",
+      "plain": "%d / %02d"
+    },
+    "armory.original.only": {
+      "original": "Armament research is available in the resistance expansion. Original rules stay unchanged.",
+      "plain": "Armament research is available in the resistance expansion. Original rules stay unchanged."
+    },
+    "armory.error": {
+      "original": "Unable to proceed. Check design, factories, stock and unit ownership.",
+      "plain": "Unable to proceed. Check design, factories, stock and unit ownership."
+    },
+    "armory.status.available": {
+      "original": "Available",
+      "plain": "Available"
+    },
+    "armory.status.known": {
+      "original": "Known",
+      "plain": "Known"
+    },
+    "armory.status.researching": {
+      "original": "Researching",
+      "plain": "Researching"
+    },
+    "armory.status.locked": {
+      "original": "Needs prerequisite or free slot",
+      "plain": "Needs prerequisite or free slot"
+    },
+    "armory.research.terms": {
+      "original": "%d months · 180 gold/month",
+      "plain": "%d months · 180 gold/month"
+    },
+    "armory.production.terms": {
+      "original": "%d groups/factory/month · gold%d iron%d coal%d fuel%d each",
+      "plain": "%d groups/factory/month · gold%d iron%d coal%d fuel%d each"
+    },
+    "armory.last": {
+      "original": "Last month: %d groups",
+      "plain": "Last month: %d groups"
+    },
+    "armory.shortage": {
+      "original": "Shortage or stock full",
+      "plain": "Shortage or stock full"
+    },
+    "armory.stock.amount": {
+      "original": "Stock: %d groups",
+      "plain": "Stock: %d groups"
+    },
+    "armory.equipment.item": {
+      "original": "%s %d groups",
+      "plain": "%s %d groups"
+    },
+    "armory.unit.name": {
+      "original": "%s · %s",
+      "plain": "%s · %s"
+    },
+    "armory.unit.summary": {
+      "original": "Force %d · need %d groups · selected %d",
+      "plain": "Force %d · need %d groups · selected %d"
+    },
+    "armory.queue.empty": {
+      "original": "Research slot free · select a design",
+      "plain": "Research slot free · select a design"
+    },
+    "armory.queue.note": {
+      "original": "Existing lines settle before research. Assign factories after unlocking.",
+      "plain": "Existing lines settle before research. Assign factories after unlocking."
+    },
+    "armory.queue.active": {
+      "original": "Research: %s · %d / %d months",
+      "plain": "Research: %s · %d / %d months"
+    },
+    "armory.research.shortage": {
+      "original": "Less than 180 gold: research will pause this month.",
+      "plain": "Less than 180 gold: research will pause this month."
+    },
+    "armory.research.paused": {
+      "original": "Paused. Research progress is retained.",
+      "plain": "Paused. Research progress is retained."
+    },
+    "armory.research.started": {
+      "original": "Research started; funds are charged monthly.",
+      "plain": "Research started; funds are charged monthly."
+    },
+    "armory.month.done": {
+      "original": "Advanced to %d / %02d.",
+      "plain": "Advanced to %d / %02d."
+    },
+    "armory.saved": {
+      "original": "Campaign and armament progress saved.",
+      "plain": "Campaign and armament progress saved."
+    },
+    "armory.loaded": {
+      "original": "Campaign and armament progress restored.",
+      "plain": "Campaign and armament progress restored."
+    },
+    "armory.assigned": {
+      "original": "Factory allocation updated.",
+      "plain": "Factory allocation updated."
+    },
+    "armory.issued": {
+      "original": "Issued %d groups; replaced gear returned to stock.",
+      "plain": "Issued %d groups; replaced gear returned to stock."
+    },
+    "armory.resource.0": {
+      "original": "Gold",
+      "plain": "Gold"
+    },
+    "armory.resource.1": {
+      "original": "Iron",
+      "plain": "Iron"
+    },
+    "armory.resource.2": {
+      "original": "Coal",
+      "plain": "Coal"
+    },
+    "armory.resource.3": {
+      "original": "Fuel",
+      "plain": "Fuel"
+    },
+    "armory.page.0": {
+      "original": "Research",
+      "plain": "Research"
+    },
+    "armory.page.1": {
+      "original": "Production",
+      "plain": "Production"
+    },
+    "armory.page.2": {
+      "original": "Stock",
+      "plain": "Stock"
+    },
+    "armory.page.3": {
+      "original": "Equipment",
+      "plain": "Equipment"
+    },
+    "armory.step.0": {
+      "original": "Unlock designs",
+      "plain": "Unlock designs"
+    },
+    "armory.step.1": {
+      "original": "Assign factories",
+      "plain": "Assign factories"
+    },
+    "armory.step.2": {
+      "original": "Check available gear",
+      "plain": "Check available gear"
+    },
+    "armory.step.3": {
+      "original": "Issue and recover",
+      "plain": "Issue and recover"
+    },
+    "armory.category.0": {
+      "original": "Rifles",
+      "plain": "Rifles"
+    },
+    "armory.category.1": {
+      "original": "Armor",
+      "plain": "Armor"
+    },
+    "armory.category.2": {
+      "original": "Artillery",
+      "plain": "Artillery"
+    },
+    "armory.category.hint.0": {
+      "original": "Infantry firepower",
+      "plain": "Infantry firepower"
+    },
+    "armory.category.hint.1": {
+      "original": "Assault and mobility",
+      "plain": "Assault and mobility"
+    },
+    "armory.category.hint.2": {
+      "original": "Mountain / field / AT",
+      "plain": "Mountain / field / AT"
+    },
+    "armory.fact.0": {
+      "original": "Role",
+      "plain": "Role"
+    },
+    "armory.fact.1": {
+      "original": "Research",
+      "plain": "Research"
+    },
+    "armory.fact.2": {
+      "original": "Power / rough",
+      "plain": "Power / rough"
+    },
+    "armory.fact.3": {
+      "original": "Factory output",
+      "plain": "Factory output"
+    },
+    "armory.fact.4": {
+      "original": "Stock",
+      "plain": "Stock"
+    },
+    "armory.model.rifle-old": {
+      "original": "Service bolt-action rifle",
+      "plain": "Service bolt-action rifle"
+    },
+    "armory.role.rifle-old": {
+      "original": "Basic infantry firepower",
+      "plain": "Basic infantry firepower"
+    },
+    "armory.description.rifle-old": {
+      "original": "Basic design for replacements. Equipment must be issued.",
+      "plain": "Basic design for replacements. Equipment must be issued."
+    },
+    "armory.model.rifle-modern": {
+      "original": "Improved rifle",
+      "plain": "Improved rifle"
+    },
+    "armory.role.rifle-modern": {
+      "original": "Firepower and reliability",
+      "plain": "Firepower and reliability"
+    },
+    "armory.description.rifle-modern": {
+      "original": "Replace old gear in batches. Unchanged groups keep existing equipment.",
+      "plain": "Replace old gear in batches. Unchanged groups keep existing equipment."
+    },
+    "armory.model.light-tank": {
+      "original": "Light tank equipment",
+      "plain": "Light tank equipment"
+    },
+    "armory.role.light-tank": {
+      "original": "Mobile assault",
+      "plain": "Mobile assault"
+    },
+    "armory.description.light-tank": {
+      "original": "Requires iron, coal and fuel. Lower power in rough terrain.",
+      "plain": "Requires iron, coal and fuel. Lower power in rough terrain."
+    },
+    "armory.model.armor-improved": {
+      "original": "Improved armored equipment",
+      "plain": "Improved armored equipment"
+    },
+    "armory.role.armor-improved": {
+      "original": "Armored unit improvement",
+      "plain": "Armored unit improvement"
+    },
+    "armory.description.armor-improved": {
+      "original": "Higher industrial cost. Armor and piercing interactions remain in development.",
+      "plain": "Higher industrial cost. Armor and piercing interactions remain in development."
+    },
+    "armory.model.mountain-basic": {
+      "original": "Light mountain gun",
+      "plain": "Light mountain gun"
+    },
+    "armory.role.mountain-basic": {
+      "original": "Mountain support",
+      "plain": "Mountain support"
+    },
+    "armory.description.mountain-basic": {
+      "original": "Light mountain support. Existing movement and railway rules apply.",
+      "plain": "Light mountain support. Existing movement and railway rules apply."
+    },
+    "armory.model.mountain-improved": {
+      "original": "Improved mountain gun",
+      "plain": "Improved mountain gun"
+    },
+    "armory.role.mountain-improved": {
+      "original": "Mountain firepower",
+      "plain": "Mountain firepower"
+    },
+    "armory.description.mountain-improved": {
+      "original": "Retains rough-terrain power and lower manufacturing cost.",
+      "plain": "Retains rough-terrain power and lower manufacturing cost."
+    },
+    "armory.model.field-howitzer": {
+      "original": "Field howitzer",
+      "plain": "Field howitzer"
+    },
+    "armory.role.field-howitzer": {
+      "original": "Field firepower",
+      "plain": "Field firepower"
+    },
+    "armory.description.field-howitzer": {
+      "original": "Stronger on open ground; weaker in rough terrain. Mountain guns remain useful.",
+      "plain": "Stronger on open ground; weaker in rough terrain. Mountain guns remain useful."
+    },
+    "armory.model.antitank": {
+      "original": "Antitank gun",
+      "plain": "Antitank gun"
+    },
+    "armory.role.antitank": {
+      "original": "Antitank support",
+      "plain": "Antitank support"
+    },
+    "armory.description.antitank": {
+      "original": "Provides unit support firepower. Piercing interaction is still in development.",
+      "plain": "Provides unit support firepower. Piercing interaction is still in development."
+    },
+    "armory.model.legacy-rifle": {
+      "original": "Existing infantry gear",
+      "plain": "Existing infantry gear"
+    },
+    "armory.role.legacy-rifle": {
+      "original": "Starting equipment",
+      "plain": "Starting equipment"
+    },
+    "armory.description.legacy-rifle": {
+      "original": "Abstract starting gear. It can be recovered and reissued, not manufactured.",
+      "plain": "Abstract starting gear. It can be recovered and reissued, not manufactured."
+    },
+    "armory.model.legacy-artillery": {
+      "original": "Existing artillery gear",
+      "plain": "Existing artillery gear"
+    },
+    "armory.role.legacy-artillery": {
+      "original": "Starting equipment",
+      "plain": "Starting equipment"
+    },
+    "armory.description.legacy-artillery": {
+      "original": "Original artillery is not assigned an unverified historical model.",
+      "plain": "Original artillery is not assigned an unverified historical model."
+    },
+    "armory.model.legacy-armor": {
+      "original": "Existing armored gear",
+      "plain": "Existing armored gear"
+    },
+    "armory.role.legacy-armor": {
+      "original": "Starting equipment",
+      "plain": "Starting equipment"
+    },
+    "armory.description.legacy-armor": {
+      "original": "Keeps starting unit strength. Upgrades require production.",
+      "plain": "Keeps starting unit strength. Upgrades require production."
+    },
+    "room.armory": {
+      "original": "Armory  F7",
+      "plain": "Armory  F7"
+    },
+    "armory.convert": {
+      "original": "Convert to armor",
+      "plain": "Convert to armor"
+    },
+    "armory.convert.confirm": {
+      "original": "Confirm  Y",
+      "plain": "Confirm  Y"
+    },
+    "armory.convert.cancel": {
+      "original": "Cancel  N / ESC",
+      "plain": "Cancel  N / ESC"
+    },
+    "armory.convert.review": {
+      "original": "Convert %s\nInfantry force %d → armor force %d\nNeeds %d equipment groups and %d gold\n%d unassigned personnel enter the reserve.\nInfantry gear returns to stock. Unit and general IDs stay.",
+      "plain": "Convert %s\nInfantry force %d → armor force %d\nNeeds %d equipment groups and %d gold\n%d unassigned personnel enter the reserve.\nInfantry gear returns to stock. Unit and general IDs stay."
+    },
+    "armory.convert.summary": {
+      "original": "Infantry %d → armor %d; full stock + 1,000 gold",
+      "plain": "Infantry %d → armor %d; full stock + 1,000 gold"
+    },
+    "armory.convert.done": {
+      "original": "Armor conversion complete. Infantry gear returned.",
+      "plain": "Armor conversion complete. Infantry gear returned."
+    },
+    "armory.reserve": {
+      "original": "Reserve %d",
+      "plain": "Reserve %d"
+    },
+    "armory.reserve.issue": {
+      "original": "Use reserves",
+      "plain": "Use reserves"
+    },
+    "battleinfo.title": {
+      "original": "BATTLE INFORMATION · BOTH SIDES",
+      "plain": "BATTLE INFORMATION · BOTH SIDES"
+    },
+    "battleinfo.attacker": {
+      "original": "Attacker",
+      "plain": "Attacker"
+    },
+    "battleinfo.defender": {
+      "original": "Defender",
+      "plain": "Defender"
+    },
+    "battleinfo.previous": {
+      "original": "Previous  ←",
+      "plain": "Previous  ←"
+    },
+    "battleinfo.next": {
+      "original": "Next  →",
+      "plain": "Next  →"
+    },
+    "battleinfo.back": {
+      "original": "Back  ESC",
+      "plain": "Back  ESC"
+    },
+    "battleinfo.pages": {
+      "original": "%d / %d",
+      "plain": "%d / %d"
+    },
+    "battleinfo.empty": {
+      "original": "No units on this page.",
+      "plain": "No units on this page."
+    },
+    "battleinfo.total": {
+      "original": "Alive %d · force %d (original scale)",
+      "plain": "Alive %d · force %d (original scale)"
+    },
+    "battleinfo.branch.total": {
+      "original": "%s: %d units · force %d",
+      "plain": "%s: %d units · force %d"
+    },
+    "battleinfo.branch.1": {
+      "original": "Infantry",
+      "plain": "Infantry"
+    },
+    "battleinfo.branch.6": {
+      "original": "Cavalry",
+      "plain": "Cavalry"
+    },
+    "battleinfo.branch.5": {
+      "original": "Armor",
+      "plain": "Armor"
+    },
+    "battleinfo.branch.4": {
+      "original": "Artillery",
+      "plain": "Artillery"
+    },
+    "battleinfo.supply": {
+      "original": "Source province: G%d F%d A%d Fuel%d",
+      "plain": "Source province: G%d F%d A%d Fuel%d"
+    },
+    "battleinfo.offmap": {
+      "original": "off-map",
+      "plain": "off-map"
+    },
+    "battleinfo.unit.force": {
+      "original": "Force %d · leadership %d · skill %d",
+      "plain": "Force %d · leadership %d · skill %d"
+    },
+    "battleinfo.unit.condition": {
+      "original": "Arming %d · stamina %d · morale %d",
+      "plain": "Arming %d · stamina %d · morale %d"
+    },
+    "battleinfo.unit.field": {
+      "original": "XP %d · move %d/%d · cell %s",
+      "plain": "XP %d · move %d/%d · cell %s"
+    },
+    "battleinfo.unit.equipped": {
+      "original": "Gear %d/%d groups · missing %d · power %d%%",
+      "plain": "Gear %d/%d groups · missing %d · power %d%%"
+    },
+    "battleinfo.unit.untracked": {
+      "original": "Original mode does not track equipment models.",
+      "plain": "Original mode does not track equipment models."
+    },
+    "battleinfo.unit.unknown": {
+      "original": "Thickness / piercing / vehicle counts: unavailable",
+      "plain": "Thickness / piercing / vehicle counts: unavailable"
+    },
+    "battleinfo.supply.0": {
+      "original": "Source: gold %d · food %d",
+      "plain": "Source: gold %d · food %d"
+    },
+    "battleinfo.supply.1": {
+      "original": "Ammo %d · fuel %d",
+      "plain": "Ammo %d · fuel %d"
+    },
+    "battleinfo.branch.unknown": {
+      "original": "Unknown branch",
+      "plain": "Unknown branch"
+    },
+    "desk.title": {
+      "original": "The Great Era",
+      "plain": "The Great Era"
+    },
+    "desk.mode": {
+      "original": "Modern interface",
+      "plain": "Modern interface"
+    },
+    "desk.headquarters": {
+      "original": "Headquarters",
+      "plain": "Headquarters"
+    },
+    "desk.progress": {
+      "original": "Progress",
+      "plain": "Progress"
+    },
+    "desk.mouse.help": {
+      "original": "Left click to select\nEsc / right click to return\nWheel to zoom the map",
+      "plain": "Left click to select\nEsc / right click to return\nWheel to zoom the map"
+    },
+    "desk.breadcrumb": {
+      "original": "National command /",
+      "plain": "National command /"
+    },
+    "desk.footer": {
+      "original": "Commands run after confirmation. F6 toolbar, F10 save and quit.",
+      "plain": "Commands run after confirmation. F6 toolbar, F10 save and quit."
+    },
+    "desk.selected": {
+      "original": "Selected",
+      "plain": "Selected"
+    },
+    "desk.force": {
+      "original": "Provincial strength",
+      "plain": "Provincial strength"
+    },
+    "desk.arsenal": {
+      "original": "Arsenals",
+      "plain": "Arsenals"
+    },
+    "desk.coal": {
+      "original": "Coal",
+      "plain": "Coal"
+    },
+    "desk.iron": {
+      "original": "Iron",
+      "plain": "Iron"
+    },
+    "desk.stationed": {
+      "original": "Stationed commanders",
+      "plain": "Stationed commanders"
+    },
+    "desk.resource.0": {
+      "original": "Funds",
+      "plain": "Funds"
+    },
+    "desk.resource.1": {
+      "original": "Food",
+      "plain": "Food"
+    },
+    "desk.resource.2": {
+      "original": "Ammunition",
+      "plain": "Ammunition"
+    },
+    "desk.resource.3": {
+      "original": "Fuel",
+      "plain": "Fuel"
+    },
+    "desk.resource.4": {
+      "original": "Arsenals",
+      "plain": "Arsenals"
+    },
+    "desk.date": {
+      "original": "%d / %d",
+      "plain": "%d / %d"
+    },
+    "desk.unit.detail": {
+      "original": "%s · Leadership %d · Arms %d",
+      "plain": "%s · Leadership %d · Arms %d"
+    },
+    "desk.map": {
+      "original": "National map",
+      "plain": "National map"
+    },
+    "desk.map.hint": {
+      "original": "Select a province to issue orders or inspect forces.",
+      "plain": "Select a province to issue orders or inspect forces."
+    },
+    "desk.map.reset": {
+      "original": "Reset view",
+      "plain": "Reset view"
+    },
+    "desk.back": {
+      "original": "Back",
+      "plain": "Back"
+    },
+    "desk.cancel": {
+      "original": "Cancel",
+      "plain": "Cancel"
+    },
+    "desk.confirm": {
+      "original": "Confirm",
+      "plain": "Confirm"
+    },
+    "desk.adjust": {
+      "original": "Back to edit",
+      "plain": "Back to edit"
+    },
+    "desk.recruit": {
+      "original": "Recruit",
+      "plain": "Recruit"
+    },
+    "desk.transfer": {
+      "original": "Transfer",
+      "plain": "Transfer"
+    },
+    "desk.reorganize": {
+      "original": "Reorganize",
+      "plain": "Reorganize"
+    },
+    "desk.people": {
+      "original": "Commanders",
+      "plain": "Commanders"
+    },
+    "desk.save": {
+      "original": "Save progress",
+      "plain": "Save progress"
+    },
+    "desk.load": {
+      "original": "Load progress",
+      "plain": "Load progress"
+    },
+    "desk.commands": {
+      "original": "More commands",
+      "plain": "More commands"
+    },
+    "desk.commands.hint": {
+      "original": "Existing strategy rules. Select an order to configure it.",
+      "plain": "Existing strategy rules. Select an order to configure it."
+    },
+    "desk.form.hint": {
+      "original": "Choose, review and confirm. Back leaves the form.",
+      "plain": "Choose, review and confirm. Back leaves the form."
+    },
+    "desk.province": {
+      "original": "Province",
+      "plain": "Province"
+    },
+    "desk.branch": {
+      "original": "Branch",
+      "plain": "Branch"
+    },
+    "desk.quantity": {
+      "original": "Amount",
+      "plain": "Amount"
+    },
+    "desk.limit": {
+      "original": "Limit %s",
+      "plain": "Limit %s"
+    },
+    "desk.maximum": {
+      "original": "Maximum",
+      "plain": "Maximum"
+    },
+    "desk.cost": {
+      "original": "Funds required",
+      "plain": "Funds required"
+    },
+    "desk.after.gold": {
+      "original": "Funds after order",
+      "plain": "Funds after order"
+    },
+    "desk.recruit.review": {
+      "original": "Review recruitment",
+      "plain": "Review recruitment"
+    },
+    "desk.recruit.confirm": {
+      "original": "Confirm recruitment",
+      "plain": "Confirm recruitment"
+    },
+    "desk.recruit.terms": {
+      "original": "%s · %s\nRecruit %s troops for %s funds.\nExisting rules allocate the troops.",
+      "plain": "%s · %s\nRecruit %s troops for %s funds.\nExisting rules allocate the troops."
+    },
+    "desk.destination": {
+      "original": "Destination",
+      "plain": "Destination"
+    },
+    "desk.resources": {
+      "original": "Supplies",
+      "plain": "Supplies"
+    },
+    "desk.select.all": {
+      "original": "Select available",
+      "plain": "Select available"
+    },
+    "desk.general.row": {
+      "original": "%s · %s · Strength %s · Stamina %d",
+      "plain": "%s · %s · Strength %s · Stamina %d"
+    },
+    "desk.review": {
+      "original": "Review and confirm",
+      "plain": "Review and confirm"
+    },
+    "desk.review.terms": {
+      "original": "Confirm to execute the current order.",
+      "plain": "Confirm to execute the current order."
+    },
+    "desk.transfer.confirm": {
+      "original": "Confirm transfer",
+      "plain": "Confirm transfer"
+    },
+    "desk.transfer.terms": {
+      "original": "%s → %s\nTransfer %d commanders.\nFunds %d, food %d, ammo %d, fuel %d.",
+      "plain": "%s → %s\nTransfer %d commanders.\nFunds %d, food %d, ammo %d, fuel %d."
+    },
+    "desk.supply": {
+      "original": "Supply",
+      "plain": "Supply"
+    },
+    "desk.supply.terms": {
+      "original": "Supply %s\nFunds %d, food %d, ammo %d, fuel %d.",
+      "plain": "Supply %s\nFunds %d, food %d, ammo %d, fuel %d."
+    },
+    "desk.reorganize.hint": {
+      "original": "Confirm to commit. Back cancels and restores the starting state.",
+      "plain": "Confirm to commit. Back cancels and restores the starting state."
+    },
+    "desk.pool": {
+      "original": "Unassigned strength %s",
+      "plain": "Unassigned strength %s"
+    },
+    "desk.assign": {
+      "original": "Assign troops",
+      "plain": "Assign troops"
+    },
+    "desk.reorganize.finish": {
+      "original": "Commit reorganization",
+      "plain": "Commit reorganization"
+    },
+    "desk.reorganize.finish.terms": {
+      "original": "All troops are assigned. Confirm to commit using the existing command budget.",
+      "plain": "All troops are assigned. Confirm to commit using the existing command budget."
+    },
+    "desk.reorganize.cancel": {
+      "original": "Cancel this reorganization?",
+      "plain": "Cancel this reorganization?"
+    },
+    "desk.reorganize.cancel.terms": {
+      "original": "Cancel restores starting strength, arms and equipment. No troops or commands are lost.",
+      "plain": "Cancel restores starting strength, arms and equipment. No troops or commands are lost."
+    },
+    "desk.reorganize.cancel.yes": {
+      "original": "Cancel and return",
+      "plain": "Cancel and return"
+    },
+    "desk.keep.editing": {
+      "original": "Keep editing",
+      "plain": "Keep editing"
+    },
+    "desk.reorganize.legacy": {
+      "original": "Historical draft",
+      "plain": "Historical draft"
+    },
+    "desk.reorganize.legacy.terms": {
+      "original": "This old save has no starting snapshot. Finish assigning troops or save and quit to resume later.",
+      "plain": "This old save has no starting snapshot. Finish assigning troops or save and quit to resume later."
+    },
+    "desk.save.exit": {
+      "original": "Save and quit",
+      "plain": "Save and quit"
+    },
+    "desk.trade": {
+      "original": "Trade",
+      "plain": "Trade"
+    },
+    "desk.import": {
+      "original": "Import",
+      "plain": "Import"
+    },
+    "desk.export": {
+      "original": "Export",
+      "plain": "Export"
+    },
+    "desk.trade.terms": {
+      "original": "%s, amount %d, funds %d.\nConfirm the selected import or export.",
+      "plain": "%s, amount %d, funds %d.\nConfirm the selected import or export."
+    },
+    "desk.people.hint": {
+      "original": "Select a commander for statistics and the full biography.",
+      "plain": "Select a commander for statistics and the full biography."
+    },
+    "desk.person.stats": {
+      "original": "%s\nStrength %d, leadership %d, skill %d\nArms %d, stamina %d, morale %d",
+      "plain": "%s\nStrength %d, leadership %d, skill %d\nArms %d, stamina %d, morale %d"
+    },
+    "desk.biography": {
+      "original": "Full biography",
+      "plain": "Full biography"
+    },
+    "desk.save.confirm": {
+      "original": "Save progress",
+      "plain": "Save progress"
+    },
+    "desk.save.terms": {
+      "original": "Confirm to save the world, troops, equipment and battle or reorganization progress.",
+      "plain": "Confirm to save the world, troops, equipment and battle or reorganization progress."
+    },
+    "desk.save.done": {
+      "original": "Progress saved.",
+      "plain": "Progress saved."
+    },
+    "desk.save.failed": {
+      "original": "Save failed; game retained: ",
+      "plain": "Save failed; game retained: "
+    },
+    "desk.save.unavailable": {
+      "original": "No save source or destination.",
+      "plain": "No save source or destination."
+    },
+    "desk.load.confirm": {
+      "original": "Load progress",
+      "plain": "Load progress"
+    },
+    "desk.load.terms": {
+      "original": "Loading replaces current progress. Failed loads keep the current game.",
+      "plain": "Loading replaces current progress. Failed loads keep the current game."
+    },
+    "desk.quit.confirm": {
+      "original": "Save and quit the game",
+      "plain": "Save and quit the game"
+    },
+    "desk.quit.terms": {
+      "original": "Save before quitting. If saving fails, the game stays open.",
+      "plain": "Save before quitting. If saving fails, the game stays open."
+    },
+    "desk.train.confirm": {
+      "original": "Confirm training",
+      "plain": "Confirm training"
+    },
+    "desk.train.terms": {
+      "original": "Train using existing rules and the command budget.",
+      "plain": "Train using existing rules and the command budget."
+    },
+    "desk.choose": {
+      "original": "Choose an item",
+      "plain": "Choose an item"
+    },
+    "desk.choose.hint": {
+      "original": "Select a name. Wheel scrolls; Back cancels.",
+      "plain": "Select a name. Wheel scrolls; Back cancels."
+    },
+    "desk.armory": {
+      "original": "Armory",
+      "plain": "Armory"
+    },
+    "desk.month": {
+      "original": "End month",
+      "plain": "End month"
+    },
+    "desk.month.terms": {
+      "original": "Run the computer turn, settle production and advance the month.",
+      "plain": "Run the computer turn, settle production and advance the month."
+    },
+    "desk.battle.resume": {
+      "original": "Resume battle",
+      "plain": "Resume battle"
+    },
+    "desk.battle.locked": {
+      "original": "Battle paused. Inspect or save; resume the battle before issuing new orders.",
+      "plain": "Battle paused. Inspect or save; resume the battle before issuing new orders."
+    },
+    "desk.battle.legacy": {
+      "original": "Direct DT1 sessions cannot save a full tactical state. Finish the battle; importing DT1 into a remake save supports safe pauses.",
+      "plain": "Direct DT1 sessions cannot save a full tactical state. Finish the battle; importing DT1 into a remake save supports safe pauses."
+    },
+    "desk.battle.pause": {
+      "original": "View national map",
+      "plain": "View national map"
+    },
+    "desk.no.commands": {
+      "original": "No commands remaining this month.",
+      "plain": "No commands remaining this month."
+    },
+    "toolbar.music.huan-wo-he-shan": {
+      "original": "Return Our Land",
+      "plain": "Return Our Land"
+    },
+    "toolbar.music.national-revolution": {
+      "original": "National Revolution Song",
+      "plain": "National Revolution Song"
+    },
+    "toolbar.music.eight-hundred-heroes": {
+      "original": "Eight Hundred Heroes",
+      "plain": "Eight Hundred Heroes"
     }
   }
 }

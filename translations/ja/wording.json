@@ -1009,8 +1009,8 @@
       "plain": "原版画面"
     },
     "toolbar.interface.command": {
-      "original": "司令部画面",
-      "plain": "司令部画面"
+      "original": "Modern",
+      "plain": "Modern"
     },
     "toolbar.ai.current.long": {
       "original": "現在のリメイク AI",
@@ -1097,12 +1097,1120 @@
       "plain": "終幕"
     },
     "toolbar.music.note": {
-      "original": "音楽モードと曲を別々に選択。設定を保存します。",
-      "plain": "音楽モードと曲を別々に選択。設定を保存します。"
+      "original": "選曲を保存。軍歌は本機 HD 専用。原版では場面曲、HD に戻すと軍歌を再開。",
+      "plain": "選曲を保存。軍歌は本機 HD 専用。原版では場面曲、HD に戻すと軍歌を再開。"
     },
     "toolbar.music.unavailable": {
-      "original": "この曲の原版 MUS/TIM がありません。現在の音楽を維持します。",
-      "plain": "この曲の原版 MUS/TIM がありません。現在の音楽を維持します。"
+      "original": "この曲の音源がありません。現在の音楽を維持します。",
+      "plain": "この曲の音源がありません。現在の音楽を維持します。"
+    },
+    "opening.eyebrow": {
+      "original": "戦役準備",
+      "plain": "戦役準備"
+    },
+    "opening.title": {
+      "original": "時代と勢力を選択",
+      "plain": "時代と勢力を選択"
+    },
+    "opening.intro": {
+      "original": "矢印で勢力、1–3でシナリオ、Mでモード切替、Enterで開始。",
+      "plain": "矢印で勢力、1–3でシナリオ、Mでモード切替、Enterで開始。"
+    },
+    "opening.original": {
+      "original": "原版戦役",
+      "plain": "原版戦役"
+    },
+    "opening.original.hint": {
+      "original": "原版のルール",
+      "plain": "原版のルール"
+    },
+    "opening.resistance": {
+      "original": "統一後の抗日戦",
+      "plain": "統一後の抗日戦"
+    },
+    "opening.resistance.hint": {
+      "original": "統一後に東北侵攻が発生",
+      "plain": "統一後に東北侵攻が発生"
+    },
+    "opening.factions": {
+      "original": "選択できる勢力 · %d",
+      "plain": "選択できる勢力 · %d"
+    },
+    "opening.source": {
+      "original": "原始シナリオから新規開始。領土を持つ全勢力を保持。",
+      "plain": "原始シナリオから新規開始。領土を持つ全勢力を保持。"
+    },
+    "opening.provinces": {
+      "original": "支配する省",
+      "plain": "支配する省"
+    },
+    "opening.generals": {
+      "original": "有効な将領",
+      "plain": "有効な将領"
+    },
+    "opening.force": {
+      "original": "兵力／万人",
+      "plain": "兵力／万人"
+    },
+    "opening.start": {
+      "original": "戦役開始",
+      "plain": "戦役開始"
+    },
+    "opening.save.hint": {
+      "original": "進行は単一の .gesave に保存。美術・画面・音楽はゲーム中に切替可能。",
+      "plain": "進行は単一の .gesave に保存。美術・画面・音楽はゲーム中に切替可能。"
+    },
+    "opening.continue": {
+      "original": "続きから [C]",
+      "plain": "続きから [C]"
+    },
+    "opening.quit": {
+      "original": "終了しますか？ Y 確認 / N 戻る",
+      "plain": "終了しますか？ Y 確認 / N 戻る"
+    },
+    "opening.stage.1": {
+      "original": "北伐期",
+      "plain": "北伐期"
+    },
+    "opening.stage.2": {
+      "original": "抗戦前期",
+      "plain": "抗戦前期"
+    },
+    "opening.stage.3": {
+      "original": "抗日後期",
+      "plain": "抗日後期"
+    },
+    "opening.date": {
+      "original": "%d 年 %d 月",
+      "plain": "%d 年 %d 月"
+    },
+    "opening.japan": {
+      "original": "日本軍",
+      "plain": "日本軍"
+    },
+    "opening.leader": {
+      "original": "指導者 %d",
+      "plain": "指導者 %d"
+    },
+    "opening.original.only": {
+      "original": "原版限定",
+      "plain": "原版限定"
+    },
+    "opening.summary": {
+      "original": "将領 %d 人 · %d 省",
+      "plain": "将領 %d 人 · %d 省"
+    },
+    "opening.home": {
+      "original": "開始する省：%s",
+      "plain": "開始する省：%s"
+    },
+    "opening.original.note": {
+      "original": "原版と拡張のルールは別です。日本軍は原版で選択可能。",
+      "plain": "原版と拡張のルールは別です。日本軍は原版で選択可能。"
+    },
+    "opening.resistance.pending": {
+      "original": "軍備整備を試遊できます。日本軍侵攻は開発中です。F7 で軍備局を開きます。",
+      "plain": "軍備整備を試遊できます。日本軍侵攻は開発中です。F7 で軍備局を開きます。"
+    },
+    "opening.japan.note": {
+      "original": "日本軍は原版で選択可能。抗日拡張は中国勢力向けです。",
+      "plain": "日本軍は原版で選択可能。抗日拡張は中国勢力向けです。"
+    },
+    "opening.enemy.readonly": {
+      "original": "他勢力の省です。閲覧のみ可能です。",
+      "plain": "他勢力の省です。閲覧のみ可能です。"
+    },
+    "armory.kicker": {
+      "original": "軍需と整備",
+      "plain": "軍需と整備"
+    },
+    "armory.title": {
+      "original": "軍 備 局",
+      "plain": "軍 備 局"
+    },
+    "armory.intro": {
+      "original": "設計を研究し、工場を割り当て、部隊に装備を配備する。",
+      "plain": "設計を研究し、工場を割り当て、部隊に装備を配備する。"
+    },
+    "armory.mode": {
+      "original": "拡張戦役・整備プレビュー",
+      "plain": "拡張戦役・整備プレビュー"
+    },
+    "armory.factories": {
+      "original": "軍需工場 %d / %d",
+      "plain": "軍需工場 %d / %d"
+    },
+    "armory.categories": {
+      "original": "装備分類",
+      "plain": "装備分類"
+    },
+    "armory.sidebar.note": {
+      "original": "研究完了だけでは自動換装されません。\n\n山砲・野戦砲・対戦車砲を使い分けます。",
+      "plain": "研究完了だけでは自動換装されません。\n\n山砲・野戦砲・対戦車砲を使い分けます。"
+    },
+    "armory.artillery.note": {
+      "original": "山地支援・野戦火力・対戦車の各系統。",
+      "plain": "山地支援・野戦火力・対戦車の各系統。"
+    },
+    "armory.catalog.note": {
+      "original": "汎用装備設計。装備組は抽象的な編装単位です。",
+      "plain": "汎用装備設計。装備組は抽象的な編装単位です。"
+    },
+    "armory.capacity": {
+      "original": "実際の工場 %d・装備生産に使用 %d",
+      "plain": "実際の工場 %d・装備生産に使用 %d"
+    },
+    "armory.production.locked": {
+      "original": "この分類の設計を先に研究してください。",
+      "plain": "この分類の設計を先に研究してください。"
+    },
+    "armory.production.note": {
+      "original": "完成分のみ資材を消費。資材不足でも生産ラインは維持されます。",
+      "plain": "完成分のみ資材を消費。資材不足でも生産ラインは維持されます。"
+    },
+    "armory.stock.note": {
+      "original": "装備を選んで換装画面で配備。旧装備も再利用できます。",
+      "plain": "装備を選んで換装画面で配備。旧装備も再利用できます。"
+    },
+    "armory.selected.stock": {
+      "original": "選択：%s・在庫 %d 組",
+      "plain": "選択：%s・在庫 %d 組"
+    },
+    "armory.unit": {
+      "original": "組",
+      "plain": "組"
+    },
+    "armory.issue": {
+      "original": "配備可能な装備を支給",
+      "plain": "配備可能な装備を支給"
+    },
+    "armory.previous": {
+      "original": "前のページ",
+      "plain": "前のページ"
+    },
+    "armory.next": {
+      "original": "次のページ",
+      "plain": "次のページ"
+    },
+    "armory.pages": {
+      "original": "%d / %d ページ",
+      "plain": "%d / %d ページ"
+    },
+    "armory.units.empty": {
+      "original": "この分類に換装可能な自軍部隊がありません。",
+      "plain": "この分類に換装可能な自軍部隊がありません。"
+    },
+    "armory.equipment.note": {
+      "original": "部分換装可。交換した装備は在庫へ戻り、新兵には補充が必要です。",
+      "plain": "部分換装可。交換した装備は在庫へ戻り、新兵には補充が必要です。"
+    },
+    "armory.months.progress": {
+      "original": "%d / %d か月",
+      "plain": "%d / %d か月"
+    },
+    "armory.output": {
+      "original": "月 %d 組",
+      "plain": "月 %d 組"
+    },
+    "armory.research.start": {
+      "original": "研究開始",
+      "plain": "研究開始"
+    },
+    "armory.research.pause": {
+      "original": "研究を一時停止",
+      "plain": "研究を一時停止"
+    },
+    "armory.production.open": {
+      "original": "生産を割り当て",
+      "plain": "生産を割り当て"
+    },
+    "armory.stock.open": {
+      "original": "在庫を見る",
+      "plain": "在庫を見る"
+    },
+    "armory.month": {
+      "original": "一か月進める  ▶",
+      "plain": "一か月進める  ▶"
+    },
+    "armory.footer": {
+      "original": "F7 軍備・1–4 手順・上下 分類・E 翌月・ESC 戻る",
+      "plain": "F7 軍備・1–4 手順・上下 分類・E 翌月・ESC 戻る"
+    },
+    "armory.save": {
+      "original": "保存",
+      "plain": "保存"
+    },
+    "armory.load": {
+      "original": "読込",
+      "plain": "読込"
+    },
+    "armory.back": {
+      "original": "地図に戻る",
+      "plain": "地図に戻る"
+    },
+    "armory.quit": {
+      "original": "進度を保存して終了しますか？\nY はい・N／ESC 戻る",
+      "plain": "進度を保存して終了しますか？\nY はい・N／ESC 戻る"
+    },
+    "armory.date": {
+      "original": "%d 年 %02d 月",
+      "plain": "%d 年 %02d 月"
+    },
+    "armory.original.only": {
+      "original": "軍備研究は抗日拡張戦役用です。原版の規則は維持されます。",
+      "plain": "軍備研究は抗日拡張戦役用です。原版の規則は維持されます。"
+    },
+    "armory.error": {
+      "original": "実行できません。設計・工場・在庫・部隊所属を確認してください。",
+      "plain": "実行できません。設計・工場・在庫・部隊所属を確認してください。"
+    },
+    "armory.status.available": {
+      "original": "研究可能",
+      "plain": "研究可能"
+    },
+    "armory.status.known": {
+      "original": "習得済み",
+      "plain": "習得済み"
+    },
+    "armory.status.researching": {
+      "original": "研究中",
+      "plain": "研究中"
+    },
+    "armory.status.locked": {
+      "original": "前提設計または空き研究枠が必要",
+      "plain": "前提設計または空き研究枠が必要"
+    },
+    "armory.research.terms": {
+      "original": "%d か月・毎月 180 金",
+      "plain": "%d か月・毎月 180 金"
+    },
+    "armory.production.terms": {
+      "original": "工場毎月 %d 組・各 金%d 鉄%d 石炭%d 燃料%d",
+      "plain": "工場毎月 %d 組・各 金%d 鉄%d 石炭%d 燃料%d"
+    },
+    "armory.last": {
+      "original": "先月の生産 %d 組",
+      "plain": "先月の生産 %d 組"
+    },
+    "armory.shortage": {
+      "original": "資材不足または在庫上限",
+      "plain": "資材不足または在庫上限"
+    },
+    "armory.stock.amount": {
+      "original": "在庫 %d 組",
+      "plain": "在庫 %d 組"
+    },
+    "armory.equipment.item": {
+      "original": "%s %d 組",
+      "plain": "%s %d 組"
+    },
+    "armory.unit.name": {
+      "original": "%s・%s",
+      "plain": "%s・%s"
+    },
+    "armory.unit.summary": {
+      "original": "兵力 %d・必要 %d 組・選択装備 %d 組",
+      "plain": "兵力 %d・必要 %d 組・選択装備 %d 組"
+    },
+    "armory.queue.empty": {
+      "original": "研究枠が空いています・設計を選択",
+      "plain": "研究枠が空いています・設計を選択"
+    },
+    "armory.queue.note": {
+      "original": "既存生産を先に精算し、研究に投入。完成後に工場を割り当てます。",
+      "plain": "既存生産を先に精算し、研究に投入。完成後に工場を割り当てます。"
+    },
+    "armory.queue.active": {
+      "original": "研究中：%s・%d / %d か月",
+      "plain": "研究中：%s・%d / %d か月"
+    },
+    "armory.research.shortage": {
+      "original": "180 金未満のため、今月の研究投入は停止します。",
+      "plain": "180 金未満のため、今月の研究投入は停止します。"
+    },
+    "armory.research.paused": {
+      "original": "一時停止しました。研究進度は維持されます。",
+      "plain": "一時停止しました。研究進度は維持されます。"
+    },
+    "armory.research.started": {
+      "original": "研究開始。軍費は毎月投入されます。",
+      "plain": "研究開始。軍費は毎月投入されます。"
+    },
+    "armory.month.done": {
+      "original": "%d 年 %02d 月に進みました。",
+      "plain": "%d 年 %02d 月に進みました。"
+    },
+    "armory.saved": {
+      "original": "戦役と軍備の進度を保存しました。",
+      "plain": "戦役と軍備の進度を保存しました。"
+    },
+    "armory.loaded": {
+      "original": "戦役と軍備の進度を復元しました。",
+      "plain": "戦役と軍備の進度を復元しました。"
+    },
+    "armory.assigned": {
+      "original": "軍需工場の割り当てを更新しました。",
+      "plain": "軍需工場の割り当てを更新しました。"
+    },
+    "armory.issued": {
+      "original": "%d 組を配備し、交換した装備を在庫に戻しました。",
+      "plain": "%d 組を配備し、交換した装備を在庫に戻しました。"
+    },
+    "armory.resource.0": {
+      "original": "軍費",
+      "plain": "軍費"
+    },
+    "armory.resource.1": {
+      "original": "鉄",
+      "plain": "鉄"
+    },
+    "armory.resource.2": {
+      "original": "石炭",
+      "plain": "石炭"
+    },
+    "armory.resource.3": {
+      "original": "燃料",
+      "plain": "燃料"
+    },
+    "armory.page.0": {
+      "original": "研究",
+      "plain": "研究"
+    },
+    "armory.page.1": {
+      "original": "生産",
+      "plain": "生産"
+    },
+    "armory.page.2": {
+      "original": "在庫",
+      "plain": "在庫"
+    },
+    "armory.page.3": {
+      "original": "換装",
+      "plain": "換装"
+    },
+    "armory.step.0": {
+      "original": "設計を習得",
+      "plain": "設計を習得"
+    },
+    "armory.step.1": {
+      "original": "工場を割り当て",
+      "plain": "工場を割り当て"
+    },
+    "armory.step.2": {
+      "original": "軍需品を確認",
+      "plain": "軍需品を確認"
+    },
+    "armory.step.3": {
+      "original": "配備と回収",
+      "plain": "配備と回収"
+    },
+    "armory.category.0": {
+      "original": "小銃",
+      "plain": "小銃"
+    },
+    "armory.category.1": {
+      "original": "装甲",
+      "plain": "装甲"
+    },
+    "armory.category.2": {
+      "original": "火砲",
+      "plain": "火砲"
+    },
+    "armory.category.hint.0": {
+      "original": "歩兵の基本火力",
+      "plain": "歩兵の基本火力"
+    },
+    "armory.category.hint.1": {
+      "original": "突撃と機動",
+      "plain": "突撃と機動"
+    },
+    "armory.category.hint.2": {
+      "original": "山地・野戦・対戦車",
+      "plain": "山地・野戦・対戦車"
+    },
+    "armory.fact.0": {
+      "original": "戦場での役割",
+      "plain": "戦場での役割"
+    },
+    "armory.fact.1": {
+      "original": "研究進度",
+      "plain": "研究進度"
+    },
+    "armory.fact.2": {
+      "original": "火力／山地",
+      "plain": "火力／山地"
+    },
+    "armory.fact.3": {
+      "original": "工場の月産",
+      "plain": "工場の月産"
+    },
+    "armory.fact.4": {
+      "original": "現在の在庫",
+      "plain": "現在の在庫"
+    },
+    "armory.model.rifle-old": {
+      "original": "制式ボルト式小銃",
+      "plain": "制式ボルト式小銃"
+    },
+    "armory.role.rifle-old": {
+      "original": "基本歩兵火力",
+      "plain": "基本歩兵火力"
+    },
+    "armory.description.rifle-old": {
+      "original": "補充用の基本設計。部隊への配備が必要です。",
+      "plain": "補充用の基本設計。部隊への配備が必要です。"
+    },
+    "armory.model.rifle-modern": {
+      "original": "改良小銃",
+      "plain": "改良小銃"
+    },
+    "armory.role.rifle-modern": {
+      "original": "火力と信頼性",
+      "plain": "火力と信頼性"
+    },
+    "armory.description.rifle-modern": {
+      "original": "旧装備を順次交換。未換装分は既存装備を使用します。",
+      "plain": "旧装備を順次交換。未換装分は既存装備を使用します。"
+    },
+    "armory.model.light-tank": {
+      "original": "軽戦車整備",
+      "plain": "軽戦車整備"
+    },
+    "armory.role.light-tank": {
+      "original": "機動突撃",
+      "plain": "機動突撃"
+    },
+    "armory.description.light-tank": {
+      "original": "鉄・石炭・燃料が必要。丘陵と山地では火力が下がります。",
+      "plain": "鉄・石炭・燃料が必要。丘陵と山地では火力が下がります。"
+    },
+    "armory.model.armor-improved": {
+      "original": "装甲・火砲改良",
+      "plain": "装甲・火砲改良"
+    },
+    "armory.role.armor-improved": {
+      "original": "装甲部隊の強化",
+      "plain": "装甲部隊の強化"
+    },
+    "armory.description.armor-improved": {
+      "original": "工業コストが高い装備。装甲と貫徹の相互作用は開発中です。",
+      "plain": "工業コストが高い装備。装甲と貫徹の相互作用は開発中です。"
+    },
+    "armory.model.mountain-basic": {
+      "original": "軽山砲",
+      "plain": "軽山砲"
+    },
+    "armory.role.mountain-basic": {
+      "original": "山地支援",
+      "plain": "山地支援"
+    },
+    "armory.description.mountain-basic": {
+      "original": "軽量の山地支援設計。既存の通行・鉄道規則に従います。",
+      "plain": "軽量の山地支援設計。既存の通行・鉄道規則に従います。"
+    },
+    "armory.model.mountain-improved": {
+      "original": "改良山砲",
+      "plain": "改良山砲"
+    },
+    "armory.role.mountain-improved": {
+      "original": "山地火力",
+      "plain": "山地火力"
+    },
+    "armory.description.mountain-improved": {
+      "original": "山地適性を維持し、生産コストも低く抑えます。",
+      "plain": "山地適性を維持し、生産コストも低く抑えます。"
+    },
+    "armory.model.field-howitzer": {
+      "original": "野戦榴弾砲",
+      "plain": "野戦榴弾砲"
+    },
+    "armory.role.field-howitzer": {
+      "original": "野戦の重火力",
+      "plain": "野戦の重火力"
+    },
+    "armory.description.field-howitzer": {
+      "original": "平地で強力ですが、丘陵・山地では効果低下。山砲も有用です。",
+      "plain": "平地で強力ですが、丘陵・山地では効果低下。山砲も有用です。"
+    },
+    "armory.model.antitank": {
+      "original": "対戦車砲",
+      "plain": "対戦車砲"
+    },
+    "armory.role.antitank": {
+      "original": "対戦車火力",
+      "plain": "対戦車火力"
+    },
+    "armory.description.antitank": {
+      "original": "部隊支援火力を提供。貫徹の相互作用は開発中です。",
+      "plain": "部隊支援火力を提供。貫徹の相互作用は開発中です。"
+    },
+    "armory.model.legacy-rifle": {
+      "original": "既存歩兵装備",
+      "plain": "既存歩兵装備"
+    },
+    "armory.role.legacy-rifle": {
+      "original": "初期装備",
+      "plain": "初期装備"
+    },
+    "armory.description.legacy-rifle": {
+      "original": "初期部隊の抽象装備。回収と再配備は可能ですが生産できません。",
+      "plain": "初期部隊の抽象装備。回収と再配備は可能ですが生産できません。"
+    },
+    "armory.model.legacy-artillery": {
+      "original": "既存砲兵装備",
+      "plain": "既存砲兵装備"
+    },
+    "armory.role.legacy-artillery": {
+      "original": "初期装備",
+      "plain": "初期装備"
+    },
+    "armory.description.legacy-artillery": {
+      "original": "原版の砲兵を未確認の史実型式に割り当てません。",
+      "plain": "原版の砲兵を未確認の史実型式に割り当てません。"
+    },
+    "armory.model.legacy-armor": {
+      "original": "既存装甲装備",
+      "plain": "既存装甲装備"
+    },
+    "armory.role.legacy-armor": {
+      "original": "初期装備",
+      "plain": "初期装備"
+    },
+    "armory.description.legacy-armor": {
+      "original": "初期部隊の戦力を維持。換装には生産が必要です。",
+      "plain": "初期部隊の戦力を維持。換装には生産が必要です。"
+    },
+    "room.armory": {
+      "original": "軍備研究  F7",
+      "plain": "軍備研究  F7"
+    },
+    "armory.convert": {
+      "original": "装甲部隊へ改編",
+      "plain": "装甲部隊へ改編"
+    },
+    "armory.convert.confirm": {
+      "original": "改編を確認  Y",
+      "plain": "改編を確認  Y"
+    },
+    "armory.convert.cancel": {
+      "original": "取消  N / ESC",
+      "plain": "取消  N / ESC"
+    },
+    "armory.convert.review": {
+      "original": "%s を装甲部隊へ改編\n歩兵兵力 %d → 装甲兵力 %d\n戦車装備 %d 組と軍費 %d 金が必要\n未編入の %d 人は予備人員へ。\n歩兵装備は在庫へ戻り、将軍と部隊 ID は維持。",
+      "plain": "%s を装甲部隊へ改編\n歩兵兵力 %d → 装甲兵力 %d\n戦車装備 %d 組と軍費 %d 金が必要\n未編入の %d 人は予備人員へ。\n歩兵装備は在庫へ戻り、将軍と部隊 ID は維持。"
+    },
+    "armory.convert.summary": {
+      "original": "歩兵兵力 %d → 装甲編装 %d。在庫全数と 1,000 金が必要",
+      "plain": "歩兵兵力 %d → 装甲編装 %d。在庫全数と 1,000 金が必要"
+    },
+    "armory.convert.done": {
+      "original": "装甲改編完了。歩兵装備を在庫へ返却しました。",
+      "plain": "装甲改編完了。歩兵装備を在庫へ返却しました。"
+    },
+    "armory.reserve": {
+      "original": "予備人員 %d",
+      "plain": "予備人員 %d"
+    },
+    "armory.reserve.issue": {
+      "original": "予備人員を編入",
+      "plain": "予備人員を編入"
+    },
+    "battleinfo.title": {
+      "original": "交 戦 両 軍 詳 細",
+      "plain": "交 戦 両 軍 詳 細"
+    },
+    "battleinfo.attacker": {
+      "original": "攻撃側",
+      "plain": "攻撃側"
+    },
+    "battleinfo.defender": {
+      "original": "防御側",
+      "plain": "防御側"
+    },
+    "battleinfo.previous": {
+      "original": "前頁  ←",
+      "plain": "前頁  ←"
+    },
+    "battleinfo.next": {
+      "original": "次頁  →",
+      "plain": "次頁  →"
+    },
+    "battleinfo.back": {
+      "original": "戦場へ  ESC",
+      "plain": "戦場へ  ESC"
+    },
+    "battleinfo.pages": {
+      "original": "%d / %d 頁",
+      "plain": "%d / %d 頁"
+    },
+    "battleinfo.empty": {
+      "original": "このページに参戦部隊なし。",
+      "plain": "このページに参戦部隊なし。"
+    },
+    "battleinfo.total": {
+      "original": "生存 %d 隊・総兵力 %d（原版尺度）",
+      "plain": "生存 %d 隊・総兵力 %d（原版尺度）"
+    },
+    "battleinfo.branch.total": {
+      "original": "%s：%d 隊・兵力 %d",
+      "plain": "%s：%d 隊・兵力 %d"
+    },
+    "battleinfo.branch.1": {
+      "original": "歩兵",
+      "plain": "歩兵"
+    },
+    "battleinfo.branch.6": {
+      "original": "騎兵",
+      "plain": "騎兵"
+    },
+    "battleinfo.branch.5": {
+      "original": "装甲",
+      "plain": "装甲"
+    },
+    "battleinfo.branch.4": {
+      "original": "砲兵",
+      "plain": "砲兵"
+    },
+    "battleinfo.supply": {
+      "original": "出発省：金%d 糧%d 弾%d 油%d",
+      "plain": "出発省：金%d 糧%d 弾%d 油%d"
+    },
+    "battleinfo.offmap": {
+      "original": "未配置",
+      "plain": "未配置"
+    },
+    "battleinfo.unit.force": {
+      "original": "兵力 %d・指揮 %d・戦技 %d",
+      "plain": "兵力 %d・指揮 %d・戦技 %d"
+    },
+    "battleinfo.unit.condition": {
+      "original": "武装 %d・体力 %d・士気 %d",
+      "plain": "武装 %d・体力 %d・士気 %d"
+    },
+    "battleinfo.unit.field": {
+      "original": "経験 %d・機動 %d/%d・位置 %s",
+      "plain": "経験 %d・機動 %d/%d・位置 %s"
+    },
+    "battleinfo.unit.equipped": {
+      "original": "装備 %d/%d 組・不足 %d・火力 %d%%",
+      "plain": "装備 %d/%d 組・不足 %d・火力 %d%%"
+    },
+    "battleinfo.unit.untracked": {
+      "original": "原版では型式別装備を追跡しません。",
+      "plain": "原版では型式別装備を追跡しません。"
+    },
+    "battleinfo.unit.unknown": {
+      "original": "装甲厚・貫徹・実際の車砲数：未提供",
+      "plain": "装甲厚・貫徹・実際の車砲数：未提供"
+    },
+    "battleinfo.supply.0": {
+      "original": "出発省：金 %d・糧 %d",
+      "plain": "出発省：金 %d・糧 %d"
+    },
+    "battleinfo.supply.1": {
+      "original": "弾薬 %d・燃料 %d",
+      "plain": "弾薬 %d・燃料 %d"
+    },
+    "battleinfo.branch.unknown": {
+      "original": "兵種不明",
+      "plain": "兵種不明"
+    },
+    "desk.title": {
+      "original": "大時代の物語",
+      "plain": "大時代の物語"
+    },
+    "desk.mode": {
+      "original": "Modern 操作画面",
+      "plain": "Modern 操作画面"
+    },
+    "desk.headquarters": {
+      "original": "司令部",
+      "plain": "司令部"
+    },
+    "desk.progress": {
+      "original": "進行状況",
+      "plain": "進行状況"
+    },
+    "desk.mouse.help": {
+      "original": "左クリックで選択・決定\nESC／右クリックで戻る\nホイールで地図を拡縮",
+      "plain": "左クリックで選択・決定\nESC／右クリックで戻る\nホイールで地図を拡縮"
+    },
+    "desk.breadcrumb": {
+      "original": "全国指揮 ／",
+      "plain": "全国指揮 ／"
+    },
+    "desk.footer": {
+      "original": "確認後に命令を実行。F6 設定、F10 保存して終了。",
+      "plain": "確認後に命令を実行。F6 設定、F10 保存して終了。"
+    },
+    "desk.selected": {
+      "original": "選択中",
+      "plain": "選択中"
+    },
+    "desk.force": {
+      "original": "省内兵力",
+      "plain": "省内兵力"
+    },
+    "desk.arsenal": {
+      "original": "兵器工場",
+      "plain": "兵器工場"
+    },
+    "desk.coal": {
+      "original": "石炭",
+      "plain": "石炭"
+    },
+    "desk.iron": {
+      "original": "鉄",
+      "plain": "鉄"
+    },
+    "desk.stationed": {
+      "original": "駐在将領",
+      "plain": "駐在将領"
+    },
+    "desk.resource.0": {
+      "original": "軍費",
+      "plain": "軍費"
+    },
+    "desk.resource.1": {
+      "original": "食糧",
+      "plain": "食糧"
+    },
+    "desk.resource.2": {
+      "original": "弾薬",
+      "plain": "弾薬"
+    },
+    "desk.resource.3": {
+      "original": "燃料",
+      "plain": "燃料"
+    },
+    "desk.resource.4": {
+      "original": "兵器工場",
+      "plain": "兵器工場"
+    },
+    "desk.date": {
+      "original": "%d 年 %d 月",
+      "plain": "%d 年 %d 月"
+    },
+    "desk.unit.detail": {
+      "original": "%s · 指揮 %d · 武装 %d",
+      "plain": "%s · 指揮 %d · 武装 %d"
+    },
+    "desk.map": {
+      "original": "全国地図",
+      "plain": "全国地図"
+    },
+    "desk.map.hint": {
+      "original": "省を選択して命令や軍情を確認。",
+      "plain": "省を選択して命令や軍情を確認。"
+    },
+    "desk.map.reset": {
+      "original": "視点を戻す",
+      "plain": "視点を戻す"
+    },
+    "desk.back": {
+      "original": "戻る",
+      "plain": "戻る"
+    },
+    "desk.cancel": {
+      "original": "キャンセル",
+      "plain": "キャンセル"
+    },
+    "desk.confirm": {
+      "original": "実行を確認",
+      "plain": "実行を確認"
+    },
+    "desk.adjust": {
+      "original": "調整に戻る",
+      "plain": "調整に戻る"
+    },
+    "desk.recruit": {
+      "original": "徴兵",
+      "plain": "徴兵"
+    },
+    "desk.transfer": {
+      "original": "部隊移動",
+      "plain": "部隊移動"
+    },
+    "desk.reorganize": {
+      "original": "再編成",
+      "plain": "再編成"
+    },
+    "desk.people": {
+      "original": "人物資料",
+      "plain": "人物資料"
+    },
+    "desk.save": {
+      "original": "進行を保存",
+      "plain": "進行を保存"
+    },
+    "desk.load": {
+      "original": "進行を読込",
+      "plain": "進行を読込"
+    },
+    "desk.commands": {
+      "original": "その他の命令",
+      "plain": "その他の命令"
+    },
+    "desk.commands.hint": {
+      "original": "既存の政略規則で命令を設定・確認。",
+      "plain": "既存の政略規則で命令を設定・確認。"
+    },
+    "desk.form.hint": {
+      "original": "選択、確認して実行。戻るで画面を離れる。",
+      "plain": "選択、確認して実行。戻るで画面を離れる。"
+    },
+    "desk.province": {
+      "original": "所在する省",
+      "plain": "所在する省"
+    },
+    "desk.branch": {
+      "original": "補充兵種",
+      "plain": "補充兵種"
+    },
+    "desk.quantity": {
+      "original": "数量",
+      "plain": "数量"
+    },
+    "desk.limit": {
+      "original": "上限 %s",
+      "plain": "上限 %s"
+    },
+    "desk.maximum": {
+      "original": "最大値",
+      "plain": "最大値"
+    },
+    "desk.cost": {
+      "original": "必要な軍費",
+      "plain": "必要な軍費"
+    },
+    "desk.after.gold": {
+      "original": "実行後の軍費",
+      "plain": "実行後の軍費"
+    },
+    "desk.recruit.review": {
+      "original": "徴兵内容を確認",
+      "plain": "徴兵内容を確認"
+    },
+    "desk.recruit.confirm": {
+      "original": "徴兵を確認",
+      "plain": "徴兵を確認"
+    },
+    "desk.recruit.terms": {
+      "original": "%s · %s\n%s 人を補充、軍費 %s。\n既存の規則で部隊に配分。",
+      "plain": "%s · %s\n%s 人を補充、軍費 %s。\n既存の規則で部隊に配分。"
+    },
+    "desk.destination": {
+      "original": "目的地",
+      "plain": "目的地"
+    },
+    "desk.resources": {
+      "original": "移動・輸送物資",
+      "plain": "移動・輸送物資"
+    },
+    "desk.select.all": {
+      "original": "利用可能な全将領",
+      "plain": "利用可能な全将領"
+    },
+    "desk.general.row": {
+      "original": "%s · %s · 兵力 %s · 体力 %d",
+      "plain": "%s · %s · 兵力 %s · 体力 %d"
+    },
+    "desk.review": {
+      "original": "内容を確認",
+      "plain": "内容を確認"
+    },
+    "desk.review.terms": {
+      "original": "確認後に現在の命令を実行。",
+      "plain": "確認後に現在の命令を実行。"
+    },
+    "desk.transfer.confirm": {
+      "original": "移動を確認",
+      "plain": "移動を確認"
+    },
+    "desk.transfer.terms": {
+      "original": "%s → %s\n%d 人の将領を移動。\n軍費 %d、食糧 %d、弾薬 %d、燃料 %d。",
+      "plain": "%s → %s\n%d 人の将領を移動。\n軍費 %d、食糧 %d、弾薬 %d、燃料 %d。"
+    },
+    "desk.supply": {
+      "original": "補給",
+      "plain": "補給"
+    },
+    "desk.supply.terms": {
+      "original": "%s に補給\n軍費 %d、食糧 %d、弾薬 %d、燃料 %d。",
+      "plain": "%s に補給\n軍費 %d、食糧 %d、弾薬 %d、燃料 %d。"
+    },
+    "desk.reorganize.hint": {
+      "original": "確認で再編を確定。戻るで取消し、開始前に復元。",
+      "plain": "確認で再編を確定。戻るで取消し、開始前に復元。"
+    },
+    "desk.pool": {
+      "original": "未配分兵力 %s",
+      "plain": "未配分兵力 %s"
+    },
+    "desk.assign": {
+      "original": "兵力を配分",
+      "plain": "兵力を配分"
+    },
+    "desk.reorganize.finish": {
+      "original": "再編成を確定",
+      "plain": "再編成を確定"
+    },
+    "desk.reorganize.finish.terms": {
+      "original": "残兵力は配分済み。既存の命令数を使って再編を確定。",
+      "plain": "残兵力は配分済み。既存の命令数を使って再編を確定。"
+    },
+    "desk.reorganize.cancel": {
+      "original": "今回の再編を取り消す？",
+      "plain": "今回の再編を取り消す？"
+    },
+    "desk.reorganize.cancel.terms": {
+      "original": "取消すと開始前の兵力・武装・装備帳に復元。人員や命令数は失わない。",
+      "plain": "取消すと開始前の兵力・武装・装備帳に復元。人員や命令数は失わない。"
+    },
+    "desk.reorganize.cancel.yes": {
+      "original": "取り消して戻る",
+      "plain": "取り消して戻る"
+    },
+    "desk.keep.editing": {
+      "original": "編集を続ける",
+      "plain": "編集を続ける"
+    },
+    "desk.reorganize.legacy": {
+      "original": "旧形式の再編進行",
+      "plain": "旧形式の再編進行"
+    },
+    "desk.reorganize.legacy.terms": {
+      "original": "旧保存には開始前の配置がないため正確な復元は不可。配分を完了するか、保存終了して後で継続。",
+      "plain": "旧保存には開始前の配置がないため正確な復元は不可。配分を完了するか、保存終了して後で継続。"
+    },
+    "desk.save.exit": {
+      "original": "保存して終了",
+      "plain": "保存して終了"
+    },
+    "desk.trade": {
+      "original": "商業活動",
+      "plain": "商業活動"
+    },
+    "desk.import": {
+      "original": "輸入",
+      "plain": "輸入"
+    },
+    "desk.export": {
+      "original": "輸出",
+      "plain": "輸出"
+    },
+    "desk.trade.terms": {
+      "original": "%s、数量 %d、取引軍費 %d。\n選択した輸入・輸出を確認。",
+      "plain": "%s、数量 %d、取引軍費 %d。\n選択した輸入・輸出を確認。"
+    },
+    "desk.people.hint": {
+      "original": "将領を選び能力、兵力、人物伝を確認。",
+      "plain": "将領を選び能力、兵力、人物伝を確認。"
+    },
+    "desk.person.stats": {
+      "original": "%s\n兵力 %d、指揮 %d、戦技 %d\n武装 %d、体力 %d、士気 %d",
+      "plain": "%s\n兵力 %d、指揮 %d、戦技 %d\n武装 %d、体力 %d、士気 %d"
+    },
+    "desk.biography": {
+      "original": "人物伝全文",
+      "plain": "人物伝全文"
+    },
+    "desk.save.confirm": {
+      "original": "進行を保存",
+      "plain": "進行を保存"
+    },
+    "desk.save.terms": {
+      "original": "世界、兵力、装備、戦闘・再編の進行を保存。",
+      "plain": "世界、兵力、装備、戦闘・再編の進行を保存。"
+    },
+    "desk.save.done": {
+      "original": "進行を保存した。",
+      "plain": "進行を保存した。"
+    },
+    "desk.save.failed": {
+      "original": "保存失敗。進行は保持：",
+      "plain": "保存失敗。進行は保持："
+    },
+    "desk.save.unavailable": {
+      "original": "保存元または保存先がない。",
+      "plain": "保存元または保存先がない。"
+    },
+    "desk.load.confirm": {
+      "original": "進行を読込",
+      "plain": "進行を読込"
+    },
+    "desk.load.terms": {
+      "original": "読込は現在の進行を置換。失敗時は現在のゲームを保持。",
+      "plain": "読込は現在の進行を置換。失敗時は現在のゲームを保持。"
+    },
+    "desk.quit.confirm": {
+      "original": "保存してゲームを終了",
+      "plain": "保存してゲームを終了"
+    },
+    "desk.quit.terms": {
+      "original": "保存して終了。保存に失敗したらゲームを継続。",
+      "plain": "保存して終了。保存に失敗したらゲームを継続。"
+    },
+    "desk.train.confirm": {
+      "original": "訓練を確認",
+      "plain": "訓練を確認"
+    },
+    "desk.train.terms": {
+      "original": "既存の規則と命令数で訓練を実行。",
+      "plain": "既存の規則と命令数で訓練を実行。"
+    },
+    "desk.choose": {
+      "original": "項目を選択",
+      "plain": "項目を選択"
+    },
+    "desk.choose.hint": {
+      "original": "名前を選択。ホイールでスクロール、戻るで取消。",
+      "plain": "名前を選択。ホイールでスクロール、戻るで取消。"
+    },
+    "desk.armory": {
+      "original": "軍備局",
+      "plain": "軍備局"
+    },
+    "desk.month": {
+      "original": "今月を終了",
+      "plain": "今月を終了"
+    },
+    "desk.month.terms": {
+      "original": "コンピューター行動と生産を処理し、翌月へ進む。",
+      "plain": "コンピューター行動と生産を処理し、翌月へ進む。"
+    },
+    "desk.battle.resume": {
+      "original": "戦闘を再開",
+      "plain": "戦闘を再開"
+    },
+    "desk.battle.locked": {
+      "original": "戦闘を一時停止中。閲覧・保存は可能。命令前に戦闘を再開。",
+      "plain": "戦闘を一時停止中。閲覧・保存は可能。命令前に戦闘を再開。"
+    },
+    "desk.battle.legacy": {
+      "original": "DT1 直接起動では戦術の全進行を保存できない。戦闘完了が必要。重製保存への DT1 取込は安全な一時停止に対応。",
+      "plain": "DT1 直接起動では戦術の全進行を保存できない。戦闘完了が必要。重製保存への DT1 取込は安全な一時停止に対応。"
+    },
+    "desk.battle.pause": {
+      "original": "全国地図を見る",
+      "plain": "全国地図を見る"
+    },
+    "desk.no.commands": {
+      "original": "今月の命令数を使い切った。",
+      "plain": "今月の命令数を使い切った。"
+    },
+    "toolbar.music.huan-wo-he-shan": {
+      "original": "還我河山",
+      "plain": "還我河山"
+    },
+    "toolbar.music.national-revolution": {
+      "original": "國民革命歌",
+      "plain": "國民革命歌"
+    },
+    "toolbar.music.eight-hundred-heroes": {
+      "original": "歌八百壯士",
+      "plain": "歌八百壯士"
     }
   }
 }

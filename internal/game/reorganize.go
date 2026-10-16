@@ -8,12 +8,67 @@ import "fmt"
 // 都維護一個「目前剩餘兵力」池。玩家選一位將領後，該將現有兵力先進池，
 // 再輸入要配回給他的數量；池歸零才可離開。
 type Reorganization struct {
-	w       *AIWorld
-	branch  uint8
-	targets []GeneralID
-	pool    int
-	arms    int // 步兵／騎兵的武裝總量（兵力 × 武裝程度）。
-	changed bool
+	w                *AIWorld
+	branch           uint8
+	targets          []GeneralID
+	pool             int
+	arms             int // 步兵／騎兵的武裝總量（兵力 × 武裝程度）。
+	changed          bool
+	initial          []ReorganizationMember
+	initialEquipment *Armory
+}
+
+type ReorganizationMember struct {
+	General GeneralID
+	Force   uint16
+	Arms    uint8
+}
+
+// ReorganizationSnapshot 保存已離開將領記錄、仍在整編池中的兵力。
+type ReorganizationSnapshot struct {
+	Branch           uint8
+	Targets          []GeneralID
+	Pool, Arms       int
+	Changed          bool
+	Initial          []ReorganizationMember `json:",omitempty"`
+	InitialEquipment *Armory                `json:",omitempty"`
+}
+
+func (r *Reorganization) Snapshot() *ReorganizationSnapshot {
+	if r == nil {
+		return nil
+	}
+	return &ReorganizationSnapshot{Branch: r.branch, Targets: r.Targets(), Pool: r.pool, Arms: r.arms, Changed: r.changed,
+		Initial: append([]ReorganizationMember(nil), r.initial...), InitialEquipment: r.initialEquipment.Clone()}
+}
+
+func (w *AIWorld) RestoreReorganization(p ProvinceID, state *ReorganizationSnapshot) (*Reorganization, error) {
+	if state == nil {
+		return nil, nil
+	}
+	r, err := w.BeginReorganization(p, state.Branch)
+	if err != nil {
+		return nil, err
+	}
+	if len(r.targets) != len(state.Targets) || state.Pool < 0 || int64(state.Pool) > int64(len(w.Units))*65535 || state.Arms < 0 || int64(state.Arms) > int64(state.Pool)*255+65535 {
+		return nil, fmt.Errorf("game: 整編池或候選不合法")
+	}
+	for i, id := range r.targets {
+		if state.Targets[i] != id {
+			return nil, fmt.Errorf("game: 整編候選與世界不一致")
+		}
+	}
+	r.pool, r.arms, r.changed = state.Pool, state.Arms, state.Changed
+	r.initial = append([]ReorganizationMember(nil), state.Initial...)
+	r.initialEquipment = state.InitialEquipment.Clone()
+	if len(r.initial) > 0 {
+		if _, err := r.rollbackWorld(); err != nil {
+			return nil, err
+		}
+	} else if r.initialEquipment != nil {
+		return nil, fmt.Errorf("game: 整編裝備快照缺少初始人員")
+	}
+	return r, nil
 }
 
 // BeginReorganization 建立某省、某兵種的整編工作階段。
@@ -38,7 +93,75 @@ func (w *AIWorld) BeginReorganization(p ProvinceID, branch uint8) (*Reorganizati
 	if len(r.targets) == 0 {
 		return nil, fmt.Errorf("game: 省 %d 沒有可整編的%s", p, BranchName(branch))
 	}
+	for _, id := range r.targets {
+		i := r.indexOf(id)
+		s := w.Strengths[i]
+		r.initial = append(r.initial, ReorganizationMember{General: id, Force: s.Force, Arms: s.F20})
+	}
+	if w.Opts.Armory != nil {
+		r.initialEquipment = w.Opts.Armory.Clone()
+		if err := r.initialEquipment.Sync(w); err != nil {
+			return nil, err
+		}
+	}
 	return r, nil
+}
+
+// CanCancel is false for historical saves that never recorded a starting state.
+func (r *Reorganization) CanCancel() bool { return r != nil && len(r.initial) > 0 }
+
+func (r *Reorganization) rollbackWorld() (*AIWorld, error) {
+	if !r.CanCancel() || len(r.initial) != len(r.targets) {
+		return nil, fmt.Errorf("game: 沒有完整的整編前配置")
+	}
+	world := *r.w
+	world.Strengths = append([]StrengthInput(nil), r.w.Strengths...)
+	before, now := uint64(0), uint64(r.pool)
+	for j, member := range r.initial {
+		i := r.indexOf(member.General)
+		if member.General != r.targets[j] || i < 0 || i >= len(world.Strengths) || world.Strengths[i].Branch != r.branch {
+			return nil, fmt.Errorf("game: 整編初始候選不一致")
+		}
+		before += uint64(member.Force)
+		now += uint64(world.Strengths[i].Force)
+		world.Strengths[i].Force, world.Strengths[i].F20 = member.Force, member.Arms
+	}
+	if before != now {
+		return nil, fmt.Errorf("game: 整編兵力快照不守恆")
+	}
+	if (r.w.Opts.Armory != nil) != (r.initialEquipment != nil) {
+		return nil, fmt.Errorf("game: 整編缺少裝備快照")
+	}
+	if r.initialEquipment != nil {
+		if err := r.initialEquipment.Validate(&world); err != nil {
+			return nil, err
+		}
+		for i, u := range world.Units {
+			e := r.initialEquipment.Units[u.General]
+			if e == nil || e.Faction != u.Faction || e.Force != world.Strengths[i].Force || e.Branch != world.Strengths[i].Branch {
+				return nil, fmt.Errorf("game: 整編初始裝備與人員不一致")
+			}
+		}
+	}
+	return &world, nil
+}
+
+// Cancel restores a fully validated start state before changing any live data.
+// Equipment bookkeeping caused by saving a draft is rolled back with personnel.
+func (r *Reorganization) Cancel() error {
+	world, err := r.rollbackWorld()
+	if err != nil {
+		return err
+	}
+	for _, member := range r.initial {
+		i := r.indexOf(member.General)
+		r.w.Strengths[i].Force, r.w.Strengths[i].F20 = world.Strengths[i].Force, world.Strengths[i].F20
+	}
+	if r.initialEquipment != nil {
+		*r.w.Opts.Armory = *r.initialEquipment.Clone()
+	}
+	r.pool, r.arms, r.changed = 0, 0, false
+	return nil
 }
 
 // Targets 回傳原版順序的候選將領 ID 副本。

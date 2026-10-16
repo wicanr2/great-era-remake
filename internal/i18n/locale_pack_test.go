@@ -99,16 +99,19 @@ func TestLocalizedWordingUsesAvailableEtenGlyphs(t *testing.T) {
 		}
 		missing := map[rune]bool{}
 		for key, entry := range catalog.Entries {
-			// Command-room and permanent-toolbar labels always use the embedded
+			// Command-room, opening and permanent-toolbar labels use the embedded
 			// Unicode font, including above the original interface. Existing
 			// legacy labels must still be covered by Eten.
-			if (len(key) >= 5 && key[:5] == "room.") || (len(key) >= 8 && key[:8] == "toolbar.") {
+			if (len(key) >= 5 && (key[:5] == "room." || key[:5] == "desk.")) || (len(key) >= 8 && key[:8] == "toolbar.") || (len(key) >= 8 && key[:8] == "opening.") || (len(key) >= 7 && key[:7] == "armory.") || (len(key) >= 11 && key[:11] == "battleinfo.") {
 				font, fontErr := assets.EmbeddedModernFont()
 				if fontErr != nil {
 					t.Fatal(fontErr)
 				}
 				for _, text := range []string{entry.Original, entry.Plain} {
 					for _, r := range text {
+						if r == '\n' || r == '\r' || r == '\t' {
+							continue
+						} // Layout controls do not occupy atlas cells.
 						if _, ok := font.Glyph(r); !ok {
 							t.Fatalf("%s %s 的新介面字型缺字 %q", language, key, r)
 						}

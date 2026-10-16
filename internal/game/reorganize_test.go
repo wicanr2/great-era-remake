@@ -1,6 +1,63 @@
 package game
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
+
+func TestReorganizationCancelRestoresBlendedArmsAndSurvivesSnapshot(t *testing.T) {
+	w := reorganizationWorld(t, BranchInfantry, []uint16{100, 100}, []uint8{20, 80})
+	initial := append([]StrengthInput(nil), w.Strengths...)
+	r, _ := w.BeginReorganization(1, BranchInfantry)
+	if err := r.Assign(1, 0); err != nil {
+		t.Fatal(err)
+	}
+	if err := r.Assign(2, 100); err != nil {
+		t.Fatal(err)
+	}
+	if r.Remaining() != 100 || w.Strengths[1].F20 != 50 {
+		t.Fatal("no actual mixed draft")
+	}
+	restored, err := w.RestoreReorganization(1, r.Snapshot())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := restored.Cancel(); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(w.Strengths, initial) || restored.Remaining() != 0 || restored.Changed() {
+		t.Fatal("cancel did not restore exact force and armed level")
+	}
+}
+
+func TestReorganizationRejectsInvalidRollbackAndPreservesLegacyDraft(t *testing.T) {
+	w := reorganizationWorld(t, BranchInfantry, []uint16{100, 100}, []uint8{20, 80})
+	r, _ := w.BeginReorganization(1, BranchInfantry)
+	if err := r.Assign(1, 0); err != nil {
+		t.Fatal(err)
+	}
+	state := r.Snapshot()
+	state.Initial[0].Force++
+	before := append([]StrengthInput(nil), w.Strengths...)
+	if _, err := w.RestoreReorganization(1, state); err == nil {
+		t.Fatal("invalid rollback accepted")
+	}
+	if !reflect.DeepEqual(before, w.Strengths) {
+		t.Fatal("failed restore changed live data")
+	}
+	state.Initial = nil
+	state.InitialEquipment = nil
+	old, err := w.RestoreReorganization(1, state)
+	if err != nil || old.CanCancel() {
+		t.Fatal(old, err)
+	}
+	if err := old.Cancel(); err == nil {
+		t.Fatal("historical starting state was invented")
+	}
+	if err := old.Assign(2, 200); err != nil || !old.CanFinish() {
+		t.Fatal(err)
+	}
+}
 
 func reorganizationWorld(t *testing.T, branch uint8, forces []uint16, arms []uint8) *AIWorld {
 	t.Helper()

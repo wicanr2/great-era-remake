@@ -458,7 +458,7 @@ func (c *Canvas) DrawPlayerTransferSelection(f CommandFonts, generals *assets.Gl
 		}
 		c.DrawNumber(uint32(i+1), fg, cx+34, cy)
 		if ids[i] > 0 {
-			if err := c.DrawEntry(generals, ids[i]-1, 3, fg, cx+48, cy, true); err != nil {
+			if err := c.DrawGeneralName(generals, ids[i], fg, cx+48, cy); err != nil {
 				return err
 			}
 		}
@@ -593,7 +593,7 @@ func (c *Canvas) DrawGeneralList(f CommandFonts, generals *assets.GlyphFile,
 		}
 		c.DrawNumber(uint32(i+1), fg, cx+22, cy)
 		if id > 0 {
-			if err := c.DrawEntry(generals, id-1, 3, fg, cx+38, cy, true); err != nil {
+			if err := c.DrawGeneralName(generals, id, fg, cx+38, cy); err != nil {
 				return err
 			}
 		}
@@ -711,7 +711,7 @@ func (c *Canvas) DrawProvinceDetail(f CommandFonts, pf PanelFonts, d PanelData,
 		return err
 	}
 	if d.Province.Governor.Valid() {
-		if err := c.DrawEntry(pf.Gen, int(d.Province.Governor)-1, 3, fg, x+130, y+14, true); err != nil {
+		if err := c.DrawGeneralName(pf.Gen, int(d.Province.Governor), fg, x+130, y+14); err != nil {
 			return err
 		}
 	}
@@ -776,7 +776,7 @@ func (c *Canvas) DrawGeneralDetail(f CommandFonts, pf PanelFonts, fan *assets.Gl
 		return err
 	}
 	if id > 0 {
-		if err := c.DrawEntry(pf.Gen, id-1, 3, fg, x+86, y+16, true); err != nil {
+		if err := c.DrawGeneralName(pf.Gen, id, fg, x+86, y+16); err != nil {
 			return err
 		}
 	}
@@ -850,7 +850,7 @@ func (c *Canvas) DrawReorganizationTarget(f CommandFonts, generals *assets.Glyph
 		cy := y + 56 + (i%10)*24
 		c.DrawNumber(uint32(i+1), fg, cx, cy)
 		if id > 0 {
-			if err := c.DrawEntry(generals, id-1, 3, fg, cx+38, cy, true); err != nil {
+			if err := c.DrawGeneralName(generals, id, fg, cx+38, cy); err != nil {
 				return err
 			}
 		}
@@ -867,7 +867,7 @@ func (c *Canvas) DrawReorganizationAmount(f CommandFonts, generals *assets.Glyph
 		return err
 	}
 	if generalID > 0 {
-		if err := c.DrawEntry(generals, generalID-1, 3, fg, x+88, y+28, true); err != nil {
+		if err := c.DrawGeneralName(generals, generalID, fg, x+88, y+28); err != nil {
 			return err
 		}
 	}

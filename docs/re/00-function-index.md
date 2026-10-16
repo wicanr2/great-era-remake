@@ -201,7 +201,9 @@
 | `sub_31174` | `sub_31174` 的資料流逐項吻合：模式 6 先把體力 `>=30` 的候選設為選中，玩家點人 | `docs/playtest/18-player-transfer-selection.md`（另 1 份） | 2 |
 | `sub_31AA6` | 兩者都呼叫共用的 `sub_31AA6` 建立最多 100 筆的將領 ID 陣列。該函式已確認： | `docs/re/33-player-transfer.md`（另 3 份） | 7 |
 | `sub_3231A` | `sub_3231A` 依序問四次：「司令欲調動多少**黃金**／**糧食**／**彈藥**／**燃料**？」 | `docs/mechanics/40-economy.md`（另 3 份） | 6 |
-| `sub_32FB2` | `sub_32FB2`：劇本開場填第 2 欄 | `docs/formats/07-dt1-layout.md`（另 1 份） | 7 |
+| `sub_32EC0` | confirmed：掃描 24 槽，判斷傳入領袖是否已收錄 | [SPEC-54](../spec/54-native-campaign-start.md#新局初始化證據) | 1 |
+| `sub_32F03` | confirmed：依有效省編號收錄首次出現的非零司令 | [SPEC-54](../spec/54-native-campaign-start.md#新局初始化證據) | 1 |
+| `sub_32FB2` | confirmed：初始化勢力領袖、反查及矩陣，不只第 2 欄 | [SPEC-54](../spec/54-native-campaign-start.md#新局初始化證據)及 `docs/formats/07-dt1-layout.md` | 8 |
 | `sub_33888` | `sub_33888` \| 13 \| 司令無省長無數兵工廠數兵力將領數人民忠誠度萬 \| | `docs/re/27-screen-map.md`（另 2 份） | 3 |
 | `sub_34105` | sub_34105(目標省) ; 重畫 | `docs/mechanics/70-ai.md`（另 1 份） | 3 |
 | `sub_3412B` | 指令裡只剩偏移」的相對形式。**慰勞軍民（`sub_3412B`）也會加民心**， | `docs/re/19-loyalty.md`（另 6 份） | 12 |

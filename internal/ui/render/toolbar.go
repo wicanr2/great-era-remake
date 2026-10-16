@@ -12,6 +12,7 @@ import (
 )
 
 type ToolbarView struct {
+	Desk               bool
 	Labels, Values     [l.ToolbarFields]string
 	Options            [l.ToolbarFields][]string
 	Selected           [l.ToolbarFields]int
@@ -47,6 +48,9 @@ func (v ToolbarView) MenuRect() l.Rect {
 	if v.Menu < 0 || v.Menu >= l.ToolbarFields {
 		return l.Rect{}
 	}
+	if v.Desk {
+		return l.DeskToolbarMenu(v.Menu, len(v.Options[v.Menu]), len(v.Notes))
+	}
 	return l.ToolbarMenu(v.Menu, len(v.Options[v.Menu]), len(v.Notes))
 }
 
@@ -54,6 +58,9 @@ func (v ToolbarView) Hit(x, y int) (int, int) {
 	rows := 0
 	if v.Menu >= 0 && v.Menu < l.ToolbarFields {
 		rows = len(v.Options[v.Menu])
+	}
+	if v.Desk {
+		return l.DeskToolbarHit(x, y, v.Menu, rows, len(v.Notes))
 	}
 	return l.ToolbarHit(x, y, v.Menu, rows, len(v.Notes))
 }

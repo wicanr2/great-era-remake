@@ -134,3 +134,50 @@
 推廣片為 93.534 秒、1280×720、30 fps、H.264 與雙聲道 AAC，檔名 `great-era-remake-promo-comparison-v.1.0.2-20261015.mp4`，SHA-256 `c4120355e0c986d2308be0caf9db1278f520f7733797495fe71deaa44cee47d4`。17 章完整解碼、字幕邊界、非靜音、黑幀及八秒以上凍結檢查通過；章節中心抽幀及開發插圖全幅圖已視覺核對。平均音量 -20.5 dB，峰值 -6.3 dB，不宣稱新的實機或人耳驗收。
 
 重製片段由本版公開 Linux 封包重新實錄；DOS 片段沿用 2026-10-15 原程式的 DOSBox-X 輔助原片，原收據及雜湊保留，不冒稱本輪重新錄製或規則對拍。素材、字幕、技術及視覺紀錄集中於版本目錄 `promo/`，原片及工具位於 `workplace/hoi4-ui-prototype/release-v.1.0.2-20261015/`。公開僅五份引擎／驗證附件，發布前後的遠端 SHA-256 均與本機核准內容相符；242 份前版交付及 154 份原始輸入雜湊不變，後者包含 153 份素材及一份來源 ZIP。
+
+## v.1.0.3-20261015 推廣影片重錄
+
+狀態：READY，限已完成的新畫面擷取及視覺剪輯。使用者於正式版發布後要求重錄影片，由 [Issue #18](https://github.com/wicanr2/great-era-remake/issues/18)追蹤。配樂方向隨後由 #19 修正，2026-10-16 試聽已採用，最終混音仍待全曲與正式整合；已發布附件、封包與 tag 保留。
+
+- 使用正式 v.1.0.3 Linux 封包，固定 seed 1，透過正常指令展示常駐工具列、美術／介面獨立切換、地圖縮放拖曳、人物閱讀、HD 開發插圖、存檔與六角戰術操作。
+- 重錄 DOS 原版比較段，使用唯讀輸入副本及既有 DOSBox-X 設定，只作輔助視覺展示。不重新開啟原版規則研究，不宣稱同狀態或 dosgolem 對拍。
+- 本版新錄音樂選單展示 HD／原版／靜音、自動與八首指定曲目，錄製來源仍為已發布 v.1.0.3 的程序原創與重製版 AdLib 播放。這些原片不能冒稱新增原曲重編已接入遊戲。最終新配樂與展示版本依 #19 確認後整合；刻意靜音區間單獨登記。
+- 延續已確認的土褐、鐵黑及砂岩配色。輸出 H.264、1280×720、30 fps、雙聲道 AAC；完整保留 1280×768 原始視窗，不裁掉常駐工具列或底部指令。
+- 驗收來源雜湊、完整解碼、非靜音片段、音量、黑幀、長時間凍結、字幕邊界與逐章抽幀；正常操作片段與原片同時間點核對。含原版畫面及原版模式音訊時只留本機。
+
+原片及腳本入口為 `workplace/hoi4-ui-prototype/promo-v.1.0.3-20261015/README.md`。正式影片、抽幀、來源與影音驗證輸出至 `dist-all/v.1.0.3-20261015/promo/`，既有前版影片保留。
+
+## DOS 原曲管弦重編與新增軍歌試聽
+
+狀態：DRAFT，技術整合契約尚待補齊。使用者於 2026-10-16 採用主題曲與三首軍歌的試聽方向，並授權接入遊戲；全曲、正式接入、循環與新版交付尚未實作。由 [Issue #19](https://github.com/wicanr2/great-era-remake/issues/19)追蹤，入口為 `workplace/hoi4-ui-prototype/original-hd-music-20261015/README.md`。
+
+- 使用者要求 HD 以 DOS 原曲旋律為基礎，編曲更有氣勢，並已原則同意銅管、弦樂、軍鼓及定音鼓的試聽方向。已發布八曲為程序原創，兩者分別標示。
+- 《還我河山》依使用者指定 YouTube AdqAbKvndiw 核對版本，曲譜來源為《歌林》印頁 16、PDF 第 25 頁，標示朱偰詞、陳田鶴曲。移調、配器、和聲與新增聲部屬重編，不能冒稱原錄音或原編制。
+- 《國民革命歌》依曲譜保留旋律。使用者詢問與《兩隻老虎》同調後明確選擇保留，要求軍樂感及另一首壯烈軍歌；已採用《歌八百壯士》的試聽方向，來源為《二期抗戰新歌初集》印頁 84、PDF 第 103 頁。
+- 玩家須能在遊戲內指定曲目，與 HD／原版／靜音模式獨立。既有八曲指定播放已在 v.1.0.3 實作；新增曲目接線及缺檔行為須另完成正式規格，不將試聽頁當作遊戲完成證據。
+- 音符來源、輸入雜湊、MIDI、音色授權、編曲聲部、同步分軌及 Ogg 量測留存本機。FluidR3 GM 3.1 音源 SHA-256 為 `74594e8f4250680adf590507a306655a299935343583256f3b722c48a1bc1cb0`，授權原文隨試聽保存。
+- 試聽片段尚未完成全曲或無縫循環。技術解碼及 MIDI 讀回不取代人耳聽審。原版旋律衍生音樂與未核清散布權的曲譜不提交或公開上傳；已有公開版及標籤保持不變。
+
+## v.1.1.0-20261017 交付與展示
+
+狀態：READY。使用者要求三平台完整版、Release、更新 README 截圖並重錄推廣影片，且明確選擇先完成 SPEC-60 配樂。工作由 [Issue #32](https://github.com/wicanr2/great-era-remake/issues/32)追蹤。
+
+沿用已驗收的 SPEC-54–59 開局、軍備整備、雙方資訊、Modern 與安全返回；完整日軍入侵仍在開發。公開包只含原創八曲，本機完整版提供原曲 HD 與三首軍歌。新版本從乾淨 master 重建，舊 tag、附件與封包不動。
+
+展示圖皆由本版實際程式正常操作擷取，重製版 seed 1。DOS 只裁除模擬器標題列，為 DOSBox-X 輔助視覺展示，使用不同進度，不宣稱 dosgolem 對拍。原片、正常輸入、PNG 與程式雜湊由本機 `workplace/hoi4-ui-prototype/release-v.1.1.0-20261017/source-screenshots.json` 索引。
+
+| 展示 | 圖片 SHA-256 |
+|---|---|
+| [modern-map-v.1.1.0-20261017.png](../../docs/images/modern-map-v.1.1.0-20261017.png) | `7168a5825fdd1500e472a5f283d3b5be275f1e358f4d83dba5866cc9634cc824` |
+| [command-original-v.1.1.0-20261017.png](../../docs/images/command-original-v.1.1.0-20261017.png) | `390ba0e037619431b31760e3e0b4d36e67825e17900b28f5482571d2048bd22b` |
+| [development-v.1.1.0-20261017.png](../../docs/images/development-v.1.1.0-20261017.png) | `e655ed486ad58edf7c3094276db626a803a799df8526f16871f80840e018c781` |
+| [biography-modern-v.1.1.0-20261017.png](../../docs/images/biography-modern-v.1.1.0-20261017.png) | `50d6db36ff8a8a5deb585aeb7a416b3084ea40097bc1ffed8bd9060f057a466a` |
+| [biography-original-v.1.1.0-20261017.png](../../docs/images/biography-original-v.1.1.0-20261017.png) | `62881bea97a249e6019eac6a806a82196de2849e89e5a0d4fefdc741e8150e67` |
+| [battle-hd-v.1.1.0-20261017.png](../../docs/images/battle-hd-v.1.1.0-20261017.png) | `a6d2fee40e4f57bae71f145cd757b09738ebe94f477565450c5820e83fee7555` |
+| [battle-original-v.1.1.0-20261017.png](../../docs/images/battle-original-v.1.1.0-20261017.png) | `3b52d803c24ac486bc90958e24460d4db7cf2dc8beeb61c8c18021cbb7b66ad4` |
+| [battle-information-v.1.1.0-20261017.png](../../docs/images/battle-information-v.1.1.0-20261017.png) | `930ad1377ab165fd14f79af2e0f0c319d881533cc3f68c459506845fee6c732b` |
+| [modern-recruit-v.1.1.0-20261017.png](../../docs/images/modern-recruit-v.1.1.0-20261017.png) | `8161f1705751de02e22b9f53ad8d0813e82ee42fb1811adc3a727a8262e820bb` |
+| [armory-v.1.1.0-20261017.png](../../docs/images/armory-v.1.1.0-20261017.png) | `c3e15461692675ca6f4dead567c0557df1f4f02fd839148c62e386a6cee91772` |
+| [music-toolbar-v.1.1.0-20261017.png](../../docs/images/music-toolbar-v.1.1.0-20261017.png) | `5e793381ab02fba9ff80846449b7a6d8456ee8a773f72e26c3ac13401f7a375c` |
+| [opening-v.1.1.0-20261017.png](../../docs/images/opening-v.1.1.0-20261017.png) | `f30e802164320674f91e7b374e04b140e9d45944c9aca6a8d547305ddc1efee0` |
+| [dos-original-v.1.1.0-20261017.png](../../docs/images/dos-original-v.1.1.0-20261017.png) | `741f58e27761b11e9e9d91252261721b1a9048f0698890fbb1db68d11b09637a` |

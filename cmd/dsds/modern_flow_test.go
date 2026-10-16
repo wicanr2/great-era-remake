@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/wicanr2/great-era-remake/internal/game"
 	"github.com/wicanr2/great-era-remake/internal/i18n"
 	"github.com/wicanr2/great-era-remake/internal/ui/actions"
 	uiaudio "github.com/wicanr2/great-era-remake/internal/ui/audio"
@@ -50,6 +51,76 @@ func TestDevelopmentIllustrationsFollowArtThemeWithoutChangingActions(t *testing
 	if len(other.Illustrations) != 0 {
 		t.Fatal("開發插圖不應影響其他選單")
 	}
+}
+
+func TestConfirmationBackUsesCancelForBothInterfaces(t *testing.T) {
+	a := &app{resolution: uiresolution.ModeHigh, themeMode: uitheme.ModeModern}
+	for _, sc := range []screen{screenTransferConfirm, screenRecruitConfirm, screenTrainConfirm,
+		screenSaveConfirm, screenLoadConfirm, screenQuit, screenReorganizeCancel} {
+		a.screen = sc
+		for _, resolution := range []uiresolution.Mode{uiresolution.ModeHigh, uiresolution.ModeOriginal} {
+			a.resolution = resolution
+			if sc == screenQuit && resolution == uiresolution.ModeOriginal {
+				continue // The legacy quit dialog uses its own Cancel card.
+			}
+			targets := a.navigationTargets()
+			if len(targets) == 0 || targets[0].Action != actions.Cancel {
+				t.Fatalf("screen=%d resolution=%s: back must cancel: %+v", sc, resolution, targets)
+			}
+			r := targets[0].Rect
+			if got := actions.Hit(targets, r.X+r.W/2, r.Y+r.H/2); got != a.pointerBackAction() {
+				t.Fatalf("mouse and Esc/right click differ: %q", got)
+			}
+		}
+	}
+	a.screen, a.resolution = screenRecruitAmount, uiresolution.ModeHigh
+	if got := a.navigationTargets()[0].Action; got != actions.Back {
+		t.Fatalf("ordinary input must return without confirming: %q", got)
+	}
+}
+
+func TestReorganizationCancelCardsUseConfirmAndCancel(t *testing.T) {
+	a := &app{screen: screenReorganizeCancel, wording: loadTraditionalWordingForModernFlowTest(t), wordingMode: i18n.WordingOriginal}
+	targets := a.modernFlowTargets()
+	if len(targets) != 2 || targets[0].Action != actions.Confirm || targets[1].Action != actions.Cancel {
+		t.Fatalf("reorganization dialog has nonfunctional cards: %+v", targets)
+	}
+}
+
+func TestTransferSelectionMouseSubmitRequiresSelectedGeneral(t *testing.T) {
+	a := newArmoryApp(t, 1, 1)
+	a.resolution, a.themeMode = uiresolution.ModeHigh, uitheme.ModeModern
+	a.wording, a.wordingMode = loadTraditionalWordingForModernFlowTest(t), i18n.WordingOriginal
+	targets, err := a.world.PlayerTransferTargets(a.current)
+	if err != nil || len(targets) == 0 {
+		t.Fatal(targets, err)
+	}
+	a.transferSession, err = a.world.BeginPlayerTransfer(a.current, targets[0], game.PlayerTransferPartial, a.generals)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a.screen = screenTransferSelection
+	assertSubmit := func(want bool) {
+		t.Helper()
+		d, err := a.modernFlowData()
+		if err != nil {
+			t.Fatal(err)
+		}
+		nav := a.navigationTargets()
+		if (len(nav) == 2 && nav[1].Action == actions.Submit) != want || (d.Next != "") != want {
+			t.Fatalf("submit=%v: targets=%+v label=%q", want, nav, d.Next)
+		}
+	}
+	assertSubmit(false)
+	id := a.transferSession.Candidates()[0]
+	if err := a.transferSession.Toggle(id); err != nil {
+		t.Fatal(err)
+	}
+	assertSubmit(true)
+	if err := a.transferSession.Toggle(id); err != nil {
+		t.Fatal(err)
+	}
+	assertSubmit(false)
 }
 
 func loadTraditionalWordingForModernFlowTest(t *testing.T) *i18n.WordingCatalog {

@@ -31,7 +31,7 @@ type Preferences struct {
 }
 
 func Default() Preferences {
-	return Preferences{Theme: "modern", Layout: "command", Resolution: "high", Audio: "modern", Scale: 2, MessageTime: 5}
+	return Preferences{Theme: "modern", Layout: "modern", Resolution: "high", Audio: "modern", Scale: 2, MessageTime: 5}
 }
 
 // DefaultPath 遵循 XDG；os.UserConfigDir 在 Linux 會優先使用 XDG_CONFIG_HOME。
@@ -161,7 +161,7 @@ func validateAudio(p Preferences) error {
 		return fmt.Errorf("prefs: 未知音樂模式 %q", p.Audio)
 	}
 	switch p.MusicTrack {
-	case "", "scene", "strategy", "main-theme", "battle-1", "battle-2", "battle-alt", "wall", "final":
+	case "", "scene", "strategy", "main-theme", "battle-1", "battle-2", "battle-alt", "wall", "final", "huan-wo-he-shan", "national-revolution", "eight-hundred-heroes":
 		return nil
 	default:
 		return fmt.Errorf("prefs: 未知曲目 %q", p.MusicTrack)

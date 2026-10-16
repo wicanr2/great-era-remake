@@ -32,6 +32,15 @@ type toolbarState struct {
 func newToolbarState() *toolbarState { return &toolbarState{menu: -1, hover: -1, focus: -1} }
 
 func (a *app) gameSurfaceSize() (int, int) {
+	if a.armorySurface() {
+		return 1280, 720
+	}
+	if a.opening != nil {
+		return 1280, 720
+	}
+	if a.modernDeskVisible() {
+		return l.DeskWidth, l.DeskHeight
+	}
 	if a.commandInterface() {
 		return 1280, 720
 	}
@@ -42,6 +51,9 @@ func (a *app) toolbarHeight() int {
 	if a.toolbar == nil {
 		return 0
 	}
+	if a.modernDeskVisible() {
+		return l.DeskToolbarHeight
+	}
 	w, _ := a.gameSurfaceSize()
 	return l.ToolbarHeightForWidth(w)
 }
@@ -50,7 +62,8 @@ func (a *app) gameMouseEnabled() bool { return !a.preferences.KeyboardOnly }
 
 func (a *app) gameSurfacePosition(x, y int) (int, int, bool) {
 	w, h := a.gameSurfaceSize()
-	return l.ToolbarToGame(x, y, w, h, a.toolbar != nil)
+	y -= a.toolbarHeight()
+	return x, y, x >= 0 && x < w && y >= 0 && y < h
 }
 
 func (a *app) gameCursorPosition() (int, int, bool) {
@@ -60,6 +73,12 @@ func (a *app) gameCursorPosition() (int, int, bool) {
 }
 
 func (a *app) cancelGamePointer() {
+	a.desk.Press, a.desk.Slider = "", ""
+	a.desk.Drag = false
+	a.armoryView.Press = -1
+	if a.battle != nil {
+		a.battle.infoPress = ""
+	}
 	a.pointer.cancel()
 	a.pointerAction = actions.None
 	a.room.Drag = false
@@ -122,6 +141,7 @@ func (a *app) toolbarView() render.ToolbarView {
 		b.view, b.viewKey = v, key
 	}
 	v := b.view
+	v.Desk = a.modernDeskVisible()
 	v.Menu, v.Hover, v.Focus = b.menu, b.hover, b.focus
 	if b.menu >= 0 {
 		v.Notes = b.notes[b.menu]
@@ -158,7 +178,7 @@ func (a *app) applyToolbarOption(field, row int) error {
 		if row == 0 {
 			return a.setInterfacePreference(l.InterfaceOriginal)
 		}
-		return a.setInterfacePreference(l.InterfaceCommand)
+		return a.setInterfacePreference(l.InterfaceModern)
 	case 3:
 		mode, track := a.audioMode, uiaudio.Track(a.preferences.MusicTrack)
 		if row < 3 {
@@ -229,7 +249,7 @@ func (a *app) updateToolbar() bool {
 	x, y = x*l.ToolbarWidth/w, y*l.ToolbarWidth/w
 	v := a.toolbarView()
 	field, row := v.Hit(x, y)
-	insideBar := x >= 0 && x < l.ToolbarWidth && y >= 0 && y < l.ToolbarHeight
+	insideBar := x >= 0 && x < l.ToolbarWidth && y >= 0 && y < a.toolbarHeight()*l.ToolbarWidth/w
 	if b.menu >= 0 && b.focus < 0 {
 		if field == b.menu && row >= 0 {
 			b.hover = row
@@ -324,11 +344,18 @@ func (a *app) drawToolbar(dst *ebiten.Image) {
 		return
 	}
 	v := a.toolbarView()
-	key := fmt.Sprintf("%s/%d/%d/%d", b.viewKey, b.menu, b.hover, b.focus)
+	key := fmt.Sprintf("%s/%d/%d/%d/%t", b.viewKey, b.menu, b.hover, b.focus, v.Desk)
 	if b.frame == nil || b.frameKey != key {
 		height := max(l.ToolbarHeight, v.MenuRect().Bottom())
+		if v.Desk {
+			height = max(l.DeskToolbarHeight, v.MenuRect().Bottom())
+		}
 		c := render.NewCanvas(l.ToolbarWidth, height)
-		c.DrawToolbar(a.eten, v)
+		if v.Desk {
+			c.DrawDeskToolbar(a.eten, v)
+		} else {
+			c.DrawToolbar(a.eten, v)
+		}
 		if b.frame != nil {
 			b.frame.Dispose()
 		}

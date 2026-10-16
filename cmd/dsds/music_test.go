@@ -42,3 +42,60 @@ func TestOldPreferencesDefaultToHDMusic(t *testing.T) {
 		t.Fatalf("prefs=%+v %v", got, err)
 	}
 }
+
+func TestMilitarySelectionSurvivesModeChangesAndRestart(t *testing.T) {
+	a := &app{audio: uiaudio.NewOff(), preferences: userprefs.Default(), prefsPath: filepath.Join(t.TempDir(), "prefs.json")}
+	var played uiaudio.Track
+	a.music.create = func(mode uiaudio.Mode, track uiaudio.Track) (*uiaudio.Manager, error) {
+		played = track
+		return uiaudio.NewOff(), nil
+	}
+	for _, track := range []uiaudio.Track{uiaudio.TrackHuanWoHeShan, uiaudio.TrackNationalRevolution, uiaudio.TrackEightHundredHeroes} {
+		for _, mode := range []uiaudio.Mode{uiaudio.ModeModern, uiaudio.ModeRetro, uiaudio.ModeOff, uiaudio.ModeModern} {
+			if err := a.setMusic(mode, track, true); err != nil {
+				t.Fatal(err)
+			}
+			if mode == uiaudio.ModeRetro && uiaudio.HDOnlyTrack(played) {
+				t.Fatal("retro requested an invented DOS military cue")
+			}
+			if mode == uiaudio.ModeModern && played != track {
+				t.Fatalf("HD restored %s instead of %s", played, track)
+			}
+			p, err := userprefs.Load(a.prefsPath)
+			if err != nil || p.MusicTrack != string(track) || p.Audio != string(mode) {
+				t.Fatalf("restart preference %+v: %v", p, err)
+			}
+		}
+	}
+}
+
+func TestMissingMilitaryTrackDoesNotBecomeProceduralMusic(t *testing.T) {
+	old := uiaudio.NewOff()
+	a := &app{audio: old, audioMode: uiaudio.ModeModern, preferences: userprefs.Default(), prefsPath: filepath.Join(t.TempDir(), "prefs.json")}
+	a.music.dir = "../../assets/music/modern"
+	before := a.preferences
+	for _, track := range []uiaudio.Track{uiaudio.TrackHuanWoHeShan, uiaudio.TrackNationalRevolution, uiaudio.TrackEightHundredHeroes} {
+		if err := a.setMusic(uiaudio.ModeModern, track, true); err == nil {
+			t.Fatal("missing military arrangement accepted")
+		}
+		if a.audio != old || a.preferences != before {
+			t.Fatal("missing track replaced active audio or preferences")
+		}
+	}
+}
+
+func TestUnavailableSavedMilitaryMusicDoesNotBlockStartup(t *testing.T) {
+	a := &app{audio: uiaudio.NewOff(), preferences: userprefs.Default()}
+	a.music.create = func(mode uiaudio.Mode, track uiaudio.Track) (*uiaudio.Manager, error) {
+		if uiaudio.HDOnlyTrack(track) {
+			return nil, errors.New("private arrangement absent")
+		}
+		return uiaudio.NewOff(), nil
+	}
+	if err := a.startMusic(uiaudio.ModeModern, uiaudio.TrackHuanWoHeShan); err != nil {
+		t.Fatal(err)
+	}
+	if a.preferences.MusicTrack != string(uiaudio.TrackHuanWoHeShan) {
+		t.Fatal("startup discarded the saved local choice")
+	}
+}

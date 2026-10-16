@@ -178,9 +178,9 @@ func TestGeneralProvinceAgainstScreen(t *testing.T) {
 
 // TestGeneralProvinceRange 所屬省必須是 0 或 1..39。
 //
-// [雷] 三個 MAN(N).DAT 都是 9,042 B（274 筆的空間），**但實際筆數不同**：
-// 第一期 274 位、第二三期各 106 位，其餘是殘料（`+4` 會讀出 180 這種越界值）。
-// 筆數要以對應的 MAN{N}15 名表為準，不能用「檔案大小 ÷ 33」。
+// 此測試只驗 MAN 名表涵蓋的 274／106／106 筆子集。
+// 第二、三期實際有 191 筆有效記錄，不能用此子集推論其餘全是殘料；
+// 全勢力與敵軍 85 筆的覆蓋另見 scenariochoices_test.go。
 func TestGeneralProvinceRange(t *testing.T) {
 	for _, c := range []struct {
 		dat, names string
@@ -214,7 +214,8 @@ func TestGeneralProvinceRange(t *testing.T) {
 		}
 		t.Logf("%s：名表 %d 位，%d 位無所屬", c.dat, count, unassigned)
 
-		// 殘料驗證：名表之後的空間確實有越界值，證明不能整檔解析。
+		// 名表後還含有效日軍與未用尾段。此處只驗整檔解析會遇到越界值，
+		// 不據此把整段當成殘料。
 		if extra := len(data)/GeneralRecordSize - count; extra > 0 {
 			bad := 0
 			for i := count; i < len(data)/GeneralRecordSize; i++ {

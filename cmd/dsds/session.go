@@ -11,28 +11,38 @@ import (
 // 只有 buildSession 全部成功後才能交給 app 替換；解析中途不得觸碰
 // 目前遊戲的任何指標。這是桌面載入與未來 Android 背景恢復共用的邊界。
 type gameSession struct {
-	tbl               *game.ProvinceTable
-	generals          []game.General
-	factions          game.FactionTable
-	leaders           game.FactionLeaders
-	factionOf         game.FactionOfGeneral
-	warRecords        [game.ProvinceCount + 1]game.WarRecord
-	majorPowerLeaders game.MajorPowerLeaders
-	ledger            game.DiplomacyLedger
-	world             *game.AIWorld
-	cmdBudget         *game.CommandBudget
-	origSave          []byte
-	current           game.ProvinceID
-	playerCommander   game.GeneralID
-	year              uint16
-	month             uint8
+	armory                *game.Armory
+	pendingArmoryView     *armoryViewSnapshot
+	pendingReorganization *game.Reorganization
+	tbl                   *game.ProvinceTable
+	generals              []game.General
+	factions              game.FactionTable
+	leaders               game.FactionLeaders
+	factionOf             game.FactionOfGeneral
+	warRecords            [game.ProvinceCount + 1]game.WarRecord
+	majorPowerLeaders     game.MajorPowerLeaders
+	ledger                game.DiplomacyLedger
+	world                 *game.AIWorld
+	cmdBudget             *game.CommandBudget
+	origSave              []byte
+	current               game.ProvinceID
+	playerCommander       game.GeneralID
+	year                  uint16
+	month                 uint8
+}
+
+// canSaveSession only checks whether a save source and destination are configured.
+// The shared autosave writer validates the snapshot and reports filesystem errors.
+func (a *app) canSaveSession() bool {
+	return a != nil && a.savePath != "" && (a.campaign != nil || a.origSave != nil)
 }
 
 // buildSession 從 .DT1 建立一份完整快照。省份、將領、勢力、領袖、
 // 勢力反查、block10 runtime 清單、外交帳本與停火任一區塊解析失敗，
 // 整份載入就失敗。
 //
-// ⚠️ .DT1 沒有自述期別；呼叫端必須先以 SAVE(N).DT1 的 N 對應 sc.Stage。
+// ⚠️ .DT1 沒有自述期別；呼叫端必須從已知來源或重製保存 metadata 明示 sc.Stage。
+// SAVE(N).DT1 的 N 是存檔槽，兩份附帶存檔都屬北伐，不能用 N 當劇本 ID。
 // 不可單靠內容猜期別，因為第一期的前 191 筆也能被當成第二期解析。
 func buildSession(save []byte, sc game.Scenario, current game.ProvinceID, player game.GeneralID) (*gameSession, error) {
 	if len(save) == 0 {
@@ -137,7 +147,13 @@ func buildSession(save []byte, sc game.Scenario, current game.ProvinceID, player
 
 // applySession 只接受已完整建好的快照，並一次替換所有會交叉引用的核心指標。
 func (a *app) applySession(s *gameSession) {
+	a.desk = modernDeskState{}
+	a.armory = s.armory
+	a.armoryView = defaultArmoryView()
 	a.tbl, a.generals, a.factions, a.world, a.ledger = s.tbl, s.generals, s.factions, s.world, s.ledger
+	if a.world != nil {
+		a.world.Map = a.m
+	}
 	a.factionLeaders, a.factionOf, a.warRecords = s.leaders, s.factionOf, s.warRecords
 	a.majorPowerLeaders = s.majorPowerLeaders
 	a.cmdBudget, a.origSave = s.cmdBudget, s.origSave
@@ -161,10 +177,14 @@ func (a *app) applySession(s *gameSession) {
 	a.ceasefireInput = 0
 	a.autonomyTargets, a.autonomyInput, a.autonomySpent = nil, 0, false
 	a.productionItem, a.productionInput, a.productionSpent = 0, 0, false
+	a.reorganization = s.pendingReorganization
 }
 
 // loadSessionBytes 先在舊 app 之外建完新快照；任何錯誤都不會改變舊狀態。
 func (a *app) loadSessionBytes(save []byte) error {
+	if a.campaign != nil || isCampaignSave(save) {
+		return a.loadCampaign(save)
+	}
 	sc, err := game.ScenarioByStage(uint8(a.stage))
 	if err != nil {
 		return err

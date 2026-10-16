@@ -316,8 +316,8 @@ func ParseMajorPowerLeaders(data []byte) (MajorPowerLeaders, error) {
 // WriteMajorPowerLeaders 把已從原版 runtime 快照載入的區塊 10 寫回副本。
 //
 // 區塊的讀寫位移與 20-byte 形狀已由 `sub_595D4`／`sub_59CBF` confirmed；
-// 但清單何時由劇本流程生成仍未知，因此只提供明確的逐欄 writer，
-// 不把它標成 SaveBlock.Known，也不在沒有 runtime 快照時自行產生名冊。
+// 新局填入時機另由 SPEC-54 的 sub_38839 證據確認。本 writer 沿用匯入
+// 快照，不把單一存檔的殘留當成固定名冊，也不建立未知 DT1 區塊。
 func WriteMajorPowerLeaders(orig []byte, leaders MajorPowerLeaders) ([]byte, error) {
 	blk, err := SaveBlockByGlobal("word_70026")
 	if err != nil {

@@ -42,7 +42,7 @@ test "$(stat -c '%u:%g' "$package_out")" = "$package_user"
 package_stage="$(mktemp -d "$package_out/.dsds-release-stage.XXXXXX")"
 package_stage_name="${package_stage##*/}"
 cleanup_package() {
-  timeout 30 docker run --rm --network none --label dsds.task=release-20261014-r2 --memory 256m --cpus 1 --pids-limit 64 \
+  timeout 30 docker run --rm --network none --label "dsds.task=release-$package_version" --memory 256m --cpus 1 --pids-limit 64 \
     --user "$package_user" -v "$package_out:/output:rw" --entrypoint /bin/bash "$package_go" \
     -c 'case "$1" in .dsds-release-stage.*) rm -rf -- "/output/$1" ;; *) exit 2 ;; esac' bash "$package_stage_name"
 }
@@ -51,7 +51,7 @@ package_go_id="$(docker image inspect "$package_go" --format '{{.Id}}')"
 package_mac_id="$(docker image inspect "$package_mac" --format '{{.Id}}')"
 package_appimage_id="$(docker image inspect "$package_appimage" --format '{{.Id}}')"
 if [ "$package_reuse_full" = 1 ]; then
-timeout 90 docker run --rm --network none --label dsds.task=release-20261014-r2 --memory 2g --cpus 2 --pids-limit 192 \
+timeout 90 docker run --rm --network none --label "dsds.task=release-$package_version" --memory 2g --cpus 2 --pids-limit 192 \
   --user "$package_user" \
   -v "$package_root:/work:ro" -v "$package_project:/src:ro" -v "$package_stage:/stage:rw" \
   -v "$package_out:/output:ro" -w /work -e DSDS_PACKAGE_FULL_LOCAL=0 \
@@ -63,7 +63,7 @@ timeout 90 docker run --rm --network none --label dsds.task=release-20261014-r2 
     python3 tools/release/reuse_build.py "$1"
   ' bash "$package_version"
 else
-timeout 360 docker run --rm --network none --label dsds.task=release-20261014-r2 --memory 4g --cpus 4 --pids-limit 512 \
+timeout 360 docker run --rm --network none --label "dsds.task=release-$package_version" --memory 4g --cpus 4 --pids-limit 512 \
   --user "$package_user" -v "$package_root:/work:ro" -v "$package_project:/src:ro" -v "$package_modules:/go/pkg:ro" \
   -v "$package_project/workplace/orig:/work/workplace/orig:ro" -v "$package_project/workplace/eten:/work/workplace/eten:ro" \
   -v "$package_stage:/stage:rw" -v "$package_cache:/go-build:rw" -w "$package_source" -e GOCACHE=/go-build -e GOPROXY=off \
@@ -94,7 +94,7 @@ timeout 360 docker run --rm --network none --label dsds.task=release-20261014-r2
       -ldflags="-s -w -X main.buildVersion=$DSDS_VERSION" -o /stage/build/dsds.exe ./cmd/dsds
     cat /stage/full-tests.log
   '
-timeout 360 docker run --rm --network none --label dsds.task=release-20261014-r2 --memory 3g --cpus 3 --pids-limit 512 \
+timeout 360 docker run --rm --network none --label "dsds.task=release-$package_version" --memory 3g --cpus 3 --pids-limit 512 \
   --user "$package_user" -v "$package_root:/work:ro" -v "$package_modules:/go/pkg:ro" \
   -v "$package_stage:/stage:rw" -v "$package_cache:/go-build:rw" -w /work -e GOCACHE=/go-build -e GOPROXY=off \
   -e DSDS_VERSION="$package_version" -e MACOSX_DEPLOYMENT_TARGET=12.0 \
@@ -112,14 +112,14 @@ timeout 360 docker run --rm --network none --label dsds.task=release-20261014-r2
     file /stage/build/dsds-macos
   '
 fi
-timeout 60 docker run --rm --network none --label dsds.task=release-20261014-r2 --memory 2g --cpus 2 --pids-limit 128 \
+timeout 60 docker run --rm --network none --label "dsds.task=release-$package_version" --memory 2g --cpus 2 --pids-limit 128 \
   --user "$package_user" -v "$package_root:/work:ro" -v "$package_stage:/stage:rw" \
   -v "$package_modules:/go/pkg:ro" \
   -v "$package_out:/output:rw" -w /work -e DSDS_PACKAGE_FULL_LOCAL="$package_full" \
   -e DSDS_PACKAGE_RELEASE_CHANNEL="$package_channel" --entrypoint python3 "$package_go" \
   tools/release/package.py assemble "$package_version"
 if [ "$package_kind" = full-local ]; then
-timeout 90 docker run --rm --network none --label dsds.task=release-20261014-r2 --memory 2g --cpus 2 --pids-limit 128 \
+timeout 90 docker run --rm --network none --label "dsds.task=release-$package_version" --memory 2g --cpus 2 --pids-limit 128 \
   --user "$package_user" -v "$package_stage:/stage:rw" -v "$package_out:/output:rw" \
   -e DSDS_VERSION="$package_version" -e DSDS_PACKAGE_KIND="$package_kind" -e DSDS_PACKAGE_SUFFIX="$package_suffix" --entrypoint /bin/bash "$package_appimage" -c '
     set -euo pipefail
@@ -137,7 +137,7 @@ timeout 90 docker run --rm --network none --label dsds.task=release-20261014-r2 
     test -x squashfs-root/usr/bin/dsds
   '
 fi
-timeout 60 docker run --rm --network none --label dsds.task=release-20261014-r2 --memory 2g --cpus 2 --pids-limit 128 \
+timeout 60 docker run --rm --network none --label "dsds.task=release-$package_version" --memory 2g --cpus 2 --pids-limit 128 \
   --user "$package_user" -v "$package_root:/work:ro" -v "$package_stage:/stage:rw" \
   -v "$package_project:/src:ro" -v "$package_out:/output:rw" -w /work -e DSDS_PACKAGE_FULL_LOCAL="$package_full" \
   -e DSDS_REFERENCE_VERSION="$package_reference" \

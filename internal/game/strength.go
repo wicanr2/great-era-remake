@@ -81,6 +81,9 @@ const (
 
 // StrengthOpts 是公式裡幾個由全域狀態決定的開關。
 type StrengthOpts struct {
+	// Armory is present only in the explicitly selected remake expansion.
+	Armory             *Armory
+	ArmoryRoughTerrain bool
 	// FactionBonus 是 `byte_6FFCA & 0x70`。
 	FactionBonus uint8
 	// MajorPower 回報某個勢力領袖是不是十大勢力之一（`sub_5C7FE`，
@@ -175,6 +178,9 @@ func Strength(in StrengthInput, opt StrengthOpts) int {
 	// 兵種 5 最後再翻倍——它的基礎權重已經是最高的 100。
 	if in.Branch == 5 {
 		s *= 2
+	}
+	if opt.Armory != nil {
+		s = int((uint64(s)*uint64(opt.Armory.Power(in.General, in.Branch, in.Force, opt.ArmoryRoughTerrain)) + 50) / 100)
 	}
 	return s
 }

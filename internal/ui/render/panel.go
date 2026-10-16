@@ -132,7 +132,7 @@ func (c *Canvas) DrawStrategyPanel(d PanelData, f PanelFonts) error {
 			return err
 		}
 		if row.gen.Valid() {
-			if err := c.DrawEntry(f.Gen, int(row.gen)-1, 3, panelFG, panelLabel+72, y, true); err != nil {
+			if err := c.DrawGeneralName(f.Gen, int(row.gen), panelFG, panelLabel+72, y); err != nil {
 				return err
 			}
 		}

@@ -25,7 +25,8 @@ type DT1State struct {
 // ParseDT1 以該期實際將領數解析 .DT1 的完整已知快照。
 //
 // generalCount 必須是劇本明示的將領筆數，不可從姓名表猜測；這保留
-// SAVE(1).DT1 後 85 筆無姓名部隊仍屬有效記錄的既有結論。
+// 第二、三期第 107..191 筆仍是有效記錄；它們不在 MAN 名表，
+// 另有日本姓名表，不能因姓名映射未接入就丟棄記錄。
 func ParseDT1(data []byte, generalCount int) (DT1State, error) {
 	var state DT1State
 	if len(data) < SaveFileSize {

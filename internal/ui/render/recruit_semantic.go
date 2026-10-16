@@ -50,14 +50,14 @@ func (c *Canvas) DrawRecruitSemantic(fonts *assets.EtenFonts, generals *assets.G
 			cx, cy := x+30+(i/10)*205, y+56+(i%10)*24
 			c.DrawNumber(uint32(i+1), fg, cx, cy)
 			if id > 0 {
-				_ = c.DrawEntry(generals, id-1, 3, fg, cx+38, cy, true)
+				_ = c.DrawGeneralName(generals, id, fg, cx+38, cy)
 			}
 		}
 		c.DrawNumber(amount, fg, x+w-24, y+18)
 	case "reorganize-amount":
 		draw(labels.General, x+24, y+26)
 		if generalID > 0 {
-			_ = c.DrawEntry(generals, generalID-1, 3, fg, x+112, y+26, true)
+			_ = c.DrawGeneralName(generals, generalID, fg, x+112, y+26)
 		}
 		draw(labels.Amount+labels.Force, x+24, y+72)
 		draw(labels.Remaining, x+24, y+118)

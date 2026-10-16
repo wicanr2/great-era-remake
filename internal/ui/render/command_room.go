@@ -246,6 +246,9 @@ func (c *Canvas) DrawCommandRoom(d CommandRoomData) error {
 		}
 		roomLabel(c, d.Fonts, v, l.Rect{r.X + 40, r.Y, r.W - 46, r.H}, fg, 18, false)
 	}
+	if d.Labels["armory"] != "" {
+		roomButton(c, d.Fonts, d.Labels["armory"], l.RoomArmory, s, false)
+	}
 	roomRect(c, l.CommandRoom.Sidebar, s.Paper, s.Muted)
 	roomRivets(c, l.CommandRoom.Sidebar, s)
 	roomRect(c, l.Rect{14, 112, 342, 58}, s.Panel, s.Muted)

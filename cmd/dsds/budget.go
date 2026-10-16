@@ -20,6 +20,9 @@ import (
 
 // withBudget 包一個政略指令：先檢查指令數，做成事才扣。
 func (a *app) withBudget(p game.ProvinceID, run func() string) string {
+	if !a.ownsProvince(p) {
+		return a.openingText("enemy.readonly")
+	}
 	if a.cmdBudget.Remaining(p) <= 0 {
 		return fmt.Sprintf("%s 這個月的指令數用完了", a.provinceName(p))
 	}

@@ -318,13 +318,37 @@ func (a *app) finishReorganization() {
 // 玩家側已接上每省預算與面板剩餘值；目前仍待逐一確認的是哪些指令會消耗額度。
 // 電腦側也已照命令數公式跑（`cmd/dsds/computer.go`）。
 func (a *app) endTurn() string {
-	// 電腦回合：決策鏈 A（`docs/re/28`）。玩家勢力是目前所在省的司令。
-	var ai string
-	if prov, err := a.tbl.At(a.current); err == nil && prov.Commander != 0 {
-		ai = describeComputerTurn(a.runComputerTurn(prov.Commander))
+	if a.activeBattle() {
+		return a.deskText("battle.locked")
 	}
+	if a.armory != nil {
+		if err := a.armory.Sync(a.world); err != nil {
+			return err.Error()
+		}
+		a.armory.PlanAI(a.world, a.playerCommander)
+	}
+	// 新戰役固定玩家領袖；查看敵省不交換玩家與 AI 身份。
+	var ai string
+	player := a.playerCommander
+	if player == 0 && a.campaign == nil {
+		if prov, err := a.tbl.At(a.current); err == nil {
+			player = prov.Commander
+		}
+	}
+	if player != 0 {
+		ai = describeComputerTurn(a.runComputerTurn(player))
+	}
+	a.syncExpansionGenerals()
 
 	a.month++
+	if a.armory != nil {
+		if err := a.armory.Sync(a.world); err != nil {
+			return err.Error()
+		}
+		if err := a.armory.SettleMonth(a.world, a.armory.LastMonth+1); err != nil {
+			return err.Error()
+		}
+	}
 	if a.month <= 12 {
 		// 換月：指令數重新算（`docs/re/13` §2）。
 		a.cmdBudget.Reset()
@@ -340,7 +364,11 @@ func (a *app) endTurn() string {
 
 	a.month = 1
 	a.cmdBudget.Reset()
-	st := &game.GameState{Stage: 1, Year: uint8(a.year), Month: a.month,
+	stage := uint8(a.stage)
+	if stage == 0 {
+		stage = 1
+	}
+	st := &game.GameState{Stage: stage, Year: uint8(a.year), Month: a.month,
 		MajorPower: a.world.Opts.MajorPower}
 	rep := a.world.AdvanceYear(st, a.generals, 0, nil)
 	a.year = uint16(st.Year)

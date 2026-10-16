@@ -53,6 +53,6 @@ func startupPathsFor(exe, cwd, platform string, env func(string) string, home fu
 			base = filepath.Join(h, "AppData/Local")
 		}
 	}
-	p.save = filepath.Join(base, "GreatEraRemake/Saves/SAVE(1).DT1")
+	p.save = filepath.Join(base, "GreatEraRemake/Saves/campaign.gesave")
 	return p
 }

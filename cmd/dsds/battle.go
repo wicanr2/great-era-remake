@@ -104,6 +104,7 @@ var (
 
 // battleState 是戰鬥畫面的介面狀態。規則狀態在 `sim` 裡。
 type battleState struct {
+	paused     bool
 	sim        *game.BattleSim
 	sel        int    // 目前選中第幾個攻方單位
 	log        string // 最近一次動作的結果，畫在面板上
@@ -112,6 +113,8 @@ type battleState struct {
 	settled    bool                  // 世界層已套用結算；避免 F10／重複寫回重跑
 	forceDirty bool                  // 戰鬥副本的已確認兵力尚未同步回將領表
 	mode       battleMode            // 原版五項選單的目前輸入層
+	infoPage   int
+	infoPress  string
 	// retreatInput／retreatTargets 服務原版樣本與省份表 fallback；來源標籤
 	// 保留在 game.RetreatCandidates，不把 fallback 冒充跨戰鬥 oracle。
 	retreatInput   uint32
@@ -284,6 +287,10 @@ func retreatDestination(input uint32, targets []game.ProvinceID) (game.ProvinceI
 // `sub_4166E` 掃 NWMAP `0x4000` 旗標候選；玩家手動部署仍是另一條
 // `sub_42566` 互動路徑。
 func (a *app) startBattle(at, from game.ProvinceID) error {
+	if a.activeBattle() {
+		return fmt.Errorf("%s", a.deskText("battle.locked"))
+	}
+	a.syncExpansionGenerals()
 	fromProv, err := a.tbl.At(from)
 	if err != nil {
 		return err
@@ -326,7 +333,14 @@ func (a *app) startBattle(at, from game.ProvinceID) error {
 		return fmt.Errorf("省 %d 的 NWMAP 0x4000 候選放不下守軍", at)
 	}
 
-	sim, err := game.NewBattleSim(a.m, at, from, atk, def, game.StrengthOpts{Stage: 1})
+	opt := game.StrengthOpts{Stage: 1}
+	if a.armory != nil {
+		if err := a.armory.Sync(a.world); err != nil {
+			return err
+		}
+		opt = a.world.Opts
+	}
+	sim, err := game.NewBattleSim(a.m, at, from, atk, def, opt)
 	if err != nil {
 		return err
 	}
@@ -367,6 +381,7 @@ func (a *app) startBattle(at, from game.ProvinceID) error {
 	atProv.Flags |= game.ProvinceFlagInBattle
 	a.battle = b
 	a.screen, a.dirty = screenBattle, true
+	a.applyWindowSize()
 	return nil
 }
 
@@ -422,6 +437,10 @@ func (a *app) updateBattle() error {
 		a.screen, a.dirty = screenMap, true
 		return nil
 	}
+	if b.mode == battleModeInspect {
+		a.updateBattleInformation()
+		return nil
+	}
 	if err := a.syncBattleForces(); err != nil {
 		return err
 	}
@@ -432,8 +451,7 @@ func (a *app) updateBattle() error {
 			a.dirty = true
 			return nil
 		}
-		a.battle = nil
-		a.screen, a.dirty = screenMap, true
+		a.pauseBattle()
 		return nil
 	}
 	if b.finished {
@@ -448,6 +466,10 @@ func (a *app) updateBattle() error {
 			return false
 		}
 		b.mode = mode
+		if mode == battleModeInspect {
+			b.infoPage = 0
+			b.infoPress = ""
+		}
 		b.retreatInput = 0
 		b.log = battleModeMessage(mode)
 		a.dirty = true
@@ -559,14 +581,6 @@ func (a *app) updateBattle() error {
 		a.dirty = true
 		return nil
 	}
-	if b.mode == battleModeInspect {
-		b.log = fmt.Sprintf("查閱：將領 %d｜兵力 %d｜格 %d｜命令 %d",
-			u.General, u.Force(), u.Cell, u.Command)
-		fmt.Fprintln(os.Stderr, "[battle]", b.log)
-		b.mode = battleModeCommand
-		a.dirty = true
-		return nil
-	}
 
 	// Enter：remake 的直接攻擊捷徑，選取目前目標表的第一個目標；兵種 4
 	// 在沒有相鄰目標時也可能選到已證實的遠程候選。原版主選單的「攻擊」
@@ -651,6 +665,33 @@ func (a *app) updateBattle() error {
 		a.dirty = true
 	}
 	return nil
+}
+
+func (a *app) activeBattle() bool { return a != nil && a.battle != nil && !a.battle.finished }
+func (a *app) pauseBattle() {
+	if !a.activeBattle() {
+		a.battle = nil
+		a.screen, a.dirty = screenMap, true
+		a.applyWindowSize()
+		return
+	}
+	if a.campaign == nil {
+		a.report(a.deskText("battle.legacy"))
+		return
+	}
+	a.battle.paused = true
+	a.screen, a.dirty = screenMap, true
+	a.desk.Commands = false
+	a.desk.Scroll = 0
+	a.applyWindowSize()
+}
+func (a *app) resumeBattle() {
+	if a.battle != nil {
+		a.battle.paused = false
+		a.screen, a.dirty = screenBattle, true
+		a.desk.Press = ""
+		a.applyWindowSize()
+	}
 }
 
 // syncBattleForces 把戰場副本的已確認兵力同步到玩家世界。
@@ -948,8 +989,16 @@ func (a *app) drawBattle(c *render.Canvas) error {
 	if b == nil {
 		return nil
 	}
+	if b.mode == battleModeInspect {
+		c.DrawBattleInformation(a.battleInformationData())
+		return nil
+	}
 	if a.highModernBattle() {
-		return a.drawModernBattle(c)
+		if err := a.drawModernBattle(c); err != nil {
+			return err
+		}
+		c.DrawBattleReturn(a.eten, true, a.deskText("back"))
+		return nil
 	}
 	bf, err := a.m.Battlefield(b.sim.At)
 	if err != nil {
@@ -1002,6 +1051,9 @@ func (a *app) drawBattle(c *render.Canvas) error {
 	// 能承載自由組合訊息時仍保留 stderr 診斷，不讓訊息列阻斷規則。
 	if a.eten != nil && b.log != "" {
 		c.DrawSemanticText(a.eten, b.log, a.uiStyle().Ink, render.BattlePanelX+8, 306)
+	}
+	if a.eten != nil {
+		c.DrawBattleReturn(a.eten, false, a.deskText("back"))
 	}
 	return nil
 }

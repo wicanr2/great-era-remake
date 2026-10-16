@@ -100,6 +100,19 @@ func (a *app) modernFlowData() (render.ModernFlowSurfaceData, error) {
 	}
 
 	switch a.screen {
+	case screenOtherOptions:
+		d.Title = text("other.title")
+		for _, key := range []string{"other.save", "other.load", "other.sound", "other.command_art", "other.music", "other.message_time", "other.spectate", "other.quit", "other.display", "other.resolution"} {
+			d.Options = append(d.Options, text(key))
+		}
+	case screenDisplayOptions:
+		d.Title = text("settings.title")
+		for _, key := range []string{"settings.wording.original", "settings.wording.plain", "settings.theme.retro", "settings.theme.modern"} {
+			d.Options = append(d.Options, text(key))
+		}
+	case screenResolutionOptions:
+		d.Title = text("settings.resolution")
+		d.Options = []string{text("settings.resolution.original"), text("settings.resolution.high")}
 	case screenDevelop:
 		d.Title, d.Options = commandTitle(strategyCommandDevelop), []string{text("develop.reclaim"), text("develop.arsenal"), text("develop.mine")}
 		if a.themeMode == uitheme.ModeModern {
@@ -119,6 +132,9 @@ func (a *app) modernFlowData() (render.ModernFlowSurfaceData, error) {
 				end = len(candidates)
 			}
 			d.Options = generalOptions(candidates[start:end])
+			if len(a.transferSession.Selected()) > 0 {
+				d.Next = text("common.confirm")
+			}
 		}
 	case screenTransferAmount:
 		keys := []string{"transfer.resource.gold", "transfer.resource.food", "transfer.resource.ammo", "transfer.resource.fuel"}
@@ -166,6 +182,12 @@ func (a *app) modernFlowData() (render.ModernFlowSurfaceData, error) {
 		input(commandTitle(strategyCommandRecruit), text("recruit.amount"), strconv.Itoa(int(a.recruitAmount)))
 	case screenRecruitConfirm:
 		confirm(commandTitle(strategyCommandRecruit), text("recruit.confirm"))
+	case screenReorganizeCancel:
+		key := "desk.reorganize.cancel.terms"
+		if a.reorganization != nil && !a.reorganization.CanCancel() {
+			key = "desk.reorganize.legacy.terms"
+		}
+		confirm(commandTitle(strategyCommandRecruit), text(key))
 	case screenReorganizeTarget:
 		d.Title, d.Prompt = commandTitle(strategyCommandRecruit), text("recruit.general")
 		if a.reorganization != nil {
@@ -348,7 +370,7 @@ func (a *app) modernFlowTargets() []actions.Target {
 		return out
 	}
 	if a.screen == screenTransferConfirm || a.screen == screenRecruitConfirm || a.screen == screenTrainConfirm ||
-		a.screen == screenSaveConfirm || a.screen == screenLoadConfirm || a.screen == screenQuit {
+		a.screen == screenSaveConfirm || a.screen == screenLoadConfirm || a.screen == screenQuit || a.screen == screenReorganizeCancel {
 		if len(l.Cards) < 2 {
 			return nil
 		}

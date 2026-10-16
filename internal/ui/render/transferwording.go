@@ -61,7 +61,7 @@ func (c *Canvas) DrawPlainTransferSelection(fonts *assets.EtenFonts, generals *a
 		}
 		c.DrawNumber(uint32(i+1), fg, cx+34, cy)
 		if ids[i] > 0 {
-			if err := c.DrawEntry(generals, ids[i]-1, 3, fg, cx+48, cy, true); err != nil {
+			if err := c.DrawGeneralName(generals, ids[i], fg, cx+48, cy); err != nil {
 				return nil, err
 			}
 		}

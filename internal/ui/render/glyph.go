@@ -87,3 +87,15 @@ func (c *Canvas) DrawEntry(f *assets.GlyphFile, k, slotWidth int, fg assets.RGB,
 	c.DrawGlyphs(f.Glyphs[start:start+slotWidth], fg, x, y, bold)
 	return nil
 }
+
+// DrawGeneralName 缺少已確認的姓名字模時顯示編號，不猜接另一份名表。
+func (c *Canvas) DrawGeneralName(f *assets.GlyphFile, id int, fg assets.RGB, x, y int) error {
+	if id <= 0 {
+		return nil
+	}
+	if f != nil && id*3 <= len(f.Glyphs) {
+		return c.DrawEntry(f, id-1, 3, fg, x, y, true)
+	}
+	c.DrawNumber(uint32(id), fg, x+45, y)
+	return nil
+}

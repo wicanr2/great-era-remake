@@ -1009,8 +1009,8 @@
       "plain": "原版介面"
     },
     "toolbar.interface.command": {
-      "original": "指揮介面",
-      "plain": "指揮介面"
+      "original": "Modern",
+      "plain": "Modern"
     },
     "toolbar.ai.current.long": {
       "original": "現有重製 AI",
@@ -1097,12 +1097,1120 @@
       "plain": "終幕"
     },
     "toolbar.music.note": {
-      "original": "音樂模式與選曲分別勾選，立即生效並記住設定。",
-      "plain": "音樂模式與選曲分別勾選，立即生效並記住設定。"
+      "original": "立即切換並記住選曲。軍歌限本機 HD；原版模式播情境曲，回 HD 恢復。",
+      "plain": "立即切換並記住選曲。軍歌限本機 HD；原版模式播情境曲，回 HD 恢復。"
     },
     "toolbar.music.unavailable": {
-      "original": "未提供這首原版 MUS/TIM，保留目前音樂。",
-      "plain": "未提供這首原版 MUS/TIM，保留目前音樂。"
+      "original": "缺少這首曲目的音源，保留目前音樂。",
+      "plain": "缺少這首曲目的音源，保留目前音樂。"
+    },
+    "opening.eyebrow": {
+      "original": "戰役準備",
+      "plain": "戰役準備"
+    },
+    "opening.title": {
+      "original": "選擇你的時代與勢力",
+      "plain": "選擇你的時代與勢力"
+    },
+    "opening.intro": {
+      "original": "選擇劇本與勢力，從原始劇本建立新局。方向鍵選勢力，1–3 選劇本，M 切模式，Enter 開始。",
+      "plain": "選擇劇本與勢力，從原始劇本建立新局。方向鍵選勢力，1–3 選劇本，M 切模式，Enter 開始。"
+    },
+    "opening.original": {
+      "original": "原版戰役",
+      "plain": "原版戰役"
+    },
+    "opening.original.hint": {
+      "original": "沿用原版規則",
+      "plain": "沿用原版規則"
+    },
+    "opening.resistance": {
+      "original": "統一後抗日",
+      "plain": "統一後抗日"
+    },
+    "opening.resistance.hint": {
+      "original": "統一後立即觸發東北入侵",
+      "plain": "統一後立即觸發東北入侵"
+    },
+    "opening.factions": {
+      "original": "可選勢力 · %d",
+      "plain": "可選勢力 · %d"
+    },
+    "opening.source": {
+      "original": "從原始劇本建立新局，保留所有有領地勢力。",
+      "plain": "從原始劇本建立新局，保留所有有領地勢力。"
+    },
+    "opening.provinces": {
+      "original": "控制省份",
+      "plain": "控制省份"
+    },
+    "opening.generals": {
+      "original": "有效將領",
+      "plain": "有效將領"
+    },
+    "opening.force": {
+      "original": "兵力／萬",
+      "plain": "兵力／萬"
+    },
+    "opening.start": {
+      "original": "開始戰役",
+      "plain": "開始戰役"
+    },
+    "opening.save.hint": {
+      "original": "單一 .gesave 保存進度；美術、介面與音樂可在遊戲中切換。",
+      "plain": "單一 .gesave 保存進度；美術、介面與音樂可在遊戲中切換。"
+    },
+    "opening.continue": {
+      "original": "繼續進度 [C]",
+      "plain": "繼續進度 [C]"
+    },
+    "opening.quit": {
+      "original": "離開遊戲？ Y 確認 / N 返回",
+      "plain": "離開遊戲？ Y 確認 / N 返回"
+    },
+    "opening.stage.1": {
+      "original": "北伐時期",
+      "plain": "北伐時期"
+    },
+    "opening.stage.2": {
+      "original": "抗戰前期",
+      "plain": "抗戰前期"
+    },
+    "opening.stage.3": {
+      "original": "抗日後期",
+      "plain": "抗日後期"
+    },
+    "opening.date": {
+      "original": "%d 年 %d 月",
+      "plain": "%d 年 %d 月"
+    },
+    "opening.japan": {
+      "original": "日軍勢力",
+      "plain": "日軍勢力"
+    },
+    "opening.leader": {
+      "original": "領袖 %d",
+      "plain": "領袖 %d"
+    },
+    "opening.original.only": {
+      "original": "限原版戰役",
+      "plain": "限原版戰役"
+    },
+    "opening.summary": {
+      "original": "%d 位將領 · %d 省",
+      "plain": "%d 位將領 · %d 省"
+    },
+    "opening.home": {
+      "original": "初始所在省：%s",
+      "plain": "初始所在省：%s"
+    },
+    "opening.original.note": {
+      "original": "原版規則與擴充規則分開。日軍可選原版戰役。",
+      "plain": "原版規則與擴充規則分開。日軍可選原版戰役。"
+    },
+    "opening.resistance.pending": {
+      "original": "軍備整備可試玩；日軍入侵仍在開發。F7 開啟軍備局。",
+      "plain": "軍備整備可試玩；日軍入侵仍在開發。F7 開啟軍備局。"
+    },
+    "opening.japan.note": {
+      "original": "日軍可玩原版戰役；抗日擴充供中國勢力遊玩。",
+      "plain": "日軍可玩原版戰役；抗日擴充供中國勢力遊玩。"
+    },
+    "opening.enemy.readonly": {
+      "original": "這是其他勢力的省份，只能查閱。",
+      "plain": "這是其他勢力的省份，只能查閱。"
+    },
+    "armory.kicker": {
+      "original": "軍工與整備",
+      "plain": "軍工與整備"
+    },
+    "armory.title": {
+      "original": "軍 備 局",
+      "plain": "軍 備 局"
+    },
+    "armory.intro": {
+      "original": "研究設計，分配產能，再把裝備送到部隊。",
+      "plain": "研究設計，分配產能，再把裝備送到部隊。"
+    },
+    "armory.mode": {
+      "original": "抗日擴充・整備試玩",
+      "plain": "抗日擴充・整備試玩"
+    },
+    "armory.factories": {
+      "original": "軍工廠 %d / %d",
+      "plain": "軍工廠 %d / %d"
+    },
+    "armory.categories": {
+      "original": "裝備分類",
+      "plain": "裝備分類"
+    },
+    "armory.sidebar.note": {
+      "original": "研發完成不會自動換裝。\n\n山炮、野戰火砲與戰防炮各有用途。",
+      "plain": "研發完成不會自動換裝。\n\n山炮、野戰火砲與戰防炮各有用途。"
+    },
+    "armory.artillery.note": {
+      "original": "山地支援、野戰火力、反裝甲分線。",
+      "plain": "山地支援、野戰火力、反裝甲分線。"
+    },
+    "armory.catalog.note": {
+      "original": "通用裝備設計；裝備組是抽象編裝單位。",
+      "plain": "通用裝備設計；裝備組是抽象編裝單位。"
+    },
+    "armory.capacity": {
+      "original": "實際工廠 %d　·　裝備已用 %d",
+      "plain": "實際工廠 %d　·　裝備已用 %d"
+    },
+    "armory.production.locked": {
+      "original": "尚未掌握此類設計，請先研發。",
+      "plain": "尚未掌握此類設計，請先研發。"
+    },
+    "armory.production.note": {
+      "original": "只扣實際產出的材料；缺料保留產線。",
+      "plain": "只扣實際產出的材料；缺料保留產線。"
+    },
+    "armory.stock.note": {
+      "original": "點選裝備，再到換裝頁配發；舊裝備可再用。",
+      "plain": "點選裝備，再到換裝頁配發；舊裝備可再用。"
+    },
+    "armory.selected.stock": {
+      "original": "選定：%s　·　庫存 %d 組",
+      "plain": "選定：%s　·　庫存 %d 組"
+    },
+    "armory.unit": {
+      "original": "組",
+      "plain": "組"
+    },
+    "armory.issue": {
+      "original": "配發可用裝備",
+      "plain": "配發可用裝備"
+    },
+    "armory.previous": {
+      "original": "上一頁",
+      "plain": "上一頁"
+    },
+    "armory.next": {
+      "original": "下一頁",
+      "plain": "下一頁"
+    },
+    "armory.pages": {
+      "original": "%d / %d 頁",
+      "plain": "%d / %d 頁"
+    },
+    "armory.units.empty": {
+      "original": "目前沒有可換裝的自有部隊。",
+      "plain": "目前沒有可換裝的自有部隊。"
+    },
+    "armory.equipment.note": {
+      "original": "可部分換裝，替下裝備回庫；新兵須另補裝。",
+      "plain": "可部分換裝，替下裝備回庫；新兵須另補裝。"
+    },
+    "armory.months.progress": {
+      "original": "%d / %d 個月",
+      "plain": "%d / %d 個月"
+    },
+    "armory.output": {
+      "original": "%d 組／月",
+      "plain": "%d 組／月"
+    },
+    "armory.research.start": {
+      "original": "開始研發",
+      "plain": "開始研發"
+    },
+    "armory.research.pause": {
+      "original": "暫停研發",
+      "plain": "暫停研發"
+    },
+    "armory.production.open": {
+      "original": "安排生產",
+      "plain": "安排生產"
+    },
+    "armory.stock.open": {
+      "original": "檢視庫存",
+      "plain": "檢視庫存"
+    },
+    "armory.month": {
+      "original": "推進一個月  ▶",
+      "plain": "推進一個月  ▶"
+    },
+    "armory.footer": {
+      "original": "F7 軍備　·　1–4 步驟　·　上下分類　·　E 換月　·　ESC 返回",
+      "plain": "F7 軍備　·　1–4 步驟　·　上下分類　·　E 換月　·　ESC 返回"
+    },
+    "armory.save": {
+      "original": "保存進度",
+      "plain": "保存進度"
+    },
+    "armory.load": {
+      "original": "讀取進度",
+      "plain": "讀取進度"
+    },
+    "armory.back": {
+      "original": "返回地圖",
+      "plain": "返回地圖"
+    },
+    "armory.quit": {
+      "original": "離開並保存進度？\nY 確定　N／ESC 返回",
+      "plain": "離開並保存進度？\nY 確定　N／ESC 返回"
+    },
+    "armory.date": {
+      "original": "%d 年 %02d 月",
+      "plain": "%d 年 %02d 月"
+    },
+    "armory.original.only": {
+      "original": "軍備研發供抗日擴充使用，原版戰役維持原規則。",
+      "plain": "軍備研發供抗日擴充使用，原版戰役維持原規則。"
+    },
+    "armory.error": {
+      "original": "無法執行。請確認設計、工廠、庫存及部隊歸屬。",
+      "plain": "無法執行。請確認設計、工廠、庫存及部隊歸屬。"
+    },
+    "armory.status.available": {
+      "original": "可研發",
+      "plain": "可研發"
+    },
+    "armory.status.known": {
+      "original": "已掌握",
+      "plain": "已掌握"
+    },
+    "armory.status.researching": {
+      "original": "研究中",
+      "plain": "研究中"
+    },
+    "armory.status.locked": {
+      "original": "需前置設計或空閒席位",
+      "plain": "需前置設計或空閒席位"
+    },
+    "armory.research.terms": {
+      "original": "%d 個月 · 每月 180 金",
+      "plain": "%d 個月 · 每月 180 金"
+    },
+    "armory.production.terms": {
+      "original": "每廠月產 %d 組 · 每組金%d 鐵%d 煤%d 油%d",
+      "plain": "每廠月產 %d 組 · 每組金%d 鐵%d 煤%d 油%d"
+    },
+    "armory.last": {
+      "original": "上月產出 %d 組",
+      "plain": "上月產出 %d 組"
+    },
+    "armory.shortage": {
+      "original": "缺料或庫存已滿",
+      "plain": "缺料或庫存已滿"
+    },
+    "armory.stock.amount": {
+      "original": "現有庫存 %d 組",
+      "plain": "現有庫存 %d 組"
+    },
+    "armory.equipment.item": {
+      "original": "%s %d 組",
+      "plain": "%s %d 組"
+    },
+    "armory.unit.name": {
+      "original": "%s · %s",
+      "plain": "%s · %s"
+    },
+    "armory.unit.summary": {
+      "original": "兵力 %d　需求 %d 組　選定裝備 %d 組",
+      "plain": "兵力 %d　需求 %d 組　選定裝備 %d 組"
+    },
+    "armory.queue.empty": {
+      "original": "研究席位空閒 · 選擇裝備設計",
+      "plain": "研究席位空閒 · 選擇裝備設計"
+    },
+    "armory.queue.note": {
+      "original": "先結算既有產線，再投入研究；完成後另配工廠。",
+      "plain": "先結算既有產線，再投入研究；完成後另配工廠。"
+    },
+    "armory.queue.active": {
+      "original": "研究中：%s　%d / %d 個月",
+      "plain": "研究中：%s　%d / %d 個月"
+    },
+    "armory.research.shortage": {
+      "original": "軍費不足 180 金，本月研究將暫停投入。",
+      "plain": "軍費不足 180 金，本月研究將暫停投入。"
+    },
+    "armory.research.paused": {
+      "original": "已暫停，保留研發進度。",
+      "plain": "已暫停，保留研發進度。"
+    },
+    "armory.research.started": {
+      "original": "開始研發，按月投入軍費。",
+      "plain": "開始研發，按月投入軍費。"
+    },
+    "armory.month.done": {
+      "original": "已推進至 %d 年 %02d 月。",
+      "plain": "已推進至 %d 年 %02d 月。"
+    },
+    "armory.saved": {
+      "original": "已保存完整戰役與軍備進度。",
+      "plain": "已保存完整戰役與軍備進度。"
+    },
+    "armory.loaded": {
+      "original": "已恢復戰役與軍備進度。",
+      "plain": "已恢復戰役與軍備進度。"
+    },
+    "armory.assigned": {
+      "original": "已更新兵工廠配置。",
+      "plain": "已更新兵工廠配置。"
+    },
+    "armory.issued": {
+      "original": "已配發 %d 組，替下的裝備已回庫。",
+      "plain": "已配發 %d 組，替下的裝備已回庫。"
+    },
+    "armory.resource.0": {
+      "original": "軍費",
+      "plain": "軍費"
+    },
+    "armory.resource.1": {
+      "original": "鐵",
+      "plain": "鐵"
+    },
+    "armory.resource.2": {
+      "original": "煤",
+      "plain": "煤"
+    },
+    "armory.resource.3": {
+      "original": "燃油",
+      "plain": "燃油"
+    },
+    "armory.page.0": {
+      "original": "研發",
+      "plain": "研發"
+    },
+    "armory.page.1": {
+      "original": "生產",
+      "plain": "生產"
+    },
+    "armory.page.2": {
+      "original": "庫存",
+      "plain": "庫存"
+    },
+    "armory.page.3": {
+      "original": "換裝",
+      "plain": "換裝"
+    },
+    "armory.step.0": {
+      "original": "解鎖裝備設計",
+      "plain": "解鎖裝備設計"
+    },
+    "armory.step.1": {
+      "original": "分配兵工廠",
+      "plain": "分配兵工廠"
+    },
+    "armory.step.2": {
+      "original": "查看可用軍械",
+      "plain": "查看可用軍械"
+    },
+    "armory.step.3": {
+      "original": "配發與回收",
+      "plain": "配發與回收"
+    },
+    "armory.category.0": {
+      "original": "步槍",
+      "plain": "步槍"
+    },
+    "armory.category.1": {
+      "original": "裝甲",
+      "plain": "裝甲"
+    },
+    "armory.category.2": {
+      "original": "火砲",
+      "plain": "火砲"
+    },
+    "armory.category.hint.0": {
+      "original": "步兵基本火力",
+      "plain": "步兵基本火力"
+    },
+    "armory.category.hint.1": {
+      "original": "突擊與機動",
+      "plain": "突擊與機動"
+    },
+    "armory.category.hint.2": {
+      "original": "山地・野戰・戰防",
+      "plain": "山地・野戰・戰防"
+    },
+    "armory.fact.0": {
+      "original": "戰場角色",
+      "plain": "戰場角色"
+    },
+    "armory.fact.1": {
+      "original": "研發進度",
+      "plain": "研發進度"
+    },
+    "armory.fact.2": {
+      "original": "火力／山地",
+      "plain": "火力／山地"
+    },
+    "armory.fact.3": {
+      "original": "每廠月產量",
+      "plain": "每廠月產量"
+    },
+    "armory.fact.4": {
+      "original": "現有庫存",
+      "plain": "現有庫存"
+    },
+    "armory.model.rifle-old": {
+      "original": "制式栓動步槍",
+      "plain": "制式栓動步槍"
+    },
+    "armory.role.rifle-old": {
+      "original": "基本步兵火力",
+      "plain": "基本步兵火力"
+    },
+    "armory.description.rifle-old": {
+      "original": "維持補充的基本設計。配發後才進入部隊編裝。",
+      "plain": "維持補充的基本設計。配發後才進入部隊編裝。"
+    },
+    "armory.model.rifle-modern": {
+      "original": "改良步槍",
+      "plain": "改良步槍"
+    },
+    "armory.role.rifle-modern": {
+      "original": "火力與可靠性",
+      "plain": "火力與可靠性"
+    },
+    "armory.description.rifle-modern": {
+      "original": "逐批替換舊裝備，未換裝部分維持現有裝備。",
+      "plain": "逐批替換舊裝備，未換裝部分維持現有裝備。"
+    },
+    "armory.model.light-tank": {
+      "original": "輕型戰車整備",
+      "plain": "輕型戰車整備"
+    },
+    "armory.role.light-tank": {
+      "original": "機動突擊",
+      "plain": "機動突擊"
+    },
+    "armory.description.light-tank": {
+      "original": "需要鐵、煤與燃油。丘陵及山地火力較低。",
+      "plain": "需要鐵、煤與燃油。丘陵及山地火力較低。"
+    },
+    "armory.model.armor-improved": {
+      "original": "裝甲與火炮改良",
+      "plain": "裝甲與火炮改良"
+    },
+    "armory.role.armor-improved": {
+      "original": "裝甲部隊強化",
+      "plain": "裝甲部隊強化"
+    },
+    "armory.description.armor-improved": {
+      "original": "較高工業成本。裝甲與穿甲對抗仍將繼續調整。",
+      "plain": "較高工業成本。裝甲與穿甲對抗仍將繼續調整。"
+    },
+    "armory.model.mountain-basic": {
+      "original": "輕型山炮",
+      "plain": "輕型山炮"
+    },
+    "armory.role.mountain-basic": {
+      "original": "山地支援",
+      "plain": "山地支援"
+    },
+    "armory.description.mountain-basic": {
+      "original": "輕型山地支援設計。仍遵守既有通行與鐵路規則。",
+      "plain": "輕型山地支援設計。仍遵守既有通行與鐵路規則。"
+    },
+    "armory.model.mountain-improved": {
+      "original": "山炮改良",
+      "plain": "山炮改良"
+    },
+    "armory.role.mountain-improved": {
+      "original": "山地火力",
+      "plain": "山地火力"
+    },
+    "armory.description.mountain-improved": {
+      "original": "維持山地適性，較低產製成本適合大量整備。",
+      "plain": "維持山地適性，較低產製成本適合大量整備。"
+    },
+    "armory.model.field-howitzer": {
+      "original": "野戰榴彈炮",
+      "plain": "野戰榴彈炮"
+    },
+    "armory.role.field-howitzer": {
+      "original": "野戰重火力",
+      "plain": "野戰重火力"
+    },
+    "armory.description.field-howitzer": {
+      "original": "平地火力較高；丘陵及山地效果下降，不能全面替代山炮。",
+      "plain": "平地火力較高；丘陵及山地效果下降，不能全面替代山炮。"
+    },
+    "armory.model.antitank": {
+      "original": "戰防炮",
+      "plain": "戰防炮"
+    },
+    "armory.role.antitank": {
+      "original": "戰防火力",
+      "plain": "戰防火力"
+    },
+    "armory.description.antitank": {
+      "original": "先提供部隊支援火力；穿甲對抗仍在開發。",
+      "plain": "先提供部隊支援火力；穿甲對抗仍在開發。"
+    },
+    "armory.model.legacy-rifle": {
+      "original": "既有步兵裝備",
+      "plain": "既有步兵裝備"
+    },
+    "armory.role.legacy-rifle": {
+      "original": "開局裝備",
+      "plain": "開局裝備"
+    },
+    "armory.description.legacy-rifle": {
+      "original": "原部隊的抽象裝備。可回收配發，不能複製生產。",
+      "plain": "原部隊的抽象裝備。可回收配發，不能複製生產。"
+    },
+    "armory.model.legacy-artillery": {
+      "original": "既有炮兵裝備",
+      "plain": "既有炮兵裝備"
+    },
+    "armory.role.legacy-artillery": {
+      "original": "開局裝備",
+      "plain": "開局裝備"
+    },
+    "armory.description.legacy-artillery": {
+      "original": "不把原版炮兵誤指為特定型號或全部山炮。",
+      "plain": "不把原版炮兵誤指為特定型號或全部山炮。"
+    },
+    "armory.model.legacy-armor": {
+      "original": "既有裝甲裝備",
+      "plain": "既有裝甲裝備"
+    },
+    "armory.role.legacy-armor": {
+      "original": "開局裝備",
+      "plain": "開局裝備"
+    },
+    "armory.description.legacy-armor": {
+      "original": "保留開局部隊的既有戰力，換裝另需生產。",
+      "plain": "保留開局部隊的既有戰力，換裝另需生產。"
+    },
+    "room.armory": {
+      "original": "軍備研發  F7",
+      "plain": "軍備研發  F7"
+    },
+    "armory.convert": {
+      "original": "改編裝甲",
+      "plain": "改編裝甲"
+    },
+    "armory.convert.confirm": {
+      "original": "確認改編  Y",
+      "plain": "確認改編  Y"
+    },
+    "armory.convert.cancel": {
+      "original": "取消  N / ESC",
+      "plain": "取消  N / ESC"
+    },
+    "armory.convert.review": {
+      "original": "%s 改編裝甲\n原步兵兵力 %d → 裝甲兵力 %d\n需要戰車裝備 %d 組及軍費 %d 金\n未編入人員 %d 轉入預備隊。\n步兵裝備全部退庫，將領與部隊識別保留。",
+      "plain": "%s 改編裝甲\n原步兵兵力 %d → 裝甲兵力 %d\n需要戰車裝備 %d 組及軍費 %d 金\n未編入人員 %d 轉入預備隊。\n步兵裝備全部退庫，將領與部隊識別保留。"
+    },
+    "armory.convert.summary": {
+      "original": "步兵兵力 %d → 裝甲編裝 %d；需全額庫存及 1,000 金",
+      "plain": "步兵兵力 %d → 裝甲編裝 %d；需全額庫存及 1,000 金"
+    },
+    "armory.convert.done": {
+      "original": "裝甲改編完成，步兵裝備已退庫。",
+      "plain": "裝甲改編完成，步兵裝備已退庫。"
+    },
+    "armory.reserve": {
+      "original": "預備人員 %d",
+      "plain": "預備人員 %d"
+    },
+    "armory.reserve.issue": {
+      "original": "編入預備人員",
+      "plain": "編入預備人員"
+    },
+    "battleinfo.title": {
+      "original": "交 戰 雙 方 詳 情",
+      "plain": "交 戰 雙 方 詳 情"
+    },
+    "battleinfo.attacker": {
+      "original": "攻方",
+      "plain": "攻方"
+    },
+    "battleinfo.defender": {
+      "original": "守方",
+      "plain": "守方"
+    },
+    "battleinfo.previous": {
+      "original": "上一頁  ←",
+      "plain": "上一頁  ←"
+    },
+    "battleinfo.next": {
+      "original": "下一頁  →",
+      "plain": "下一頁  →"
+    },
+    "battleinfo.back": {
+      "original": "返回戰場  ESC",
+      "plain": "返回戰場  ESC"
+    },
+    "battleinfo.pages": {
+      "original": "%d / %d 頁",
+      "plain": "%d / %d 頁"
+    },
+    "battleinfo.empty": {
+      "original": "本頁無參戰部隊。",
+      "plain": "本頁無參戰部隊。"
+    },
+    "battleinfo.total": {
+      "original": "存活 %d 隊 · 總兵力 %d〔原版尺度〕",
+      "plain": "存活 %d 隊 · 總兵力 %d〔原版尺度〕"
+    },
+    "battleinfo.branch.total": {
+      "original": "%s：%d 隊 · 兵力 %d",
+      "plain": "%s：%d 隊 · 兵力 %d"
+    },
+    "battleinfo.branch.1": {
+      "original": "步兵",
+      "plain": "步兵"
+    },
+    "battleinfo.branch.6": {
+      "original": "騎兵",
+      "plain": "騎兵"
+    },
+    "battleinfo.branch.5": {
+      "original": "裝甲",
+      "plain": "裝甲"
+    },
+    "battleinfo.branch.4": {
+      "original": "火砲",
+      "plain": "火砲"
+    },
+    "battleinfo.supply": {
+      "original": "來源省：金%d 糧%d 彈%d 油%d",
+      "plain": "來源省：金%d 糧%d 彈%d 油%d"
+    },
+    "battleinfo.offmap": {
+      "original": "未部署",
+      "plain": "未部署"
+    },
+    "battleinfo.unit.force": {
+      "original": "兵力 %d · 帶兵 %d · 戰技 %d",
+      "plain": "兵力 %d · 帶兵 %d · 戰技 %d"
+    },
+    "battleinfo.unit.condition": {
+      "original": "武裝 %d · 體力 %d · 士氣 %d",
+      "plain": "武裝 %d · 體力 %d · 士氣 %d"
+    },
+    "battleinfo.unit.field": {
+      "original": "經驗 %d · 機動 %d/%d · 格位 %s",
+      "plain": "經驗 %d · 機動 %d/%d · 格位 %s"
+    },
+    "battleinfo.unit.equipped": {
+      "original": "裝備 %d/%d 組 · 缺 %d · 火力 %d%%",
+      "plain": "裝備 %d/%d 組 · 缺 %d · 火力 %d%%"
+    },
+    "battleinfo.unit.untracked": {
+      "original": "原版未追蹤逐型裝備；武裝程度見上列。",
+      "plain": "原版未追蹤逐型裝備；武裝程度見上列。"
+    },
+    "battleinfo.unit.unknown": {
+      "original": "裝甲厚度、穿甲、實際車砲數：未提供",
+      "plain": "裝甲厚度、穿甲、實際車砲數：未提供"
+    },
+    "battleinfo.supply.0": {
+      "original": "來源省：黃金 %d · 糧食 %d",
+      "plain": "來源省：黃金 %d · 糧食 %d"
+    },
+    "battleinfo.supply.1": {
+      "original": "彈藥 %d · 燃料 %d",
+      "plain": "彈藥 %d · 燃料 %d"
+    },
+    "battleinfo.branch.unknown": {
+      "original": "未知兵種",
+      "plain": "未知兵種"
+    },
+    "desk.title": {
+      "original": "大時代的故事",
+      "plain": "大時代的故事"
+    },
+    "desk.mode": {
+      "original": "Modern 指揮介面",
+      "plain": "Modern 指揮介面"
+    },
+    "desk.headquarters": {
+      "original": "指揮部",
+      "plain": "指揮部"
+    },
+    "desk.progress": {
+      "original": "進度",
+      "plain": "進度"
+    },
+    "desk.mouse.help": {
+      "original": "左鍵選取與確認\nESC／右鍵返回\n滾輪縮放地圖",
+      "plain": "左鍵選取與確認\nESC／右鍵返回\n滾輪縮放地圖"
+    },
+    "desk.breadcrumb": {
+      "original": "全國指揮 ／",
+      "plain": "全國指揮 ／"
+    },
+    "desk.footer": {
+      "original": "未確認前不執行命令。F6 工具列，F10 儲存離開。",
+      "plain": "未確認前不執行命令。F6 工具列，F10 儲存離開。"
+    },
+    "desk.selected": {
+      "original": "目前選取",
+      "plain": "目前選取"
+    },
+    "desk.force": {
+      "original": "本省兵力",
+      "plain": "本省兵力"
+    },
+    "desk.arsenal": {
+      "original": "兵工廠",
+      "plain": "兵工廠"
+    },
+    "desk.coal": {
+      "original": "煤",
+      "plain": "煤"
+    },
+    "desk.iron": {
+      "original": "鐵",
+      "plain": "鐵"
+    },
+    "desk.stationed": {
+      "original": "駐省將領",
+      "plain": "駐省將領"
+    },
+    "desk.resource.0": {
+      "original": "軍費",
+      "plain": "軍費"
+    },
+    "desk.resource.1": {
+      "original": "糧食",
+      "plain": "糧食"
+    },
+    "desk.resource.2": {
+      "original": "彈藥",
+      "plain": "彈藥"
+    },
+    "desk.resource.3": {
+      "original": "燃料",
+      "plain": "燃料"
+    },
+    "desk.resource.4": {
+      "original": "兵工廠",
+      "plain": "兵工廠"
+    },
+    "desk.date": {
+      "original": "%d 年 %d 月",
+      "plain": "%d 年 %d 月"
+    },
+    "desk.unit.detail": {
+      "original": "%s · 帶兵 %d · 武裝 %d",
+      "plain": "%s · 帶兵 %d · 武裝 %d"
+    },
+    "desk.map": {
+      "original": "全國地圖",
+      "plain": "全國地圖"
+    },
+    "desk.map.hint": {
+      "original": "選取省份後，下達命令或查看軍情。",
+      "plain": "選取省份後，下達命令或查看軍情。"
+    },
+    "desk.map.reset": {
+      "original": "重設視角",
+      "plain": "重設視角"
+    },
+    "desk.back": {
+      "original": "返回",
+      "plain": "返回"
+    },
+    "desk.cancel": {
+      "original": "取消",
+      "plain": "取消"
+    },
+    "desk.confirm": {
+      "original": "確認執行",
+      "plain": "確認執行"
+    },
+    "desk.adjust": {
+      "original": "返回調整",
+      "plain": "返回調整"
+    },
+    "desk.recruit": {
+      "original": "徵兵",
+      "plain": "徵兵"
+    },
+    "desk.transfer": {
+      "original": "調動部隊",
+      "plain": "調動部隊"
+    },
+    "desk.reorganize": {
+      "original": "重新整編",
+      "plain": "重新整編"
+    },
+    "desk.people": {
+      "original": "人物檔案",
+      "plain": "人物檔案"
+    },
+    "desk.save": {
+      "original": "儲存進度",
+      "plain": "儲存進度"
+    },
+    "desk.load": {
+      "original": "載入進度",
+      "plain": "載入進度"
+    },
+    "desk.commands": {
+      "original": "其他指令",
+      "plain": "其他指令"
+    },
+    "desk.commands.hint": {
+      "original": "沿用現有政略規則。點選指令後設定與確認。",
+      "plain": "沿用現有政略規則。點選指令後設定與確認。"
+    },
+    "desk.form.hint": {
+      "original": "選擇、預覽、確認。返回即可離開。",
+      "plain": "選擇、預覽、確認。返回即可離開。"
+    },
+    "desk.province": {
+      "original": "所在省份",
+      "plain": "所在省份"
+    },
+    "desk.branch": {
+      "original": "補充兵種",
+      "plain": "補充兵種"
+    },
+    "desk.quantity": {
+      "original": "數量",
+      "plain": "數量"
+    },
+    "desk.limit": {
+      "original": "上限 %s",
+      "plain": "上限 %s"
+    },
+    "desk.maximum": {
+      "original": "最大可用",
+      "plain": "最大可用"
+    },
+    "desk.cost": {
+      "original": "本次軍費",
+      "plain": "本次軍費"
+    },
+    "desk.after.gold": {
+      "original": "完成後軍費",
+      "plain": "完成後軍費"
+    },
+    "desk.recruit.review": {
+      "original": "檢查並確認徵兵",
+      "plain": "檢查並確認徵兵"
+    },
+    "desk.recruit.confirm": {
+      "original": "確認徵兵",
+      "plain": "確認徵兵"
+    },
+    "desk.recruit.terms": {
+      "original": "%s · %s\n補充 %s 人，軍費 %s。\n確認後依現有規則補充部隊。",
+      "plain": "%s · %s\n補充 %s 人，軍費 %s。\n確認後依現有規則補充部隊。"
+    },
+    "desk.destination": {
+      "original": "目的地",
+      "plain": "目的地"
+    },
+    "desk.resources": {
+      "original": "隨軍／運補物資",
+      "plain": "隨軍／運補物資"
+    },
+    "desk.select.all": {
+      "original": "全選可用將領",
+      "plain": "全選可用將領"
+    },
+    "desk.general.row": {
+      "original": "%s · %s · 兵力 %s · 體力 %d",
+      "plain": "%s · %s · 兵力 %s · 體力 %d"
+    },
+    "desk.review": {
+      "original": "檢查並確認",
+      "plain": "檢查並確認"
+    },
+    "desk.review.terms": {
+      "original": "確認後才會執行目前命令。",
+      "plain": "確認後才會執行目前命令。"
+    },
+    "desk.transfer.confirm": {
+      "original": "確認調動",
+      "plain": "確認調動"
+    },
+    "desk.transfer.terms": {
+      "original": "%s → %s\n調動 %d 位將領。\n軍費 %d、糧食 %d、彈藥 %d、燃料 %d。",
+      "plain": "%s → %s\n調動 %d 位將領。\n軍費 %d、糧食 %d、彈藥 %d、燃料 %d。"
+    },
+    "desk.supply": {
+      "original": "運補",
+      "plain": "運補"
+    },
+    "desk.supply.terms": {
+      "original": "運補至 %s\n軍費 %d、糧食 %d、彈藥 %d、燃料 %d。",
+      "plain": "運補至 %s\n軍費 %d、糧食 %d、彈藥 %d、燃料 %d。"
+    },
+    "desk.reorganize.hint": {
+      "original": "確認才完成整編；返回可取消並還原原配置。",
+      "plain": "確認才完成整編；返回可取消並還原原配置。"
+    },
+    "desk.pool": {
+      "original": "待分配兵力 %s",
+      "plain": "待分配兵力 %s"
+    },
+    "desk.assign": {
+      "original": "確認配兵",
+      "plain": "確認配兵"
+    },
+    "desk.reorganize.finish": {
+      "original": "確認整編",
+      "plain": "確認整編"
+    },
+    "desk.reorganize.finish.terms": {
+      "original": "剩餘兵力已分配。確認後完成整編，依現有規則扣除指令。",
+      "plain": "剩餘兵力已分配。確認後完成整編，依現有規則扣除指令。"
+    },
+    "desk.reorganize.cancel": {
+      "original": "取消這次整編？",
+      "plain": "取消這次整編？"
+    },
+    "desk.reorganize.cancel.terms": {
+      "original": "取消會還原開始整編前的兵力、武裝與裝備帳。人員不會消失，也不消耗指令。",
+      "plain": "取消會還原開始整編前的兵力、武裝與裝備帳。人員不會消失，也不消耗指令。"
+    },
+    "desk.reorganize.cancel.yes": {
+      "original": "取消整編並返回",
+      "plain": "取消整編並返回"
+    },
+    "desk.keep.editing": {
+      "original": "繼續編輯",
+      "plain": "繼續編輯"
+    },
+    "desk.reorganize.legacy": {
+      "original": "舊整編進度",
+      "plain": "舊整編進度"
+    },
+    "desk.reorganize.legacy.terms": {
+      "original": "這份舊存檔沒有整編前配置，無法精確還原。可繼續分配後完成，或保存離開，下次接續。",
+      "plain": "這份舊存檔沒有整編前配置，無法精確還原。可繼續分配後完成，或保存離開，下次接續。"
+    },
+    "desk.save.exit": {
+      "original": "儲存並離開",
+      "plain": "儲存並離開"
+    },
+    "desk.trade": {
+      "original": "商業活動",
+      "plain": "商業活動"
+    },
+    "desk.import": {
+      "original": "進口",
+      "plain": "進口"
+    },
+    "desk.export": {
+      "original": "出口",
+      "plain": "出口"
+    },
+    "desk.trade.terms": {
+      "original": "%s，數量 %d，交易軍費 %d。\n確認後依目前買賣方向執行。",
+      "plain": "%s，數量 %d，交易軍費 %d。\n確認後依目前買賣方向執行。"
+    },
+    "desk.people.hint": {
+      "original": "點選將領查看能力、兵力與完整人物正文。",
+      "plain": "點選將領查看能力、兵力與完整人物正文。"
+    },
+    "desk.person.stats": {
+      "original": "%s\n兵力 %d，帶兵 %d，戰技 %d\n武裝 %d，體力 %d，士氣 %d",
+      "plain": "%s\n兵力 %d，帶兵 %d，戰技 %d\n武裝 %d，體力 %d，士氣 %d"
+    },
+    "desk.biography": {
+      "original": "完整人物自傳",
+      "plain": "完整人物自傳"
+    },
+    "desk.save.confirm": {
+      "original": "儲存進度",
+      "plain": "儲存進度"
+    },
+    "desk.save.terms": {
+      "original": "確認後保存目前世界、兵力、裝備與戰鬥／整編進度。",
+      "plain": "確認後保存目前世界、兵力、裝備與戰鬥／整編進度。"
+    },
+    "desk.save.done": {
+      "original": "進度已儲存。",
+      "plain": "進度已儲存。"
+    },
+    "desk.save.failed": {
+      "original": "儲存失敗，進度保留：",
+      "plain": "儲存失敗，進度保留："
+    },
+    "desk.save.unavailable": {
+      "original": "沒有可保存的進度或路徑。",
+      "plain": "沒有可保存的進度或路徑。"
+    },
+    "desk.load.confirm": {
+      "original": "載入進度",
+      "plain": "載入進度"
+    },
+    "desk.load.terms": {
+      "original": "載入會取代目前進度。失敗時保留目前遊戲。",
+      "plain": "載入會取代目前進度。失敗時保留目前遊戲。"
+    },
+    "desk.quit.confirm": {
+      "original": "儲存並離開遊戲",
+      "plain": "儲存並離開遊戲"
+    },
+    "desk.quit.terms": {
+      "original": "確認後先保存再離開；保存失敗則繼續留在遊戲。",
+      "plain": "確認後先保存再離開；保存失敗則繼續留在遊戲。"
+    },
+    "desk.train.confirm": {
+      "original": "確認練兵",
+      "plain": "確認練兵"
+    },
+    "desk.train.terms": {
+      "original": "依現有規則執行練兵並消耗指令。",
+      "plain": "依現有規則執行練兵並消耗指令。"
+    },
+    "desk.choose": {
+      "original": "選擇項目",
+      "plain": "選擇項目"
+    },
+    "desk.choose.hint": {
+      "original": "直接點選名稱；滾輪捲動，返回取消選擇。",
+      "plain": "直接點選名稱；滾輪捲動，返回取消選擇。"
+    },
+    "desk.armory": {
+      "original": "軍備局",
+      "plain": "軍備局"
+    },
+    "desk.month": {
+      "original": "結束本月",
+      "plain": "結束本月"
+    },
+    "desk.month.terms": {
+      "original": "將執行電腦回合、結算並推進月份。",
+      "plain": "將執行電腦回合、結算並推進月份。"
+    },
+    "desk.battle.resume": {
+      "original": "繼續戰鬥",
+      "plain": "繼續戰鬥"
+    },
+    "desk.battle.locked": {
+      "original": "戰鬥暫停中。可查閱與保存，請先繼續戰鬥再下命令。",
+      "plain": "戰鬥暫停中。可查閱與保存，請先繼續戰鬥再下命令。"
+    },
+    "desk.battle.legacy": {
+      "original": "舊 DT1 直接入口無法保存完整戰術進度，請先完成戰鬥；正常 DT1 匯入重製存檔可使用安全暫停。",
+      "plain": "舊 DT1 直接入口無法保存完整戰術進度，請先完成戰鬥；正常 DT1 匯入重製存檔可使用安全暫停。"
+    },
+    "desk.battle.pause": {
+      "original": "查看全國地圖",
+      "plain": "查看全國地圖"
+    },
+    "desk.no.commands": {
+      "original": "這個月的指令數已用完。",
+      "plain": "這個月的指令數已用完。"
+    },
+    "toolbar.music.huan-wo-he-shan": {
+      "original": "還我河山",
+      "plain": "還我河山"
+    },
+    "toolbar.music.national-revolution": {
+      "original": "國民革命歌",
+      "plain": "國民革命歌"
+    },
+    "toolbar.music.eight-hundred-heroes": {
+      "original": "歌八百壯士",
+      "plain": "歌八百壯士"
     }
   }
 }

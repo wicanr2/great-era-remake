@@ -37,9 +37,11 @@ func interfaceFromPreference(s string) l.InterfaceMode {
 	if s == "original" {
 		return l.InterfaceOriginal
 	}
-	return l.InterfaceCommand
+	return l.InterfaceModern
 }
-func (a *app) commandInterface() bool { return a != nil && a.room.Mode == l.InterfaceCommand }
+func (a *app) commandInterface() bool {
+	return a != nil && (a.room.Mode == l.InterfaceCommand || a.room.Mode == l.InterfaceModern)
+}
 func (a *app) highInterface() bool {
 	if a == nil || a.room.Mode == l.InterfaceOriginal {
 		return false
@@ -47,13 +49,16 @@ func (a *app) highInterface() bool {
 	return a.commandInterface() || (a.resolution == "high" && a.themeMode == t.ModeModern)
 }
 func (a *app) roomVisible() bool {
-	return a.commandInterface() && (a.screen == screenMap || a.screen == screenCommand)
+	return a.commandInterface() && !a.modernDeskVisible() && (a.screen == screenMap || a.screen == screenCommand)
 }
 func (a *app) setInterfacePreference(mode l.InterfaceMode) error {
+	if mode == l.InterfaceCommand {
+		mode = l.InterfaceModern
+	}
 	if !l.ValidInterface(string(mode)) || mode == "" {
 		return fmt.Errorf("未知介面 %q", mode)
 	}
-	if mode == l.InterfaceCommand && (a.eten == nil || a.wording == nil) {
+	if mode == l.InterfaceModern && (a.eten == nil || a.wording == nil) {
 		return fmt.Errorf("新介面需要完整字庫與語系資料")
 	}
 	next := a.preferences
@@ -64,6 +69,8 @@ func (a *app) setInterfacePreference(mode l.InterfaceMode) error {
 	a.preferences = next
 	a.room.Mode = mode
 	a.room.Archive = false
+	a.desk.Pending = ""
+	a.desk.Picker = ""
 	a.room.Drag = false
 	a.pointer.cancel()
 	a.dirty = true
@@ -74,7 +81,7 @@ func (a *app) setInterfacePreference(mode l.InterfaceMode) error {
 	return nil
 }
 func (a *app) toggleInterface() error {
-	mode := l.InterfaceCommand
+	mode := l.InterfaceModern
 	if a.commandInterface() {
 		mode = l.InterfaceOriginal
 	}
@@ -213,12 +220,15 @@ func (a *app) composeCommandRoom() error {
 	style := a.uiStyle()
 	data := render.CommandRoomData{Map: a.room.Map.Render(a.room.Camera, l.CommandRoom.Map.W, l.CommandRoom.Map.H, a.themeMode == t.ModeRetro, a.room.Political, factions), Fonts: a.eten, Style: style, Title: a.roomText("title"), Date: fmt.Sprintf("%d / %02d", a.year, a.month), Interface: a.roomText("interface." + string(a.room.Mode)), Art: a.roomText("art." + string(a.themeMode)), Tab: a.room.Tab, CommandScroll: a.room.CommandScroll, Message: a.msg, Labels: map[string]string{}, Markers: a.roomMarkers()}
 	data.Portrait, data.PortraitUnavailable = a.portraitForGeneral(p.Commander)
-	data.Panel = render.PanelData{ID: a.current, Province: p, Force: game.ForceOf(a.generals, a.current), Generals: game.CountOf(a.generals, a.current), Commands: a.cmdBudget.Remaining(a.current), ProvinceName: a.provinceName(a.current), CommanderName: a.generalDisplayName(p.Commander), Labels: labels, Style: style}
+	data.Panel = render.PanelData{ID: a.current, Province: p, Force: game.ForceOf(a.generals, a.current), Generals: game.CountOf(a.generals, a.current), Commands: a.cmdBudget.Peek(a.current), ProvinceName: a.provinceName(a.current), CommanderName: a.generalDisplayName(p.Commander), Labels: labels, Style: style}
 	if a.themeMode == t.ModeRetro {
 		data.OriginalUnits = a.unitTheme
 	}
 	for _, key := range []string{"previous_province", "next_province", "people", "narrative", "save", "end_turn", "camera_hint", "shortcuts", "close"} {
 		data.Labels[key] = a.roomText(key)
+	}
+	if a.armory != nil {
+		data.Labels["armory"] = a.roomText("armory")
 	}
 	for i := 0; i < 6; i++ {
 		data.Tabs = append(data.Tabs, a.roomText("tab."+strconv.Itoa(i)))
@@ -278,6 +288,9 @@ func (a *app) commandRoomTargets() []actions.Target {
 	}
 	add(l.RoomInterface, "interface")
 	add(l.RoomArt, "art")
+	if a.armory != nil {
+		add(l.RoomArmory, "armory")
+	}
 	add(l.RoomPrevious, "province.previous")
 	add(l.RoomNext, "province.next")
 	add(l.RoomCommander, "commander")
@@ -408,6 +421,9 @@ func (a *app) updateCommandRoom() bool {
 		return false
 	}
 	switch key {
+	case "armory":
+		a.openArmory()
+		return true
 	case "commands.up":
 		a.scrollRoomCommands(-1)
 	case "commands.down":
@@ -452,7 +468,7 @@ func (a *app) updateCommandRoom() bool {
 		a.screen = screenNarrative
 		a.dirty = true
 	case "save":
-		if a.origSave == nil {
+		if !a.canSaveSession() {
 			a.report(a.roomText("save_unavailable"))
 		} else if err := a.autosave(); err != nil {
 			a.report(err.Error())

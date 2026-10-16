@@ -120,7 +120,7 @@ func (a *app) basePointerPosition(x, y int) (int, int, bool) {
 // Right click follows the same return/cancel route as Esc, including dialogs.
 func (a *app) pointerBackAction() actions.Action {
 	switch a.screen {
-	case screenQuit, screenTransferConfirm, screenRecruitConfirm, screenTrainConfirm,
+	case screenQuit, screenReorganizeCancel, screenTransferConfirm, screenRecruitConfirm, screenTrainConfirm,
 		screenSaveConfirm, screenLoadConfirm:
 		return actions.Cancel
 	default:
@@ -132,7 +132,7 @@ func (a *app) navigationActions() []actions.Action {
 	switch a.screen {
 	case screenMap, screenBattle, screenQuit:
 		return nil
-	case screenTransferConfirm, screenRecruitConfirm, screenTrainConfirm,
+	case screenReorganizeCancel, screenTransferConfirm, screenRecruitConfirm, screenTrainConfirm,
 		screenSaveConfirm, screenLoadConfirm:
 		return []actions.Action{actions.Cancel}
 	case screenTransferSelection:
@@ -168,14 +168,21 @@ func (a *app) navigationActions() []actions.Action {
 }
 
 func (a *app) navigationTargets() []actions.Target {
+	if a.screen == screenBattle && a.battle != nil && a.battle.mode != battleModeInspect && a.eten != nil {
+		r := uilayout.BattleReturnButton(a.highModernBattle())
+		return []actions.Target{{Action: actions.Back, Rect: actions.Rect{X: r.X, Y: r.Y, W: r.W, H: r.H}}}
+	}
 	if a.highModernFlow() {
 		page, err := uilayout.NewModernPageLayout(uilayout.ModernDesignSurface())
 		if err != nil {
 			return nil
 		}
-		out := []actions.Target{{Action: actions.Back,
+		out := []actions.Target{{Action: a.pointerBackAction(),
 			Rect: actions.Rect{X: page.Back.X, Y: page.Back.Y, W: page.Back.W, H: page.Back.H}}}
-		if a.screen == screenBiography || a.screen == screenNarrative {
+		if a.screen == screenTransferSelection && len(a.navigationActions()) > 1 {
+			out = append(out, actions.Target{Action: actions.Submit,
+				Rect: actions.Rect{X: page.Next.X, Y: page.Next.Y, W: page.Next.W, H: page.Next.H}})
+		} else if a.screen == screenBiography || a.screen == screenNarrative {
 			if (a.screen == screenBiography && a.bioPage > 0) || (a.screen == screenNarrative && a.narrativePage > 0) {
 				out = append(out, actions.Target{Action: actions.PreviousPage,
 					Rect: actions.Rect{X: page.Previous.X, Y: page.Previous.Y, W: page.Previous.W, H: page.Previous.H}})
@@ -218,7 +225,7 @@ func (a *app) interactiveTargets() []actions.Target {
 		return a.commandRoomTargets()
 	}
 	if a.screen == screenBattle {
-		return a.battlefieldTargets()
+		return append(a.battlefieldTargets(), a.navigationTargets()...)
 	}
 	base := a.pointerTargets()
 	out := append(a.numericKeypadTargets(), a.navigationTargets()...)
@@ -228,6 +235,9 @@ func (a *app) interactiveTargets() []actions.Target {
 // battlefieldTargets 只公告目前選中單位周圍可由鍵盤完成的動作。
 // 主畫面的同一張地圖刻意不走這條路：它是省內戰場展示，不是 39 省地圖。
 func (a *app) battlefieldTargets() []actions.Target {
+	if a.battle != nil && a.battle.mode == battleModeInspect {
+		return nil
+	}
 	if a.battle == nil || a.battle.finished {
 		return nil
 	}
@@ -794,7 +804,7 @@ func (a *app) pointerTargets() []actions.Target {
 		return append(vertical(2, fieldX+24, fieldY+64, 426, 52),
 			actions.Target{Action: actions.Back, Rect: actions.Rect{X: fieldX + 16, Y: 292, W: 180, H: 58}})
 
-	case screenTransferConfirm, screenRecruitConfirm, screenTrainConfirm,
+	case screenReorganizeCancel, screenTransferConfirm, screenRecruitConfirm, screenTrainConfirm,
 		screenSaveConfirm, screenLoadConfirm, screenQuit:
 		return []actions.Target{
 			{Action: actions.Confirm, Rect: actions.Rect{X: fieldX + 45, Y: 85, W: 165, H: 90}},

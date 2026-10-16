@@ -368,7 +368,7 @@ func (c *Canvas) drawLeaderWithColor(f PanelFonts, id game.GeneralID, x, y int, 
 	if id == 0 || f.Gen == nil {
 		return nil
 	}
-	return c.DrawEntry(f.Gen, int(id)-1, 3, fg, x, y, true)
+	return c.DrawGeneralName(f.Gen, int(id), fg, x, y)
 }
 
 // drawSpacedEntry 與 DrawEntry 相同，但字距可以指定。

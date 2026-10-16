@@ -17,6 +17,7 @@ import (
 type Combatant struct {
 	CombatUnit
 	Strength StrengthInput // 算戰力要用的欄位
+	armory   *Armory       // Derived pointer; restored from the campaign, never serialized.
 }
 
 // BattleSim 是一場戰鬥的執行期狀態。
@@ -65,6 +66,7 @@ func NewBattleSim(m *Map, at, from ProvinceID, attacker, defender []*Combatant, 
 		if u == nil {
 			continue
 		}
+		u.armory = opt.Armory
 		if u.NextCell == 0 && u.TargetUnit == 0 {
 			u.NextCell = NoCell
 		}
@@ -128,6 +130,41 @@ func (s *BattleSim) isEnemyOf(attacking bool) func(GeneralID) bool {
 // Unit 依將領 ID 取單位。
 func (s *BattleSim) Unit(id GeneralID) *Combatant { return s.byID[id] }
 
+// RestoreBattleSim 只重建衍生索引，不部署或重置保存中的單位。
+func RestoreBattleSim(m *Map, at, from ProvinceID, commander GeneralID, attacker, defender []*Combatant, opt StrengthOpts, generalCount int) (*BattleSim, error) {
+	if m == nil || !at.Valid() || !from.Valid() || at == from || len(attacker) > UnitsPerSide || len(defender) > UnitsPerSide {
+		return nil, fmt.Errorf("game: 戰鬥快照的省份或部隊數不合法")
+	}
+	field, err := m.Battlefield(at)
+	if err != nil {
+		return nil, err
+	}
+	s := &BattleSim{Field: field, At: at, From: from, AtCommander: commander, Opts: opt, byID: make(map[GeneralID]*Combatant)}
+	for side, list := range [][]*Combatant{attacker, defender} {
+		for _, u := range list {
+			if u == nil || u.General == 0 || int(u.General) > generalCount || s.byID[u.General] != nil || u.Attacking != (side == 0) || (!u.Cell.Valid() && u.Cell != NoCell) || (!u.NextCell.Valid() && u.NextCell != NoCell) || int(u.TargetUnit) > generalCount {
+				return nil, fmt.Errorf("game: 戰鬥快照有不合法的單位")
+			}
+			copyUnit := *u
+			copyUnit.armory = opt.Armory
+			ptr := &copyUnit
+			s.byID[u.General] = ptr
+			if u.Cell.Valid() {
+				if s.Occ[u.Cell] != 0 {
+					return nil, fmt.Errorf("game: 戰鬥快照重複佔用格 %d", u.Cell)
+				}
+				s.Occ[u.Cell] = u.General
+			}
+			if side == 0 {
+				s.Attacker = append(s.Attacker, ptr)
+			} else {
+				s.Defender = append(s.Defender, ptr)
+			}
+		}
+	}
+	return s, nil
+}
+
 // BeginTurn 套用回合開始的重置（`sub_5446D`／`sub_543C2`）：
 // 機動力回滿、標記可行動。
 func (s *BattleSim) BeginTurn() {
@@ -163,7 +200,12 @@ func (s *BattleSim) StrengthOf(u *Combatant) int {
 	in.Branch = u.Branch()
 	in.Faction = u.Faction
 	in.General = u.General
-	return Strength(in, s.Opts)
+	opt := s.Opts
+	if opt.Armory != nil && u.Cell.Valid() && s.Field != nil {
+		kind := s.tileOf(u).Kind
+		opt.ArmoryRoughTerrain = kind == assets.TileHill || kind == assets.TileMountain
+	}
+	return Strength(in, opt)
 }
 
 // Engage 讓 a 與 b 交戰一次，回傳雙方的兵力損失。
@@ -303,6 +345,11 @@ func (u *Combatant) Branch() uint8 { return u.Strength.Branch }
 func (u *Combatant) applyLoss(n int) {
 	if n <= 0 {
 		return
+	}
+	before := u.Strength.Force
+	after := uint16(max(0, int(before)-n))
+	if u.armory != nil {
+		u.armory.ApplyLoss(u.General, before, after)
 	}
 	if n >= int(u.Strength.Force) {
 		u.Strength.Force = 0

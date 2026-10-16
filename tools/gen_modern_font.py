@@ -111,8 +111,20 @@ def render_glyph(font: ImageFont.FreeTypeFont, char: str) -> tuple[int, bytes]:
     return advance, pack_alpha(image)
 
 
-def write_atlas(root: Path, font_path: Path, font_index: int, output: Path, family: str) -> None:
+def write_atlas(root: Path, font_path: Path, font_index: int, output: Path, family: str,
+                retain_atlas: Path | None = None) -> None:
     chars = collect_runes(root)
+    if retain_atlas is not None:
+        retained = retain_atlas.read_bytes()
+        if len(retained) < 20 or retained[:4] != MAGIC:
+            raise SystemExit("保留字模來源不是有效 GEMF v2")
+        version, width, height, row, reserved1, reserved2, count = struct.unpack_from("<HHHHHHI", retained, 4)
+        if (version, width, height, row, reserved1, reserved2) != (VERSION, CELL_W, CELL_H, CELL_W, 0, 0) or len(retained) != 20 + count * 1032:
+            raise SystemExit("保留字模來源的版本或形狀不符")
+        old = [struct.unpack_from("<I", retained, 20 + i * 1032)[0] for i in range(count)]
+        if old != sorted(set(old)) or any(c > 0x10ffff or 0xd800 <= c <= 0xdfff for c in old):
+            raise SystemExit("保留字模來源的 Unicode 索引不符")
+        chars = sorted(set(chars).union(old))
     try:
         font = ImageFont.truetype(str(font_path), CELL_H, index=font_index)
     except OSError as exc:
@@ -138,8 +150,9 @@ def main() -> int:
     parser.add_argument("--font-index", type=int, default=3)
     parser.add_argument("--family", choices=("sans", "serif"), default="sans")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--retain-atlas", type=Path, help="保留既有 GEMF v2 的字元集合，避免文案刪字縮減既有字型能力")
     args = parser.parse_args()
-    write_atlas(args.root, args.font, args.font_index, args.output, args.family)
+    write_atlas(args.root, args.font, args.font_index, args.output, args.family, args.retain_atlas)
     return 0
 
 

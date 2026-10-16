@@ -90,3 +90,43 @@ func TestModernLoopMetadataResamplesToSharedOutputRate(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestLocalOriginalHDArrangementsLoopAtDeviceRates(t *testing.T) {
+	dir := os.Getenv("DSDS_LOCAL_HD_MUSIC")
+	if dir == "" {
+		t.Skip("private full arrangements not supplied")
+	}
+	set, err := LoadModernTracks(dir)
+	if err != nil || len(set.Sources) != 11 || len(set.Warnings) != 0 {
+		t.Fatalf("full HD catalog: %d, %v, %v", len(set.Sources), set.Warnings, err)
+	}
+	for track, source := range set.Sources {
+		for _, rate := range []int{44100, 48000} {
+			stream, scaled, err := decodeModernSource(source, rate)
+			if err != nil {
+				t.Fatalf("%s @ %d: %v", track, rate, err)
+			}
+			pcm, err := io.ReadAll(stream)
+			if err != nil || len(pcm) == 0 {
+				t.Fatalf("decode %s: %v", track, err)
+			}
+			loop, err := newLoopReader(stream, scaled)
+			if err != nil {
+				t.Fatalf("loop %s @ %d: %v", track, rate, err)
+			}
+			n := int(scaled.LoopLength * 4)
+			if n <= 8192 || n > len(pcm) {
+				t.Fatalf("loop range %d/%d", n, len(pcm))
+			}
+			for repeat := 0; repeat < 3; repeat++ {
+				got := make([]byte, n)
+				if _, err := io.ReadFull(loop, got); err != nil {
+					t.Fatal(err)
+				}
+				if !bytes.Equal(got, pcm[:n]) {
+					t.Fatalf("%s @ %d loop %d differs", track, rate, repeat)
+				}
+			}
+		}
+	}
+}

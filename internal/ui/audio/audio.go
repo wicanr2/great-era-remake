@@ -28,15 +28,23 @@ const (
 type Track string
 
 const (
-	TrackScene     Track = "scene"
-	TrackStrategy  Track = "strategy"
-	TrackMainTheme Track = "main-theme"
-	TrackBattle1   Track = "battle-1"
-	TrackBattle2   Track = "battle-2"
-	TrackBattleAlt Track = "battle-alt"
-	TrackWall      Track = "wall"
-	TrackFinal     Track = "final"
+	TrackScene              Track = "scene"
+	TrackStrategy           Track = "strategy"
+	TrackMainTheme          Track = "main-theme"
+	TrackBattle1            Track = "battle-1"
+	TrackBattle2            Track = "battle-2"
+	TrackBattleAlt          Track = "battle-alt"
+	TrackWall               Track = "wall"
+	TrackFinal              Track = "final"
+	TrackHuanWoHeShan       Track = "huan-wo-he-shan"
+	TrackNationalRevolution Track = "national-revolution"
+	TrackEightHundredHeroes Track = "eight-hundred-heroes"
 )
+
+// HDOnlyTrack identifies additional arrangements without a DOS MUS counterpart.
+func HDOnlyTrack(track Track) bool {
+	return track == TrackHuanWoHeShan || track == TrackNationalRevolution || track == TrackEightHundredHeroes
+}
 
 // Effect 是 Modern 外殼的短效果音。它不是原版音效的逐樣本仿製；每一個
 // 名稱只代表玩家已知的 UI／戰鬥事件，實際波形由純 Go 合成器產生。

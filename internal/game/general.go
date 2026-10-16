@@ -309,8 +309,10 @@ func CountOf(gs []General, p ProvinceID) int {
 
 // GeneralNameSlotWidth 是 MAN{N}15 名表的槽寬：每個人名佔 3 個字模格。
 //
-// 將領筆數要用名表算（`len(Glyphs) / 3`），**不能用「檔案大小 ÷ 33」**——
-// 三個 MAN(N).DAT 都是 9,042 B，但第二三期只有 106 位，其餘是殘料。
+// 姓名槽數用 `len(Glyphs) / 3`；有效將領筆數則用 Scenario.Generals，
+// 不能用姓名槽數或「檔案大小 ÷ 33」取代——
+// 三個 MAN(N).DAT 都是 9,042 B；第二、三期有 191 筆有效記錄，
+// MAN 名表只含 106 個姓名，另有 85 槽日本姓名表，ID 映射仍待確認。
 const GeneralNameSlotWidth = 3
 
 // SaveGeneralsOffset 是 `SAVE(N).DT1` 裡**將領區的起點**：5203。

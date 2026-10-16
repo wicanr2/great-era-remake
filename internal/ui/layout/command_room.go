@@ -14,6 +14,7 @@ const RoomVisibleCommands = 8
 func RoomCommand(i int) Rect { return Rect{20, 322 + i*38, 320, 35} }
 
 var RoomArt = Rect{1168, 6, 104, 34}
+var RoomArmory = Rect{792, 52, 180, 36}
 var RoomInterface = Rect{1036, 6, 124, 34}
 var RoomPrevious = Rect{302, 122, 24, 30}
 var RoomNext = Rect{330, 122, 24, 30}
@@ -47,10 +48,11 @@ var RoomArchiveListNext = Rect{400, 636, 88, 30}
 type InterfaceMode string
 
 const (
+	InterfaceModern   InterfaceMode = "modern"
 	InterfaceCommand  InterfaceMode = "command"
 	InterfaceOriginal InterfaceMode = "original"
 )
 
 func ValidInterface(mode string) bool {
-	return mode == "" || mode == string(InterfaceCommand) || mode == string(InterfaceOriginal)
+	return mode == "" || mode == string(InterfaceCommand) || mode == string(InterfaceModern) || mode == string(InterfaceOriginal)
 }
