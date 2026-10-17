@@ -332,3 +332,19 @@ Modern 提案置於 workplace/hoi4-ui-prototype/modern-controls-20261016，原�
 六份封包、76 秒推廣片、README 十三張新圖與四條 Linux／Wine 封包實跑完成。三份本機完整包各約 28 MiB；公開包排除原版資料、字庫與十一首衍生音樂。十九套件、音訊、影片、版本、架構、CRC、私有來源與舊交付保護核對通過。SOURCE 為 36157deb67d86f40f29093e673e3f60cb22cabc8，已推送 master。
 
 共用 AGENTS.md 的主機 gh 例外目前只列 Issue，Release 未列入，且禁止搬運主機憑證。已向使用者提出本次主機 gh 發布五個已驗證公開附件的執行例外；未獲回答前不建立或發布新版 Release。其餘交付與校驗已完成，入口為本版 dist-all/index.html。
+
+## 2026-10-17：README 新版操作說明
+
+依使用者要求補齊玩家操作。核對目前開局、Modern 表單、工具列及戰術的程式與 SPEC-58／59／60，集中說明滑鼠選省、徵兵、調動、整編、人物、軍備、確認取消、戰鬥暫停續戰、存讀檔及即時切換。快捷鍵區分軍政頁與戰術指令層，存讀檔使用 Ctrl／Command+S、Ctrl／Command+L；保留整備試玩與未完成入侵的分界。CONTEXT 連至同一份操作章節。
+
+文件與現有程式、十三張本版實錄核對；67 個相對連結及錨點、差異空白檢查通過，資產拒絕掃描 1,469 檔零命中。僅修改 README、CONTEXT 與本紀錄，無需重跑遊戲測試或重建封包。三檔擁有權均為 1000:1000，既有 2,124 個 root-owned 項目不變，無 .md 目錄。本輪容器已移除；修改留在工作樹，未提交或推送。
+
+## 2026-10-17：正式發布 v.1.1.0-20261017
+
+使用者回覆「授權發布 gh」，補足本次主機 gh 的執行例外。重新核對主機認證、GitHub #1／#32、現有 Release 及歷史 tag，並沿用已完成的六包、十九套件、四條封包流程與影片驗收，沒有重建或覆寫已驗證產物。
+
+新 annotated tag 指向實際打包來源 `36157deb67d86f40f29093e673e3f60cb22cabc8`。先建立草稿，上傳三平台公開引擎 ZIP、SHA256SUMS.txt 與 RELEASE-VERIFICATION.json，下載回本機逐一核對 SHA-256；五個附件均相符後，於臺灣時間 2026-10-17 07:56:56 正式發布並設為 latest。公開狀態、精確附件 ID、大小、雜湊及 tag 提交再次回讀相符；四個歷史 tag 未變，遠端仍僅有 master 分支。[正式 Release](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.1.0-20261017)。
+
+原版資料、字庫、八首原曲 HD、三首軍歌及比較影片仍保留本機。發布收據由 `workplace/hoi4-ui-prototype/release-v.1.1.0-20261017/README.md` 索引，包含 publication-verification.json、正式 API 本文及回下載副本。CONTEXT 與 SPEC-48 更新正式狀態，README 新版操作隨文件收尾提交 master；GitHub #32 結案，#1 更新完成項目。完整抗日戰役及平台真機仍由既有 Issue 追蹤。
+
+文件收尾通過 104 個相對連結及錨點、差異空白與 1,469 檔資產拒絕掃描，十三張 README 實錄保留；本輪只更動文件，沿用既有程式及封包驗收。四份文件擁有權為 1000:1000，既有 2,124 個 root-owned 項目不變，無 .md 目錄，本輪容器已清除。文件提交以 `Publish release status and Modern control guide` 保存並推送 master，完整來源及狀態可由該提交與本輪發布收據回查。

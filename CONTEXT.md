@@ -4,9 +4,9 @@
 
 | 項目 | 現況與入口 |
 |---|---|
-| 本輪交付 | v.1.1.0-20261017 六份封包及本機影片已驗證完成，Release 等待使用者允許主機 gh 的執行例外。 [Issue #32](https://github.com/wicanr2/great-era-remake/issues/32)保存發行工作；來源 `36157deb67d86f40f29093e673e3f60cb22cabc8` 已推送 master，README 更新十三張本版實錄。工具與驗收入口為 `workplace/hoi4-ui-prototype/release-v.1.1.0-20261017/README.md` |
+| 本輪交付 | v.1.1.0-20261017 已正式發布，六份封包、76 秒本機影片及 README 十三張實錄已驗證完成。[Issue #32](https://github.com/wicanr2/great-era-remake/issues/32)保存發行工作；README 已補新版操作。工具、附件回下載及發布收據入口為 `workplace/hoi4-ui-prototype/release-v.1.1.0-20261017/README.md` |
 | 主要分支 | GitHub 僅保留 `master`；已整併正式版、前版發行與研究分支全部提交，其餘三個遠端分支依使用者要求移除；整理見 [Issue #9](https://github.com/wicanr2/great-era-remake/issues/9)，清理見 [Issue #10](https://github.com/wicanr2/great-era-remake/issues/10) |
-| 正式版 | [v.1.0.3-20261015](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.0.3-20261015)，來源提交 `60bc1521ae0de7135ed07ef3bd276a4b0ea75c10`；五份公開附件雜湊核對相符，舊 tag、Release 與附件保留 |
+| 正式版 | [v.1.1.0-20261017](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.1.0-20261017)，來源提交 `36157deb67d86f40f29093e673e3f60cb22cabc8`；五份公開附件回下載 SHA-256 全部相符，GitHub latest 已切換。舊 tag、Release 與附件保留；[公開驗收收據](https://github.com/wicanr2/great-era-remake/releases/download/v.1.1.0-20261017/RELEASE-VERIFICATION.json) |
 | 呈現與音訊 | 主線預設 Modern、HD 美術、滑鼠及 HD 音樂，美術／介面／音樂可獨立切換。原版介面保留；本機完整版含八首原曲 HD 與三首軍歌，公開引擎包保留已採用八首原創 Ogg。接線見 [SPEC-60](docs/spec/60-original-hd-music.md) |
 | v1.0.3 已發行修正 | 常駐五欄工具列加入 HD／原版／靜音、自動／八首選曲及偏好保存；完整版零參數啟動自行定位資料，存檔寫使用者目錄；見 [Issue #17](https://github.com/wicanr2/great-era-remake/issues/17)及 [SPEC-51](docs/spec/51-live-music-startup.md) |
 | 人物 | 416 筆檔案、392 篇中文正文；24 位待考依使用者決定停止研究，#3 以 not planned 關閉；英日各 392 篇保留 machine-draft |
@@ -53,4 +53,4 @@
 
 過去的現況表、已停止工作清單及被後續方案取代的設計文件不再放在目前工作樹。其完整內容由 Git 提交歷史保存，入口集中於 WORKLOG；原始研究輸入、獨有證據與已發布交付物不因去重刪除。文件去重與引用核對見 [Issue #11](https://github.com/wicanr2/great-era-remake/issues/11)。
 
-README 以北伐與抗戰故事開場，介紹玩法、Modern 與 HD、十四勢力開局、軍備整備及即時切換。十三張本版實錄與故事只由 README 維護；影片與下載入口為本機 `dist-all/v.1.1.0-20261017/index.html`。歷史原片與舊交付保留，來源及驗收見 [SPEC-48](docs/spec/48-hd-release-integration.md)與 #32。
+README 以北伐與抗戰故事開場，介紹玩法、Modern 與 HD、十四勢力開局、軍備整備及即時切換。[新版操作](README.md#新版操作modern)集中說明滑鼠流程、返回與取消、戰術暫停續戰、存讀檔及快捷鍵。十三張本版實錄與故事只由 README 維護；影片與下載入口為本機 `dist-all/v.1.1.0-20261017/index.html`。歷史原片與舊交付保留，來源及驗收見 [SPEC-48](docs/spec/48-hd-release-integration.md)與 #32。

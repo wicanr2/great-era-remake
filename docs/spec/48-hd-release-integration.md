@@ -160,7 +160,7 @@
 
 ## v.1.1.0-20261017 交付與展示
 
-狀態：CONFORMED，本機交付與正常玩家驗收完成，Release 待執行例外授權。使用者要求三平台完整版、Release、更新 README 截圖並重錄推廣影片，且明確選擇先完成 SPEC-60 配樂。工作由 [Issue #32](https://github.com/wicanr2/great-era-remake/issues/32)追蹤。
+狀態：CONFORMED，本機交付、正常玩家驗收及正式 Release 已完成。使用者要求三平台完整版、Release、更新 README 截圖並重錄推廣影片，且明確選擇先完成 SPEC-60 配樂，並於 2026-10-17 授權主機 gh 發布。工作由 [Issue #32](https://github.com/wicanr2/great-era-remake/issues/32)追蹤。
 
 沿用已驗收的 SPEC-54–59 開局、軍備整備、雙方資訊、Modern 與安全返回；完整日軍入侵仍在開發。公開包只含原創八曲，本機完整版提供原曲 HD 與三首軍歌。新版本從乾淨 master 重建，舊 tag、附件與封包不動。
 
@@ -187,3 +187,5 @@
 本機推廣片為 76 秒、1280×720、30 fps、H.264／雙聲道 AAC，SHA-256 `887d68eed7b60eb3747911d764b465e907b1b8e79e6d980f2c5c68002af4a38d`。十九章、非靜音、完整解碼、字幕、黑幀、長時間凍結與接回原片的視覺檢查通過。編碼進度延遲以實際 PNG 與原片匹配定位，戰術末段另重錄並等待排空，不以錯誤工具時間作遊戲缺陷。音樂僅用本輪自行渲染的原曲 HD 與軍歌，沒有下載他人演出作成品。影片、來源、rights、抽幀與 QA 在本版 promo 目錄。
 
 5,715 份保護檔案中，5,712 份位元組保持不變；唯一三份差異為公開原創配樂的版本 metadata，八首 Ogg 本體未變。錄影及 README 程式與正式 Linux 二進位 SHA-256 相同。
+
+[v.1.1.0-20261017](https://github.com/wicanr2/great-era-remake/releases/tag/v.1.1.0-20261017)於 2026-10-17 正式發布並設為最新版本，tag 指向實際打包提交 `36157deb67d86f40f29093e673e3f60cb22cabc8`。三平台公開引擎 ZIP、SHA256SUMS.txt 與 RELEASE-VERIFICATION.json 共五個附件回下載後，SHA-256 均與本機核准檔案相符；公開狀態、附件 ID 與雜湊收據由本輪工作區 README 索引。原版資料、字庫、原曲 HD、軍歌與比較影片留在本機，舊發行保留。
