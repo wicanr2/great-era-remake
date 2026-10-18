@@ -80,12 +80,42 @@ func (c *Canvas) DrawMessageOverlay(fonts *assets.EtenFonts, fg, bg assets.RGB,
 	x, y, w, h int, msg string) []rune {
 	c.fillRect(x, y, w, h, bg)
 	c.strokeRect(x, y, w, h, fg)
+	// New toolbar messages can contain Japanese glyphs absent from Eten.
+	// Preserve the existing bitmap path whenever Eten covers the whole text.
+	if messageNeedsUnicode(fonts, msg) {
+		roomParagraph(c, fonts, msg, uilayout.Rect{X: x + 12, Y: y + 8, W: w - 24, H: h - 16}, fg)
+		return nil
+	}
 	lines := wrapSemanticMessage(msg, w-24, 3)
 	missing := []rune{}
 	for i, line := range lines {
 		missing = append(missing, c.DrawSemanticText(fonts, line, fg, x+12, y+10+i*24)...)
 	}
 	return uniqueRunes(missing)
+}
+
+func messageNeedsUnicode(fonts *assets.EtenFonts, text string) bool {
+	font, err := assets.EmbeddedModernFontFamily(assets.ModernFontSans)
+	if err != nil {
+		return false
+	}
+	needed := false
+	for _, r := range text {
+		if r == '\n' || r == '\r' || r == '\t' || r >= 0x20 && r <= 0x7e {
+			continue
+		}
+		covered := false
+		if fonts != nil {
+			_, covered = fonts.GlyphRune(r)
+		}
+		if !covered {
+			if _, available := font.Glyph(r); !available {
+				return false
+			}
+			needed = true
+		}
+	}
+	return needed
 }
 
 func wrapSemanticMessage(s string, maxPixels, maxLines int) []string {

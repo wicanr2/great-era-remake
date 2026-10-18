@@ -18,6 +18,19 @@ import "fmt"
 //  3. 攻方存活的將領移防到 at 省——**這是 remake 的補完**，
 //     原版打完之後部隊怎麼安置還沒解（`docs/re/06` 只解到進戰鬥）
 func (w *AIWorld) ResolveAttack(from, at ProvinceID) (BattleOutcome, error) {
+	return w.resolveAttack(from, at, nil)
+}
+
+// ResolveSelectedAttack shares settlement with ordinary attacks, but uses the
+// explicit Japanese breakthrough formation rather than silently changing it.
+func (w *AIWorld) ResolveSelectedAttack(from, at ProvinceID, ids []GeneralID) (BattleOutcome, error) {
+	if len(ids) == 0 {
+		return BattleOutcome{}, fmt.Errorf("game: selected attack requires armies")
+	}
+	return w.resolveAttack(from, at, ids)
+}
+
+func (w *AIWorld) resolveAttack(from, at ProvinceID, ids []GeneralID) (BattleOutcome, error) {
 	if w.Map == nil {
 		return BattleOutcome{}, fmt.Errorf("game: ResolveAttack 需要 Map")
 	}
@@ -31,6 +44,12 @@ func (w *AIWorld) ResolveAttack(from, at ProvinceID) (BattleOutcome, error) {
 	}
 
 	atk, atkIdx := w.combatants(from, src.Commander)
+	if ids != nil {
+		atk, atkIdx, err = w.SelectedCombatants(from, src.Commander, ids)
+		if err != nil {
+			return BattleOutcome{}, err
+		}
+	}
 	def, defIdx := w.combatants(at, dst.Commander)
 	if len(atk) == 0 {
 		return BattleOutcome{}, fmt.Errorf("game: 省 %d 沒有可出兵的將領", from)
@@ -44,7 +63,13 @@ func (w *AIWorld) ResolveAttack(from, at ProvinceID) (BattleOutcome, error) {
 		// 「有主但沒有將領」，下一回合又被別人白拿——連續跑時
 		// 會看到「拿下 151 省」但有主省只有 31 個（`docs/playtest/06` §2）。
 		dst.Capture(src.Commander)
-		w.Units[atkIdx[0]].Province = at
+		if ids != nil {
+			for _, i := range atkIdx {
+				w.Units[i].Province = at
+			}
+		} else {
+			w.Units[atkIdx[0]].Province = at
+		}
 		return BattleOutcome{AttackerWon: true, Decided: true}, nil
 	}
 

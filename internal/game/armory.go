@@ -28,21 +28,22 @@ type EquipmentModel struct {
 	Output            uint32
 	Cost              ArmoryCost
 	Power, RoughPower uint32
+	Armor, Piercing   uint32 // SPEC-65 design coefficients; derived, not saved.
 	Legacy            bool
 }
 
 var equipmentModels = []EquipmentModel{
-	{ID: "rifle-old", Class: EquipmentRifle, Output: 30, Cost: ArmoryCost{Gold: 4, Iron: 1}, Power: 100, RoughPower: 100},
-	{ID: "rifle-modern", Class: EquipmentRifle, Months: 2, Prerequisite: "rifle-old", Output: 24, Cost: ArmoryCost{Gold: 6, Iron: 1}, Power: 125, RoughPower: 125},
-	{ID: "light-tank", Class: EquipmentArmor, Months: 3, Output: 1, Cost: ArmoryCost{Gold: 300, Iron: 15, Coal: 6, Fuel: 2}, Power: 125, RoughPower: 87},
-	{ID: "armor-improved", Class: EquipmentArmor, Months: 4, Prerequisite: "light-tank", Output: 1, Cost: ArmoryCost{Gold: 450, Iron: 22, Coal: 9, Fuel: 3}, Power: 150, RoughPower: 105},
-	{ID: "mountain-basic", Class: EquipmentArtillery, Output: 2, Cost: ArmoryCost{Gold: 65, Iron: 4, Coal: 2}, Power: 100, RoughPower: 100},
-	{ID: "mountain-improved", Class: EquipmentArtillery, Months: 2, Prerequisite: "mountain-basic", Output: 2, Cost: ArmoryCost{Gold: 80, Iron: 5, Coal: 2}, Power: 125, RoughPower: 125},
-	{ID: "field-howitzer", Class: EquipmentArtillery, Months: 3, Output: 1, Cost: ArmoryCost{Gold: 130, Iron: 8, Coal: 4}, Power: 140, RoughPower: 90},
-	{ID: "antitank", Class: EquipmentArtillery, Months: 2, Output: 2, Cost: ArmoryCost{Gold: 90, Iron: 4, Coal: 2}, Power: 110, RoughPower: 110},
-	{ID: "legacy-rifle", Class: EquipmentRifle, Power: 100, RoughPower: 100, Legacy: true},
-	{ID: "legacy-armor", Class: EquipmentArmor, Power: 100, RoughPower: 100, Legacy: true},
-	{ID: "legacy-artillery", Class: EquipmentArtillery, Power: 100, RoughPower: 100, Legacy: true},
+	{ID: "rifle-old", Class: EquipmentRifle, Output: 30, Cost: ArmoryCost{Gold: 4, Iron: 1}, Power: 100, RoughPower: 100, Piercing: 5},
+	{ID: "rifle-modern", Class: EquipmentRifle, Months: 2, Prerequisite: "rifle-old", Output: 24, Cost: ArmoryCost{Gold: 6, Iron: 1}, Power: 125, RoughPower: 125, Piercing: 10},
+	{ID: "light-tank", Class: EquipmentArmor, Months: 3, Output: 1, Cost: ArmoryCost{Gold: 300, Iron: 15, Coal: 6, Fuel: 2}, Power: 125, RoughPower: 87, Armor: 50, Piercing: 50},
+	{ID: "armor-improved", Class: EquipmentArmor, Months: 4, Prerequisite: "light-tank", Output: 1, Cost: ArmoryCost{Gold: 450, Iron: 22, Coal: 9, Fuel: 3}, Power: 150, RoughPower: 105, Armor: 70, Piercing: 70},
+	{ID: "mountain-basic", Class: EquipmentArtillery, Output: 2, Cost: ArmoryCost{Gold: 65, Iron: 4, Coal: 2}, Power: 100, RoughPower: 100, Piercing: 20},
+	{ID: "mountain-improved", Class: EquipmentArtillery, Months: 2, Prerequisite: "mountain-basic", Output: 2, Cost: ArmoryCost{Gold: 80, Iron: 5, Coal: 2}, Power: 125, RoughPower: 125, Piercing: 30},
+	{ID: "field-howitzer", Class: EquipmentArtillery, Months: 3, Output: 1, Cost: ArmoryCost{Gold: 130, Iron: 8, Coal: 4}, Power: 140, RoughPower: 90, Piercing: 40},
+	{ID: "antitank", Class: EquipmentArtillery, Months: 2, Output: 2, Cost: ArmoryCost{Gold: 90, Iron: 4, Coal: 2}, Power: 110, RoughPower: 110, Piercing: 80},
+	{ID: "legacy-rifle", Class: EquipmentRifle, Power: 100, RoughPower: 100, Legacy: true, Piercing: 5},
+	{ID: "legacy-armor", Class: EquipmentArmor, Power: 100, RoughPower: 100, Legacy: true, Armor: 20, Piercing: 30},
+	{ID: "legacy-artillery", Class: EquipmentArtillery, Power: 100, RoughPower: 100, Legacy: true, Piercing: 20},
 }
 
 func EquipmentCatalog() []EquipmentModel { return append([]EquipmentModel(nil), equipmentModels...) }
@@ -105,6 +106,8 @@ type Armory struct {
 	Units                   map[GeneralID]*UnitEquipment
 	ReservePersonnel        map[GeneralID]uint32
 	Initial, Produced, Lost map[EquipmentID]uint64
+	InvasionBatches         map[uint8]InvasionArrival `json:",omitempty"`
+	Landing                 *InvasionLanding          `json:",omitempty"`
 }
 
 var (
@@ -271,6 +274,22 @@ func affordable(r, c ArmoryCost, wanted uint32) uint32 {
 }
 func scaledCost(c ArmoryCost, n uint32) ArmoryCost {
 	return ArmoryCost{c.Gold * n, c.Iron * n, c.Coal * n, c.Fuel * n}
+}
+
+// PauseMonth advances the accounting clock without making up paused production
+// or research later. Issued equipment and loss accounting remain in use.
+func (a *Armory) PauseMonth(w *AIWorld, month uint32) error {
+	if a == nil || month != a.LastMonth+1 || month > 65536*12 {
+		return ErrArmoryMonth
+	}
+	if err := a.Validate(w); err != nil {
+		return err
+	}
+	for _, nation := range a.Nations {
+		nation.Last = map[EquipmentID]ArmoryProduction{}
+	}
+	a.LastMonth = month
+	return nil
 }
 
 // SettleMonth charges each completed item once. Research follows existing lines.
@@ -565,6 +584,8 @@ func (a *Armory) Clone() *Armory {
 	out.Produced = maps.Clone(a.Produced)
 	out.Lost = maps.Clone(a.Lost)
 	out.ReservePersonnel = maps.Clone(a.ReservePersonnel)
+	out.InvasionBatches = a.cloneInvasionBatches()
+	out.Landing = a.Landing.Clone()
 	return &out
 }
 func (a *Armory) sync(w *AIWorld) error {
@@ -729,6 +750,13 @@ func (a *Armory) Validate(w *AIWorld) error {
 			return ErrArmoryState
 		}
 	}
+	imports, err := a.invasionEquipment(w)
+	if err != nil {
+		return err
+	}
+	if !a.validInvasionLanding() {
+		return ErrInvasionLanding
+	}
 	totals := map[EquipmentID]uint64{}
 	for _, ledger := range []map[EquipmentID]uint64{a.Initial, a.Produced, a.Lost} {
 		for id, n := range ledger {
@@ -797,7 +825,7 @@ func (a *Armory) Validate(w *AIWorld) error {
 		}
 	}
 	for _, m := range equipmentModels {
-		if a.Initial[m.ID]+a.Produced[m.ID] != totals[m.ID]+a.Lost[m.ID] {
+		if a.Initial[m.ID]+a.Produced[m.ID]+imports[m.ID] != totals[m.ID]+a.Lost[m.ID] {
 			return fmt.Errorf("%w: equipment ledger %s", ErrArmoryState, m.ID)
 		}
 	}

@@ -10,6 +10,7 @@ import (
 	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/game"
 	"github.com/wicanr2/great-era-remake/internal/ui/actions"
+	uilayout "github.com/wicanr2/great-era-remake/internal/ui/layout"
 	"github.com/wicanr2/great-era-remake/internal/ui/render"
 )
 
@@ -77,7 +78,7 @@ func battleModeMessage(mode battleMode) string {
 func commandNumberPressed() (int, bool) {
 	keys := [...]ebiten.Key{ebiten.Key1, ebiten.Key2, ebiten.Key3, ebiten.Key4, ebiten.Key5}
 	for i, key := range keys {
-		if inpututil.IsKeyJustPressed(key) {
+		if keyboardKeyPressed(key) {
 			return i + 1, true
 		}
 	}
@@ -86,7 +87,7 @@ func commandNumberPressed() (int, bool) {
 
 func attackOptionPressed() (int, bool) {
 	for i, key := range dirKeys {
-		if inpututil.IsKeyJustPressed(key) {
+		if keyboardKeyPressed(key) {
 			return i + 1, true
 		}
 	}
@@ -104,17 +105,21 @@ var (
 
 // battleState 是戰鬥畫面的介面狀態。規則狀態在 `sim` 裡。
 type battleState struct {
-	paused     bool
-	sim        *game.BattleSim
-	sel        int    // 目前選中第幾個攻方單位
-	log        string // 最近一次動作的結果，畫在面板上
-	finished   bool
-	settlement game.BattleSettlement // 已證實的收尾分類；未知時保持零值
-	settled    bool                  // 世界層已套用結算；避免 F10／重複寫回重跑
-	forceDirty bool                  // 戰鬥副本的已確認兵力尚未同步回將領表
-	mode       battleMode            // 原版五項選單的目前輸入層
-	infoPage   int
-	infoPress  string
+	japaneseBlitz    bool           // SPEC-63: finite monthly attacks and supply writeback.
+	humanDefender    bool           // SPEC-63: input ownership, independent of actual battle sides.
+	previewDefender  game.GeneralID // transient hover only; never saved as a command
+	paused           bool
+	sim              *game.BattleSim
+	sel              int    // 目前選中第幾個攻方單位
+	log              string // 最近一次動作的結果，畫在面板上
+	finished         bool
+	settlement       game.BattleSettlement // 已證實的收尾分類；未知時保持零值
+	settled          bool                  // 世界層已套用結算；避免 F10／重複寫回重跑
+	externalInvasion bool
+	forceDirty       bool       // 戰鬥副本的已確認兵力尚未同步回將領表
+	mode             battleMode // 原版五項選單的目前輸入層
+	infoPage         int
+	infoPress        string
 	// retreatInput／retreatTargets 服務原版樣本與省份表 fallback；來源標籤
 	// 保留在 game.RetreatCandidates，不把 fallback 冒充跨戰鬥 oracle。
 	retreatInput   uint32
@@ -158,6 +163,9 @@ func (b *battleState) finishWithWinner(winner game.BattleSide) {
 	}
 	b.settlement = settlement
 	b.finished = true
+	if b.humanDefender {
+		b.retreatTargets = nil
+	}
 }
 
 // finishByTurnLimit 記錄「無勝方、回合用盡」的已證實分類。這是目前唯一
@@ -173,6 +181,9 @@ func (b *battleState) finishByTurnLimit() {
 	}
 	b.settlement = settlement
 	b.finished = true
+	if b.humanDefender {
+		b.retreatTargets = nil
+	}
 }
 
 // persistFinishedBattle 讓所有已結束分支共用同一個副本寫回入口。
@@ -210,6 +221,9 @@ func (a *app) applyBattleSettlement() error {
 	if b == nil || b.sim == nil || b.settled {
 		return nil
 	}
+	if b.externalInvasion {
+		return a.settleExternalInvasion(0)
+	}
 	if b.settlement.Kind == game.BattleSettlementUnknown {
 		// 舊測試 fixture／尚未分類的異常結束不猜戰後結果；ESC 仍會
 		// 由 clearBattleFlag 清理暫時旗標。
@@ -222,9 +236,14 @@ func (a *app) applyBattleSettlement() error {
 	if a.world != nil {
 		units = a.world.Units
 	}
+	commitSupply, err := a.prepareJapaneseSupply(b)
+	if err != nil {
+		return err
+	}
 	if err := game.ApplyBattleSettlement(b.sim, a.tbl, a.generals, units, b.settlement); err != nil {
 		return err
 	}
+	commitSupply()
 	if b.settlement.Kind == game.BattleSettlementDecisive &&
 		b.settlement.Winner == game.BattleSideFirst {
 		// 攻方勝後，地圖游標跟著玩家軍隊進入新佔領省，避免
@@ -287,6 +306,10 @@ func retreatDestination(input uint32, targets []game.ProvinceID) (game.ProvinceI
 // `sub_4166E` 掃 NWMAP `0x4000` 旗標候選；玩家手動部署仍是另一條
 // `sub_42566` 互動路徑。
 func (a *app) startBattle(at, from game.ProvinceID) error {
+	return a.startBattleWithRoster(at, from, nil)
+}
+
+func (a *app) startBattleWithRoster(at, from game.ProvinceID, roster []game.GeneralID) error {
 	if a.activeBattle() {
 		return fmt.Errorf("%s", a.deskText("battle.locked"))
 	}
@@ -306,6 +329,12 @@ func (a *app) startBattle(at, from game.ProvinceID) error {
 	// Faction 對應執行期記錄 +14，應填省份司令而非省編號；戰力公式的
 	// 十大勢力加成與敵我判定都會讀這個欄位（docs/spec/02 §3、docs/re/08 §4）。
 	atk := combatants(a.generals, from, fromProv.Commander)
+	if roster != nil {
+		atk, _, err = a.world.SelectedCombatants(from, fromProv.Commander, roster)
+		if err != nil {
+			return err
+		}
+	}
 	def := combatants(a.generals, at, atProv.Commander)
 	if len(atk) == 0 {
 		return fmt.Errorf("省 %d 沒有將領可以出兵", from)
@@ -432,6 +461,7 @@ func combatants(gs []game.General, prov game.ProvinceID, faction game.GeneralID)
 //
 // ESC 退回政略畫面（`AGENTS.md` §8：ESC 只取消／退回，不離開遊戲）。
 func (a *app) updateBattle() error {
+	a.updateBattlePreview()
 	b := a.battle
 	if b == nil {
 		a.screen, a.dirty = screenMap, true
@@ -462,6 +492,9 @@ func (a *app) updateBattle() error {
 		// 目前輸入沒有可重建的省份資料，安全停在主選單。
 		if mode == battleModeRetreat && len(b.retreatTargets) == 0 {
 			b.log = "撤退候選尚未由原版證據閉合"
+			if b.humanDefender {
+				b.log = a.militaryText("withdraw.unavailable")
+			}
 			a.dirty = true
 			return false
 		}
@@ -498,6 +531,14 @@ func (a *app) updateBattle() error {
 				a.dirty = true
 				return nil
 			}
+			if b.humanDefender {
+				if err := a.withdrawDefenders(to); err != nil {
+					fmt.Fprintln(os.Stderr, "[defender withdrawal]", err)
+					b.log = a.militaryText("withdraw.failed")
+					a.dirty = true
+				}
+				return nil
+			}
 			// 立即撤退樣本在回到政略地圖時不改寫 DT2／MEM_WAR；
 			// 這裡只移動目前畫面的省份，不呼叫任何戰後寫回入口。
 			b.settlement = game.BattleSettlementImmediateRetreat()
@@ -515,10 +556,10 @@ func (a *app) updateBattle() error {
 
 	// Tab：換一個攻方單位。
 	if a.actionPressed(actions.BattleNextUnit, ebiten.KeyTab) {
-		if len(b.sim.Attacker) == 0 {
+		if len(b.humanUnits()) == 0 {
 			return nil
 		}
-		b.sel = (b.sel + 1) % len(b.sim.Attacker)
+		b.sel = (b.sel + 1) % len(b.humanUnits())
 		b.log = ""
 		a.dirty = true
 		return nil
@@ -526,6 +567,9 @@ func (a *app) updateBattle() error {
 	u := b.current()
 	if u == nil {
 		b.finished = true
+		if b.humanDefender {
+			b.retreatTargets = nil
+		}
 		a.dirty = true
 		return nil
 	}
@@ -670,7 +714,11 @@ func (a *app) updateBattle() error {
 func (a *app) activeBattle() bool { return a != nil && a.battle != nil && !a.battle.finished }
 func (a *app) pauseBattle() {
 	if !a.activeBattle() {
-		a.battle = nil
+		if a.strategyTurn == nil {
+			a.battle = nil
+		} else if a.battle != nil {
+			a.battle.paused = true
+		}
 		a.screen, a.dirty = screenMap, true
 		a.applyWindowSize()
 		return
@@ -741,7 +789,7 @@ func (a *app) directionPressed() (game.HexDir, bool) {
 		return game.HexDir(pointerDir), true
 	}
 	for i, key := range dirKeys {
-		if inpututil.IsKeyJustPressed(key) {
+		if keyboardKeyPressed(key) {
 			return game.HexDir(i + 1), true
 		}
 	}
@@ -786,7 +834,11 @@ func (b *battleState) runDefenderAI() {
 		return b.sim.RouteNextCell(to, from)
 	}
 
-	r := b.sim.ExecuteAction(d.A.Action, b.sim.Defender, b.sim.Attacker, route)
+	action := d.A.Action
+	if b.humanDefender {
+		action = d.B.Action
+	}
+	r := b.sim.ExecuteAction(action, b.enemyUnits(), b.humanUnits(), route)
 	if r.Decisive {
 		if r.DecisiveAttackerWon {
 			b.finishWithWinner(game.BattleSideFirst)
@@ -802,7 +854,7 @@ func (b *battleState) runDefenderAI() {
 	}
 
 	moves, fights := 0, 0
-	for _, u := range b.sim.Defender {
+	for _, u := range b.enemyUnits() {
 		if b.sim.StepByOrder(u) {
 			moves++
 		}
@@ -810,12 +862,16 @@ func (b *battleState) runDefenderAI() {
 			fights++
 		}
 	}
-	b.aiLog = fmt.Sprintf("守方：%s（動 %d 打 %d）",
-		game.BattleActionName(d.A.Action), moves, fights)
+	role := "守方"
+	if b.humanDefender {
+		role = "攻方"
+	}
+	b.aiLog = fmt.Sprintf("%s：%s（動 %d 打 %d）",
+		role, game.BattleActionName(action), moves, fights)
 	if !r.Implemented {
 		b.aiLog += " ⚠未實作"
 	}
-	b.aiAction, b.aiMoves, b.aiFights = int(d.A.Action), moves, fights
+	b.aiAction, b.aiMoves, b.aiFights = int(action), moves, fights
 
 	// ⚠️ **畫面上還畫不出這行字。** 原版的字模是每個場景一份子集
 	// （`AGENTS.md` §3），畫不出自由組合的中文；完整字型是 M6 的事。
@@ -826,10 +882,11 @@ func (b *battleState) runDefenderAI() {
 
 // current 回傳目前選中的攻方單位，跳過已陣亡的。
 func (b *battleState) current() *game.Combatant {
-	for i := 0; i < len(b.sim.Attacker); i++ {
-		u := b.sim.Attacker[(b.sel+i)%len(b.sim.Attacker)]
+	units := b.humanUnits()
+	for i := 0; i < len(units); i++ {
+		u := units[(b.sel+i)%len(units)]
 		if u.Alive() && u.Cell.Valid() {
-			b.sel = (b.sel + i) % len(b.sim.Attacker)
+			b.sel = (b.sel + i) % len(units)
 			return u
 		}
 	}
@@ -851,7 +908,7 @@ func (b *battleState) adjacentEnemies(u *game.Combatant) []*game.Combatant {
 		return nil
 	}
 	out := make([]*game.Combatant, 0, 6)
-	for _, d := range b.sim.Defender {
+	for _, d := range b.enemyUnits() {
 		if d != nil && d.Alive() && d.Cell.Valid() && game.Adjacent(u.Cell, d.Cell) {
 			out = append(out, d)
 		}
@@ -940,7 +997,7 @@ func (a *app) executeBattleAttack(number int) error {
 	}
 	u := b.current()
 	if u == nil {
-		b.log = "沒有可操作的攻方單位"
+		b.log = "沒有可操作的部隊"
 		a.dirty = true
 		return nil
 	}
@@ -1011,7 +1068,7 @@ func (a *app) drawBattle(c *render.Canvas) error {
 		if !u.Alive() || !u.Cell.Valid() {
 			continue
 		}
-		idx := render.BranchIcon(u.Branch(), true, u.Facing)
+		idx := render.BranchIcon(u.Branch(), !b.humanDefender, u.Facing)
 		if err := a.drawThemedUnit(c, idx, u.Cell); err != nil {
 			return err
 		}
@@ -1020,7 +1077,7 @@ func (a *app) drawBattle(c *render.Canvas) error {
 		if !u.Alive() || !u.Cell.Valid() {
 			continue
 		}
-		idx := render.BranchIcon(u.Branch(), false, u.Facing)
+		idx := render.BranchIcon(u.Branch(), b.humanDefender, u.Facing)
 		if err := a.drawThemedUnit(c, idx, u.Cell); err != nil {
 			return err
 		}
@@ -1091,21 +1148,59 @@ func (a *app) drawModernBattle(c *render.Canvas) error {
 		}
 	}
 	names := map[game.GeneralID]string{}
+	portraits := map[game.GeneralID]render.PortraitView{}
+	var hovered *game.Combatant
 	for _, group := range [][]*game.Combatant{b.sim.Attacker, b.sim.Defender} {
 		for _, u := range group {
 			if u != nil {
 				names[u.General] = a.generalDisplayName(u.General)
+				portrait, unavailable := a.portraitForGeneral(u.General)
+				portraits[u.General] = render.PortraitView{Portrait: portrait, Unavailable: unavailable}
+				if u.General == b.previewDefender {
+					hovered = u
+				}
 			}
 		}
 	}
 	return c.DrawModernBattleSurface(render.ModernBattleSurfaceData{
-		GeneralNames: names,
-		Battlefield:  bf,
-		Theme:        a.battlefieldTheme, Units: a.unitTheme,
+		GeneralNames:  names,
+		HumanDefender: b.humanDefender,
+		Portraits:     portraits, HoveredDefender: hovered,
+		Battlefield: bf,
+		Theme:       a.battlefieldTheme, Units: a.unitTheme,
 		Attackers: b.sim.Attacker, Defenders: b.sim.Defender,
 		CurrentCell: currentCell, TargetCells: targets, TargetNums: numbers,
 		Panel: d, Labels: labels, Fonts: a.eten, Log: b.log, Style: a.uiStyle(),
 	})
+}
+
+func (a *app) updateBattlePreview() {
+	if a.battle == nil {
+		return
+	}
+	var id game.GeneralID
+	if a.highModernBattle() {
+		x, y, valid := a.gameCursorPosition()
+		if valid {
+			layout, err := uilayout.NewEarthBattleLayout(uilayout.ModernDesignSurface())
+			if err == nil {
+				for _, u := range a.battle.enemyUnits() {
+					if u == nil || !u.Alive() || !u.Cell.Valid() {
+						continue
+					}
+					col, row := u.Cell.ColRow()
+					if layout.CellContains(col, row, x, y) {
+						id = u.General
+						break
+					}
+				}
+			}
+		}
+	}
+	if a.battle.previewDefender != id {
+		a.battle.previewDefender = id
+		a.dirty = true
+	}
 }
 
 func (a *app) modernBattleLabels() (render.ModernBattleLabels, error) {
@@ -1180,6 +1275,11 @@ func (a *app) modernBattleLabels() (render.ModernBattleLabels, error) {
 		}
 	}
 	if a.battle != nil && a.battle.sim != nil {
+		if a.battle.externalInvasion && len(a.battle.sim.Attacker) > 0 {
+			out.AttackerName = a.generalDisplayName(a.battle.sim.Attacker[0].Faction)
+			out.DefenderName = a.generalDisplayName(a.battle.sim.AtCommander)
+			return out, nil
+		}
 		if p, lookupErr := a.tbl.At(a.battle.sim.From); lookupErr == nil {
 			out.AttackerName = a.generalDisplayName(p.Commander)
 		}
@@ -1247,6 +1347,15 @@ func (a *app) battlePanelData() render.BattlePanelData {
 	}
 	d.Attacker.Units, d.Attacker.Soldiers = count(b.sim.Attacker)
 	d.Defender.Units, d.Defender.Soldiers = count(b.sim.Defender)
+	if b.externalInvasion && len(b.sim.Attacker) > 0 {
+		d.Attacker.Leader = b.sim.Attacker[0].Faction
+		d.Defender.Leader = b.sim.AtCommander
+		d.Attacker.Gold, d.Attacker.Food = uint32(b.supAtk.Gold), uint32(b.supAtk.Food)
+		d.Attacker.Ammo, d.Attacker.Fuel = uint32(b.supAtk.Ammo), uint32(b.supAtk.Fuel)
+		d.Defender.Gold, d.Defender.Food = uint32(b.supDef.Gold), uint32(b.supDef.Food)
+		d.Defender.Ammo, d.Defender.Fuel = uint32(b.supDef.Ammo), uint32(b.supDef.Fuel)
+		return d
+	}
 
 	if p, err := a.tbl.At(b.sim.From); err == nil {
 		d.Attacker.Leader = p.Commander

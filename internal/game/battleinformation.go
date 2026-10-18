@@ -22,6 +22,7 @@ type BattleUnitInformation struct {
 	Mobility, MaxMobility, Experience uint8
 	Tracked                           bool
 	Need, Equipped, Power             uint32
+	Protection                        EquipmentProtection
 	Equipment                         []BattleEquipmentInformation
 }
 
@@ -56,6 +57,7 @@ func InspectBattle(s *BattleSim) BattleInformation {
 					rough = kind == assets.TileHill || kind == assets.TileMountain
 				}
 				row.Power = army.Power(u.General, u.Branch(), u.Force(), rough)
+				row.Protection = army.Protection(u.General, u.Branch(), u.Force())
 				for _, m := range EquipmentCatalog() {
 					if count := army.Units[u.General].Items[m.ID]; count > 0 {
 						row.Equipment = append(row.Equipment, BattleEquipmentInformation{ID: m.ID, Count: count})

@@ -51,6 +51,16 @@ type BattleSim struct {
 // 守方本來就在場上（`docs/re/07` §5）。所以守方的落點由呼叫端給定，
 // 這裡只檢查它們合法。
 func NewBattleSim(m *Map, at, from ProvinceID, attacker, defender []*Combatant, opt StrengthOpts) (*BattleSim, error) {
+	zone, err := m.DeployZone(at, from)
+	if err != nil {
+		return nil, err
+	}
+	return newBattleSimInZone(m, at, from, attacker, defender, opt, zone)
+}
+
+// newBattleSimInZone shares ordinary and SPEC-63 external deployment rules.
+// Its callers validate the source and own any unit mutation policy.
+func newBattleSimInZone(m *Map, at, from ProvinceID, attacker, defender []*Combatant, opt StrengthOpts, zone []CellIndex) (*BattleSim, error) {
 	// ⚠️ **Go 的零值對不上原版的欄位語意，在唯一入口一次修好。**
 	//
 	//	`+12` NextCell  原版哨兵是 0xFF，而 Go 零值 0 是**合法格編號**
@@ -103,10 +113,6 @@ func NewBattleSim(m *Map, at, from ProvinceID, attacker, defender []*Combatant, 
 	}
 
 	// 攻方走部署掃描：從 cell 195 往下，挑進場區裡旁邊沒敵人的空格。
-	zone, err := m.DeployZone(at, from)
-	if err != nil {
-		return nil, err
-	}
 	for _, u := range attacker {
 		u.Attacking = true
 		cell, ok := s.Occ.Deploy(zone, u.General, s.isEnemyOf(true))
@@ -132,7 +138,15 @@ func (s *BattleSim) Unit(id GeneralID) *Combatant { return s.byID[id] }
 
 // RestoreBattleSim 只重建衍生索引，不部署或重置保存中的單位。
 func RestoreBattleSim(m *Map, at, from ProvinceID, commander GeneralID, attacker, defender []*Combatant, opt StrengthOpts, generalCount int) (*BattleSim, error) {
-	if m == nil || !at.Valid() || !from.Valid() || at == from || len(attacker) > UnitsPerSide || len(defender) > UnitsPerSide {
+	return restoreBattleSim(m, at, from, commander, attacker, defender, opt, generalCount, false)
+}
+
+func restoreBattleSim(m *Map, at, from ProvinceID, commander GeneralID, attacker, defender []*Combatant, opt StrengthOpts, generalCount int, external bool) (*BattleSim, error) {
+	validSource := from.Valid() && at != from
+	if external {
+		validSource = at == InvasionEntryProvince && from == ExternalInvasionSource
+	}
+	if m == nil || !at.Valid() || !validSource || len(attacker) > UnitsPerSide || len(defender) > UnitsPerSide {
 		return nil, fmt.Errorf("game: 戰鬥快照的省份或部隊數不合法")
 	}
 	field, err := m.Battlefield(at)

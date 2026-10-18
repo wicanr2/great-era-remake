@@ -34,6 +34,7 @@ type DeskDialog struct {
 	YesDisabled          bool
 }
 type DeskData struct {
+	LightUI                                                bool
 	Fonts                                                  *assets.EtenFonts
 	Labels                                                 map[string]string
 	Title, Prompt, Province, Commander, Date, Page, Status string
@@ -48,6 +49,7 @@ type DeskData struct {
 	Scroll, ContentHeight                                  int
 	Focus                                                  string
 	Dialog                                                 *DeskDialog
+	Portrait                                               *PortraitView
 }
 
 var deskInk = assets.RGB{R: 238, G: 230, B: 215}
@@ -106,14 +108,15 @@ func DeskHit(d DeskData, x, y int) string {
 	}
 	return ""
 }
-func deskFill(c *Canvas, r l.Rect, col assets.RGB) { c.fillRect(r.X, r.Y, r.W, r.H, col) }
+func deskFill(c *Canvas, r l.Rect, col assets.RGB) { c.fillUIRect(r.X, r.Y, r.W, r.H, col) }
 func deskLabel(c *Canvas, f *assets.EtenFonts, text string, r l.Rect, col assets.RGB, size int) {
 	roomLabel(c, f, text, r, col, size, false)
 }
 func deskGradient(c *Canvas, r l.Rect, top, bottom assets.RGB) {
+	top, bottom = c.uiSurface(top), c.uiSurface(bottom)
 	for y := 0; y < r.H; y++ {
 		mix := func(a, b byte) byte { return byte((int(a)*(r.H-1-y) + int(b)*y) / max(1, r.H-1)) }
-		c.fillRect(r.X, r.Y+y, r.W, 1, assets.RGB{R: mix(top.R, bottom.R), G: mix(top.G, bottom.G), B: mix(top.B, bottom.B)})
+		c.fillUIRect(r.X, r.Y+y, r.W, 1, assets.RGB{R: mix(top.R, bottom.R), G: mix(top.G, bottom.G), B: mix(top.B, bottom.B)})
 	}
 }
 func deskButton(c *Canvas, f *assets.EtenFonts, v DeskControl, focus string) {
@@ -143,14 +146,14 @@ func deskButton(c *Canvas, f *assets.EtenFonts, v DeskControl, focus string) {
 		return
 	}
 	deskGradient(c, r, top, bottom)
-	c.strokeRect(r.X, r.Y, r.W, r.H, edge)
+	c.strokeUIRect(r.X, r.Y, r.W, r.H, edge)
 	if v.Key == focus {
-		c.strokeRect(r.X-2, r.Y-2, r.W+4, r.H+4, deskGold)
+		c.strokeUIRect(r.X-2, r.Y-2, r.W+4, r.H+4, deskGold)
 	}
 	text := v.Text
 	if v.Kind == "checkbox" {
 		check := l.Rect{r.X + 12, r.Y + (r.H-18)/2, 18, 18}
-		c.strokeRect(check.X, check.Y, 18, 18, deskGold)
+		c.strokeUIRect(check.X, check.Y, 18, 18, deskGold)
 		if v.Selected {
 			deskFill(c, l.Rect{check.X + 4, check.Y + 4, 10, 10}, deskAccent)
 		}
@@ -165,10 +168,11 @@ func deskButton(c *Canvas, f *assets.EtenFonts, v DeskControl, focus string) {
 }
 func DrawDesk(d DeskData) *Canvas {
 	c := NewCanvas(l.DeskWidth, l.DeskHeight)
+	c.UseLightUI(d.LightUI)
 	deskFill(c, l.Rect{W: l.DeskWidth, H: l.DeskHeight}, deskBackground)
 	word := func(k string) string { return d.Labels[k] }
 	deskGradient(c, l.DeskHeader, assets.RGB{R: 40, G: 42, B: 45}, assets.RGB{R: 28, G: 30, B: 32})
-	c.strokeRect(0, 75, 1280, 1, deskLine)
+	c.strokeUIRect(0, 75, 1280, 1, deskLine)
 	deskLabel(c, d.Fonts, "GREAT ERA · REMAKE", l.Rect{20, 8, 210, 20}, deskMuted, 11)
 	deskLabel(c, d.Fonts, word("title"), l.Rect{20, 29, 222, 36}, deskInk, 22)
 	for i, value := range d.Resources[:5] {
@@ -180,19 +184,19 @@ func DrawDesk(d DeskData) *Canvas {
 	deskLabel(c, d.Fonts, word("mode"), l.Rect{1120, 36, 140, 22}, deskGold, 11)
 	deskFill(c, l.DeskSidebar, assets.RGB{R: 32, G: 34, B: 37})
 	deskFill(c, l.DeskInspector, assets.RGB{R: 34, G: 36, B: 38})
-	c.strokeRect(179, 76, 1, 633, deskLine)
-	c.strokeRect(1020, 76, 1, 633, deskLine)
+	c.strokeUIRect(179, 76, 1, 633, deskLine)
+	c.strokeUIRect(1020, 76, 1, 633, deskLine)
 	deskLabel(c, d.Fonts, word("headquarters"), l.Rect{20, 96, 150, 24}, deskMuted, 11)
 	deskLabel(c, d.Fonts, word("progress"), l.Rect{20, 421, 150, 24}, deskMuted, 11)
 	roomParagraph(c, d.Fonts, word("mouse.help"), l.Rect{20, 575, 150, 100}, deskMuted)
 	deskFill(c, l.Rect{180, 76, 840, 64}, assets.RGB{R: 36, G: 37, B: 40})
-	c.strokeRect(180, 139, 840, 1, deskLine)
+	c.strokeUIRect(180, 139, 840, 1, deskLine)
 	deskLabel(c, d.Fonts, word("breadcrumb"), l.Rect{276, 87, 170, 42}, deskMuted, 13)
 	deskLabel(c, d.Fonts, d.Title, l.Rect{446, 87, 420, 42}, deskInk, 13)
 	deskFill(c, l.DeskActions, assets.RGB{R: 37, G: 37, B: 40})
-	c.strokeRect(180, 642, 840, 1, deskLine)
+	c.strokeUIRect(180, 642, 840, 1, deskLine)
 	deskFill(c, l.DeskFooter, assets.RGB{R: 32, G: 33, B: 35})
-	c.strokeRect(0, 709, 1280, 1, deskLine)
+	c.strokeUIRect(0, 709, 1280, 1, deskLine)
 	deskLabel(c, d.Fonts, word("footer"), l.Rect{18, 714, 850, 22}, deskMuted, 12)
 	deskLabel(c, d.Fonts, word("selected"), l.Rect{1038, 95, 224, 24}, deskGold, 15)
 	deskLabel(c, d.Fonts, d.Province, l.Rect{1038, 130, 224, 40}, deskInk, 26)
@@ -202,7 +206,7 @@ func DrawDesk(d DeskData) *Canvas {
 		deskLabel(c, d.Fonts, fact.Label, l.Rect{x, y, 108, 20}, deskMuted, 12)
 		deskLabel(c, d.Fonts, fact.Value, l.Rect{x, y + 20, 108, 25}, deskInk, 16)
 	}
-	c.strokeRect(1038, 334, 224, 1, deskLine)
+	c.strokeUIRect(1038, 334, 224, 1, deskLine)
 	deskLabel(c, d.Fonts, word("stationed"), l.Rect{1038, 350, 224, 24}, deskGold, 15)
 	for i, u := range d.Units {
 		if i >= 4 {
@@ -212,9 +216,10 @@ func DrawDesk(d DeskData) *Canvas {
 		deskLabel(c, d.Fonts, u.Name, l.Rect{1038, y, 120, 24}, deskInk, 15)
 		deskLabel(c, d.Fonts, u.Force, l.Rect{1160, y, 102, 24}, deskInk, 14)
 		deskLabel(c, d.Fonts, u.Detail, l.Rect{1038, y + 25, 224, 24}, deskMuted, 11)
-		c.strokeRect(1038, y+61, 224, 1, deskLine)
+		c.strokeUIRect(1038, y+61, 224, 1, deskLine)
 	}
 	body := NewCanvas(l.DeskWidth, l.DeskHeight)
+	body.UseLightUI(d.LightUI)
 	deskFill(body, l.DeskContent, deskBackground)
 	deskLabel(body, d.Fonts, d.Title, l.Rect{200, 160, 650, 34}, deskInk, 24)
 	deskLabel(body, d.Fonts, d.Prompt, l.Rect{200, 198, 800, 26}, deskMuted, 13)
@@ -226,12 +231,12 @@ func DrawDesk(d DeskData) *Canvas {
 				body.img.Set(r.X+x, r.Y+y, d.Map.At(x*d.Map.Bounds().Dx()/r.W, y*d.Map.Bounds().Dy()/r.H))
 			}
 		}
-		body.strokeRect(r.X, r.Y, r.W, r.H, deskLine)
+		body.strokeUIRect(r.X, r.Y, r.W, r.H, deskLine)
 	}
 	for _, r := range d.Cards {
 		r.Y -= d.Scroll
 		deskGradient(body, r, assets.RGB{R: 48, G: 46, B: 43}, assets.RGB{R: 38, G: 39, B: 42})
-		body.strokeRect(r.X, r.Y, r.W, r.H, deskLine)
+		body.strokeUIRect(r.X, r.Y, r.W, r.H, deskLine)
 	}
 	for _, v := range d.Texts {
 		r := v.Rect
@@ -266,9 +271,9 @@ func DrawDesk(d DeskData) *Canvas {
 						body.img.Set(r.X+x, r.Y+y, im.Image.At(bounds.Min.X+x*bounds.Dx()/r.W, bounds.Min.Y+y*bounds.Dy()/r.H))
 					}
 				}
-				body.strokeRect(r.X, r.Y, r.W, r.H, deskGold)
+				body.strokeUIRect(r.X, r.Y, r.W, r.H, deskGold)
 				if v.Key == d.Focus {
-					body.strokeRect(r.X+2, r.Y+2, r.W-4, r.H-4, deskAccent)
+					body.strokeUIRect(r.X+2, r.Y+2, r.W-4, r.H-4, deskAccent)
 				}
 				deskFill(body, l.Rect{r.X + 1, r.Bottom() - 43, r.W - 2, 42}, deskPanel)
 				deskLabel(body, d.Fonts, v.Text, l.Rect{r.X + 12, r.Bottom() - 43, r.W - 24, 42}, deskInk, 16)
@@ -280,6 +285,9 @@ func DrawDesk(d DeskData) *Canvas {
 	}
 	clip := image.Rect(l.DeskContent.X, l.DeskContent.Y, l.DeskContent.Right(), l.DeskContent.Bottom())
 	draw.Draw(c.img, clip, body.img, clip.Min, draw.Over)
+	if d.Portrait != nil {
+		drawPortraitView(c, d.Fonts, *d.Portrait, l.Rect{X: 800, Y: 244, W: 184, H: 350})
+	}
 	if d.Status != "" {
 		deskFill(c, l.Rect{200, 612, 800, 26}, deskBackground)
 		deskLabel(c, d.Fonts, d.Status, l.Rect{206, 612, 788, 26}, deskGold, 12)
@@ -306,7 +314,7 @@ func DrawDesk(d DeskData) *Canvas {
 		}
 		r := l.DeskDialog
 		deskFill(c, r, deskPanel)
-		c.strokeRect(r.X, r.Y, r.W, r.H, deskGold)
+		c.strokeUIRect(r.X, r.Y, r.W, r.H, deskGold)
 		deskFill(c, l.Rect{r.X, r.Y, r.W, 3}, deskAccent)
 		deskLabel(c, d.Fonts, d.Dialog.Title, l.Rect{r.X + 25, r.Y + 20, r.W - 50, 40}, deskInk, 24)
 		roomParagraph(c, d.Fonts, d.Dialog.Text, l.Rect{r.X + 25, r.Y + 72, r.W - 50, 94}, deskMuted)
@@ -327,10 +335,14 @@ func (c *Canvas) DrawBattleReturn(fonts *assets.EtenFonts, high bool, text strin
 func (c *Canvas) DrawDeskToolbar(fonts *assets.EtenFonts, v ToolbarView) {
 	draw.Draw(c.img, c.Bounds(), image.NewUniform(color.RGBA{}), image.Point{}, draw.Src)
 	deskFill(c, l.Rect{W: l.DeskWidth, H: l.DeskToolbarHeight}, assets.RGB{R: 41, G: 38, B: 36})
-	c.strokeRect(0, 57, 1280, 1, deskGold)
+	c.strokeUIRect(0, 57, 1280, 1, deskGold)
 	for i := 0; i < l.ToolbarFields; i++ {
 		r := l.DeskToolbarField(i)
-		deskLabel(c, fonts, v.Labels[i], l.Rect{r.X - 35, 11, 32, 36}, deskMuted, 13)
+		label := l.Rect{r.X - 35, 11, 32, 36}
+		if i == 5 {
+			label = l.Rect{r.X - 91, 11, 84, 36}
+		}
+		deskLabel(c, fonts, v.Labels[i], label, deskMuted, 13)
 		deskButton(c, fonts, DeskControl{Key: strconv.Itoa(i), Text: v.Values[i] + "  v", Rect: r, Selected: v.Menu == i}, "")
 	}
 	if v.Menu < 0 || v.Menu >= l.ToolbarFields {
@@ -338,7 +350,7 @@ func (c *Canvas) DrawDeskToolbar(fonts *assets.EtenFonts, v ToolbarView) {
 	}
 	r := v.MenuRect()
 	deskFill(c, r, deskPanel)
-	c.strokeRect(r.X, r.Y, r.W, r.H, deskGold)
+	c.strokeUIRect(r.X, r.Y, r.W, r.H, deskGold)
 	for i, s := range v.Options[v.Menu] {
 		selected := i == v.Selected[v.Menu]
 		if len(v.Checked[v.Menu]) == len(v.Options[v.Menu]) {

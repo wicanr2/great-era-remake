@@ -1009,8 +1009,8 @@
       "plain": "原版介面"
     },
     "toolbar.interface.command": {
-      "original": "Modern",
-      "plain": "Modern"
+      "original": "Modern 深色",
+      "plain": "Modern 深色"
     },
     "toolbar.ai.current.long": {
       "original": "現有重製 AI",
@@ -1113,24 +1113,24 @@
       "plain": "選擇你的時代與勢力"
     },
     "opening.intro": {
-      "original": "選擇劇本與勢力，從原始劇本建立新局。方向鍵選勢力，1–3 選劇本，M 切模式，Enter 開始。",
-      "plain": "選擇劇本與勢力，從原始劇本建立新局。方向鍵選勢力，1–3 選劇本，M 切模式，Enter 開始。"
+      "original": "選擇劇本、勢力與軍備抗日選項。方向鍵選勢力，1–3 選劇本，M 切換軍備，Enter 開始。",
+      "plain": "選擇劇本、勢力與軍備抗日選項。方向鍵選勢力，1–3 選劇本，M 切換軍備，Enter 開始。"
     },
     "opening.original": {
-      "original": "原版戰役",
-      "plain": "原版戰役"
+      "original": "軍備＋抗日：關閉",
+      "plain": "軍備＋抗日：關閉"
     },
     "opening.original.hint": {
-      "original": "沿用原版規則",
-      "plain": "沿用原版規則"
+      "original": "不啟用軍備與新增抗戰",
+      "plain": "不啟用軍備與新增抗戰"
     },
     "opening.resistance": {
-      "original": "統一後抗日",
-      "plain": "統一後抗日"
+      "original": "軍備＋抗日：開啟",
+      "plain": "軍備＋抗日：開啟"
     },
     "opening.resistance.hint": {
-      "original": "統一後立即觸發東北入侵",
-      "plain": "統一後立即觸發東北入侵"
+      "original": "開放軍備，統一後對日抗戰",
+      "plain": "開放軍備，統一後對日抗戰"
     },
     "opening.factions": {
       "original": "可選勢力 · %d",
@@ -1205,12 +1205,12 @@
       "plain": "初始所在省：%s"
     },
     "opening.original.note": {
-      "original": "原版規則與擴充規則分開。日軍可選原版戰役。",
-      "plain": "原版規則與擴充規則分開。日軍可選原版戰役。"
+      "original": "軍備與新增抗日已關閉；開局後可從頂部工具列啟用。",
+      "plain": "軍備與新增抗日已關閉；開局後可從頂部工具列啟用。"
     },
     "opening.resistance.pending": {
-      "original": "軍備整備可試玩；日軍入侵仍在開發。F7 開啟軍備局。",
-      "plain": "軍備整備可試玩；日軍入侵仍在開發。F7 開啟軍備局。"
+      "original": "開局啟用軍備局；統一全部有主的非日軍省份後宣戰。日軍按當年名冊分三批入侵，宣戰後不可關閉。",
+      "plain": "開局啟用軍備局；統一全部有主的非日軍省份後宣戰。日軍按當年名冊分三批入侵，宣戰後不可關閉。"
     },
     "opening.japan.note": {
       "original": "日軍可玩原版戰役；抗日擴充供中國勢力遊玩。",
@@ -2211,6 +2211,194 @@
     "toolbar.music.eight-hundred-heroes": {
       "original": "歌八百壯士",
       "plain": "歌八百壯士"
+    },
+    "military.title": {
+      "original": "軍備＋抗日",
+      "plain": "軍備＋抗日"
+    },
+    "military.on": {
+      "original": "開啟",
+      "plain": "開啟"
+    },
+    "military.off": {
+      "original": "關閉",
+      "plain": "關閉"
+    },
+    "military.locked": {
+      "original": "已鎖定",
+      "plain": "已鎖定"
+    },
+    "military.option.on": {
+      "original": "開啟軍備與新增抗日",
+      "plain": "開啟軍備與新增抗日"
+    },
+    "military.option.off": {
+      "original": "關閉軍備與新增抗日",
+      "plain": "關閉軍備與新增抗日"
+    },
+    "military.note": {
+      "original": "宣戰前可切換。停用時保留進度與庫存，暫停研發生產；宣戰後不能關閉。入侵仍在接線。",
+      "plain": "宣戰前可切換。停用時保留進度與庫存，暫停研發生產；宣戰後不能關閉。入侵仍在接線。"
+    },
+    "military.locked.note": {
+      "original": "已對日宣戰，軍備與抗日不能關閉。",
+      "plain": "已對日宣戰，軍備與抗日不能關閉。"
+    },
+    "military.disabled.note": {
+      "original": "軍備＋抗日已關閉。請從最上方工具列開啟。",
+      "plain": "軍備＋抗日已關閉。請從最上方工具列開啟。"
+    },
+    "military.busy": {
+      "original": "請先完成或取消戰鬥、整編或目前確認，再切換軍備設定。",
+      "plain": "請先完成或取消戰鬥、整編或目前確認，再切換軍備設定。"
+    },
+    "military.campaign.required": {
+      "original": "請先開始或載入重製戰役。",
+      "plain": "請先開始或載入重製戰役。"
+    },
+    "military.withdraw.unavailable": {
+      "original": "沒有可撤退的相鄰己方省份；可繼續作戰或暫停保存。",
+      "plain": "沒有可撤退的相鄰己方省份；可繼續作戰或暫停保存。"
+    },
+    "military.withdraw.failed": {
+      "original": "撤退未完成，請重新選擇相鄰己方省份。",
+      "plain": "撤退未完成，請重新選擇相鄰己方省份。"
+    },
+    "toolbar.interface.light": {
+      "original": "Modern 亮底",
+      "plain": "Modern 亮底"
+    },
+    "battleinfo.unit.protection": {
+      "original": "裝甲 %.1f · 穿甲 %.1f · 減傷上限 50%%（係數）",
+      "plain": "裝甲 %.1f · 穿甲 %.1f · 減傷上限 50%%（係數）"
+    },
+    "classic.map.title": {
+      "original": "全國地圖",
+      "plain": "全國地圖"
+    },
+    "classic.map.hint": {
+      "original": "左右選省 P 查看省地圖",
+      "plain": "左右選省 P 查看省地圖"
+    },
+    "classic.commands": {
+      "original": "Enter 指令",
+      "plain": "Enter 指令"
+    },
+    "classic.province": {
+      "original": "P 省地圖",
+      "plain": "P 省地圖"
+    },
+    "classic.home": {
+      "original": "Home 全國",
+      "plain": "Home 全國"
+    },
+    "classic.roster.title": {
+      "original": "部隊基本資料",
+      "plain": "部隊基本資料"
+    },
+    "classic.roster.hint": {
+      "original": "Up/Down 選將 Enter 詳情 B 自傳 Esc/0 返回",
+      "plain": "Up/Down 選將 Enter 詳情 B 自傳 Esc/0 返回"
+    },
+    "classic.unit.title": {
+      "original": "番號",
+      "plain": "番號"
+    },
+    "classic.input.hint": {
+      "original": "Backspace 刪一位 Delete 清空 Esc 取消",
+      "plain": "Backspace 刪一位 Delete 清空 Esc 取消"
+    },
+    "military.turn.pending": {
+      "original": "電腦回合尚未完成。請繼續換月，或保存進度。",
+      "plain": "電腦回合尚未完成。請繼續換月，或保存進度。"
+    },
+    "military.turn.continue": {
+      "original": "繼續電腦回合",
+      "plain": "繼續電腦回合"
+    },
+    "military.turn.defend": {
+      "original": "日軍進攻%s。請指揮守軍；本月尚未結算。",
+      "plain": "日軍進攻%s。請指揮守軍；本月尚未結算。"
+    },
+    "military.turn.failed": {
+      "original": "無法建立守城戰，該省的本次進攻已取消。",
+      "plain": "無法建立守城戰，該省的本次進攻已取消。"
+    },
+    "invasion.title": {
+      "original": "日軍對華宣戰",
+      "plain": "日軍對華宣戰"
+    },
+    "invasion.date": {
+      "original": "%d 年 %d 月",
+      "plain": "%d 年 %d 月"
+    },
+    "invasion.intro": {
+      "original": "中國已統一。東北戰線開啟，守軍準備迎戰。",
+      "plain": "中國已統一。東北戰線開啟，守軍準備迎戰。"
+    },
+    "invasion.roster": {
+      "original": "本次固定指揮名冊",
+      "plain": "本次固定指揮名冊"
+    },
+    "invasion.continue": {
+      "original": "繼續戰役",
+      "plain": "繼續戰役"
+    },
+    "invasion.view": {
+      "original": "檢視地圖",
+      "plain": "檢視地圖"
+    },
+    "invasion.menu": {
+      "original": "返回主選單",
+      "plain": "返回主選單"
+    },
+    "invasion.alternate": {
+      "original": "架空延續",
+      "plain": "架空延續"
+    },
+    "invasion.batch.status": {
+      "original": "已到達 %d／3 批，新編部隊 %d／10",
+      "plain": "已到達 %d／3 批，新編部隊 %d／10"
+    },
+    "invasion.exit.note": {
+      "original": "Enter 繼續；Esc 返回；F10 保存並離開。",
+      "plain": "Enter 繼續；Esc 返回；F10 保存並離開。"
+    },
+    "invasion.quit.title": {
+      "original": "保存目前戰役並離開？",
+      "plain": "保存目前戰役並離開？"
+    },
+    "invasion.quit.yes": {
+      "original": "Y 保存離開",
+      "plain": "Y 保存離開"
+    },
+    "invasion.quit.no": {
+      "original": "N 返回",
+      "plain": "N 返回"
+    },
+    "invasion.victory.title": {
+      "original": "抗戰勝利",
+      "plain": "抗戰勝利"
+    },
+    "invasion.victory.body": {
+      "original": "日軍戰線已瓦解。這場統一後抗戰結束了。",
+      "plain": "日軍戰線已瓦解。這場統一後抗戰結束了。"
+    },
+    "invasion.defeat.title": {
+      "original": "戰役敗北",
+      "plain": "戰役敗北"
+    },
+    "invasion.defeat.body": {
+      "original": "玩家已失去全部領土。可查看戰局或返回主選單。",
+      "plain": "玩家已失去全部領土。可查看戰局或返回主選單。"
+    },
+    "invasion.ended": {
+      "original": "戰役已結束，可查閱、保存或返回主選單。",
+      "plain": "戰役已結束，可查閱、保存或返回主選單。"
+    },
+    "invasion.failed": {
+      "original": "戰役事件未提交：%v",
+      "plain": "戰役事件未提交：%v"
     }
   }
 }

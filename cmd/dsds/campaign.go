@@ -31,6 +31,7 @@ type campaignSnapshot struct {
 	Strengths      []game.StrengthInput
 	FactionBonus   uint8
 	EnableExtra    bool
+	StrategyTurn   *strategyTurn `json:",omitempty"`
 	Battle         *campaignBattle
 	Reorganization *game.ReorganizationSnapshot
 	DT2, MemWar    []byte
@@ -43,8 +44,20 @@ type campaignExpansion struct {
 	View   armoryViewSnapshot
 }
 
+// v3 separates the live rules switch from the campaign's historical identity.
+// The armory may remain present while disabled so no equipment is discarded.
+type campaignOptions struct {
+	Base   campaignSnapshot
+	Rules  game.MilitaryRules
+	Armory *game.Armory
+	View   armoryViewSnapshot
+}
+
 type campaignBattle struct {
 	Paused                         bool `json:",omitempty"`
+	HumanDefender                  bool `json:",omitempty"`
+	JapaneseBlitz                  bool `json:",omitempty"`
+	ExternalInvasion               bool `json:",omitempty"`
 	At, From                       game.ProvinceID
 	AtCommander                    game.GeneralID
 	Attacker, Defender             []*game.Combatant
@@ -117,6 +130,7 @@ func sessionFromState(state game.DT1State, sc game.Scenario, current game.Provin
 
 func (a *app) campaignState() campaignSnapshot {
 	s := campaignSnapshot{Identity: *a.campaign, Current: a.current, Year: a.year, Month: a.month, RNG: a.rng.Seed(), Budget: a.cmdBudget.Snapshot(), Units: a.world.Units, Strengths: a.world.Strengths, FactionBonus: a.world.Opts.FactionBonus, EnableExtra: a.world.EnableExtra, DT2: a.battleDT2, MemWar: a.battleMemWar}
+	s.StrategyTurn = a.strategyTurn
 	s.State = game.DT1State{Provinces: a.tbl, Generals: a.generals, Factions: a.factions, FactionLeaders: a.factionLeaders, FactionOfGeneral: a.factionOf, WarRecords: a.warRecords, CeasefireStates: a.world.CeasefireState, MajorPowerLeaders: a.majorPowerLeaders, Ledger: a.ledger}
 	table := *a.tbl
 	date := game.GameDate{Year: a.year, Month: a.month}
@@ -129,6 +143,9 @@ func (a *app) campaignState() campaignSnapshot {
 	if b := a.battle; b != nil && b.sim != nil {
 		s.Battle = &campaignBattle{At: b.sim.At, From: b.sim.From, AtCommander: b.sim.AtCommander, Attacker: b.sim.Attacker, Defender: b.sim.Defender, FactionBonus: b.sim.Opts.FactionBonus, Selected: b.sel, Log: b.log, Finished: b.finished, Settlement: b.settlement, Settled: b.settled, ForceDirty: b.forceDirty, Mode: b.mode, RetreatInput: b.retreatInput, RetreatTargets: b.retreatTargets, Turn: b.turn, TurnCap: b.turnCap, AILog: b.aiLog, AIAction: b.aiAction, AIMoves: b.aiMoves, AIFights: b.aiFights, Leader: b.leader, SupplyAttacker: b.supAtk, SupplyDefender: b.supDef, Units: b.units, EnableLastSteps: b.enableLastSteps}
 		s.Battle.Paused = b.paused
+		s.Battle.HumanDefender = b.humanDefender
+		s.Battle.JapaneseBlitz = b.japaneseBlitz
+		s.Battle.ExternalInvasion = b.externalInvasion
 	}
 	return s
 }
@@ -147,13 +164,11 @@ func (a *app) saveCampaign() error {
 		}
 	}
 	s := a.campaignState()
-	var b []byte
-	var err error
-	if a.armory == nil {
-		b, err = game.EncodeCampaignSave(s, a.origSave)
-	} else {
-		b, err = game.EncodeCampaignSaveVersion(campaignExpansion{Base: s, Phase: "preparation", Armory: a.armory.Clone(), View: a.armoryViewSnapshot()}, a.origSave, 2)
+	v4, err := a.campaignV4State(s)
+	if err != nil {
+		return err
 	}
+	b, err := game.EncodeCampaignSaveVersion(v4, a.origSave, game.CampaignSaveCurrentVersion)
 	if err != nil {
 		return err
 	}
@@ -175,12 +190,23 @@ func (a *app) decodeCampaign(data []byte) (*gameSession, *campaignSnapshot, *bat
 	}
 	var legacy []byte
 	var expansion *campaignExpansion
+	var options *campaignOptions
+	var v4 *campaignV4
 	if version == 1 {
 		legacy, err = game.DecodeCampaignSave(data, &saved)
-	} else {
+	} else if version == 2 {
 		expansion = &campaignExpansion{}
 		legacy, err = game.DecodeCampaignSaveVersion(data, expansion, 2)
 		saved = expansion.Base
+	} else if version == 3 {
+		options = &campaignOptions{}
+		legacy, err = game.DecodeCampaignSaveVersion(data, options, 3)
+		saved = options.Base
+	} else {
+		v4 = &campaignV4{}
+		legacy, err = game.DecodeCampaignSaveVersion(data, v4, 4)
+		saved = v4.Base
+		options = &campaignOptions{Base: saved, Rules: v4.Rules, Armory: v4.Armory, View: v4.View}
 	}
 	if err != nil {
 		return nil, nil, nil, err
@@ -192,7 +218,7 @@ func (a *app) decodeCampaign(data []byte) (*gameSession, *campaignSnapshot, *bat
 	bad := func() (*gameSession, *campaignSnapshot, *battleState, error) {
 		return nil, nil, nil, fmt.Errorf("戰役保存的世界或身份資料不合法")
 	}
-	validMode := version == 1 && saved.Identity.Mode == "original" || version == 2 && saved.Identity.Mode == "unification-resistance" && !(saved.Identity.Stage > 1 && saved.Identity.Player == 107)
+	validMode := version == 1 && saved.Identity.Mode == "original" || version == 2 && saved.Identity.Mode == "unification-resistance" && !(saved.Identity.Stage > 1 && saved.Identity.Player == 107) || version >= 3 && (saved.Identity.Mode == "original" || saved.Identity.Mode == "unification-resistance")
 	if !validMode || saved.Identity.Player == 0 || int(saved.Identity.Player) > sc.Generals || saved.State.Provinces == nil || len(saved.State.Generals) != sc.Generals || len(saved.Units) != sc.Generals || len(saved.Strengths) != sc.Generals || !saved.Current.Valid() || int(saved.Current) > sc.Provinces || saved.Year == 0 || saved.Month < 1 || saved.Month > 12 {
 		return bad()
 	}
@@ -206,6 +232,20 @@ func (a *app) decodeCampaign(data []byte) (*gameSession, *campaignSnapshot, *bat
 		return bad()
 	}
 	seen := map[game.GeneralID]bool{}
+	var actorGenerals []game.General
+	var actorUnits []game.CombatUnit
+	var actorStrengths []game.StrengthInput
+	var actorKeys map[game.GeneralID]string
+	if v4 != nil {
+		actorGenerals, actorUnits, actorStrengths, actorKeys, err = projectCampaignActors(v4, sc)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+	}
+	validRuntimeID := func(id game.GeneralID) bool { return id > 0 && (int(id) <= sc.Generals || actorKeys[id] != "") }
+	validFactionID := func(id game.GeneralID) bool {
+		return int(id) <= sc.Generals || id == 300 && sc.Stage == 1 && v4 != nil && v4.Declaration != nil && v4.Declaration.Controller == 1
+	}
 	for i, id := range saved.State.FactionLeaders {
 		if id == 0 {
 			continue
@@ -216,12 +256,12 @@ func (a *app) decodeCampaign(data []byte) (*gameSession, *campaignSnapshot, *bat
 		seen[id] = true
 	}
 	for _, p := range saved.State.Provinces.Province[:sc.Provinces] {
-		if int(p.Commander) > sc.Generals {
+		if !validFactionID(p.Commander) {
 			return bad()
 		}
 	}
 	for i, u := range saved.Units {
-		if int(u.General) != i+1 || int(u.Faction) > sc.Generals || (!u.Cell.Valid() && u.Cell != game.NoCell) || (!u.NextCell.Valid() && u.NextCell != game.NoCell) || int(u.TargetUnit) > sc.Generals {
+		if int(u.General) != i+1 || !validFactionID(u.Faction) || (!u.Cell.Valid() && u.Cell != game.NoCell) || (!u.NextCell.Valid() && u.NextCell != game.NoCell) || u.TargetUnit != 0 && !validRuntimeID(u.TargetUnit) {
 			return bad()
 		}
 	}
@@ -234,7 +274,25 @@ func (a *app) decodeCampaign(data []byte) (*gameSession, *campaignSnapshot, *bat
 	s.origSave = legacy
 	s.year, s.month = saved.Year, saved.Month
 	s.world.Units, s.world.Strengths = saved.Units, saved.Strengths
+	if v4 != nil {
+		s.generals, s.world.Units, s.world.Strengths = actorGenerals, actorUnits, actorStrengths
+		s.campaignActors, s.declaration = actorKeys, v4.Declaration
+	}
 	s.world.Opts.FactionBonus, s.world.EnableExtra = saved.FactionBonus, saved.EnableExtra
+	if options != nil {
+		month := uint32(saved.Year)*12 + uint32(saved.Month)
+		if !options.Rules.Valid(month) || options.Rules.Enabled && saved.Identity.Stage > 1 && saved.Identity.Player == 107 || options.Rules.Enabled && options.Armory == nil || !options.Rules.Enabled && options.View.Open {
+			return bad()
+		}
+		s.militaryRules = &options.Rules
+		if options.Armory == nil {
+			if options.View != (armoryViewSnapshot{}) {
+				return bad()
+			}
+		} else {
+			expansion = &campaignExpansion{Base: saved, Phase: "preparation", Armory: options.Armory, View: options.View}
+		}
+	}
 	if expansion != nil {
 		if expansion.Phase != "preparation" || expansion.Armory == nil || expansion.Armory.Provinces != sc.Provinces || expansion.Armory.LastMonth != uint32(saved.Year)*12+uint32(saved.Month) || !validArmoryView(expansion.View, expansion.Armory, saved.Identity.Player) {
 			return bad()
@@ -251,7 +309,21 @@ func (a *app) decodeCampaign(data []byte) (*gameSession, *campaignSnapshot, *bat
 		s.armory = expansion.Armory
 		s.world.Opts.Armory = s.armory
 		s.pendingArmoryView = &expansion.View
+		if s.militaryRules == nil {
+			s.militaryRules = &game.MilitaryRules{Enabled: true}
+		}
 	}
+	if v4 != nil && (!validCampaignLanding(v4) || !validCampaignController(v4, sc)) {
+		return bad()
+	}
+	runtimeScenario := sc
+	runtimeScenario.Generals = len(s.world.Units)
+	runtimeSaved := saved
+	runtimeSaved.Units, runtimeSaved.Strengths = s.world.Units, s.world.Strengths
+	if !validStrategyTurn(saved.StrategyTurn, &runtimeSaved, options, runtimeScenario) {
+		return bad()
+	}
+	s.strategyTurn = saved.StrategyTurn
 	if err := s.cmdBudget.Restore(saved.Budget, sc.Provinces); err != nil {
 		return nil, nil, nil, err
 	}
@@ -267,17 +339,83 @@ func (a *app) decodeCampaign(data []byte) (*gameSession, *campaignSnapshot, *bat
 	}
 	var battle *battleState
 	if b := saved.Battle; b != nil {
-		if int(b.At) > sc.Provinces || int(b.From) > sc.Provinces || b.Selected < 0 || b.Selected >= max(1, len(b.Attacker)) || b.Mode > battleModeInspect || b.Turn < 0 || b.TurnCap < 1 || b.TurnCap > 16 || len(b.Units) != sc.Generals {
+		selectable := len(b.Attacker)
+		if b.HumanDefender {
+			if b.AtCommander != saved.Identity.Player {
+				return bad()
+			}
+			province, err := saved.State.Provinces.At(b.At)
+			if err != nil || !b.Settled && province.Commander != saved.Identity.Player {
+				return bad()
+			}
+			if !b.Finished {
+				candidates := game.DefenderRetreatTargets(saved.State.Provinces, b.At, saved.Identity.Player)
+				if len(candidates) != len(b.RetreatTargets) {
+					return bad()
+				}
+				for i, id := range candidates {
+					if b.RetreatTargets[i] != id {
+						return bad()
+					}
+				}
+				if b.Mode == battleModeRetreat && len(candidates) == 0 {
+					return bad()
+				}
+			} else if len(b.RetreatTargets) != 0 {
+				return bad()
+			}
+			for _, unit := range b.Defender {
+				if unit == nil || unit.Faction != saved.Identity.Player {
+					return bad()
+				}
+			}
+			for _, unit := range b.Attacker {
+				if unit == nil || unit.Faction == 0 || unit.Faction == saved.Identity.Player {
+					return bad()
+				}
+			}
+			selectable = len(b.Defender)
+		}
+		external := v4 != nil && b.ExternalInvasion && b.From == game.ExternalInvasionSource
+		if b.ExternalInvasion && !external || int(b.At) > sc.Provinces || int(b.From) > sc.Provinces && !external || b.Selected < 0 || b.Selected >= max(1, selectable) || b.Mode > battleModeInspect || b.Turn < 0 || b.TurnCap < 1 || b.TurnCap > 16 || len(b.Units) != runtimeScenario.Generals {
 			return bad()
+		}
+		if v4 != nil {
+			for i, unit := range b.Units {
+				if unit != s.world.Units[i] {
+					return bad()
+				}
+			}
+		}
+		for _, side := range [][]*game.Combatant{b.Attacker, b.Defender} {
+			for _, unit := range side {
+				if unit == nil || !validRuntimeID(unit.General) || unit.TargetUnit != 0 && !validRuntimeID(unit.TargetUnit) {
+					return bad()
+				}
+			}
 		}
 		opt := s.world.Opts
 		opt.FactionBonus = b.FactionBonus
-		sim, err := game.RestoreBattleSim(a.m, b.At, b.From, b.AtCommander, b.Attacker, b.Defender, opt, sc.Generals)
+		var sim *game.BattleSim
+		if external {
+			sim, err = game.RestoreExternalBattleSim(a.m, b.At, b.AtCommander, b.Attacker, b.Defender, opt, runtimeScenario.Generals)
+		} else {
+			sim, err = game.RestoreBattleSim(a.m, b.At, b.From, b.AtCommander, b.Attacker, b.Defender, opt, runtimeScenario.Generals)
+		}
 		if err != nil {
 			return nil, nil, nil, err
 		}
 		battle = &battleState{sim: sim, sel: b.Selected, log: b.Log, finished: b.Finished, settlement: b.Settlement, settled: b.Settled, forceDirty: b.ForceDirty, mode: b.Mode, retreatInput: b.RetreatInput, retreatTargets: b.RetreatTargets, turn: b.Turn, turnCap: b.TurnCap, aiLog: b.AILog, aiAction: b.AIAction, aiMoves: b.AIMoves, aiFights: b.AIFights, leader: b.Leader, tbl: s.tbl, supAtk: b.SupplyAttacker, supDef: b.SupplyDefender, units: b.Units, enableLastSteps: b.EnableLastSteps}
 		battle.paused = b.Paused
+		battle.humanDefender = b.HumanDefender
+		battle.japaneseBlitz = b.JapaneseBlitz
+		battle.externalInvasion = b.ExternalInvasion
+		// Runtime support queries share the live strategic units before saving.
+		// Restore that relationship so withdrawal cannot leave a stale copy.
+		battle.units = s.world.Units
+		if _, err := (&app{tbl: s.tbl}).prepareJapaneseSupply(battle); err != nil {
+			return bad()
+		}
 	}
 	for _, raw := range [][]byte{saved.DT2, saved.MemWar} {
 		if len(raw) > 0 {
@@ -367,6 +505,7 @@ func (a *app) startCampaignMode(stage uint8, player game.GeneralID, mode string)
 	if err != nil {
 		return err
 	}
+	s.militaryRules = &game.MilitaryRules{Enabled: mode == "unification-resistance"}
 	gen, fan, err := a.campaignFonts(stage)
 	if err != nil {
 		return err

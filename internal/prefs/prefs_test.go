@@ -16,7 +16,7 @@ func TestMissingPreferencesUseDefaults(t *testing.T) {
 
 func TestSaveLoadRoundTripAndPermissions(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "nested", "prefs.json")
-	want := Preferences{Theme: "retro", Audio: "modern", Layout: "command", Resolution: "high", Wording: "plain", Scale: 2, MessageTime: 7}
+	want := Preferences{Theme: "retro", Audio: "modern", Layout: "command", UIAppearance: "dark", Resolution: "high", Wording: "plain", Scale: 2, MessageTime: 7}
 	if err := Save(path, want); err != nil {
 		t.Fatal(err)
 	}
@@ -38,9 +38,10 @@ func TestSaveLoadRoundTripAndPermissions(t *testing.T) {
 
 func TestBrokenOrUnknownPreferencesFailAsWholeFile(t *testing.T) {
 	for name, body := range map[string]string{
-		"broken":  `{`,
-		"unknown": `{"theme":"modern","wording":"future"}`,
-		"message": `{"message_time":11}`,
+		"broken":     `{`,
+		"unknown":    `{"theme":"modern","wording":"future"}`,
+		"message":    `{"message_time":11}`,
+		"appearance": `{"ui_appearance":"unknown"}`,
 	} {
 		t.Run(name, func(t *testing.T) {
 			path := filepath.Join(t.TempDir(), "prefs.json")
@@ -52,6 +53,17 @@ func TestBrokenOrUnknownPreferencesFailAsWholeFile(t *testing.T) {
 				t.Fatalf("壞檔應整份回預設：%+v, %v", p, err)
 			}
 		})
+	}
+}
+
+func TestOldPreferencesDefaultToDarkWithoutChangingArt(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "prefs.json")
+	if err := os.WriteFile(path, []byte(`{"theme":"retro","layout":"modern"}`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	p, err := Load(path)
+	if err != nil || p.UIAppearance != "dark" || p.Theme != "retro" || p.Layout != "modern" {
+		t.Fatal("old preferences changed art or did not select dark", p, err)
 	}
 }
 

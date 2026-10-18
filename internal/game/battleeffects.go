@@ -188,6 +188,7 @@ func (s *BattleSim) EngageWithEffects(attacker, target *Combatant) (BattleAttack
 	}
 	extraA, extraT := preparePair(attacker, target, &result.Effect, 5, 1, 1)
 	rawA, rawT := s.pairLosses(attacker, target)
+	rawA, rawT = s.protectedLosses(attacker, target, rawA, rawT)
 	attacker.applyLoss(rawA)
 	target.applyLoss(rawT)
 	result.LossAttacker = rawA + extraA
@@ -217,6 +218,7 @@ func (s *BattleSim) EngageCoordinated(attacker, target *Combatant) (BattleAttack
 	if supportCount > 0 {
 		rawT = roundDiv(rawT, supportCount)
 	}
+	rawA, rawT = s.protectedLosses(attacker, target, rawA, rawT)
 	attacker.applyLoss(rawA)
 	target.applyLoss(rawT)
 	result.LossAttacker = rawA + extraA
@@ -237,6 +239,7 @@ func (s *BattleSim) EngageCoordinated(attacker, target *Combatant) (BattleAttack
 		extraSupport, extraAttacker := preparePair(support, attacker, &result.Effect, 5, 1, 1)
 		rawSupport, rawAttacker := s.pairLosses(support, attacker)
 		rawSupport = roundDiv(rawSupport, supportCount)
+		rawSupport, rawAttacker = s.protectedLosses(support, attacker, rawSupport, rawAttacker)
 		support.applyLoss(rawSupport)
 		attacker.applyLoss(rawAttacker)
 		result.SupportLosses = append(result.SupportLosses, BattleUnitLoss{
@@ -308,6 +311,7 @@ func (s *BattleSim) EngageCavalrySpecial(attacker, target *Combatant) (BattleAtt
 		}
 		rawA, rawT := s.pairLosses(attacker, target)
 		chargeTarget := roundDiv(rawT*2, 3)
+		rawA, chargeTarget = s.protectedLosses(attacker, target, rawA, chargeTarget)
 		attacker.applyLoss(rawA)
 		target.applyLoss(chargeTarget)
 		result.LossAttacker += rawA
@@ -346,7 +350,9 @@ func (s *BattleSim) ResolveBattleAttack(attacker, target *Combatant) (BattleAtta
 	if s == nil || attacker == nil || target == nil {
 		return BattleAttackResult{}, fmt.Errorf("game: 交戰雙方不得為 nil")
 	}
-	if target.Branch() == BranchArtiller || target.Branch() == BranchArmour {
+	// SPEC-65 supplies an explicit remake combat rule for equipped campaigns.
+	// Keep the unresolved original visual-only branch when no armory is present.
+	if s.Opts.Armory == nil && (target.Branch() == BranchArtiller || target.Branch() == BranchArmour) {
 		// `sub_4B854`／`sub_4BCBE` 的窄證據只閉合了非砲兵攻擊者的
 		// 畫面／音效分支；不能讓兵種 4 的遠程路徑被這個零損失事件吃掉。
 		if attacker.Branch() == BranchArtiller {

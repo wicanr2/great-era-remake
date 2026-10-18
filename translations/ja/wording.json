@@ -1009,8 +1009,8 @@
       "plain": "原版画面"
     },
     "toolbar.interface.command": {
-      "original": "Modern",
-      "plain": "Modern"
+      "original": "Modern 暗色",
+      "plain": "Modern 暗色"
     },
     "toolbar.ai.current.long": {
       "original": "現在のリメイク AI",
@@ -1113,24 +1113,24 @@
       "plain": "時代と勢力を選択"
     },
     "opening.intro": {
-      "original": "矢印で勢力、1–3でシナリオ、Mでモード切替、Enterで開始。",
-      "plain": "矢印で勢力、1–3でシナリオ、Mでモード切替、Enterで開始。"
+      "original": "シナリオ、勢力、軍備設定を選択。矢印で勢力、1–3 でシナリオ、M で軍備切替、Enter で開始。",
+      "plain": "シナリオ、勢力、軍備設定を選択。矢印で勢力、1–3 でシナリオ、M で軍備切替、Enter で開始。"
     },
     "opening.original": {
-      "original": "原版戦役",
-      "plain": "原版戦役"
+      "original": "軍備＋抗日：無効",
+      "plain": "軍備＋抗日：無効"
     },
     "opening.original.hint": {
-      "original": "原版のルール",
-      "plain": "原版のルール"
+      "original": "軍備と追加の抗日戦を無効にする",
+      "plain": "軍備と追加の抗日戦を無効にする"
     },
     "opening.resistance": {
-      "original": "統一後の抗日戦",
-      "plain": "統一後の抗日戦"
+      "original": "軍備＋抗日：有効",
+      "plain": "軍備＋抗日：有効"
     },
     "opening.resistance.hint": {
-      "original": "統一後に東北侵攻が発生",
-      "plain": "統一後に東北侵攻が発生"
+      "original": "軍備を開放し、統一後に抗日戦へ",
+      "plain": "軍備を開放し、統一後に抗日戦へ"
     },
     "opening.factions": {
       "original": "選択できる勢力 · %d",
@@ -1205,12 +1205,12 @@
       "plain": "開始する省：%s"
     },
     "opening.original.note": {
-      "original": "原版と拡張のルールは別です。日本軍は原版で選択可能。",
-      "plain": "原版と拡張のルールは別です。日本軍は原版で選択可能。"
+      "original": "軍備と追加の抗日戦は無効です。開始後は上部ツールバーで変更できます。",
+      "plain": "軍備と追加の抗日戦は無効です。開始後は上部ツールバーで変更できます。"
     },
     "opening.resistance.pending": {
-      "original": "軍備整備を試遊できます。日本軍侵攻は開発中です。F7 で軍備局を開きます。",
-      "plain": "軍備整備を試遊できます。日本軍侵攻は開発中です。F7 で軍備局を開きます。"
+      "original": "開始時から軍備局が開きます。日本以外の所有省を統一すると宣戦し、当時の将校による三波が来襲します。宣戦後は解除できません。",
+      "plain": "開始時から軍備局が開きます。日本以外の所有省を統一すると宣戦し、当時の将校による三波が来襲します。宣戦後は解除できません。"
     },
     "opening.japan.note": {
       "original": "日本軍は原版で選択可能。抗日拡張は中国勢力向けです。",
@@ -2211,6 +2211,194 @@
     "toolbar.music.eight-hundred-heroes": {
       "original": "歌八百壯士",
       "plain": "歌八百壯士"
+    },
+    "military.title": {
+      "original": "軍備＋抗日",
+      "plain": "軍備＋抗日"
+    },
+    "military.on": {
+      "original": "有効",
+      "plain": "有効"
+    },
+    "military.off": {
+      "original": "無効",
+      "plain": "無効"
+    },
+    "military.locked": {
+      "original": "固定",
+      "plain": "固定"
+    },
+    "military.option.on": {
+      "original": "軍備と追加抗日戦を有効にする",
+      "plain": "軍備と追加抗日戦を有効にする"
+    },
+    "military.option.off": {
+      "original": "軍備と追加抗日戦を無効にする",
+      "plain": "軍備と追加抗日戦を無効にする"
+    },
+    "military.note": {
+      "original": "宣戦前に切替可能。無効時は研究と生産を停止し、進捗と在庫を保持。宣戦後は無効にできません。侵攻は接続作業中です。",
+      "plain": "宣戦前に切替可能。無効時は研究と生産を停止し、進捗と在庫を保持。宣戦後は無効にできません。侵攻は接続作業中です。"
+    },
+    "military.locked.note": {
+      "original": "宣戦済みのため、軍備と抗日戦を無効にできません。",
+      "plain": "宣戦済みのため、軍備と抗日戦を無効にできません。"
+    },
+    "military.disabled.note": {
+      "original": "軍備＋抗日は無効です。上部ツールバーで有効にできます。",
+      "plain": "軍備＋抗日は無効です。上部ツールバーで有効にできます。"
+    },
+    "military.busy": {
+      "original": "戦闘、再編成、確認操作を完了または中止してから変更してください。",
+      "plain": "戦闘、再編成、確認操作を完了または中止してから変更してください。"
+    },
+    "military.campaign.required": {
+      "original": "リメイク戦役を開始または読み込んでください。",
+      "plain": "リメイク戦役を開始または読み込んでください。"
+    },
+    "military.withdraw.unavailable": {
+      "original": "撤退先の自軍省がありません。戦闘を続けるか、一時停止して保存できます。",
+      "plain": "撤退先の自軍省がありません。戦闘を続けるか、一時停止して保存できます。"
+    },
+    "military.withdraw.failed": {
+      "original": "撤退できません。隣接する自軍の省を選択してください。",
+      "plain": "撤退できません。隣接する自軍の省を選択してください。"
+    },
+    "toolbar.interface.light": {
+      "original": "Modern 明色",
+      "plain": "Modern 明色"
+    },
+    "battleinfo.unit.protection": {
+      "original": "装甲 %.1f・貫徹 %.1f・軽減上限 50%%（係数）",
+      "plain": "装甲 %.1f・貫徹 %.1f・軽減上限 50%%（係数）"
+    },
+    "classic.map.title": {
+      "original": "全国地図",
+      "plain": "全国地図"
+    },
+    "classic.map.hint": {
+      "original": "左右で省選択 P 省地図",
+      "plain": "左右で省選択 P 省地図"
+    },
+    "classic.commands": {
+      "original": "Enter 命令",
+      "plain": "Enter 命令"
+    },
+    "classic.province": {
+      "original": "P 省地図",
+      "plain": "P 省地図"
+    },
+    "classic.home": {
+      "original": "Home 全国",
+      "plain": "Home 全国"
+    },
+    "classic.roster.title": {
+      "original": "部隊基本情報",
+      "plain": "部隊基本情報"
+    },
+    "classic.roster.hint": {
+      "original": "Up/Down 選択 Enter 詳細 B 伝記 Esc/0 戻る",
+      "plain": "Up/Down 選択 Enter 詳細 B 伝記 Esc/0 戻る"
+    },
+    "classic.unit.title": {
+      "original": "部隊番号",
+      "plain": "部隊番号"
+    },
+    "classic.input.hint": {
+      "original": "Backspace: -1 Delete: 0 Esc: 戻る",
+      "plain": "Backspace: -1 Delete: 0 Esc: 戻る"
+    },
+    "military.turn.pending": {
+      "original": "電算機の行動は未完了です。月を進めて再開するか、保存してください。",
+      "plain": "電算機の行動は未完了です。月を進めて再開するか、保存してください。"
+    },
+    "military.turn.continue": {
+      "original": "電算機の行動を再開",
+      "plain": "電算機の行動を再開"
+    },
+    "military.turn.defend": {
+      "original": "日本軍が%sへ進攻。守備軍を指揮してください。月の決算は未完了です。",
+      "plain": "日本軍が%sへ進攻。守備軍を指揮してください。月の決算は未完了です。"
+    },
+    "military.turn.failed": {
+      "original": "守備戦を開始できません。この進攻は取消しました。",
+      "plain": "守備戦を開始できません。この進攻は取消しました。"
+    },
+    "invasion.title": {
+      "original": "日本軍が対中宣戦",
+      "plain": "日本軍が対中宣戦"
+    },
+    "invasion.date": {
+      "original": "%d 年 %d 月",
+      "plain": "%d 年 %d 月"
+    },
+    "invasion.intro": {
+      "original": "中国統一後、東北の戦線が開かれた。守備隊は迎撃せよ。",
+      "plain": "中国統一後、東北の戦線が開かれた。守備隊は迎撃せよ。"
+    },
+    "invasion.roster": {
+      "original": "この戦役の固定指揮官名簿",
+      "plain": "この戦役の固定指揮官名簿"
+    },
+    "invasion.continue": {
+      "original": "戦役を続ける",
+      "plain": "戦役を続ける"
+    },
+    "invasion.view": {
+      "original": "地図を見る",
+      "plain": "地図を見る"
+    },
+    "invasion.menu": {
+      "original": "主メニューへ",
+      "plain": "主メニューへ"
+    },
+    "invasion.alternate": {
+      "original": "架空の継続戦役",
+      "plain": "架空の継続戦役"
+    },
+    "invasion.batch.status": {
+      "original": "到着 %d／3 波、追加部隊 %d／10",
+      "plain": "到着 %d／3 波、追加部隊 %d／10"
+    },
+    "invasion.exit.note": {
+      "original": "Enter 続行、Esc 戻る、F10 保存して終了。",
+      "plain": "Enter 続行、Esc 戻る、F10 保存して終了。"
+    },
+    "invasion.quit.title": {
+      "original": "戦役を保存して終了しますか？",
+      "plain": "戦役を保存して終了しますか？"
+    },
+    "invasion.quit.yes": {
+      "original": "Y 保存して終了",
+      "plain": "Y 保存して終了"
+    },
+    "invasion.quit.no": {
+      "original": "N 戻る",
+      "plain": "N 戻る"
+    },
+    "invasion.victory.title": {
+      "original": "抗戦勝利",
+      "plain": "抗戦勝利"
+    },
+    "invasion.victory.body": {
+      "original": "日本軍の戦線は崩壊し、この抗戦は終結した。",
+      "plain": "日本軍の戦線は崩壊し、この抗戦は終結した。"
+    },
+    "invasion.defeat.title": {
+      "original": "戦役敗北",
+      "plain": "戦役敗北"
+    },
+    "invasion.defeat.body": {
+      "original": "全領土を失った。地図を確認するか主メニューへ戻れます。",
+      "plain": "全領土を失った。地図を確認するか主メニューへ戻れます。"
+    },
+    "invasion.ended": {
+      "original": "戦役は終了しました。閲覧、保存、メニューへの復帰が可能です。",
+      "plain": "戦役は終了しました。閲覧、保存、メニューへの復帰が可能です。"
+    },
+    "invasion.failed": {
+      "original": "戦役イベントは確定されませんでした：%v",
+      "plain": "戦役イベントは確定されませんでした：%v"
     }
   }
 }

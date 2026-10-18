@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/i18n"
 	userprefs "github.com/wicanr2/great-era-remake/internal/prefs"
 	"github.com/wicanr2/great-era-remake/internal/ui/actions"
@@ -12,6 +13,41 @@ import (
 	uiresolution "github.com/wicanr2/great-era-remake/internal/ui/resolution"
 	uitheme "github.com/wicanr2/great-era-remake/internal/ui/theme"
 )
+
+func TestLightInterfacePreferenceIsAtomicAndIndependent(t *testing.T) {
+	dir := t.TempDir()
+	blocker := filepath.Join(dir, "file")
+	if err := os.WriteFile(blocker, []byte("not a directory"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	a := &app{toolbar: newToolbarState(), eten: &assets.EtenFonts{}, wording: &i18n.WordingCatalog{}, room: commandRoomState{Mode: l.InterfaceModern}, themeMode: uitheme.ModeModern, preferences: userprefs.Default(), prefsPath: filepath.Join(blocker, "prefs.json")}
+	before := a.preferences
+	if err := a.setInterfaceAppearance(l.InterfaceModern, "light"); err == nil || a.preferences != before || a.lightInterface() {
+		t.Fatal("failed preference write changed active appearance")
+	}
+	a.prefsPath = filepath.Join(dir, "prefs.json")
+	if err := a.setInterfaceAppearance(l.InterfaceModern, "light"); err != nil || !a.lightInterface() {
+		t.Fatal("light interface not selected", err)
+	}
+	want := before
+	want.UIAppearance = "light"
+	if a.preferences != want {
+		t.Fatal("light setting changed unrelated preferences")
+	}
+	if err := a.setInterfacePreference(l.InterfaceOriginal); err != nil || a.lightInterface() || a.preferences.UIAppearance != "light" {
+		t.Fatal("original interface forgot the light selection", err)
+	}
+	if err := a.toggleInterface(); err != nil || !a.lightInterface() {
+		t.Fatal("returning to Modern lost appearance", err)
+	}
+	loaded, err := userprefs.Load(a.prefsPath)
+	if err != nil || loaded.UIAppearance != "light" {
+		t.Fatal("restart lost appearance", err)
+	}
+	if err := a.applyToolbarOption(1, 1); err != nil || a.lightInterface() {
+		t.Fatal("explicit Modern dark did not restore dark", err)
+	}
+}
 
 func TestPermanentToolbarLayoutAndPointerOffsets(tst *testing.T) {
 	for _, tc := range []struct {

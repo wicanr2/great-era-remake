@@ -136,6 +136,7 @@ type PeopleDB struct {
 	slots     map[personSlot]int
 	excluded  map[personSlot]string
 	canonical map[int]int
+	invasion  map[string]int
 }
 
 // LoadPeople 載入 localeDir/people.json 與 sharedDir/roster-slots.json。
@@ -217,6 +218,9 @@ func LoadPeople(localeDir, sharedDir string) (*PeopleDB, error) {
 	if err := applyTranslatedBiographyOverlay(
 		filepath.Join(localeDir, "people-biography-overlay.json"), pf.Language, db,
 	); err != nil {
+		return nil, err
+	}
+	if err := applyInvasionPeople(localeDir, db); err != nil {
 		return nil, err
 	}
 	return db, nil

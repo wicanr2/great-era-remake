@@ -69,7 +69,7 @@ import hashlib,json
 p=Path('docs/licenses/generated-hd-assets.json')
 if p.exists():
     for name,digest in json.loads(p.read_text())['files'].items():
-        assert name in {'internal/ui/hdart/earth-kit.png','internal/ui/hdart/earth-units.png','internal/ui/hdart/materials.png','internal/ui/hdart/development.png'}
+        assert name in {'internal/ui/hdart/earth-kit.png','internal/ui/hdart/earth-units.png','internal/ui/hdart/materials.png','internal/ui/hdart/development.png','internal/ui/hdart/declaration.jpg'}
         assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==digest,name
 PY
 

@@ -38,14 +38,21 @@ type WordingCatalog struct {
 // RequiredWordingKeys 是目前已有玩家入口的穩定語意鍵。語系檔少任何一項都
 // 整份拒絕，避免某個深層畫面才突然退回原典或顯示空白。
 var RequiredWordingKeys = []string{
+	"classic.map.title", "classic.map.hint", "classic.commands", "classic.province", "classic.home", "classic.roster.title", "classic.roster.hint", "classic.unit.title", "classic.input.hint",
 	"common.confirm", "common.cancel", "common.back", "common.previous", "common.next",
 	"settings.title", "settings.wording", "settings.wording.original", "settings.wording.plain",
 	"settings.theme", "settings.theme.retro", "settings.theme.modern",
 	"toolbar.art", "toolbar.interface", "toolbar.ai", "toolbar.input",
-	"toolbar.art.original", "toolbar.art.hd", "toolbar.interface.original", "toolbar.interface.command",
+	"toolbar.art.original", "toolbar.art.hd", "toolbar.interface.original", "toolbar.interface.command", "toolbar.interface.light",
 	"toolbar.ai.current.long", "toolbar.ai.current", "toolbar.ai.note.1", "toolbar.ai.note.2", "toolbar.ai.note.3",
 	"toolbar.music", "toolbar.music.hd", "toolbar.music.original", "toolbar.music.off", "toolbar.music.auto", "toolbar.music.scene", "toolbar.music.strategy", "toolbar.music.main-theme", "toolbar.music.battle-1", "toolbar.music.battle-2", "toolbar.music.battle-alt", "toolbar.music.wall", "toolbar.music.final", "toolbar.music.note", "toolbar.music.unavailable",
 	"toolbar.input.mouse", "toolbar.input.keyboard", "toolbar.input.note",
+	"military.title", "military.on", "military.off", "military.locked", "military.option.on", "military.option.off",
+	"military.note", "military.locked.note", "military.disabled.note", "military.busy", "military.campaign.required",
+	"battleinfo.unit.protection",
+	"invasion.title", "invasion.date", "invasion.intro", "invasion.roster", "invasion.continue", "invasion.view", "invasion.menu", "invasion.alternate",
+	"invasion.batch.status", "invasion.exit.note", "invasion.quit.title", "invasion.quit.yes", "invasion.quit.no",
+	"invasion.victory.title", "invasion.victory.body", "invasion.defeat.title", "invasion.defeat.body", "invasion.ended", "invasion.failed",
 	"settings.resolution", "settings.resolution.original", "settings.resolution.high",
 	"other.resolution",
 	"other.save.confirm", "other.load.confirm", "other.message_time.prompt",

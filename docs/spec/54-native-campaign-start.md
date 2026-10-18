@@ -33,6 +33,8 @@
 
 ## 保存 v1
 
+本節保存原版開局子集的 v1 契約與驗收範圍。現行容器寫入及舊版本遷移改依 [SPEC-63](63-post-unification-invasion.md)，統一使用 v4；原版開局、固定玩家與 Base 資料規則不因此改變。
+
 一個 ZIP 容器包含 `manifest.json`、`state.json` 及可選 `legacy.dt1`。格式識別為 `great-era-save`、版本 1。每一項有 SHA-256，拒絕重複項目、未知名稱、未知版本、巢狀路徑、解壓總量超過 8 MiB、毀損、缺欄及不合法索引。讀取只在記憶體解碼，不解壓到玩家檔案系統。
 
 世界狀態包含完整 typed DT1State、省／將領 Raw、玩家領袖、期別、目前省、日期、原始來源雜湊、LCG 32-bit 狀態、每省已具體化的剩餘指令數、世界 Units／Strengths、戰力選項純量及 EnableExtra。原始 DT1 匯入時原樣另存，後續世界修改寫入 state，不覆寫 legacy。新局無 legacy。偏好仍由既有偏好檔處理。

@@ -1,6 +1,6 @@
 # SPEC-52：全勢力開局與統一後抗日擴充保存基礎
 
-狀態：DRAFT，限定完整抗日擴充。使用者已確認獨立擴充、保留原版規則、統一後立即入侵，並使用當年在役將領；已確認單一 `.gesave` 容器及 DT1 匯入，並採用下述開局操作原型。原版新局與保存子集另由 [SPEC-54](54-native-campaign-start.md)定稿及接入；入侵、裝備與擴充 schema 不由本草案直接進入正式路徑。
+狀態：DRAFT，保存早期獨立擴充與保存基礎。2026-10-18 使用者改採軍備與抗日共用開局開關，原版戰役也可啟用；統一判定、工具列及宣戰後鎖定以 [SPEC-63](63-post-unification-invasion.md)為準。本文件下文的「僅限獨立擴充／保留原版結局」為早期決策紀錄，不再授權新入侵實作。已完成的原版新局與保存子集仍由 [SPEC-54](54-native-campaign-start.md)定稿及接入；完整入侵與新 schema 必須另經 READY 審查。
 
 工作只由 [總計畫 #20](https://github.com/wicanr2/great-era-remake/issues/20)、[開局 #21](https://github.com/wicanr2/great-era-remake/issues/21)、[保存 #22](https://github.com/wicanr2/great-era-remake/issues/22)、[人物 #23](https://github.com/wicanr2/great-era-remake/issues/23)追蹤。本文件保存證據與契約，不複製工作狀態。
 

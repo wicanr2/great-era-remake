@@ -111,7 +111,7 @@ func TestArmoryAllExpansionFactionsSave(t *testing.T) {
 					t.Fatal(err)
 				}
 				v, err := game.CampaignSaveVersion(data)
-				if err != nil || v != 2 {
+				if err != nil || v != game.CampaignSaveCurrentVersion {
 					t.Fatal(v, err)
 				}
 				restored := &app{m: a.m, dataRead: campaignTestRead}
@@ -138,6 +138,8 @@ func TestArmoryAllExpansionFactionsSave(t *testing.T) {
 }
 func TestArmoryResearchProductionEquipmentRestart(t *testing.T) {
 	a := newArmoryApp(t, 2, 1)
+	// Stay in the preparation surface to isolate research from declaration.
+	a.screen = screenArmory
 	if err := a.armory.Research(a.world, 1, "rifle-modern"); err != nil {
 		t.Fatal(err)
 	}
@@ -208,12 +210,12 @@ func TestArmoryDamagedLoadAndFailedWriteKeepState(t *testing.T) {
 	good, _ := os.ReadFile(a.savePath)
 	before := a.campaignState()
 	army, _ := json.Marshal(a.armory)
-	var snapshot campaignExpansion
-	if _, err := game.DecodeCampaignSaveVersion(good, &snapshot, 2); err != nil {
+	var snapshot campaignV4
+	if _, err := game.DecodeCampaignSaveVersion(good, &snapshot, 4); err != nil {
 		t.Fatal(err)
 	}
 	snapshot.Armory.Nations[1].Stock["rifle-modern"]++
-	bad, err := game.EncodeCampaignSaveVersion(snapshot, nil, 2)
+	bad, err := game.EncodeCampaignSaveVersion(snapshot, nil, 4)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -245,7 +247,7 @@ func TestArmoryDamagedLoadAndFailedWriteKeepState(t *testing.T) {
 	}
 	original, _ := os.ReadFile(path)
 	version, _ := game.CampaignSaveVersion(original)
-	if version != 1 {
-		t.Fatal("original save silently migrated", version)
+	if version != game.CampaignSaveCurrentVersion {
+		t.Fatal("new campaign lacks live rules", version)
 	}
 }

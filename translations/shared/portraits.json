@@ -31,6 +31,276 @@
       "status": "available"
     },
     {
+      "person_id": 2,
+      "status": "available",
+      "asset": "portraits/0002-historical-portrait.jpg",
+      "asset_sha256": "a9040d7c32504ea6a20dd6df1d51c5de09c1f892ac31858cb39ea69e567962e3",
+      "identity": {
+        "name": "何應欽",
+        "verification": "confirmed",
+        "reference_url": "https://www.wikidata.org/wiki/Q705832"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Ho_Ying-chin.jpg#Licensing",
+        "author": "Unknown authorUnknown author",
+        "attribution": "作者不詳；Wikimedia Commons，公有領域。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Ho_Ying-chin.jpg",
+        "retrieved_at": "2026-10-17"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-17"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 3,
+      "status": "available",
+      "asset": "portraits/0003-historical-portrait.jpg",
+      "asset_sha256": "bd90980788bb20eabfb606aa284957d9b0e62b411f9e8fcb451e54aeafcc3d71",
+      "identity": {
+        "name": "馮玉祥",
+        "verification": "confirmed",
+        "reference_url": "https://www.wikidata.org/wiki/Q365894"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Feng_Yuxiang.jpg#Licensing",
+        "author": "Unknown authorUnknown author",
+        "attribution": "作者不詳；Wikimedia Commons，公有領域；採早期留存照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Feng_Yuxiang.jpg",
+        "retrieved_at": "2026-10-17"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-17"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 4,
+      "status": "available",
+      "asset": "portraits/0004-historical-portrait.jpg",
+      "asset_sha256": "34eabd9826ad84793005fb25ede606622ac45ab08cbf12cfc93876bde630513d",
+      "identity": {
+        "name": "閰錫山",
+        "verification": "confirmed",
+        "reference_url": "https://www.wikidata.org/wiki/Q699698"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Yan_Xishan.jpg#Licensing",
+        "author": "Unknown authorUnknown author",
+        "attribution": "作者不詳；Wikimedia Commons，公有領域；採早期留存照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Yan_Xishan.jpg",
+        "retrieved_at": "2026-10-17"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-17"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 11,
+      "status": "available",
+      "asset": "portraits/0011-historical-portrait.jpg",
+      "asset_sha256": "4be49962ecc5ff9055fa458a828fe850a767e10f085f2682b71b0530d73171f3",
+      "identity": {
+        "name": "朱培德",
+        "verification": "confirmed",
+        "reference_url": "https://www.wikidata.org/wiki/Q8270033"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Zhu_Peide2.jpg#Licensing",
+        "author": "Unknown; scanned by 天竺鼠",
+        "attribution": "作者不詳；Wikimedia Commons，公有領域。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Zhu_Peide2.jpg",
+        "retrieved_at": "2026-10-17"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-17"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 14,
+      "status": "available",
+      "asset": "portraits/0014-historical-portrait.jpg",
+      "asset_sha256": "bfa5bdc5657c88bd1806b0d488b97d213f845ec441bac1f747da7d22998fea5d",
+      "identity": {
+        "name": "譚延闓",
+        "verification": "confirmed",
+        "reference_url": "https://www.wikidata.org/wiki/Q708781"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Tan_Yankai.jpg#Licensing",
+        "author": "Unknown; scanned by 天竺鼠",
+        "attribution": "作者不詳；Wikimedia Commons，公有領域。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Tan_Yankai.jpg",
+        "retrieved_at": "2026-10-17"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-17"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 31,
+      "status": "available",
+      "asset": "portraits/0031-historical-portrait.jpg",
+      "asset_sha256": "ca09505c3dae4db60dd0af7fa0bda6786c81a9fb76b7d52249cecc98a84d1584",
+      "identity": {
+        "name": "陳銘樞",
+        "verification": "confirmed",
+        "reference_url": "https://www.wikidata.org/wiki/Q707927"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Chen_Mingxu.jpg#Licensing",
+        "author": "Unknown; scanned by 天竺鼠 (talk) 08:16, 23 August 2009 (UTC)",
+        "attribution": "作者不詳；Wikimedia Commons，公有領域。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Chen_Mingxu.jpg",
+        "retrieved_at": "2026-10-17"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-17"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 32,
+      "status": "available",
+      "asset": "portraits/0032-historical-portrait.jpg",
+      "asset_sha256": "773fe286bfbb7e7aad4ef9d43449a6c6ee2a4de2107ade5512f24d618bd04114",
+      "identity": {
+        "name": "陳濟棠",
+        "verification": "confirmed",
+        "reference_url": "https://www.wikidata.org/wiki/Q708883"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Chen_Jitang2.jpg#Licensing",
+        "author": "Unknown; scanned by 天竺鼠",
+        "attribution": "作者不詳；Wikimedia Commons，公有領域。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Chen_Jitang2.jpg",
+        "retrieved_at": "2026-10-17"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-17"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 41,
+      "status": "available",
+      "asset": "portraits/0041-historical-portrait.jpg",
+      "asset_sha256": "0cdbd6363b72aeb3269ca3b4e2a9e0c8c8a175177166b1d6c2d60d01add4d433",
+      "identity": {
+        "name": "程潛",
+        "verification": "confirmed",
+        "reference_url": "https://www.wikidata.org/wiki/Q699357"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Cheng_Qian.jpg#Licensing",
+        "author": "Unknown; scanned by 天竺鼠",
+        "attribution": "作者不詳；Wikimedia Commons，公有領域。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Cheng_Qian.jpg",
+        "retrieved_at": "2026-10-17"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-17"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 44,
+      "status": "available",
+      "asset": "portraits/0044-historical-portrait.jpg",
+      "asset_sha256": "d38f34ab41ad0f82b1384cf5876b83bfddf6b45618923f03afa078bd37e99f2f",
+      "identity": {
+        "name": "馬鴻逵",
+        "verification": "confirmed",
+        "reference_url": "https://www.wikidata.org/wiki/Q715070"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Ma_Hongkui.jpg#Licensing",
+        "author": "Unknown; scanned by 天竺鼠",
+        "attribution": "作者不詳；Wikimedia Commons，公有領域。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Ma_Hongkui.jpg",
+        "retrieved_at": "2026-10-17"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-17"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
       "asset": "portraits/0058-wu-peifu-1925.jpg",
       "asset_sha256": "33945a2e928d02feb4ffb4283a4493736726fcf2514ea3a4628a661425b66b1d",
       "crop": {
@@ -59,6 +329,576 @@
         "source_page": "https://commons.wikimedia.org/wiki/File:Wu_Peifu.jpg"
       },
       "status": "available"
+    },
+    {
+      "person_id": 10275,
+      "status": "available",
+      "asset": "portraits/10275-invasion.jpg",
+      "asset_sha256": "c39a54d25aa208726260c5f7529154c6dd264c48a56623faeb3dd085df49319a",
+      "identity": {
+        "name": "武藤信義",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Nobuyoshi_Mut%C5%8D"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Nobuyoshi_Muto.jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Nobuyoshi_Muto.jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10276,
+      "status": "available",
+      "asset": "portraits/10276-invasion.jpg",
+      "asset_sha256": "8d1b6e68742c8624ff41d8557c4e7220cb1bc1aceda62981a630f2f56262380a",
+      "identity": {
+        "name": "南次郎",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Jir%C5%8D_Minami"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Minami_Jir%C5%8D_1931.jpg#Licensing",
+        "author": "Agence de presse Meurisse",
+        "attribution": "Agence de presse Meurisse；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Minami_Jir%C5%8D_1931.jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10277,
+      "status": "available",
+      "asset": "portraits/10277-invasion.jpg",
+      "asset_sha256": "00de19ff8c9e0b77906060216ed7d883b954eeaca8d71189fbd5a5c4bda708ab",
+      "identity": {
+        "name": "菱刈隆",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Takashi_Hishikari"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:General_Takashi_Hishikari.jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:General_Takashi_Hishikari.jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10278,
+      "status": "available",
+      "asset": "portraits/10278-invasion.jpg",
+      "asset_sha256": "92bbe7ddc0ca15162eed2c3d10c17c5d02c8b44421adf7a255e6a44c8ace3111",
+      "identity": {
+        "name": "植田謙吉",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Kenkichi_Ueda"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Ueda_Kenkichi.jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Ueda_Kenkichi.jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10279,
+      "status": "available",
+      "asset": "portraits/10279-invasion.jpg",
+      "asset_sha256": "cdaa59921b358d3e592ba2b37de6b831d6d14c4689a0e9f617e1c59018bfa000",
+      "identity": {
+        "name": "梅津美治郎",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Yoshijir%C5%8D_Umezu"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Yoshijiro_Umedu_(cropped).jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Yoshijiro_Umedu_(cropped).jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10280,
+      "status": "available",
+      "asset": "portraits/10280-invasion.jpg",
+      "asset_sha256": "15ed8e7389bb7c510f40aa9f175250a5e721983824377b9e8de1b4055713c0a1",
+      "identity": {
+        "name": "板垣征四郎",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Seishir%C5%8D_Itagaki"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Seishiro_Itagaki_(cropped)(2).jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Seishiro_Itagaki_(cropped)(2).jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10281,
+      "status": "available",
+      "asset": "portraits/10281-invasion.jpg",
+      "asset_sha256": "6e42523daa4ea0f927f12df6c4fde21b79c30b9474ee734a3244b79348ef98e5",
+      "identity": {
+        "name": "石原莞爾",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Kanji_Ishiwara"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Kanji_Ishiwara2_(cropped).JPG#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Kanji_Ishiwara2_(cropped).JPG",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10282,
+      "status": "available",
+      "asset": "portraits/10282-invasion.jpg",
+      "asset_sha256": "99c451761accd31c6f13b7fe27394018af8c2d496248734de557a4176a373642",
+      "identity": {
+        "name": "寺內壽一",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Hisaichi_Terauchi"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:General_Hisaichi_Terauchi.jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:General_Hisaichi_Terauchi.jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10283,
+      "status": "available",
+      "asset": "portraits/10283-invasion.jpg",
+      "asset_sha256": "6a8b4e9b1da98d3875cfcc6501a7b7e7609968e0833a912d0c0625e8e9dbecb4",
+      "identity": {
+        "name": "本庄繁",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Shigeru_Honj%C5%8D"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Shigeru_Honjo,_genera%C5%82.jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Shigeru_Honjo,_genera%C5%82.jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10284,
+      "status": "available",
+      "asset": "portraits/10284-invasion.jpg",
+      "asset_sha256": "7ec10d3c2dd4f51c041b77847a92d58d383d29812d88f0296a869cc32ec5c930",
+      "identity": {
+        "name": "畑俊六",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Shunroku_Hata"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Hata_Syunroku3_(cropped).jpg#Licensing",
+        "author": "photographer is unknown",
+        "attribution": "photographer is unknown；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Hata_Syunroku3_(cropped).jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10285,
+      "status": "available",
+      "asset": "portraits/10285-invasion.jpg",
+      "asset_sha256": "bb6cfeda0a8ea6b04f7d5947258a890c2c87eecee02a0693a11acf0ac2a01647",
+      "identity": {
+        "name": "杉山元",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Hajime_Sugiyama"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Hajime_Sugiyama_02_(darker).jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Hajime_Sugiyama_02_(darker).jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10286,
+      "status": "available",
+      "asset": "portraits/10286-invasion.jpg",
+      "asset_sha256": "06cc1c62ddfc179597c472cb2902199b85f17e950e8d70d1fc4e707db16fa602",
+      "identity": {
+        "name": "林銑十郎",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Senj%C5%ABr%C5%8D_Hayashi"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Senj%C5%ABr%C5%8D_Hayashi_as_Prime_Minister.jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Senj%C5%ABr%C5%8D_Hayashi_as_Prime_Minister.jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10287,
+      "status": "available",
+      "asset": "portraits/10287-invasion.jpg",
+      "asset_sha256": "1a89171b4494ba2b715b67b8fe8acc631f96a8d144d1a93209e767be66ca2574",
+      "identity": {
+        "name": "東條英機",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Hideki_Tojo"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Hideki_Tojo_Portrait_1941_(3x4_cropped)(2).jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Hideki_Tojo_Portrait_1941_(3x4_cropped)(2).jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10288,
+      "status": "available",
+      "asset": "portraits/10288-invasion.jpg",
+      "asset_sha256": "8f4254bb2a687bff34d5a6426849ddad1037ddadb949b121ab65b5f4d99828ab",
+      "identity": {
+        "name": "阿南惟幾",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Korechika_Anami"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Korechika_Anami_(cropped).jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Korechika_Anami_(cropped).jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10289,
+      "status": "available",
+      "asset": "portraits/10289-invasion.jpg",
+      "asset_sha256": "670dc44bc133b9421687fe725f637cc38781e303ed7d0701976fe7cf25af297e",
+      "identity": {
+        "name": "多田駿",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Hayao_Tada"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Hayao_Tada.jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Hayao_Tada.jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10290,
+      "status": "available",
+      "asset": "portraits/10290-invasion.jpg",
+      "asset_sha256": "1e489c73c6c4191c7c5a0452839a73258cb9fcbcf2b6af8cd2169ea34053b365",
+      "identity": {
+        "name": "山田乙三",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Otoz%C5%8D_Yamada"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Yamada_Otozo_(cropped).jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Yamada_Otozo_(cropped).jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10291,
+      "status": "available",
+      "asset": "portraits/10291-invasion.jpg",
+      "asset_sha256": "40832fce397690948ca4db3843e40934a2dcc468d7aa1d96a744de0c4bc5219f",
+      "identity": {
+        "name": "岡村寧次",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Yasuji_Okamura"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Yasuji_Okamura.jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:Yasuji_Okamura.jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10292,
+      "status": "available",
+      "asset": "portraits/10292-invasion.jpg",
+      "asset_sha256": "f057628cef07e33d62e07790a9db6080d1d44d223ab55267163e6e2a714f74a9",
+      "identity": {
+        "name": "土肥原賢二",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Kenji_Doihara"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:General_Kenji_Doihara_IJA.jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:General_Kenji_Doihara_IJA.jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "person_id": 10293,
+      "status": "available",
+      "asset": "portraits/10293-invasion.jpg",
+      "asset_sha256": "724cdf7b790aef11cbdef367a9a8aae9910a86a0d5ad8c22ba18fb35b4ee6237",
+      "identity": {
+        "name": "安藤利吉",
+        "verification": "confirmed",
+        "reference_url": "https://en.wikipedia.org/wiki/Rikichi_And%C5%8D"
+      },
+      "rights": {
+        "kind": "public-domain",
+        "license_url": "https://commons.wikimedia.org/wiki/File:%E5%AE%89%E8%97%A4_%E5%88%A9%E5%90%89.jpg#Licensing",
+        "author": "Unknown author",
+        "attribution": "作者不詳；Wikimedia Commons 公有領域歷史照片。",
+        "source_page": "https://commons.wikimedia.org/wiki/File:%E5%AE%89%E8%97%A4_%E5%88%A9%E5%90%89.jpg",
+        "retrieved_at": "2026-10-18"
+      },
+      "review": {
+        "identity": "confirmed",
+        "rights": "confirmed",
+        "reviewed_at": "2026-10-18"
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1
+      }
     }
   ],
   "schema_version": "1"

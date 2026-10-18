@@ -812,6 +812,7 @@ func drawModernTitleScaledInto(c *Canvas, fonts *assets.EtenFonts, s string, fg 
 
 func drawModernTextScaledIntoFamily(c *Canvas, fonts *assets.EtenFonts, s string, fg assets.RGB,
 	x, y, scale, maxHalf int, missing map[rune]bool, family assets.ModernFontFamily) {
+	fg = c.uiText(fg, x, y+7*scale)
 	if scale <= 0 || maxHalf <= 0 {
 		return
 	}

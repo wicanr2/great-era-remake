@@ -1009,8 +1009,8 @@
       "plain": "Original UI"
     },
     "toolbar.interface.command": {
-      "original": "Modern",
-      "plain": "Modern"
+      "original": "Modern Dark",
+      "plain": "Modern Dark"
     },
     "toolbar.ai.current.long": {
       "original": "Current remake AI",
@@ -1113,24 +1113,24 @@
       "plain": "Choose your era and faction"
     },
     "opening.intro": {
-      "original": "Start from scenario data. Arrows: faction; 1–3: scenario; M: mode; Enter: start.",
-      "plain": "Start from scenario data. Arrows: faction; 1–3: scenario; M: mode; Enter: start."
+      "original": "Choose a scenario, faction and military option. Arrows: faction, 1–3: scenario, M: military, Enter: start.",
+      "plain": "Choose a scenario, faction and military option. Arrows: faction, 1–3: scenario, M: military, Enter: start."
     },
     "opening.original": {
-      "original": "Original campaign",
-      "plain": "Original campaign"
+      "original": "Military + resistance: off",
+      "plain": "Military + resistance: off"
     },
     "opening.original.hint": {
-      "original": "Original rules",
-      "plain": "Original rules"
+      "original": "Disable armament and the additional war",
+      "plain": "Disable armament and the additional war"
     },
     "opening.resistance": {
-      "original": "After unification",
-      "plain": "After unification"
+      "original": "Military + resistance: on",
+      "plain": "Military + resistance: on"
     },
     "opening.resistance.hint": {
-      "original": "Northeast invasion after unification",
-      "plain": "Northeast invasion after unification"
+      "original": "Armament now; resistance after unification",
+      "plain": "Armament now; resistance after unification"
     },
     "opening.factions": {
       "original": "Factions · %d",
@@ -1205,12 +1205,12 @@
       "plain": "Starting province: %s"
     },
     "opening.original.note": {
-      "original": "Campaign rules are separate. Japan is playable in original campaigns.",
-      "plain": "Campaign rules are separate. Japan is playable in original campaigns."
+      "original": "Armament and the additional war are disabled. Enable them later in the top toolbar.",
+      "plain": "Armament and the additional war are disabled. Enable them later in the top toolbar."
     },
     "opening.resistance.pending": {
-      "original": "Armament preparation is playable; the Japanese invasion remains in development. F7 opens the armory.",
-      "plain": "Armament preparation is playable; the Japanese invasion remains in development. F7 opens the armory."
+      "original": "Open the Armament Bureau from the start. Unify all owned non-Japanese provinces to trigger war and three fixed Japanese waves. Locked after declaration.",
+      "plain": "Open the Armament Bureau from the start. Unify all owned non-Japanese provinces to trigger war and three fixed Japanese waves. Locked after declaration."
     },
     "opening.japan.note": {
       "original": "Japan is playable in original campaigns; this expansion is for Chinese factions.",
@@ -2211,6 +2211,194 @@
     "toolbar.music.eight-hundred-heroes": {
       "original": "Eight Hundred Heroes",
       "plain": "Eight Hundred Heroes"
+    },
+    "military.title": {
+      "original": "Military",
+      "plain": "Military"
+    },
+    "military.on": {
+      "original": "On",
+      "plain": "On"
+    },
+    "military.off": {
+      "original": "Off",
+      "plain": "Off"
+    },
+    "military.locked": {
+      "original": "Locked",
+      "plain": "Locked"
+    },
+    "military.option.on": {
+      "original": "Enable armament and resistance",
+      "plain": "Enable armament and resistance"
+    },
+    "military.option.off": {
+      "original": "Disable armament and resistance",
+      "plain": "Disable armament and resistance"
+    },
+    "military.note": {
+      "original": "Switch before declaration. Disabling pauses research and production, retaining progress and stock. Locked after declaration. Invasion is still being connected.",
+      "plain": "Switch before declaration. Disabling pauses research and production, retaining progress and stock. Locked after declaration. Invasion is still being connected."
+    },
+    "military.locked.note": {
+      "original": "War has been declared. Armament and resistance cannot be disabled.",
+      "plain": "War has been declared. Armament and resistance cannot be disabled."
+    },
+    "military.disabled.note": {
+      "original": "Armament and resistance are off. Enable them in the top toolbar.",
+      "plain": "Armament and resistance are off. Enable them in the top toolbar."
+    },
+    "military.busy": {
+      "original": "Finish or cancel the battle, reorganization or pending confirmation before changing military rules.",
+      "plain": "Finish or cancel the battle, reorganization or pending confirmation before changing military rules."
+    },
+    "military.campaign.required": {
+      "original": "Start or load a remake campaign first.",
+      "plain": "Start or load a remake campaign first."
+    },
+    "military.withdraw.unavailable": {
+      "original": "No adjacent friendly province is available. Continue fighting or pause and save.",
+      "plain": "No adjacent friendly province is available. Continue fighting or pause and save."
+    },
+    "military.withdraw.failed": {
+      "original": "Withdrawal failed. Select an adjacent friendly province again.",
+      "plain": "Withdrawal failed. Select an adjacent friendly province again."
+    },
+    "toolbar.interface.light": {
+      "original": "Modern Light",
+      "plain": "Modern Light"
+    },
+    "battleinfo.unit.protection": {
+      "original": "Armor %.1f · piercing %.1f · cap 50%% (coeff.)",
+      "plain": "Armor %.1f · piercing %.1f · cap 50%% (coeff.)"
+    },
+    "classic.map.title": {
+      "original": "National map",
+      "plain": "National map"
+    },
+    "classic.map.hint": {
+      "original": "Left/Right: province; P: local map",
+      "plain": "Left/Right: province; P: local map"
+    },
+    "classic.commands": {
+      "original": "Enter Commands",
+      "plain": "Enter Commands"
+    },
+    "classic.province": {
+      "original": "P Local map",
+      "plain": "P Local map"
+    },
+    "classic.home": {
+      "original": "Home National",
+      "plain": "Home National"
+    },
+    "classic.roster.title": {
+      "original": "Unit records",
+      "plain": "Unit records"
+    },
+    "classic.roster.hint": {
+      "original": "Up/Down select; Enter details; B bio; Esc/0 back",
+      "plain": "Up/Down select; Enter details; B bio; Esc/0 back"
+    },
+    "classic.unit.title": {
+      "original": "Unit designation",
+      "plain": "Unit designation"
+    },
+    "classic.input.hint": {
+      "original": "Backspace: erase digit; Delete: clear; Esc: cancel",
+      "plain": "Backspace: erase digit; Delete: clear; Esc: cancel"
+    },
+    "military.turn.pending": {
+      "original": "The computer turn is unfinished. Continue the month or save your progress.",
+      "plain": "The computer turn is unfinished. Continue the month or save your progress."
+    },
+    "military.turn.continue": {
+      "original": "Continue computer turn",
+      "plain": "Continue computer turn"
+    },
+    "military.turn.defend": {
+      "original": "Japan attacks %s. Command your defenders; the month has not advanced.",
+      "plain": "Japan attacks %s. Command your defenders; the month has not advanced."
+    },
+    "military.turn.failed": {
+      "original": "The defensive battle could not start. This attack was cancelled.",
+      "plain": "The defensive battle could not start. This attack was cancelled."
+    },
+    "invasion.title": {
+      "original": "Japan declares war",
+      "plain": "Japan declares war"
+    },
+    "invasion.date": {
+      "original": "%d / %d",
+      "plain": "%d / %d"
+    },
+    "invasion.intro": {
+      "original": "China is unified. Prepare to defend the northeast.",
+      "plain": "China is unified. Prepare to defend the northeast."
+    },
+    "invasion.roster": {
+      "original": "Fixed campaign command roster",
+      "plain": "Fixed campaign command roster"
+    },
+    "invasion.continue": {
+      "original": "Continue campaign",
+      "plain": "Continue campaign"
+    },
+    "invasion.view": {
+      "original": "View map",
+      "plain": "View map"
+    },
+    "invasion.menu": {
+      "original": "Main menu",
+      "plain": "Main menu"
+    },
+    "invasion.alternate": {
+      "original": "Alternate history",
+      "plain": "Alternate history"
+    },
+    "invasion.batch.status": {
+      "original": "Arrived: %d/3 batches. New formations: %d/10.",
+      "plain": "Arrived: %d/3 batches. New formations: %d/10."
+    },
+    "invasion.exit.note": {
+      "original": "Enter: continue. Esc: back. F10: save and quit.",
+      "plain": "Enter: continue. Esc: back. F10: save and quit."
+    },
+    "invasion.quit.title": {
+      "original": "Save this campaign and quit?",
+      "plain": "Save this campaign and quit?"
+    },
+    "invasion.quit.yes": {
+      "original": "Y Save and quit",
+      "plain": "Y Save and quit"
+    },
+    "invasion.quit.no": {
+      "original": "N Return",
+      "plain": "N Return"
+    },
+    "invasion.victory.title": {
+      "original": "Campaign victory",
+      "plain": "Campaign victory"
+    },
+    "invasion.victory.body": {
+      "original": "Japan’s front has collapsed. The resistance campaign is over.",
+      "plain": "Japan’s front has collapsed. The resistance campaign is over."
+    },
+    "invasion.defeat.title": {
+      "original": "Campaign defeat",
+      "plain": "Campaign defeat"
+    },
+    "invasion.defeat.body": {
+      "original": "You have lost all territory. Review the map or return to the menu.",
+      "plain": "You have lost all territory. Review the map or return to the menu."
+    },
+    "invasion.ended": {
+      "original": "Campaign over. You can inspect, save or return to the menu.",
+      "plain": "Campaign over. You can inspect, save or return to the menu."
+    },
+    "invasion.failed": {
+      "original": "Campaign event was not committed: %v",
+      "plain": "Campaign event was not committed: %v"
     }
   }
 }

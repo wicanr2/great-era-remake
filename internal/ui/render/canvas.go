@@ -27,7 +27,8 @@ const (
 
 // Canvas 是一張可以疊圖的畫布。
 type Canvas struct {
-	img *image.RGBA
+	img     *image.RGBA
+	lightUI bool
 }
 
 // NewCanvas 開一張指定大小的畫布，初始全黑。

@@ -21,8 +21,8 @@ func loadPeople(t *testing.T) *PeopleDB {
 
 func TestPeopleSlotsCoverAllThreePeriods(t *testing.T) {
 	db := loadPeople(t)
-	if db.PersonCount() != 417 || db.SlotCount() != 486 {
-		t.Fatalf("人物／槽位 = %d/%d，預期 417/486", db.PersonCount(), db.SlotCount())
+	if db.PersonCount() != 436 || db.SlotCount() != 486 {
+		t.Fatalf("人物／槽位 = %d/%d，預期 436/486", db.PersonCount(), db.SlotCount())
 	}
 	for period, count := range map[int]int{1: 274, 2: 106, 3: 106} {
 		for slot := 1; slot <= count; slot++ {
@@ -91,7 +91,7 @@ func TestAuthoredOverlayCompletesRuntimeBiographies(t *testing.T) {
 	db := loadPeople(t)
 	withBiography := 0
 	for _, person := range db.people {
-		if person.Biography != "" {
+		if person.ID <= 417 && person.Biography != "" {
 			withBiography++
 		}
 	}
@@ -138,7 +138,7 @@ func TestTranslatedBiographyOverlayAppliesAfterFullValidation(t *testing.T) {
 	rows := make([]translatedBiographyRow, 0, translatedOverlayPeople)
 	ids := make([]int, 0, len(db.people))
 	for id, p := range db.people {
-		if id != 274 && p.Biography != "" {
+		if id <= 417 && id != 274 && p.Biography != "" {
 			ids = append(ids, id)
 		}
 	}

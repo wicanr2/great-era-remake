@@ -65,6 +65,7 @@ func roomLabelPlan(f *assets.ModernFont, text string, r l.Rect, size int) ([]str
 // Text uses the embedded font's native advances. Sizes between 16 and 32 do
 // not enlarge the old bitmap font and do not truncate resource numbers.
 func roomLabel(c *Canvas, fonts *assets.EtenFonts, text string, r l.Rect, ink assets.RGB, size int, serif bool) {
+	ink = c.uiText(ink, r.X, r.Y+r.H/2)
 	family := assets.ModernFontSans
 	if serif {
 		family = assets.ModernFontSerif
@@ -103,6 +104,11 @@ func roomLabel(c *Canvas, fonts *assets.EtenFonts, text string, r l.Rect, ink as
 }
 
 func roomSurface(c *Canvas, r l.Rect, material int, tint assets.RGB, strength float64, edge assets.RGB) {
+	if c.lightUI && (material == hdart.Steel || material == hdart.Paper) {
+		c.fillUIRect(r.X, r.Y, r.W, r.H, tint)
+		c.strokeUIRect(r.X, r.Y, r.W, r.H, edge)
+		return
+	}
 	bounds := image.Rect(r.X+1, r.Y+1, r.Right()-1, r.Bottom()-1).Intersect(c.Bounds())
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {

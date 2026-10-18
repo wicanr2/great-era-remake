@@ -54,3 +54,30 @@ func TestCampaignContainerRejectsMalformedArchivesAndJSONShape(t *testing.T) {
 		t.Fatal("超量容器被接受")
 	}
 }
+
+func TestCampaignContainerVersionsRetainLegacyAndRejectUnknown(t *testing.T) {
+	type snapshot struct{ Seed uint32 }
+	for version := 1; version <= CampaignSaveCurrentVersion; version++ {
+		raw, err := EncodeCampaignSaveVersion(snapshot{Seed: 42}, []byte{0, 255, 0, 17}, version)
+		if err != nil {
+			t.Fatal(err)
+		}
+		gotVersion, err := CampaignSaveVersion(raw)
+		if err != nil || gotVersion != version {
+			t.Fatal(gotVersion, err)
+		}
+		var state snapshot
+		legacy, err := DecodeCampaignSaveVersion(raw, &state, version)
+		if err != nil || state.Seed != 42 || !bytes.Equal(legacy, []byte{0, 255, 0, 17}) {
+			t.Fatal("version or legacy source lost", version, err)
+		}
+		if _, err := DecodeCampaignSaveVersion(raw, &state, version%CampaignSaveCurrentVersion+1); err == nil {
+			t.Fatal("mismatched DTO version accepted")
+		}
+	}
+	for _, version := range []int{0, CampaignSaveCurrentVersion + 1} {
+		if _, err := EncodeCampaignSaveVersion(snapshot{}, nil, version); err == nil {
+			t.Fatal("unknown version accepted", version)
+		}
+	}
+}

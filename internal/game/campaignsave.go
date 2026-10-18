@@ -14,6 +14,8 @@ import (
 
 const CampaignSaveLimit = 8 << 20
 
+const CampaignSaveCurrentVersion = 4
+
 type campaignManifest struct {
 	Format       string
 	Version      int
@@ -29,7 +31,7 @@ func EncodeCampaignSave(state any, legacy []byte) ([]byte, error) {
 }
 
 func EncodeCampaignSaveVersion(state any, legacy []byte, version int) ([]byte, error) {
-	if version != 1 && version != 2 {
+	if version < 1 || version > CampaignSaveCurrentVersion {
 		return nil, fmt.Errorf("game: 不支援的保存版本")
 	}
 	payload, err := json.Marshal(state)
@@ -117,14 +119,14 @@ func CampaignSaveVersion(data []byte) (int, error) {
 	if err := decodeCampaignJSON(manifest, &m); err != nil {
 		return 0, err
 	}
-	if m.Format != "great-era-save" || m.Version != 1 && m.Version != 2 {
+	if m.Format != "great-era-save" || m.Version < 1 || m.Version > CampaignSaveCurrentVersion {
 		return 0, fmt.Errorf("game: 不支援的保存格式或版本")
 	}
 	return m.Version, nil
 }
 
 func DecodeCampaignSaveVersion(data []byte, state any, version int) ([]byte, error) {
-	if version != 1 && version != 2 {
+	if version < 1 || version > CampaignSaveCurrentVersion {
 		return nil, fmt.Errorf("game: 不支援的保存版本")
 	}
 	if len(data) > CampaignSaveLimit {

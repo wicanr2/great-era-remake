@@ -1,0 +1,319 @@
+{
+  "schema": 1,
+  "officers": [
+    {
+      "key": "jp-muto-nobuyoshi",
+      "runtime_id": 275,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": {
+            "Year": 1933,
+            "Month": 7,
+            "Day": 28
+          }
+        }
+      ],
+      "source_url": "https://generals.dk/general/Mut%C5%8D/Nobuyoshi/Japan.html",
+      "source_sha256": "7bc5fa32a331c22cb72dc2ffb8f68e9d13d52e280eb3aa7922cda552de325806",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-minami-jiro",
+      "runtime_id": 276,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": {
+            "Year": 1936,
+            "Month": 4,
+            "Day": 22
+          }
+        }
+      ],
+      "source_url": "https://generals.dk/general/Minami/Jir%C5%8D/Japan.html",
+      "source_sha256": "f5de756a05c796e75720cbe19766c4cd73ba70d34f24d68a83908e8407b6180f",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-hishikari-takashi",
+      "runtime_id": 277,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": {
+            "Year": 1935,
+            "Month": 8,
+            "Day": 0
+          }
+        }
+      ],
+      "source_url": "https://generals.dk/general/Hishikari/Takashi/Japan.html",
+      "source_sha256": "d88f60f88cb36b51476c8f95dd09d4e63bbb55072efa191ec146bca8fcc9caa1",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-ueda-kenkichi",
+      "runtime_id": 278,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": {
+            "Year": 1939,
+            "Month": 12,
+            "Day": 0
+          }
+        }
+      ],
+      "source_url": "https://generals.dk/general/Ueda/Kenkichi/Japan.html",
+      "source_sha256": "0a1c3f6333608a63e59871004526cb1cc58907e2b1079009f294ec840b1afcb9",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-umezu-yoshijiro",
+      "runtime_id": 279,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": null
+        }
+      ],
+      "source_url": "https://generals.dk/general/Umezu/Yoshijiro/Japan.html",
+      "source_sha256": "b95351d48acb7046045467931c69b44e13112e5da45ae6d12910051e236173e1",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-itagaki-seishiro",
+      "runtime_id": 280,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": null
+        }
+      ],
+      "source_url": "https://generals.dk/general/Itagaki/Seishir%C5%8D/Japan.html",
+      "source_sha256": "5833bb60e696ff495c3a11bbf0409ddeac8b8e3bdc229be2cf9d248030be793f",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-ishiwara-kanji",
+      "runtime_id": 281,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": {
+            "Year": 1941,
+            "Month": 3,
+            "Day": 0
+          }
+        }
+      ],
+      "source_url": "https://generals.dk/general/Ishiwara/Kanji/Japan.html",
+      "source_sha256": "aae99d2160b7f930425750f17cc465a75b829543190cb7f9fe053d3f68726e73",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-terauchi-hisaichi",
+      "runtime_id": 282,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": null
+        }
+      ],
+      "source_url": "https://generals.dk/general/Terauchi/Hisaichi/Japan.html",
+      "source_sha256": "441e4c039586c28b1a2724bf119b5d9f1a4fcee93df87bebc863ed715ef2e39e",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-honjo-shigeru",
+      "runtime_id": 283,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": {
+            "Year": 1936,
+            "Month": 4,
+            "Day": 22
+          }
+        }
+      ],
+      "source_url": "https://generals.dk/general/Honj%C5%8D/Shigeru/Japan.html",
+      "source_sha256": "0b580e20aa2a2021793036d3a9e1b9b7dd8f4b0e36cfeb91920dac12293bb83f",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-hata-shunroku",
+      "runtime_id": 284,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": null
+        }
+      ],
+      "source_url": "https://generals.dk/general/Hata/Sh%C5%ABnroku/Japan.html",
+      "source_sha256": "a96fd25f83d775c111d26d0584f44d3717627368f94440b04b6b0d0712b7cd7e",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-sugiyama-gen",
+      "runtime_id": 285,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": null
+        }
+      ],
+      "source_url": "https://generals.dk/general/Sugiyama/Hajime/Japan.html",
+      "source_sha256": "05c861e812c43954898cc6cc0b6e645f56969ffaa3bbb99599958558b18f45fa",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-hayashi-senjuro",
+      "runtime_id": 286,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": {
+            "Year": 1936,
+            "Month": 3,
+            "Day": 0
+          }
+        }
+      ],
+      "source_url": "https://generals.dk/general/Hayashi/Senj%C5%ABr%C5%8D/Japan.html",
+      "source_sha256": "cb05b008e4115477f43d3d203859d7ce85e59c34fcb1c35654c88484f44e0255",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-tojo-hideki",
+      "runtime_id": 287,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23116,
+          "exit": {
+            "Year": 1944,
+            "Month": 7,
+            "Day": 0
+          }
+        }
+      ],
+      "source_url": "https://generals.dk/general/T%C5%8Dj%C5%8D/Hideki/Japan.html",
+      "source_sha256": "8af34667187de4a53c0be3b614cfbd737ad4545710c3d4db4e4a86a9d4a1a84d",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-anami-korechika",
+      "runtime_id": 288,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": {
+            "Year": 1945,
+            "Month": 8,
+            "Day": 15
+          }
+        }
+      ],
+      "source_url": "https://generals.dk/general/Anami/Korechika/Japan.html",
+      "source_sha256": "dadf817f6cef3cc4c68dc2836748f37e13d5272a13d544333f847b5ef9a1aac2",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-tada-hayao",
+      "runtime_id": 289,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": {
+            "Year": 1941,
+            "Month": 9,
+            "Day": 0
+          }
+        }
+      ],
+      "source_url": "https://generals.dk/general/Tada/Hayao/Japan.html",
+      "source_sha256": "15987c2c9d52b2dc69503ed1c46aaa8c4e74eafea73961f0ef9faa5f09fc5c45",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-yamada-otozo",
+      "runtime_id": 290,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": null
+        }
+      ],
+      "source_url": "https://generals.dk/general/Yamada/Otoz%C5%8D/Japan.html",
+      "source_sha256": "23f69c93a495b1cc3d6053395e57679002e1a6fcbe1254e2aba34b83360ecb71",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-okamura-yasuji",
+      "runtime_id": 291,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": null
+        }
+      ],
+      "source_url": "https://generals.dk/general/Okamura/Yasuji/Japan.html",
+      "source_sha256": "b54e077d4d009e4bc6b9c8a033a69d77291ed483830089cde8032cae5bc68676",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-doihara-kenji",
+      "runtime_id": 292,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": null
+        }
+      ],
+      "source_url": "https://generals.dk/general/Doihara/Kenji/Japan.html",
+      "source_sha256": "0e999a6fe047b7ec4cabac7d14158711931f6427065ed1b93caf54e85d2b0911",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    },
+    {
+      "key": "jp-ando-rikichi",
+      "runtime_id": 293,
+      "verified_through": 23348,
+      "windows": [
+        {
+          "from": 23113,
+          "exit": {
+            "Year": 1941,
+            "Month": 1,
+            "Day": 20
+          }
+        },
+        {
+          "from": 23304,
+          "exit": null
+        }
+      ],
+      "source_url": "https://generals.dk/general/And%C5%8D/Rikichi/Japan.html",
+      "source_sha256": "2e7a30201457c34af4cfd7d6fee6fb31a998ef2de16dec6740ab4c9593dd7f85",
+      "evidence": "reviewed monthly coverage; continuous-service interpretation is strong inference from career chronology"
+    }
+  ]
+}

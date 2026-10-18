@@ -7,6 +7,33 @@ import (
 	"github.com/wicanr2/great-era-remake/internal/assets"
 )
 
+func TestJapaneseToolbarResultUsesUnicodeInOriginalInterface(t *testing.T) {
+	fonts, err := assets.LoadEtenFonts(filepath.Join("..", "..", "..", "workplace", "eten"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	fg, bg := assets.RGB{R: 230, G: 220, B: 200}, assets.RGB{R: 30, G: 25, B: 20}
+	c := NewBGICanvas()
+	if missing := c.DrawMessageOverlay(fonts, fg, bg, 190, 250, 440, 90, "宣戦済みのため、軍備を無効にできません。"); len(missing) != 0 {
+		t.Fatal("Japanese rules message missing glyphs", missing)
+	}
+	changed := 0
+	for y := 260; y < 310; y++ {
+		for x := 202; x < 610; x++ {
+			p := c.Image().RGBAAt(x, y)
+			if p.R != bg.R || p.G != bg.G || p.B != bg.B {
+				changed++
+			}
+		}
+	}
+	if changed < 100 {
+		t.Fatal("Japanese rules message is blank")
+	}
+	if missing := c.DrawMessageOverlay(fonts, fg, bg, 190, 250, 440, 90, string(rune(0x10ffff))); len(missing) != 1 {
+		t.Fatal("unknown glyph silently hidden", missing)
+	}
+}
+
 func TestDrawDisplayOptionsHasBothChoicesAndNoMissingGlyphs(t *testing.T) {
 	fonts, err := assets.LoadEtenFonts(filepath.Join("..", "..", "..", "workplace", "eten"))
 	if err != nil {

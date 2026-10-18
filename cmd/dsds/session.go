@@ -12,6 +12,10 @@ import (
 // 目前遊戲的任何指標。這是桌面載入與未來 Android 背景恢復共用的邊界。
 type gameSession struct {
 	armory                *game.Armory
+	militaryRules         *game.MilitaryRules
+	campaignActors        map[game.GeneralID]string
+	declaration           *campaignDeclaration
+	strategyTurn          *strategyTurn
 	pendingArmoryView     *armoryViewSnapshot
 	pendingReorganization *game.Reorganization
 	tbl                   *game.ProvinceTable
@@ -148,7 +152,13 @@ func buildSession(save []byte, sc game.Scenario, current game.ProvinceID, player
 // applySession 只接受已完整建好的快照，並一次替換所有會交叉引用的核心指標。
 func (a *app) applySession(s *gameSession) {
 	a.desk = modernDeskState{}
+	a.room.Archive = false
+	a.invasionLastError = ""
+	a.provinceMap = false
 	a.armory = s.armory
+	a.militaryRules = s.militaryRules
+	a.campaignActors, a.declaration = s.campaignActors, s.declaration
+	a.strategyTurn = s.strategyTurn
 	a.armoryView = defaultArmoryView()
 	a.tbl, a.generals, a.factions, a.world, a.ledger = s.tbl, s.generals, s.factions, s.world, s.ledger
 	if a.world != nil {

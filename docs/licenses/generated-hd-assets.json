@@ -5,7 +5,8 @@
     "internal/ui/hdart/earth-kit.png": "554bf71883334a2c4f41357f4c0f6d8f70143fa37b37aecd9beb42ad6a5ca56e",
     "internal/ui/hdart/earth-units.png": "36316b25c3d182a1682e35f9468520247175a38237f947e2052feab8cd1144a5",
     "internal/ui/hdart/materials.png": "780841a27a40f12a83454f7cf6a572c74b16c2782616e14f9aba09545080cf1a",
-    "internal/ui/hdart/development.png": "f95fd3b3e0616d5d3c5063eae32d609073c92aaafaa46211f379bd9dbc9598ac"
+    "internal/ui/hdart/development.png": "f95fd3b3e0616d5d3c5063eae32d609073c92aaafaa46211f379bd9dbc9598ac",
+    "internal/ui/hdart/declaration.jpg": "400f5e2e3c91cc1f67f358a7fb4896e6fb3db64e8e92a574a5267b0ca0417bc9"
   },
   "license": "LicenseRef-RRSAL-1.0",
   "origin": "project image_gen outputs and bounded project baking; not extracted original game pixels",
@@ -260,6 +261,24 @@
       },
       "release_status": "Included in v.1.0.2-20261015",
       "issue": "https://github.com/wicanr2/great-era-remake/issues/13"
+    },
+    "declaration-20261018": {
+      "generator": "builtin imagegen",
+      "generation_record": "workplace/hoi4-ui-prototype/invasion-20261018/art-provenance.json",
+      "source": "workplace/hoi4-ui-prototype/invasion-20261018/declaration-revised.png",
+      "source_sha256": "6c12987dacd60472ae48281ad4a4d0d295dd10d46d8ec5964ddf20f5bf9115b2",
+      "runtime_asset": "internal/ui/hdart/declaration.jpg",
+      "runtime_sha256": "400f5e2e3c91cc1f67f358a7fb4896e6fb3db64e8e92a574a5267b0ca0417bc9",
+      "runtime_size": [
+        768,
+        512
+      ],
+      "runtime_bytes": 137690,
+      "decoded_bytes": 1572864,
+      "conversion": "bounded downsample and JPEG encoding; full approved composition preserved",
+      "user_request": "dedicated declaration illustration; corrected tank placement; complete the campaign",
+      "license": "LicenseRef-RRSAL-1.0",
+      "release_status": "local development; no new Release published"
     }
   },
   "approved_asset_version": "v.1.0.0-20261014",

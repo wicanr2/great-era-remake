@@ -56,6 +56,7 @@ func (a *app) battleInformationData() render.BattleInformationData {
 			}
 			if unit.Tracked {
 				lines = append(lines, fmt.Sprintf(word("unit.equipped"), unit.Equipped, unit.Need, max(int64(0), int64(unit.Need)-int64(unit.Equipped)), unit.Power))
+				lines = append(lines, fmt.Sprintf(word("unit.protection"), float64(unit.Protection.Armor)/float64(game.EquipmentCoefficientScale), float64(unit.Protection.Piercing)/float64(game.EquipmentCoefficientScale)))
 				items := []string{}
 				for _, item := range unit.Equipment {
 					items = append(items, fmt.Sprintf("%s %d", a.armoryText("model."+string(item.ID)), item.Count))
@@ -67,6 +68,8 @@ func (a *app) battleInformationData() render.BattleInformationData {
 				lines = append(lines, word("unit.untracked"), word("unit.unknown"))
 			}
 			out.Units = append(out.Units, lines)
+			portrait, unavailable := a.portraitForGeneral(unit.General)
+			out.Portraits = append(out.Portraits, render.PortraitView{Portrait: portrait, Unavailable: unavailable})
 		}
 	}
 	pages := render.BattleInformationPages(d, a.highModernBattle())

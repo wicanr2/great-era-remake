@@ -2,6 +2,19 @@ package main
 
 import "testing"
 
+func TestMessageDismissPreservesNextAndClearRemovesWait(t *testing.T) {
+	q := newMessageQueue(10)
+	q.Push("first")
+	q.Push("second")
+	if !q.Dismiss() || q.Current() != "second" || q.remaining != 10*messageTicksPerUnit {
+		t.Fatal("dismiss skipped order or inherited wait")
+	}
+	q.Clear()
+	if q.Active() || q.remaining != 0 || q.Dismiss() {
+		t.Fatal("clear left a blocking message")
+	}
+}
+
 func TestMessageQueueUsesOriginalFourHundredMillisecondUnits(t *testing.T) {
 	q := newMessageQueue(2)
 	q.Push("第一則")

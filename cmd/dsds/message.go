@@ -35,6 +35,15 @@ func (q *messageQueue) Push(msg string) {
 
 func (q *messageQueue) Active() bool { return q != nil && len(q.items) > 0 }
 
+func (q *messageQueue) Clear() { q.items = nil; q.remaining = 0 }
+func (q *messageQueue) Dismiss() bool {
+	if !q.Active() {
+		return false
+	}
+	q.remaining = 1
+	return q.Tick()
+}
+
 func (q *messageQueue) Current() string {
 	if !q.Active() {
 		return ""

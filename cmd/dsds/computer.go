@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/wicanr2/great-era-remake/internal/game"
 )
@@ -19,11 +18,11 @@ import (
 
 // computerTurnReport 是一次電腦回合的結果，用來組訊息。
 type computerTurnReport struct {
-	comforts    int
-	transfers   int
-	attacks     []string
-	relocations []string
-	recruits    []string
+	Comforts    int
+	Transfers   int
+	Attacks     []string
+	Relocations []string
+	Recruits    []string
 }
 
 // runComputerTurn 讓所有非玩家勢力行動一輪。
@@ -31,28 +30,9 @@ type computerTurnReport struct {
 // 每個省的行動次數上限用原版的命令數公式（將領數 ÷ 8 + 1，`sub_13D23`），
 // 決策鏈本身回 `AINone` 就提早收工。
 func (a *app) runComputerTurn(playerFaction game.GeneralID) computerTurnReport {
-	var rep computerTurnReport
-
-	// 依省編號跑，順序固定——原版是照它自己的清單，我們沒有那份清單，
-	// 但**固定順序**至少讓行為可重現（`AGENTS.md` §8 截圖驗收要可重現）。
-	limit := a.provinceLimit
-	if limit == 0 {
-		limit = game.ProvinceCount
-	}
-	for p := game.ProvinceID(1); int(p) <= limit; p++ {
-		prov, err := a.tbl.At(p)
-		if err != nil || prov.Commander == 0 || prov.Commander == playerFaction {
-			continue
-		}
-		budget := a.world.CommandsFor(p)
-		for i := 0; i < budget; i++ {
-			if !a.runOneComputerAction(p, &rep) {
-				break
-			}
-		}
-	}
-	sort.Strings(rep.attacks)
-	return rep
+	turn := &strategyTurn{Player: playerFaction, Province: 1}
+	a.advanceComputerTurn(turn)
+	return turn.Report
 }
 
 // runOneComputerAction 跑一次決策鏈並執行結果，回報有沒有真的做到事。
@@ -60,6 +40,9 @@ func (a *app) runOneComputerAction(p game.ProvinceID, rep *computerTurnReport) b
 	prov, err := a.tbl.At(p)
 	if err != nil {
 		return false
+	}
+	if a.japaneseBlitzActive() && prov.Commander == a.invasionFaction() {
+		return a.runJapaneseBlitz(p, rep)
 	}
 	opt := game.ChainAOpts{
 		// ⚠️ 難度旗標對應 `byte_6FFCA`。原版由誰寫還沒追到
@@ -78,7 +61,7 @@ func (a *app) runOneComputerAction(p game.ProvinceID, rep *computerTurnReport) b
 	//
 	// 遷都會消耗一個命令數。
 	if r := a.world.Relocate(p, prov.Commander, a.generals); r.Moved {
-		rep.relocations = append(rep.relocations,
+		rep.Relocations = append(rep.Relocations,
 			fmt.Sprintf("%s → %s 遷都", a.provinceName(r.From), a.provinceName(r.To)))
 		return true
 	}
@@ -88,7 +71,7 @@ func (a *app) runOneComputerAction(p game.ProvinceID, rep *computerTurnReport) b
 	// ⚠️ **內政不消耗命令數**——原版那一段在主迴圈裡、在命令數檢查之前，
 	// 沒有 `dec 狀態[-232h]`。所以它每一輪都會跑，這裡照抄。
 	if in := a.world.RunInterior(p, a.month, a.generals, 0); in.Recruited > 0 {
-		rep.recruits = append(rep.recruits,
+		rep.Recruits = append(rep.Recruits,
 			fmt.Sprintf("%s 徵兵 %d（%d 金）",
 				a.provinceName(p), in.Recruited, in.GoldSpent))
 	}
@@ -111,26 +94,24 @@ func (a *app) runOneComputerAction(p game.ProvinceID, rep *computerTurnReport) b
 		if _, err := a.world.Comfort(p, comfortPolitics(a, prov)); err != nil {
 			return false
 		}
-		rep.comforts++
+		rep.Comforts++
 		return true
 
 	case game.AITransfer:
+		if !a.japaneseOffensiveAllowed(prov.Commander) {
+			target, err := a.tbl.At(res.Action.To)
+			if err != nil || target.Commander != prov.Commander {
+				return false
+			}
+		}
 		if len(a.world.ApplyAction(res.Action).Moved) == 0 {
 			return false // 決策說要調、執行挑不到人 → 旗標沒立，換下一步
 		}
-		rep.transfers++
+		rep.Transfers++
 		return true
 
 	case game.AIAttack:
-		out, err := a.world.ResolveAttack(res.Action.From, res.Action.To)
-		if err != nil {
-			return false
-		}
-		rep.attacks = append(rep.attacks,
-			fmt.Sprintf("%s 攻 %s（%s）",
-				a.provinceName(res.Action.From), a.provinceName(res.Action.To),
-				outcomeWord(out)))
-		return true
+		return a.computerAttack(res.Action, prov.Commander, rep)
 	}
 	return false
 }

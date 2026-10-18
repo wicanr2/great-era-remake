@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/wicanr2/great-era-remake/internal/game"
@@ -221,6 +222,10 @@ func (a *app) navigationY() int {
 }
 
 func (a *app) interactiveTargets() []actions.Target {
+	if a.campaignEventSurface() {
+		w, h := a.gameSurfaceSize()
+		return render.CampaignEventTargets(w, h, a.invasionEnded(), a.screen == screenQuit)
+	}
 	if a.roomVisible() {
 		return a.commandRoomTargets()
 	}
@@ -294,13 +299,13 @@ func (a *app) battlefieldTargets() []actions.Target {
 		dx, dy := cell.ScreenXY()
 		action := actions.BattleMove(int(d))
 		occupied := false
-		for _, friend := range a.battle.sim.Attacker {
+		for _, friend := range a.battle.humanUnits() {
 			if friend.Alive() && friend.Cell == cell {
 				occupied = true
 				break
 			}
 		}
-		for _, enemy := range a.battle.sim.Defender {
+		for _, enemy := range a.battle.enemyUnits() {
 			if enemy.Alive() && enemy.Cell == cell {
 				occupied = true
 				if a.battle.mode == battleModeAttack {
@@ -395,13 +400,13 @@ func (a *app) highModernBattlefieldTargets() []actions.Target {
 		}
 		occupied := false
 		action := actions.BattleMove(int(d))
-		for _, friend := range a.battle.sim.Attacker {
+		for _, friend := range a.battle.humanUnits() {
 			if friend.Alive() && friend.Cell == cell {
 				occupied = true
 				break
 			}
 		}
-		for _, enemy := range a.battle.sim.Defender {
+		for _, enemy := range a.battle.enemyUnits() {
 			if enemy.Alive() && enemy.Cell == cell {
 				occupied = true
 				if a.battle.mode == battleModeAttack {
@@ -493,8 +498,11 @@ func (a *app) actionPressed(action actions.Action, keys ...ebiten.Key) bool {
 	if a.pointerAction == action {
 		return true
 	}
+	if action == actions.Back && a.classicZeroBack() && keyboardKeyPressed(ebiten.KeyDigit0) {
+		return true
+	}
 	for _, key := range keys {
-		if inpututil.IsKeyJustPressed(key) {
+		if keyboardKeyPressed(key) {
 			a.playInputEffect(action)
 			return true
 		}
@@ -535,6 +543,24 @@ func (a *app) pointerTargets() []actions.Target {
 
 	switch a.screen {
 	case screenMap:
+		if !a.commandInterface() && a.eten != nil && !a.provinceMap {
+			out := []actions.Target{}
+			for i, key := range []actions.Action{actions.OpenCommands, "classic.province", "classic.nation", actions.OpenNarrative} {
+				if key == actions.OpenNarrative && (a.narrative == nil || len(a.narrativeImages) == 0) {
+					continue
+				}
+				r := render.ClassicMapButtons()[i]
+				out = append(out, actions.Target{Action: key, Rect: actions.Rect{X: r.X, Y: r.Y, W: r.W, H: r.H}})
+			}
+			if !a.provinceMap && a.eten != nil {
+				if d, err := a.classicMapData(); err == nil {
+					for _, m := range d.Markers {
+						out = append(out, actions.Target{Action: actions.Action(fmt.Sprintf("classic.province.%d", m.ID)), Rect: actions.Rect{X: m.X - 11, Y: m.Y - 9, W: 24, H: 19}})
+					}
+				}
+			}
+			return out
+		}
 		if a.highModernMap() {
 			l, err := uilayout.NewModernMapLayout(uilayout.ModernDesignSurface())
 			if err != nil {

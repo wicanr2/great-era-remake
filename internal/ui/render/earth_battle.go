@@ -158,12 +158,12 @@ func (c *Canvas) drawEarthBattle(d ModernBattleSurfaceData) error {
 		return nil
 	}
 	for _, u := range d.Defenders {
-		if err := drawUnit(u, true); err != nil {
+		if err := drawUnit(u, !d.HumanDefender); err != nil {
 			return err
 		}
 	}
 	for _, u := range d.Attackers {
-		if err := drawUnit(u, false); err != nil {
+		if err := drawUnit(u, d.HumanDefender); err != nil {
 			return err
 		}
 	}
@@ -197,9 +197,15 @@ func (c *Canvas) drawEarthBattle(d ModernBattleSurfaceData) error {
 	}
 	roster := l.Rect{786, 163, 180, 372}
 	earthFrame(c, roster, 0)
-	roomLabel(c, d.Fonts, d.Labels.Attacker, l.Rect{800, 173, 150, 24}, d.Style.Accent, 15, false)
+	humanRole, enemyRole := d.Labels.Attacker, d.Labels.Defender
+	humanUnits := d.Attackers
+	if d.HumanDefender {
+		humanRole, enemyRole = d.Labels.Defender, d.Labels.Attacker
+		humanUnits = d.Defenders
+	}
+	roomLabel(c, d.Fonts, humanRole, l.Rect{800, 173, 150, 24}, d.Style.Accent, 15, false)
 	var current *game.Combatant
-	for i, u := range d.Attackers {
+	for i, u := range humanUnits {
 		if u == nil {
 			continue
 		}
@@ -216,10 +222,16 @@ func (c *Canvas) drawEarthBattle(d ModernBattleSurfaceData) error {
 	}
 	card := l.Rect{984, 268, 278, 324}
 	earthFrame(c, card, 0)
+	role := humanRole
+	if d.HoveredDefender != nil {
+		current = d.HoveredDefender
+		role = enemyRole
+	}
 	if current != nil {
-		roomLabel(c, d.Fonts, earthGeneralName(d, current.General), l.Rect{1000, 282, 120, 30}, d.Style.Accent, 21, false)
-		drawModernUnit(c, d.Units, BranchIcon(current.Branch(), false, current.Facing), l.Rect{1067, 320, 100, 100})
-		roomLabel(c, d.Fonts, strconv.Itoa(int(current.Strength.Force)), l.Rect{1165, 324, 81, 32}, d.Style.Ink, 17, false)
+		roomLabel(c, d.Fonts, role+" · "+earthGeneralName(d, current.General), l.Rect{1000, 282, 246, 30}, d.Style.Accent, 19, false)
+		drawPortraitView(c, d.Fonts, d.Portraits[current.General], l.Rect{X: 1004, Y: 318, W: 100, H: 116})
+		drawModernUnit(c, d.Units, BranchIcon(current.Branch(), d.HoveredDefender != nil, current.Facing), l.Rect{1128, 319, 56, 56})
+		roomLabel(c, d.Fonts, strconv.Itoa(int(current.Strength.Force)), l.Rect{1120, 386, 126, 32}, d.Style.Ink, 19, false)
 		earthFrame(c, l.Rect{998, 438, 250, 138}, 2)
 		ink := assets.RGB{35, 45, 55}
 		col, row := current.Cell.ColRow()

@@ -26,7 +26,7 @@ type modernDeskState struct {
 }
 
 func (a *app) modernDeskVisible() bool {
-	return a != nil && a.commandInterface() && a.opening == nil && a.world != nil && a.eten != nil && a.wording != nil && !a.armorySurface() && a.screen != screenBattle && a.screen != screenNarrative && !(a.screen == screenQuit && a.quitBack == screenBattle)
+	return a != nil && a.commandInterface() && a.opening == nil && a.world != nil && a.eten != nil && a.wording != nil && !a.armorySurface() && a.screen != screenBattle && a.screen != screenNarrative && !a.campaignEventSurface() && !(a.screen == screenQuit && a.quitBack == screenBattle)
 }
 func (a *app) deskText(key string) string {
 	v, e := a.wordingText("desk." + key)
@@ -206,6 +206,11 @@ func (a *app) deskRequestBack(home bool) (bool, error) {
 	return false, nil
 }
 func (a *app) deskOpenPage(page string) error {
+	// Repeated save/load shortcuts must not replace the original return page
+	// with the confirmation dialog itself while a slow frame is being drawn.
+	if page == "save" && a.screen == screenSaveConfirm || page == "load" && a.screen == screenLoadConfirm {
+		return nil
+	}
 	if page != "save" && a.reorganization != nil && (a.reorganization.Changed() || a.reorganization.Remaining() > 0) {
 		a.deskSetScreen(screenReorganizeCancel)
 		return nil
@@ -217,8 +222,8 @@ func (a *app) deskOpenPage(page string) error {
 	a.desk.Picker = ""
 	a.desk.Scroll = 0
 	a.desk.Commands = false
-	if a.activeBattle() && page != "map" && page != "people" && page != "resume" && page != "save" && page != "load" {
-		a.deskStatus(a.deskText("battle.locked"))
+	if a.strategyLocked() && page != "map" && page != "people" && page != "resume" && page != "save" && page != "load" && !(page == "commands" && !a.activeBattle()) {
+		a.deskStatus(a.strategyLockText())
 		return nil
 	}
 	switch page {
@@ -390,8 +395,11 @@ func (a *app) deskConfirm() (bool, error) {
 		a.finishReorganization()
 		a.deskSetScreen(screenMap)
 	case "month":
-		a.report(a.endTurn())
-		a.deskSetScreen(screenMap)
+		message := a.endTurn()
+		if a.screen != screenBattle && a.screen != screenCampaignEvent {
+			a.deskSetScreen(screenMap)
+		}
+		a.report(message)
 	default:
 		return true, nil
 	}
@@ -856,7 +864,7 @@ func (a *app) updateModernDesk() (bool, error) {
 }
 
 func (a *app) deskData() render.DeskData {
-	d := render.DeskData{Fonts: a.eten, Labels: map[string]string{}, Scroll: a.desk.Scroll, Focus: a.desk.Focus, ContentHeight: l.DeskContent.H, Page: "map", Status: a.desk.Message}
+	d := render.DeskData{LightUI: a.lightInterface(), Fonts: a.eten, Labels: map[string]string{}, Scroll: a.desk.Scroll, Focus: a.desk.Focus, ContentHeight: l.DeskContent.H, Page: "map", Status: a.desk.Message}
 	for _, key := range []string{"title", "mode", "headquarters", "progress", "mouse.help", "breadcrumb", "footer", "selected", "force", "arsenal", "coal", "iron", "stationed", "resource.0", "resource.1", "resource.2", "resource.3", "resource.4"} {
 		d.Labels[key] = a.deskText(key)
 	}
@@ -901,7 +909,7 @@ func (a *app) deskData() render.DeskData {
 	button("back", word("back"), l.DeskBack, false, false)
 	button("home", word("map"), l.DeskHome, false, false)
 	for i, key := range []string{"map", "recruit", "transfer", "reorganize", "people"} {
-		disabled := i > 0 && i < 4 && (!a.ownsProvince(a.current) || a.activeBattle())
+		disabled := i > 0 && i < 4 && (!a.ownsProvince(a.current) || a.strategyLocked())
 		control("page."+key, word(key), "button", l.DeskSidebarButton(i), false, disabled, false)
 	}
 	button("page.save", word("save"), l.Rect{12, 449, 155, 45}, false, !a.canSaveSession())
@@ -935,7 +943,7 @@ func (a *app) deskData() render.DeskData {
 			for i := 1; i <= 15; i++ {
 				label, _ := a.wordingText(fmt.Sprintf("command.%02d", i))
 				r := l.Rect{200 + ((i-1)%2)*405, 241 + ((i-1)/2)*57, 395, 48}
-				button(fmt.Sprintf("command.%d", i), label, r, true, a.activeBattle() && i != 6 && i != 15)
+				button(fmt.Sprintf("command.%d", i), label, r, true, a.strategyLocked() && i != 6 && i != 15)
 			}
 			d.ContentHeight = 590
 			break
@@ -986,13 +994,17 @@ func (a *app) deskData() render.DeskData {
 			control("page.resume", word("battle.resume"), "primary", l.Rect{200, 655, 190, 42}, false, false, false)
 			d.Status = word("battle.locked")
 		} else {
-			control("page.recruit", word("recruit"), "primary", l.Rect{200, 655, 82, 42}, false, !a.ownsProvince(a.current), false)
-			button("page.transfer", word("transfer"), l.Rect{292, 655, 112, 42}, false, !a.ownsProvince(a.current))
+			control("page.recruit", word("recruit"), "primary", l.Rect{200, 655, 82, 42}, false, !a.ownsProvince(a.current) || a.strategyLocked(), false)
+			button("page.transfer", word("transfer"), l.Rect{292, 655, 112, 42}, false, !a.ownsProvince(a.current) || a.strategyLocked())
 			button("page.people", word("people"), l.Rect{414, 655, 112, 42}, false, false)
 		}
 		button("page.commands", word("commands"), l.Rect{536, 655, 112, 42}, false, false)
-		button("page.armory", word("armory"), l.Rect{658, 655, 112, 42}, false, a.armory == nil || a.activeBattle())
-		button("month", word("month"), l.Rect{780, 655, 170, 42}, false, a.activeBattle())
+		button("page.armory", word("armory"), l.Rect{658, 655, 112, 42}, false, !a.militaryEnabled() || a.strategyLocked())
+		monthLabel := word("month")
+		if a.strategyTurn != nil && !a.activeBattle() {
+			monthLabel, d.Status = a.militaryText("turn.continue"), a.strategyLockText()
+		}
+		button("month", monthLabel, l.Rect{780, 655, 170, 42}, false, a.activeBattle())
 	case screenRecruitAmount, screenRecruitConfirm:
 		d.Page = "recruit"
 		d.Title = word("recruit")
@@ -1144,7 +1156,9 @@ func (a *app) deskData() render.DeskData {
 		if a.viewIndex >= 0 && a.viewIndex < len(a.viewGenerals) {
 			id := a.viewGenerals[a.viewIndex]
 			g := a.generals[int(id)-1]
-			text(a.generalDisplayName(id), l.Rect{218, 241, 764, 42}, 26, false, false)
+			portrait, unavailable := a.portraitForGeneral(id)
+			d.Portrait = &render.PortraitView{Portrait: portrait, Unavailable: unavailable}
+			text(a.generalDisplayName(id), l.Rect{218, 241, 562, 42}, 26, false, false)
 			body := fmt.Sprintf(word("person.stats"), a.deskBranchName(g.Branch), g.Force, g.AbilityA, g.F19, g.F20, g.Stamina, g.F30)
 			if a.screen == screenBiography {
 				if p, ok := a.currentBiography(); ok {
@@ -1153,10 +1167,13 @@ func (a *app) deskData() render.DeskData {
 						body = a.biographyUnavailable()
 					}
 					body += "\n\n" + strings.Join(p.Sources, "\n")
+					if portrait != nil {
+						body += "\n\n" + portrait.Attribution + "\n" + portrait.SourcePage + "\n" + portrait.LicenseURL
+					}
 				}
 			}
-			h := render.DeskParagraphHeight(body, 764)
-			d.Texts = append(d.Texts, render.DeskText{Text: body, Rect: l.Rect{218, 304, 764, h}, Paragraph: true})
+			h := render.DeskParagraphHeight(body, 562)
+			d.Texts = append(d.Texts, render.DeskText{Text: body, Rect: l.Rect{218, 304, 562, h}, Paragraph: true})
 			d.ContentHeight = max(502, h+190)
 			if a.screen == screenViewGeneral {
 				button("biography", word("biography"), l.Rect{200, 655, 210, 42}, false, false)

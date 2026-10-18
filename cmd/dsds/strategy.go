@@ -318,37 +318,73 @@ func (a *app) finishReorganization() {
 // 玩家側已接上每省預算與面板剩餘值；目前仍待逐一確認的是哪些指令會消耗額度。
 // 電腦側也已照命令數公式跑（`cmd/dsds/computer.go`）。
 func (a *app) endTurn() string {
+	if a.invasionEnded() {
+		return a.invasionText("ended")
+	}
 	if a.activeBattle() {
 		return a.deskText("battle.locked")
 	}
-	if a.armory != nil {
-		if err := a.armory.Sync(a.world); err != nil {
-			return err.Error()
-		}
-		a.armory.PlanAI(a.world, a.playerCommander)
+	if err := a.finishComputerBattle(); err != nil {
+		return err.Error()
 	}
-	// 新戰役固定玩家領袖；查看敵省不交換玩家與 AI 身份。
-	var ai string
+	if changed, err := a.processCampaignEvents(); err != nil {
+		return err.Error()
+	} else if changed {
+		return ""
+	}
 	player := a.playerCommander
 	if player == 0 && a.campaign == nil {
 		if prov, err := a.tbl.At(a.current); err == nil {
 			player = prov.Commander
 		}
 	}
-	if player != 0 {
+	if a.strategyTurn == nil {
+		if a.armory != nil {
+			if err := a.armory.Sync(a.world); err != nil {
+				return err.Error()
+			}
+			if a.militaryEnabled() {
+				a.armory.PlanAI(a.world, player)
+			}
+		}
+		if a.campaign != nil && (a.stage > 1 || a.invasionControlled()) && player != a.invasionFaction() && a.militaryEnabled() && a.militaryRules.Locked() {
+			used, err := a.armory.InvasionMonthlyAttacks(uint32(a.year)*12 + uint32(a.month))
+			if err != nil {
+				return err.Error()
+			}
+			a.strategyTurn = &strategyTurn{Year: a.year, Month: a.month, Player: player, Province: 1, JapaneseAttacks: used}
+		}
+	}
+	var ai string
+	if turn := a.strategyTurn; turn != nil {
+		a.advanceComputerTurn(turn)
+		if a.activeBattle() {
+			return fmt.Sprintf(a.militaryText("turn.defend"), a.provinceName(a.battle.sim.At))
+		}
+		ai = describeComputerTurn(turn.Report)
+	} else if player != 0 {
 		ai = describeComputerTurn(a.runComputerTurn(player))
 	}
 	a.syncExpansionGenerals()
-
-	a.month++
 	if a.armory != nil {
-		if err := a.armory.Sync(a.world); err != nil {
+		// Commit resources and production together. A failed month leaves the
+		// completed AI cursor intact so retrying cannot repeat earlier actions.
+		next, table, world := a.armory.Clone(), *a.tbl, *a.world
+		world.Table, world.Opts.Armory = &table, next
+		if err := next.Sync(&world); err != nil {
 			return err.Error()
 		}
-		if err := a.armory.SettleMonth(a.world, a.armory.LastMonth+1); err != nil {
+		settle := next.SettleMonth
+		if !a.militaryEnabled() {
+			settle = next.PauseMonth
+		}
+		if err := settle(&world, next.LastMonth+1); err != nil {
 			return err.Error()
 		}
+		*a.tbl, *a.armory = table, *next
 	}
+	a.strategyTurn = nil
+	a.month++
 	if a.month <= 12 {
 		// 換月：指令數重新算（`docs/re/13` §2）。
 		a.cmdBudget.Reset()
@@ -358,6 +394,11 @@ func (a *app) endTurn() string {
 			if prov, err := a.tbl.At(p); err == nil {
 				prov.Flags &^= game.ProvinceFlagTaxed
 			}
+		}
+		if changed, err := a.processCampaignEvents(); err != nil {
+			return err.Error()
+		} else if changed {
+			return ""
 		}
 		return joinTurn(fmt.Sprintf("民國 %d 年 %d 月", a.year, a.month), ai)
 	}
@@ -372,6 +413,11 @@ func (a *app) endTurn() string {
 		MajorPower: a.world.Opts.MajorPower}
 	rep := a.world.AdvanceYear(st, a.generals, 0, nil)
 	a.year = uint16(st.Year)
+	if changed, err := a.processCampaignEvents(); err != nil {
+		return err.Error()
+	} else if changed {
+		return ""
+	}
 	return joinTurn(fmt.Sprintf("民國 %d 年 1 月：%d 省人口成長共 %d 人",
 		a.year, rep.Grown, rep.Growth), ai)
 }
@@ -390,15 +436,15 @@ func joinTurn(when, ai string) string {
 // 「規則還沒接」與「規則接了但這回合沒觸發」看起來一樣。
 func describeComputerTurn(rep computerTurnReport) string {
 	var parts []string
-	parts = append(parts, rep.relocations...)
-	parts = append(parts, rep.recruits...)
-	if rep.comforts > 0 {
-		parts = append(parts, fmt.Sprintf("慰勞 %d", rep.comforts))
+	parts = append(parts, rep.Relocations...)
+	parts = append(parts, rep.Recruits...)
+	if rep.Comforts > 0 {
+		parts = append(parts, fmt.Sprintf("慰勞 %d", rep.Comforts))
 	}
-	if rep.transfers > 0 {
-		parts = append(parts, fmt.Sprintf("調動 %d", rep.transfers))
+	if rep.Transfers > 0 {
+		parts = append(parts, fmt.Sprintf("調動 %d", rep.Transfers))
 	}
-	parts = append(parts, rep.attacks...)
+	parts = append(parts, rep.Attacks...)
 	if len(parts) == 0 {
 		return ""
 	}

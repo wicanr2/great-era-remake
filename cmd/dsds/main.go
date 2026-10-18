@@ -57,6 +57,7 @@ import (
 	userprefs "github.com/wicanr2/great-era-remake/internal/prefs"
 	"github.com/wicanr2/great-era-remake/internal/ui/actions"
 	uiaudio "github.com/wicanr2/great-era-remake/internal/ui/audio"
+	uilayout "github.com/wicanr2/great-era-remake/internal/ui/layout"
 	"github.com/wicanr2/great-era-remake/internal/ui/render"
 	uiresolution "github.com/wicanr2/great-era-remake/internal/ui/resolution"
 	"github.com/wicanr2/great-era-remake/internal/ui/textlayout"
@@ -134,6 +135,7 @@ const (
 	screenSaveConfirm                      // 其他選項 1：儲存確認
 	screenLoadConfirm                      // 其他選項 2：載入確認
 	screenMessageTime                      // 其他選項 6：訊息停留時間 1..10
+	screenCampaignEvent                    // 宣戰與戰役結局，保存於 Declaration
 	screenDisplayOptions                   // remake 新增：顯示設定（由指令 15 區域進入）
 	screenResolutionOptions                // remake 新增：原版／高解析畫布
 	screenQuit                             // 離開確認
@@ -142,31 +144,36 @@ const (
 )
 
 type app struct {
-	desk             modernDeskState
-	armory           *game.Armory
-	armoryView       armoryView
-	opening          *openingState
-	campaign         *campaignIdentity
-	dataRead         func(string) ([]byte, error)
-	initialSeed      uint32
-	room             commandRoomState
-	m                *game.Map
-	tbl              *game.ProvinceTable // 39 省的狀態（存檔或初始檔）
-	generals         []game.General      // 該期的將領表
-	fonts            render.PanelFonts   // 面板用的三個字模檔
-	tiles            *render.TileSet     // NEWTERR + RAIL 的圖塊
-	origSave         []byte              // 原始存檔內容，寫回時當基底
-	cmdFonts         render.CommandFonts
-	fan              *assets.GlyphFile       // FAN(1).15，部隊番號字模
-	icons            []*assets.Image         // NEWICON.TPC 的兵種圖示
-	battlefieldTheme uitheme.Theme           // 戰場主題；retro／modern 共用同一套索引
-	unitTheme        uitheme.UnitProvider    // 與戰場主題成組切換的部隊圖示
-	hudIcons         uitheme.HUDIconProvider // modern 資源／指令輔助圖示
-	audio            *uiaudio.Manager        // 開局 BGM；off 模式為 nil
-	audioMode        uiaudio.Mode
-	audioTrack       uiaudio.Track
-	audioWarned      map[uiaudio.Track]bool
-	music            musicState
+	desk              modernDeskState
+	armory            *game.Armory
+	militaryRules     *game.MilitaryRules
+	campaignActors    map[game.GeneralID]string
+	invasionLastError string
+	declaration       *campaignDeclaration
+	strategyTurn      *strategyTurn
+	armoryView        armoryView
+	opening           *openingState
+	campaign          *campaignIdentity
+	dataRead          func(string) ([]byte, error)
+	initialSeed       uint32
+	room              commandRoomState
+	m                 *game.Map
+	tbl               *game.ProvinceTable // 39 省的狀態（存檔或初始檔）
+	generals          []game.General      // 該期的將領表
+	fonts             render.PanelFonts   // 面板用的三個字模檔
+	tiles             *render.TileSet     // NEWTERR + RAIL 的圖塊
+	origSave          []byte              // 原始存檔內容，寫回時當基底
+	cmdFonts          render.CommandFonts
+	fan               *assets.GlyphFile       // FAN(1).15，部隊番號字模
+	icons             []*assets.Image         // NEWICON.TPC 的兵種圖示
+	battlefieldTheme  uitheme.Theme           // 戰場主題；retro／modern 共用同一套索引
+	unitTheme         uitheme.UnitProvider    // 與戰場主題成組切換的部隊圖示
+	hudIcons          uitheme.HUDIconProvider // modern 資源／指令輔助圖示
+	audio             *uiaudio.Manager        // 開局 BGM；off 模式為 nil
+	audioMode         uiaudio.Mode
+	audioTrack        uiaudio.Track
+	audioWarned       map[uiaudio.Track]bool
+	music             musicState
 	// battleDT2／battleMemWar 是原始戰鬥狀態的副本；只在戰鬥結束時以
 	// internal/game 的非破壞性 writer 寫到 savePath 同目錄，絕不碰原版素材。
 	battleDT2         []byte
@@ -254,6 +261,7 @@ type app struct {
 	playerCommander   game.GeneralID // 載入時用來重新找到玩家所屬的合法省份
 	ledger            game.DiplomacyLedger
 	screen            screen
+	provinceMap       bool   // Original interface view only; not campaign state.
 	quitBack          screen // 進入離開確認前的畫面；N／ESC 必須回到原處
 	savePath          string // 離開時自動存檔的目標（不覆蓋原版）
 	saveErr           error  // 存檔失敗就不離開
@@ -358,9 +366,24 @@ func provinceIn(ids []game.ProvinceID, want game.ProvinceID) bool {
 
 func (a *app) Update() error {
 	a.syncAudioForScreen()
+	if inpututil.IsKeyJustPressed(ebiten.KeyF10) && a.screen != screenQuit {
+		if a.messages != nil {
+			a.messages.Clear()
+		}
+		a.closeToolbar()
+		a.quitBack, a.screen, a.dirty = a.screen, screenQuit, true
+		return nil
+	}
 	// 原版結果訊息會執行 DELAY(byte_6FE85×400 ms)，期間不接受指令。
 	// remake 不阻塞繪圖執行緒，但在對應 Update ticks 內同樣擋住輸入。
 	if a.messages != nil && a.messages.Active() {
+		if keyboardKeyPressed(ebiten.KeyEscape) {
+			a.messages.Dismiss()
+			a.pointer.cancel()
+			a.pointerAction = actions.None
+			a.dirty = true
+			return nil
+		}
 		a.pointer.cancel() // 等待期間的按下不得在訊息消失後變成點擊。
 		a.pointerAction = actions.None
 		if a.messages.Tick() {
@@ -369,12 +392,6 @@ func (a *app) Update() error {
 		return nil
 	}
 	a.pointerAction = actions.None
-	// F10 是唯一的離開鍵，而且要先確認（AGENTS.md §8）。
-	if inpututil.IsKeyJustPressed(ebiten.KeyF10) && a.screen != screenQuit {
-		a.closeToolbar()
-		a.quitBack, a.screen, a.dirty = a.screen, screenQuit, true
-		return nil
-	}
 	if a.updateToolbar() {
 		return nil
 	}
@@ -419,10 +436,32 @@ func (a *app) Update() error {
 	if a.screen == screenArmory {
 		return a.updateArmory()
 	}
+	if a.screen == screenCampaignEvent {
+		return a.updateCampaignEvent()
+	}
+	if changed, err := a.processCampaignEvents(); err != nil {
+		message := fmt.Sprintf(a.invasionText("failed"), err)
+		if message != a.invasionLastError {
+			a.invasionLastError = message
+			a.report(message)
+		}
+		return nil
+	} else if changed {
+		a.invasionLastError = ""
+		return nil
+	}
+	if a.invasionEnded() && a.screen == screenMap && a.actionPressed(actions.Back, ebiten.KeyEscape) {
+		a.screen, a.dirty = screenCampaignEvent, true
+		a.applyWindowSize()
+		return nil
+	}
 	if handled, err := a.updateModernDesk(); handled || err != nil {
 		return err
 	}
 	if a.updateCommandRoom() {
+		return nil
+	}
+	if a.updateClassicControls() {
 		return nil
 	}
 	switch a.screen {
@@ -447,11 +486,24 @@ func (a *app) Update() error {
 	case screenCommand:
 		// ESC 只退回上一層。
 		if a.actionPressed(actions.Back, ebiten.KeyEscape) {
+			a.provinceMap = false
 			a.screen, a.dirty = screenMap, true
+			return nil
+		}
+		if a.invasionEnded() && !a.actionPressed(actions.Select6, ebiten.KeyDigit6) && !a.actionPressed(actions.Select15, ebiten.KeyO) {
+			if a.pointerAction != actions.None || len(inpututil.AppendJustPressedKeys(nil)) > 0 {
+				a.report(a.invasionText("ended"))
+			}
 			return nil
 		}
 		if a.activeBattle() && !a.actionPressed(actions.Select6, ebiten.KeyDigit6) && !a.actionPressed(actions.Select15, ebiten.KeyO) {
 			a.resumeBattle()
+			return nil
+		}
+		if a.strategyTurn != nil && !a.activeBattle() && !a.actionPressed(actions.Select6, ebiten.KeyDigit6) && !a.actionPressed(actions.Select15, ebiten.KeyO) && !inpututil.IsKeyJustPressed(ebiten.KeyE) {
+			if a.pointerAction != actions.None || len(inpututil.AppendJustPressedKeys(nil)) > 0 {
+				a.report(a.strategyLockText())
+			}
 			return nil
 		}
 		if !a.ownsProvince(a.current) && !a.actionPressed(actions.Select6, ebiten.KeyDigit6) && !a.actionPressed(actions.Select15, ebiten.KeyO) && !inpututil.IsKeyJustPressed(ebiten.KeyE) {
@@ -462,7 +514,7 @@ func (a *app) Update() error {
 		}
 		// A：對第一個可攻打的鄰省開戰。攻打候選的規則見
 		// `docs/spec/01` §2（鄰省 − 自己控制的省）。
-		if a.actionPressed(actions.Select2, ebiten.KeyA) {
+		if a.actionPressed(actions.Select2, ebiten.KeyDigit2, ebiten.KeyA) {
 			target := a.tbl.FirstAttackable(a.current)
 			if target == 0 {
 				a.report("目前沒有可攻打的鄰省")
@@ -546,7 +598,7 @@ func (a *app) Update() error {
 			a.report(a.withBudget(a.current, a.execComfort))
 		case a.actionPressed(actions.Select12, ebiten.KeyT):
 			a.screen, a.dirty = screenTradeMode, true
-		case a.actionPressed(actions.Select3, ebiten.KeyS):
+		case a.actionPressed(actions.Select3, ebiten.KeyDigit3, ebiten.KeyS):
 			targets, err := a.world.SupplyTargets(a.current)
 			if err != nil || len(targets) == 0 {
 				a.report("無法運補：沒有同司令且未交戰的鄰省")
@@ -1403,6 +1455,14 @@ func (a *app) Update() error {
 			a.viewIndex++
 			a.dirty = true
 		}
+		if keyboardKeyPressed(ebiten.KeyPageDown) {
+			a.viewIndex = min(len(a.viewGenerals)-1, a.viewIndex+render.ClassicRosterPageSize)
+			a.dirty = true
+		}
+		if keyboardKeyPressed(ebiten.KeyPageUp) {
+			a.viewIndex = max(0, a.viewIndex-render.ClassicRosterPageSize)
+			a.dirty = true
+		}
 		if n, ok := actions.SelectionNumber(a.pointerAction); ok && n <= len(a.viewGenerals) {
 			a.viewIndex = n - 1
 			a.screen, a.dirty = screenViewGeneral, true
@@ -1454,7 +1514,7 @@ func (a *app) Update() error {
 		for d, key := range []ebiten.Key{ebiten.KeyDigit0, ebiten.KeyDigit1, ebiten.KeyDigit2,
 			ebiten.KeyDigit3, ebiten.KeyDigit4, ebiten.KeyDigit5, ebiten.KeyDigit6,
 			ebiten.KeyDigit7, ebiten.KeyDigit8, ebiten.KeyDigit9} {
-			if inpututil.IsKeyJustPressed(key) {
+			if keyboardKeyPressed(key) {
 				next := a.viewInput*10 + uint32(d)
 				if next <= game.ProvinceCount {
 					a.viewInput, a.dirty = next, true
@@ -1687,7 +1747,7 @@ func (a *app) Update() error {
 			return nil
 		}
 		for d, key := range digitKeys() {
-			if !inpututil.IsKeyJustPressed(key) {
+			if !keyboardKeyPressed(key) {
 				continue
 			}
 			if a.autonomyInput < 100 {
@@ -1919,14 +1979,14 @@ func (a *app) Update() error {
 		}
 	case inpututil.IsKeyJustPressed(ebiten.KeyRight):
 		a.current++
-		if a.current > game.ProvinceCount {
+		if a.current > game.ProvinceID(a.provinceLimit) {
 			a.current = 1
 		}
 		a.dirty = true
 	case inpututil.IsKeyJustPressed(ebiten.KeyLeft):
 		a.current--
 		if a.current < 1 {
-			a.current = game.ProvinceCount
+			a.current = game.ProvinceID(a.provinceLimit)
 		}
 		a.dirty = true
 	}
@@ -1938,7 +1998,7 @@ func (a *app) currentBiography() (*i18n.Person, bool) {
 		a.viewIndex < 0 || a.viewIndex >= len(a.viewGenerals) {
 		return nil, false
 	}
-	return a.people.PersonAt(a.stage, int(a.viewGenerals[a.viewIndex]))
+	return a.generalPerson(a.viewGenerals[a.viewIndex])
 }
 
 func (a *app) portraitForPerson(person *i18n.Person) (*i18n.Portrait, string) {
@@ -1960,7 +2020,7 @@ func (a *app) portraitForGeneral(id game.GeneralID) (*i18n.Portrait, string) {
 	if a.people == nil {
 		return a.portraitForPerson(nil)
 	}
-	person, _ := a.people.PersonAt(a.stage, int(id))
+	person, _ := a.generalPerson(id)
 	return a.portraitForPerson(person)
 }
 
@@ -2079,7 +2139,8 @@ func (a *app) highModernBattle() bool {
 }
 
 func (a *app) highModernSurface() bool {
-	return a.highModernMap() || a.highModernFlow() || a.highModernBattle()
+	w, _ := a.gameSurfaceSize()
+	return a.campaignEventSurface() && w >= 1000 || a.highModernMap() || a.highModernFlow() || a.highModernBattle()
 }
 
 // panelLabels 是 modern 側欄唯一的語系入口。所有欄位都由 wording catalog
@@ -2111,6 +2172,12 @@ func (a *app) panelLabels() (render.PanelLabels, error) {
 }
 
 func (a *app) generalDisplayName(id game.GeneralID) string {
+	if a != nil && a.campaignActors[id] != "" {
+		return a.invasionOfficerName(id)
+	}
+	if a != nil && a.stage == 1 && id == 300 && a.invasionControlled() {
+		return a.openingText("japan")
+	}
 	if a != nil && a.stage > 1 && id == 107 {
 		return a.openingText("japan")
 	}
@@ -2365,12 +2432,17 @@ func (a *app) toggleResolution() error {
 	return a.setResolutionPreference(uiresolution.Toggle(a.resolution))
 }
 
-func (a *app) applyWindowSize() {
+func (a *app) windowSize() (int, int) {
 	w, h := a.gameSurfaceSize()
 	h += a.toolbarHeight()
-	if !a.armorySurface() && !a.commandInterface() && a.resolution != uiresolution.ModeHigh {
+	if w == uiresolution.OriginalWidth && !a.armorySurface() && !a.commandInterface() && a.resolution != uiresolution.ModeHigh {
 		w, h = w*scale, h*scale
 	}
+	return w, h
+}
+
+func (a *app) applyWindowSize() {
+	w, h := a.windowSize()
 	ebiten.SetWindowSize(w, h)
 }
 
@@ -2573,6 +2645,9 @@ func writeFileAtomic(path string, data []byte, mode os.FileMode) (err error) {
 }
 
 func (a *app) compose() error {
+	if a.campaignEventSurface() {
+		return a.composeCampaignEvent()
+	}
 	if a.modernDeskVisible() {
 		return a.composeModernDesk()
 	}
@@ -2589,6 +2664,7 @@ func (a *app) compose() error {
 	if highModernSurface {
 		c = render.NewCanvas(uiresolution.HighWidth, uiresolution.HighHeight)
 	}
+	c.UseLightUI(a.lightInterface())
 	style := a.uiStyle()
 	// 在 compose 內遮蔽 legacy 常數，讓所有子畫面採同一套 modern
 	// 語意色；drawBattle 另以 a.uiStyle().Ink 取色，避免跨函式全域狀態。
@@ -2677,6 +2753,15 @@ func (a *app) compose() error {
 		}
 	} else if !highModernSurface {
 		if err := c.DrawStrategyPanel(data, a.fonts); err != nil {
+			return err
+		}
+	}
+	if !a.commandInterface() && a.screen == screenMap && !a.provinceMap && a.eten != nil {
+		d, err := a.classicMapData()
+		if err != nil {
+			return err
+		}
+		if err := checkWordingGlyphs("原版全國地圖", c.DrawClassicMap(d, panelInk, panelPaper)); err != nil {
 			return err
 		}
 	}
@@ -3263,6 +3348,12 @@ func (a *app) compose() error {
 			return err
 		}
 	case screenViewGenerals:
+		if a.eten != nil && a.wording != nil {
+			if err := checkWordingGlyphs("原版部隊資料", c.DrawClassicRoster(a.classicRosterData(), panelInk, panelPaper)); err != nil {
+				return err
+			}
+			break
+		}
 		ids := make([]int, len(a.viewGenerals))
 		forces := make([]uint16, len(a.viewGenerals))
 		for i, id := range a.viewGenerals {
@@ -3407,10 +3498,17 @@ func (a *app) compose() error {
 		gi := int(id) - 1
 		if gi >= 0 && gi < len(a.generals) && gi < len(a.world.Strengths) {
 			attack := game.Strength(a.world.Strengths[gi], a.world.Opts)
+			glyphID := int(id)
+			if a.campaignActors[id] != "" {
+				glyphID = 0
+			}
 			if err := c.DrawGeneralDetail(a.cmdFonts, a.fonts, a.fan, panelInk, panelPaper,
 				fieldX, fieldY, render.ModeBGIW-fieldX, render.ModeBGIH-fieldY,
-				int(id), a.generals[gi], attack); err != nil {
+				glyphID, a.generals[gi], attack); err != nil {
 				return err
+			}
+			if glyphID == 0 {
+				c.DrawClassicText(a.eten, a.invasionOfficerName(id), uilayout.Rect{X: fieldX + 86, Y: fieldY + 16, W: 300, H: 20}, panelInk)
 			}
 		}
 	case screenBiography:
@@ -3719,7 +3817,7 @@ func (a *app) compose() error {
 			}
 		}
 	}
-	if a.screen == screenMap && !highModernMap {
+	if a.screen == screenMap && !highModernMap && (a.commandInterface() || a.provinceMap || a.eten == nil) {
 		if err := c.DrawOpenCommandButton(a.cmdFonts, panelInk, panelPaper, render.ModeBGIW); err != nil {
 			return err
 		}
@@ -3747,8 +3845,13 @@ func (a *app) compose() error {
 			}
 		}
 	}
-	if a.numericKeypadVisible() && !highModernSurface {
+	if a.numericKeypadVisible() && !highModernSurface && a.gameMouseEnabled() {
 		c.DrawNumericKeypad(panelInk, panelPaper)
+	}
+	if !a.commandInterface() && a.preferences.KeyboardOnly && a.numericInput() != nil && a.eten != nil {
+		if err := checkWordingGlyphs("原版輸入提示", c.DrawClassicText(a.eten, a.classicText("input.hint"), uilayout.Rect{X: 198, Y: 332, W: 434, H: 16}, panelInk)); err != nil {
+			return err
+		}
 	}
 	if a.messages != nil && a.messages.Active() && !highModernSurface {
 		missing := c.DrawMessageOverlay(a.eten, panelInk, panelPaper,

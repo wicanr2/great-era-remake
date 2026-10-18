@@ -1,0 +1,492 @@
+{
+  "schema_version": "1",
+  "language": "en",
+  "people": [
+    {
+      "key": "jp-muto-nobuyoshi",
+      "person": {
+        "id": 10275,
+        "name_ingame": "武藤信義",
+        "name_common": "Nobuyoshi Mutō",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Mutō served in Japan’s General Staff, divisional command and military education. During the 1920s he commanded Tokyo Defence and the Kwantung Army, becoming Inspector-General of Military Training in 1927.\n\nHe returned to command the Kwantung Army in 1932 and also served as ambassador to Manchukuo. JACAR records his death on 28 July 1933; later invasion rosters exclude him.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://www.jacar.go.jp/exhibition/glossary/gaichitonaichi/career/career.html?data=84",
+          "https://generals.dk/general/Mut%C5%8D/Nobuyoshi/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-minami-jiro",
+      "person": {
+        "id": 10276,
+        "name_ingame": "南次郎",
+        "name_common": "Jirō Minami",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Minami came from the cavalry and headed military schools before commanding the 16th Division in 1926. He became Vice Chief of the General Staff in 1927 and commanded the Korea Army in 1929.\n\nHe served as War Minister and later commanded the Kwantung Army. After retirement in 1936 he became Governor-General of Korea and later a Privy Councillor. Those civilian appointments do not restore eligibility for this campaign.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://www.jacar.go.jp/exhibition/glossary/gaichitonaichi/career/career.html?data=27",
+          "https://generals.dk/general/Minami/Jir%C5%8D/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-hishikari-takashi",
+      "person": {
+        "id": 10277,
+        "name_ingame": "菱刈隆",
+        "name_common": "Takashi Hishikari",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Hishikari held regimental, staff and military education appointments. He commanded the 8th Division from 1924, the 4th Division from 1927 and subsequently the Taiwan Army.\n\nHe commanded the Kwantung Army in 1930 and again in 1933, also serving as ambassador to Manchukuo. Official records distinguish transfer to the reserve in August 1935 from final retirement in 1941. Campaign eligibility ends in August 1935.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://www.jacar.go.jp/exhibition/glossary/gaichitonaichi/career/career.html?data=85",
+          "https://generals.dk/general/Hishikari/Takashi/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-ueda-kenkichi",
+      "person": {
+        "id": 10278,
+        "name_ingame": "植田謙吉",
+        "name_common": "Kenkichi Ueda",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Ueda’s career began in cavalry and staff appointments, including service with forces in the Russian Far East. During the 1920s he held remount duties, later becoming a divisional commander, Vice Chief of the General Staff and commander of the Korea Army.\n\nHe commanded the Kwantung Army from 1936. Official records place his transfer to the reserve in December 1939 following Nomonhan; subsequent invasion rosters exclude him.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://www.jacar.go.jp/exhibition/glossary/gaichitonaichi/career/career.html?data=86",
+          "https://generals.dk/general/Ueda/Kenkichi/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-umezu-yoshijiro",
+      "person": {
+        "id": 10279,
+        "name_ingame": "梅津美治郎",
+        "name_common": "Yoshijirō Umezu",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Umezu served as a regimental commander and in central army administration. During the 1930s he commanded the China Garrison Army and a division, served as Vice Minister of War and led the First Army.\n\nHe took command of the Kwantung Army in 1939 and became Chief of the General Staff in 1944. After the war he received a life sentence and died in custody in 1949.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://www.jacar.go.jp/exhibition/glossary/gaichitonaichi/career/career.html?data=87",
+          "https://generals.dk/general/Umezu/Yoshijiro/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-itagaki-seishiro",
+      "person": {
+        "id": 10280,
+        "name_ingame": "板垣征四郎",
+        "name_common": "Seishirō Itagaki",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Itagaki worked at Japan’s embassy in China and in staff appointments before joining the Kwantung Army’s leadership. He served as a military adviser to Manchukuo and later its Chief of Staff.\n\nHe commanded the 5th Division in 1937 and subsequently became War Minister and a senior China staff officer. He commanded the Korea Army from 1941 and the Seventh Area Army in 1945. He was tried and executed in 1948.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://www.jacar.go.jp/exhibition/glossary/gaichitonaichi/career/career.html?data=410",
+          "https://generals.dk/general/Itagaki/Seishir%C5%8D/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-ishiwara-kanji",
+      "person": {
+        "id": 10281,
+        "name_ingame": "石原莞爾",
+        "name_common": "Kanji Ishiwara",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Ishiwara served as an attaché in Germany and taught at the Army War College. He joined the Kwantung Army’s staff in 1928 and took part in the Manchurian Incident.\n\nHe later held regimental and operations posts and commanded the 16th Division in 1939. The National Diet Library records his transfer to the reserve in March 1941, followed by teaching and defence research. He died in 1949.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://ndlsearch.ndl.go.jp/rnavi/kensei/ishiharakannji1",
+          "https://generals.dk/general/Ishiwara/Kanji/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-terauchi-hisaichi",
+      "person": {
+        "id": 10282,
+        "name_ingame": "寺內壽一",
+        "name_common": "Hisaichi Terauchi",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Terauchi served with the Imperial Guards and later held brigade, Korea Army staff, divisional and Taiwan commands. He became War Minister in 1936.\n\nHe commanded the Northern China Area Army from 1937 and the Southern Army from 1941. Official records place his reserve transfer in November 1945; he died in 1946. His deployment in this campaign is an alternate-history assignment, distinct from those recorded posts.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://ndlsearch.ndl.go.jp/rnavi/kensei/terauchihisaichi",
+          "https://generals.dk/general/Terauchi/Hisaichi/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-honjo-shigeru",
+      "person": {
+        "id": 10283,
+        "name_ingame": "本庄繁",
+        "name_common": "Shigeru Honjō",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Honjō spent much of his career in China-related staff, advisory and attaché appointments. He commanded the 10th Division from 1928 and the Kwantung Army from 1931, during the Manchurian Incident.\n\nHe became the Emperor’s Chief Aide-de-Camp in 1933 and retired in 1936. Later service as a Privy Councillor is not treated as a return to active military duty. He died in November 1945.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://generals.dk/general/Honj%C5%8D/Shigeru/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-hata-shunroku",
+      "person": {
+        "id": 10284,
+        "name_ingame": "畑俊六",
+        "name_common": "Shunroku Hata",
+        "aliases": [
+          "鈿俊六"
+        ],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Hata began in artillery and staff appointments, commanding a heavy artillery brigade in 1926. He later held senior staff, artillery, divisional and Taiwan posts. The original name table also contains the spelling 鈿俊六.\n\nHe served as War Minister, commanded the China Expeditionary Army from 1941 and the Second General Army in 1945. After a postwar life sentence, he was released in 1954 and died in 1962.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://generals.dk/general/Hata/Sh%C5%ABnroku/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-sugiyama-gen",
+      "person": {
+        "id": 10285,
+        "name_ingame": "杉山元",
+        "name_common": "Gen Sugiyama",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Sugiyama held aviation, supply and military administration appointments, heading the Army Aviation supply section in 1925. He later served as Vice Minister, divisional commander, Inspector-General of Military Training and War Minister.\n\nHe commanded in northern China, became Chief of the General Staff in 1940 and led the First General Army in 1945. He died on 12 September 1945. Later ranks are not projected onto his earlier career.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://generals.dk/general/Sugiyama/Hajime/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-hayashi-senjuro",
+      "person": {
+        "id": 10286,
+        "name_ingame": "林銑十郎",
+        "name_common": "Senjūrō Hayashi",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Hayashi held regimental and military education posts and commanded Tokyo Bay Fortress in 1926. He subsequently headed the War College, commanded the Imperial Guards Division and led the Korea Army.\n\nAfter serving as Inspector-General of Military Training and War Minister, he entered the reserve in March 1936. His appointment as Prime Minister in 1937 does not restore campaign eligibility. He died in 1943.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://generals.dk/general/Hayashi/Senj%C5%ABr%C5%8D/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-tojo-hideki",
+      "person": {
+        "id": 10287,
+        "name_ingame": "東條英機",
+        "name_common": "Hideki Tōjō",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Tōjō worked in technical, mobilization and staff appointments before serving with the Kwantung Army’s military police and staff. He became its Chief of Staff in 1937.\n\nHe later served as Vice Minister and War Minister and became Prime Minister in 1941. Official records place his reserve transfer in July 1944. He was tried after the war and executed in 1948; later invasion rosters exclude him.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://generals.dk/general/T%C5%8Dj%C5%8D/Hideki/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-anami-korechika",
+      "person": {
+        "id": 10288,
+        "name_ingame": "阿南惟幾",
+        "name_common": "Korechika Anami",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Anami held staff and education posts, commanding the Second Imperial Guards Infantry Regiment in 1933 and heading army personnel administration in 1937. He later commanded a division and served as Vice Minister of War.\n\nHe commanded the Eleventh Army in 1941 and later the Second Area Army, becoming War Minister in 1945. He died on 15 August. The approved monthly policy retains him in the frozen 1 August roster.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://generals.dk/general/Anami/Korechika/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-tada-hayao",
+      "person": {
+        "id": 10289,
+        "name_ingame": "多田駿",
+        "name_common": "Hayao Tada",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Tada taught at military colleges and worked in artillery research. He served as an instructor in Beijing in 1926, later holding artillery, divisional staff and Manchukuo advisory appointments.\n\nHe commanded the 11th Division in 1936, became Vice Chief of the General Staff and commanded the Northern China Area Army from 1939. Official records place his reserve transfer in September 1941. He died in 1948.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://generals.dk/general/Tada/Hayao/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-yamada-otozo",
+      "person": {
+        "id": 10290,
+        "name_ingame": "山田乙三",
+        "name_common": "Otozō Yamada",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Yamada came from the cavalry and served as a regimental commander. He joined the Korea Army staff in 1926 and later held senior staff, academy and divisional appointments.\n\nHe commanded the Third Army and Central China Expeditionary Army in 1938 and the Kwantung Army from 1944. Soviet captivity followed the end of the war. He returned to Japan in 1956 and died in 1965. A disputed capture day is not used in the roster.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://generals.dk/general/Yamada/Otoz%C5%8D/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-okamura-yasuji",
+      "person": {
+        "id": 10291,
+        "name_ingame": "岡村寧次",
+        "name_common": "Yasuji Okamura",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Okamura held infantry and staff appointments, commanding the Sixth Infantry Regiment in 1927. He later served on the Shanghai and Kwantung Army staffs and commanded the Second Division.\n\nHe commanded the Eleventh Army from 1938 and Northern China Area Army from 1941. In 1944 he moved through the Sixth Area Army to command the China Expeditionary Army until Japan’s surrender. He later advised Nationalist forces and died in 1966.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://generals.dk/general/Okamura/Yasuji/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-doihara-kenji",
+      "person": {
+        "id": 10292,
+        "name_ingame": "土肥原賢二",
+        "name_common": "Kenji Doihara",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Doihara served in staff and infantry posts and undertook intelligence work concerning China. He headed the Mukden Special Agency in 1931, subsequently served in Harbin and commanded an infantry brigade.\n\nHe commanded the Fourteenth Division in 1937, Fifth Army in 1939 and Seventh Area Army in 1944. He became Inspector-General of Military Training in 1945 and later held home defence commands. He was tried and executed in 1948.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://generals.dk/general/Doihara/Kenji/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "key": "jp-ando-rikichi",
+      "person": {
+        "id": 10293,
+        "name_ingame": "安藤利吉",
+        "name_common": "Rikichi Andō",
+        "aliases": [],
+        "courtesy": "",
+        "birth": null,
+        "death": null,
+        "birthplace": "",
+        "faction": "Japanese Army",
+        "highest_post": "",
+        "bio_zh": "Andō taught at the War College and served as an overseas attaché, including in India from 1925. He later commanded infantry and education units, the Fifth Division, Twenty-First Army and Southern China Area Army.\n\nHe retired in January 1941, was recalled that November and commanded the Taiwan Army. He led the Tenth Area Army and became Governor-General of Taiwan in 1944. He died in custody in Shanghai in 1946. The roster preserves his retirement gap.",
+        "bio_language": "en",
+        "bio_status": "machine-draft",
+        "periods": [
+          "Post-unification resistance"
+        ],
+        "sources": [
+          "https://www.jacar.go.jp/exhibition/glossary/gaichitonaichi/career/career.html?data=19",
+          "https://generals.dk/general/And%C5%8D/Rikichi/Japan.html"
+        ],
+        "confidence": "medium"
+      }
+    }
+  ]
+}

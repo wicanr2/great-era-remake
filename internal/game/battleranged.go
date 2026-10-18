@@ -149,6 +149,7 @@ func (s *BattleSim) EngageRangedWithEffects(attacker, target *Combatant) (Battle
 	// 因此每次 lossE 相同；原版 16-bit 寫回可能過量，remake 以兵力上限
 	// 夾住，避免 Go 的整數下溢把死亡單位變成大兵力。
 	lossTarget := clampLoss(oneShotTarget*3, target.Force())
+	_, lossTarget = s.protectedLosses(attacker, target, 0, lossTarget)
 	target.applyLoss(lossTarget)
 	result.LossTarget = lossTarget
 	result.Effect.StaminaLossAttacker += applyStaminaLoss(attacker, 5)

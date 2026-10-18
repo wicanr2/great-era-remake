@@ -7,9 +7,10 @@ import (
 )
 
 type BattleInformationSide struct {
-	Name    string
-	Summary []string
-	Units   [][]string
+	Name      string
+	Summary   []string
+	Units     [][]string
+	Portraits []PortraitView
 }
 type BattleInformationData struct {
 	Fonts  *assets.EtenFonts
@@ -24,11 +25,28 @@ type BattleInformationTarget struct {
 }
 
 func BattleInformationPages(d BattleInformationData, high bool) int {
-	n := 2
-	if high {
-		n = 3
-	}
+	n, _ := battleInformationRows(d, high)
 	return max(1, (max(len(d.Sides[0].Units), len(d.Sides[1].Units))+n-1)/n)
+}
+
+// Rich equipment rows need room for the additional protection coefficients.
+func battleInformationRows(d BattleInformationData, high bool) (count, height int) {
+	rich := false
+	for _, side := range d.Sides {
+		for _, unit := range side.Units {
+			rich = rich || len(unit) > 7
+		}
+	}
+	if high {
+		if rich {
+			return 2, 210
+		}
+		return 3, 144
+	}
+	if rich {
+		return 1, 160
+	}
+	return 2, 90
 }
 func BattleInformationTargets(d BattleInformationData, w, h int) []BattleInformationTarget {
 	pages := BattleInformationPages(d, w >= 1000)
@@ -46,6 +64,7 @@ func (c *Canvas) DrawBattleInformation(d BattleInformationData) {
 	if high {
 		pad, header, summary, rowH, size, lineH, count = 20, 48, 174, 144, 15, 19, 3
 	}
+	count, rowH = battleInformationRows(d, high)
 	ink, muted, gold := openingColor(229, 212, 181), openingColor(179, 165, 142), openingColor(209, 170, 104)
 	bg, panel, line := openingColor(25, 24, 23), openingColor(39, 36, 32), openingColor(101, 87, 71)
 	openingFill(c, l.Rect{0, 0, w, h}, bg)
@@ -67,12 +86,17 @@ func (c *Canvas) DrawBattleInformation(d BattleInformationData) {
 		for i := 0; i < count && start+i < len(info.Units); i++ {
 			y := header + summary + i*rowH
 			openingFill(c, l.Rect{x + 5, y, column - 10, 1}, line)
+			textWidth := column - 16
+			if high && start+i < len(info.Portraits) {
+				drawPortraitView(c, d.Fonts, info.Portraits[start+i], l.Rect{X: x + column - 104, Y: y + 6, W: 96, H: rowH - 12})
+				textWidth -= 112
+			}
 			for j, text := range info.Units[start+i] {
 				col := ink
 				if j == 0 {
 					col = gold
 				}
-				label(text, l.Rect{x + 8, y + 4 + j*lineH, column - 16, lineH}, col, size)
+				label(text, l.Rect{x + 8, y + 4 + j*lineH, textWidth, lineH}, col, size)
 			}
 		}
 	}

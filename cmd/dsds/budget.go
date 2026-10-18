@@ -20,6 +20,9 @@ import (
 
 // withBudget 包一個政略指令：先檢查指令數，做成事才扣。
 func (a *app) withBudget(p game.ProvinceID, run func() string) string {
+	if a.strategyLocked() {
+		return a.strategyLockText()
+	}
 	if !a.ownsProvince(p) {
 		return a.openingText("enemy.readonly")
 	}

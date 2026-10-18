@@ -28,20 +28,23 @@ type ModernBattleLabels struct {
 // ModernBattleSurfaceData 是 H1-c 的純呈現資料；所有 combatant 欄位由 cmd/dsds
 // 先整理，renderer 不執行移動、攻擊、AI 或存檔寫回。
 type ModernBattleSurfaceData struct {
-	Battlefield  *game.Battlefield
-	Theme        uitheme.Theme
-	Units        uitheme.UnitProvider
-	Attackers    []*game.Combatant
-	Defenders    []*game.Combatant
-	CurrentCell  game.CellIndex
-	GeneralNames map[game.GeneralID]string
-	TargetCells  []game.CellIndex
-	TargetNums   []int
-	Panel        BattlePanelData
-	Labels       ModernBattleLabels
-	Fonts        *assets.EtenFonts
-	Log          string
-	Style        uitheme.UIStyle
+	Battlefield     *game.Battlefield
+	Theme           uitheme.Theme
+	Units           uitheme.UnitProvider
+	Attackers       []*game.Combatant
+	Defenders       []*game.Combatant
+	HumanDefender   bool
+	CurrentCell     game.CellIndex
+	GeneralNames    map[game.GeneralID]string
+	Portraits       map[game.GeneralID]PortraitView
+	HoveredDefender *game.Combatant
+	TargetCells     []game.CellIndex
+	TargetNums      []int
+	Panel           BattlePanelData
+	Labels          ModernBattleLabels
+	Fonts           *assets.EtenFonts
+	Log             string
+	Style           uitheme.UIStyle
 }
 
 // DrawModernBattleSurface 畫 1280×720 戰鬥 HUD。地形／鐵路／部隊圖示沿用已驗證
@@ -110,12 +113,12 @@ func (c *Canvas) drawModernBattlefield(d ModernBattleSurfaceData, l uilayout.Mod
 			uilayout.Rect{X: cell.X + 4, Y: cell.Y + 5, W: cell.W - 8, H: cell.H - 10})
 	}
 	for _, u := range d.Defenders {
-		if err := drawUnit(u, true); err != nil {
+		if err := drawUnit(u, !d.HumanDefender); err != nil {
 			return err
 		}
 	}
 	for _, u := range d.Attackers {
-		if err := drawUnit(u, false); err != nil {
+		if err := drawUnit(u, d.HumanDefender); err != nil {
 			return err
 		}
 	}

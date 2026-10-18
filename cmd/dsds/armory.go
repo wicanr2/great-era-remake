@@ -69,12 +69,12 @@ func (a *app) armoryText(key string) string {
 	return s
 }
 func (a *app) openArmory() {
-	if a.activeBattle() {
-		a.report(a.deskText("battle.locked"))
+	if a.strategyLocked() {
+		a.report(a.strategyLockText())
 		return
 	}
-	if a.armory == nil || a.campaign == nil || a.campaign.Mode != "unification-resistance" {
-		a.report(a.armoryText("original.only"))
+	if a.armory == nil || a.campaign == nil || !a.militaryEnabled() {
+		a.report(a.militaryText("disabled.note"))
 		return
 	}
 	if err := a.armory.Sync(a.world); err != nil {
@@ -90,7 +90,7 @@ func (a *app) openArmory() {
 }
 func (a *app) armoryData() render.ArmoryData {
 	v := &a.armoryView
-	d := render.ArmoryData{Fonts: a.eten, Labels: map[string]string{}, Page: v.Page, Category: v.Category, Focus: v.Focus, UnitPage: v.UnitPage, Message: v.Message, Quit: a.screen == screenQuit}
+	d := render.ArmoryData{LightUI: a.lightInterface(), Fonts: a.eten, Labels: map[string]string{}, Page: v.Page, Category: v.Category, Focus: v.Focus, UnitPage: v.UnitPage, Message: v.Message, Quit: a.screen == screenQuit}
 	for _, key := range []string{"kicker", "title", "intro", "mode", "factories", "categories", "sidebar.note", "artillery.note", "catalog.note", "capacity", "production.locked", "production.note", "stock.note", "selected.stock", "unit", "issue", "previous", "next", "pages", "units.empty", "equipment.note", "months.progress", "output", "research.start", "research.pause", "production.open", "stock.open", "month", "footer", "save", "load", "back", "quit"} {
 		d.Labels[key] = a.armoryText(key)
 	}
@@ -222,6 +222,14 @@ func (a *app) composeArmory() error {
 	return nil
 }
 func (a *app) armoryAction(key string) {
+	if a.strategyLocked() {
+		a.report(a.strategyLockText())
+		return
+	}
+	if !a.militaryEnabled() {
+		a.report(a.militaryText("disabled.note"))
+		return
+	}
 	v := &a.armoryView
 	v.Press = -1
 	v.Focus = -1
@@ -292,7 +300,11 @@ func (a *app) armoryAction(key string) {
 	case "month":
 		message := a.endTurn()
 		fmt.Fprintln(os.Stderr, message)
-		v.Message = fmt.Sprintf(a.armoryText("month.done"), int(a.year)+1911, a.month)
+		if a.strategyTurn != nil {
+			v.Message = message
+		} else {
+			v.Message = fmt.Sprintf(a.armoryText("month.done"), int(a.year)+1911, a.month)
+		}
 	case "previous":
 		v.UnitPage = max(0, v.UnitPage-1)
 	case "next":
@@ -372,7 +384,7 @@ func (a *app) updateArmory() error {
 		return a.updateArmoryPointer()
 	}
 	for i, key := range []ebiten.Key{ebiten.KeyDigit1, ebiten.KeyDigit2, ebiten.KeyDigit3, ebiten.KeyDigit4} {
-		if inpututil.IsKeyJustPressed(key) {
+		if keyboardKeyPressed(key) {
 			a.armoryAction(fmt.Sprintf("page.%d", i))
 			return nil
 		}

@@ -61,7 +61,7 @@ func (a *app) openingText(key string) string {
 
 func (a *app) openingData() render.OpeningData {
 	o := a.opening
-	d := render.OpeningData{Fonts: a.eten, Stage: o.Stage, Selected: o.Selected, Mode: o.Mode, Focus: o.Focus, CanContinue: o.CanContinue, Message: o.Message, Quit: a.screen == screenQuit, Labels: map[string]string{}}
+	d := render.OpeningData{LightUI: a.lightInterface(), Fonts: a.eten, Stage: o.Stage, Selected: o.Selected, Mode: o.Mode, Focus: o.Focus, CanContinue: o.CanContinue, Message: o.Message, Quit: a.screen == screenQuit, Labels: map[string]string{}}
 	for _, key := range []string{"eyebrow", "title", "intro", "original", "original.hint", "resistance", "resistance.hint", "factions", "source", "provinces", "generals", "force", "start", "save.hint", "continue", "quit"} {
 		d.Labels[key] = a.openingText(key)
 	}
@@ -172,7 +172,7 @@ func (a *app) updateOpening() error {
 		a.dirty = true
 	}
 	for i, k := range []ebiten.Key{ebiten.KeyDigit1, ebiten.KeyDigit2, ebiten.KeyDigit3} {
-		if inpututil.IsKeyJustPressed(k) {
+		if keyboardKeyPressed(k) {
 			a.openingActivate(2 + i)
 			return nil
 		}

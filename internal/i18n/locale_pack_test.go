@@ -64,12 +64,12 @@ func TestEnglishAndJapanesePacksCoverRuntimeSurface(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if people.Language != language || people.PersonCount() != 417 {
+			if people.Language != language || people.PersonCount() != 436 {
 				t.Fatalf("人物語系／數量 = %q/%d", people.Language, people.PersonCount())
 			}
 			biographies := 0
 			for _, person := range people.people {
-				if person.Biography != "" {
+				if person.ID <= 417 && person.Biography != "" {
 					biographies++
 				}
 			}
@@ -102,7 +102,7 @@ func TestLocalizedWordingUsesAvailableEtenGlyphs(t *testing.T) {
 			// Command-room, opening and permanent-toolbar labels use the embedded
 			// Unicode font, including above the original interface. Existing
 			// legacy labels must still be covered by Eten.
-			if (len(key) >= 5 && (key[:5] == "room." || key[:5] == "desk.")) || (len(key) >= 8 && key[:8] == "toolbar.") || (len(key) >= 8 && key[:8] == "opening.") || (len(key) >= 7 && key[:7] == "armory.") || (len(key) >= 11 && key[:11] == "battleinfo.") {
+			if (len(key) >= 9 && key[:9] == "invasion.") || (len(key) >= 5 && (key[:5] == "room." || key[:5] == "desk.")) || (len(key) >= 8 && key[:8] == "toolbar.") || (len(key) >= 9 && key[:9] == "military.") || (len(key) >= 8 && key[:8] == "classic.") || (len(key) >= 8 && key[:8] == "opening.") || (len(key) >= 7 && key[:7] == "armory.") || (len(key) >= 11 && key[:11] == "battleinfo.") {
 				font, fontErr := assets.EmbeddedModernFont()
 				if fontErr != nil {
 					t.Fatal(fontErr)

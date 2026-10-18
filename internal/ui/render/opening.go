@@ -15,6 +15,7 @@ type OpeningFaction struct {
 	Disabled            bool
 }
 type OpeningData struct {
+	LightUI                      bool
 	Fonts                        *assets.EtenFonts
 	Labels                       map[string]string
 	Stages, Dates                []string
@@ -39,6 +40,10 @@ func OpeningTargets(factions int) []l.Rect {
 func openingColor(r, g, b uint8) assets.RGB { return assets.RGB{R: r, G: g, B: b} }
 
 func openingFill(c *Canvas, r l.Rect, fill assets.RGB) {
+	if c.lightUI {
+		c.fillUIRect(r.X, r.Y, r.W, r.H, fill)
+		return
+	}
 	draw.Draw(c.img, image.Rect(r.X, r.Y, r.X+r.W, r.Y+r.H), image.NewUniform(color.RGBA{R: fill.R, G: fill.G, B: fill.B, A: 255}), image.Point{}, draw.Src)
 }
 
@@ -53,6 +58,9 @@ func openingBox(c *Canvas, r l.Rect, active, disabled, action bool) {
 	if disabled {
 		top, bottom, border = openingColor(47, 42, 37), openingColor(35, 32, 29), openingColor(83, 71, 55)
 	}
+	// Convert gradient endpoints before interpolation. Converting individual
+	// rows can cross palette categories and create a visible horizontal seam.
+	top, bottom = c.uiSurface(top), c.uiSurface(bottom)
 	openingFill(c, r, border)
 	for y := 1; y < r.H-1; y++ {
 		blend := func(a, b uint8) uint8 { return uint8(int(a) + (int(b)-int(a))*y/max(1, r.H-1)) }
@@ -66,6 +74,7 @@ func openingBox(c *Canvas, r l.Rect, active, disabled, action bool) {
 // DrawOpening 沿用已採用的 1280×768 構圖，工具列由 app 額外繪製。
 func DrawOpening(d OpeningData) *Canvas {
 	c := NewCanvas(1280, 720)
+	c.UseLightUI(d.LightUI)
 	ink, muted, gold := openingColor(225, 207, 173), openingColor(196, 183, 163), openingColor(198, 148, 89)
 	openingFill(c, l.Rect{0, 0, 1280, 720}, openingColor(25, 23, 22))
 	label := func(s string, r l.Rect, col assets.RGB, size int) { roomLabel(c, d.Fonts, s, r, col, size, false) }

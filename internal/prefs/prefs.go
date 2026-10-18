@@ -21,6 +21,7 @@ type Preferences struct {
 	Icons        string `json:"icons,omitempty"`
 	Typography   string `json:"typography,omitempty"`
 	Layout       string `json:"layout,omitempty"`
+	UIAppearance string `json:"ui_appearance,omitempty"`
 	Wording      string `json:"wording,omitempty"`
 	Scale        int    `json:"scale,omitempty"`
 	Resolution   string `json:"resolution,omitempty"`
@@ -31,7 +32,7 @@ type Preferences struct {
 }
 
 func Default() Preferences {
-	return Preferences{Theme: "modern", Layout: "modern", Resolution: "high", Audio: "modern", Scale: 2, MessageTime: 5}
+	return Preferences{Theme: "modern", Layout: "modern", UIAppearance: "dark", Resolution: "high", Audio: "modern", Scale: 2, MessageTime: 5}
 }
 
 // DefaultPath 遵循 XDG；os.UserConfigDir 在 Linux 會優先使用 XDG_CONFIG_HOME。
@@ -70,6 +71,12 @@ func Load(path string) (Preferences, error) {
 	if loaded.Layout == "" {
 		loaded.Layout = p.Layout
 	}
+	if loaded.UIAppearance == "" {
+		loaded.UIAppearance = p.UIAppearance
+	}
+	if loaded.UIAppearance != "dark" && loaded.UIAppearance != "light" {
+		return p, fmt.Errorf("prefs: 未知介面配色 %q", loaded.UIAppearance)
+	}
 	if loaded.Resolution == "" {
 		loaded.Resolution = p.Resolution
 	}
@@ -102,6 +109,9 @@ func Load(path string) (Preferences, error) {
 
 // Save 以同目錄暫存檔 + rename 原子取代，避免程式中止留下半份 JSON。
 func Save(path string, p Preferences) (err error) {
+	if p.UIAppearance != "" && p.UIAppearance != "dark" && p.UIAppearance != "light" {
+		return fmt.Errorf("prefs: 未知介面配色 %q", p.UIAppearance)
+	}
 	if err := validateAudio(p); err != nil {
 		return err
 	}

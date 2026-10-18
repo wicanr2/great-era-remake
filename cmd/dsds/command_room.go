@@ -52,6 +52,14 @@ func (a *app) roomVisible() bool {
 	return a.commandInterface() && !a.modernDeskVisible() && (a.screen == screenMap || a.screen == screenCommand)
 }
 func (a *app) setInterfacePreference(mode l.InterfaceMode) error {
+	return a.setInterfaceAppearance(mode, a.preferences.UIAppearance)
+}
+
+func (a *app) lightInterface() bool {
+	return a.commandInterface() && a.preferences.UIAppearance == "light"
+}
+
+func (a *app) setInterfaceAppearance(mode l.InterfaceMode, appearance string) error {
 	if mode == l.InterfaceCommand {
 		mode = l.InterfaceModern
 	}
@@ -63,6 +71,10 @@ func (a *app) setInterfacePreference(mode l.InterfaceMode) error {
 	}
 	next := a.preferences
 	next.Layout = string(mode)
+	if appearance == "" {
+		appearance = "dark"
+	}
+	next.UIAppearance = appearance
 	if err := userprefs.Save(a.prefsPath, next); err != nil {
 		return err
 	}
@@ -128,12 +140,8 @@ func (a *app) roomPeople() []*i18n.Person {
 		return out
 	}
 	query := strings.ToLower(strings.TrimSpace(a.room.Query))
-	for id := 1; id <= 417; id++ {
-		if id == 274 {
-			continue
-		}
-		p, ok := a.people.PersonByID(id)
-		if !ok {
+	for _,p := range a.people.AllPeople() {
+		if p.ID == 274 {
 			continue
 		}
 		text := strings.Join([]string{p.NameInGame, p.NameCommon, strings.Join(p.Aliases, " "), p.Faction, p.Biography}, " ")
@@ -251,6 +259,7 @@ func (a *app) composeCommandRoom() error {
 		data.Archive = a.roomArchiveData()
 	}
 	c := render.NewCanvas(1280, 720)
+	c.UseLightUI(a.lightInterface())
 	if err := c.DrawCommandRoom(data); err != nil {
 		return err
 	}

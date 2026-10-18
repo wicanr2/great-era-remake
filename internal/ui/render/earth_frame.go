@@ -1,6 +1,7 @@
 package render
 
 import (
+	"github.com/wicanr2/great-era-remake/internal/assets"
 	"github.com/wicanr2/great-era-remake/internal/ui/hdart"
 	l "github.com/wicanr2/great-era-remake/internal/ui/layout"
 	"image"
@@ -9,6 +10,20 @@ import (
 
 // Nine-slice corners remain small and sharp. Only the quiet center stretches.
 func earthFrame(c *Canvas, r l.Rect, kind int) bool {
+	if c.lightUI && r.W >= 4 && r.H >= 4 {
+		ink := assets.RGB{185, 172, 148}
+		if kind == 1 {
+			ink = assets.RGB{192, 179, 155}
+		}
+		if kind == 3 {
+			ink = assets.RGB{173, 145, 94}
+		}
+		c.fillUIRect(r.X, r.Y, r.W, r.H, ink)
+		c.strokeUIRect(r.X, r.Y, r.W, r.H, ink)
+		c.line(r.X+1, r.Y+1, r.Right()-2, r.Y+1, assets.RGB{224, 213, 189})
+		c.line(r.X+1, r.Bottom()-2, r.Right()-2, r.Bottom()-2, assets.RGB{81, 74, 59})
+		return true
+	}
 	src := hdart.EarthPanel(kind)
 	if src == nil || r.W < 4 || r.H < 4 {
 		return false

@@ -65,11 +65,19 @@ func ApplyBattleSettlement(sim *BattleSim, table *ProvinceTable,
 	if !sim.At.Valid() || !sim.From.Valid() {
 		return fmt.Errorf("game: 戰鬥省份無效：來源 %d、目標 %d", sim.From, sim.At)
 	}
-	target, err := table.At(sim.At)
+	source, err := table.At(sim.From)
 	if err != nil {
 		return err
 	}
-	source, err := table.At(sim.From)
+	return applyBattleSettlementWinner(sim, table, generals, units, source.Commander, settlement)
+}
+
+// All potentially failing validation precedes ownership or unit changes.
+func applyBattleSettlementWinner(sim *BattleSim, table *ProvinceTable, generals []General, units []CombatUnit, winner GeneralID, settlement BattleSettlement) error {
+	if table == nil {
+		return fmt.Errorf("game: 戰鬥結算需要省份表")
+	}
+	target, err := table.At(sim.At)
 	if err != nil {
 		return err
 	}
@@ -94,9 +102,17 @@ func ApplyBattleSettlement(sim *BattleSim, table *ProvinceTable,
 
 		// 攻方勝：原版的 +20 寫入值是來源勢力司令，而不是第一個
 		// 戰場單位的陣列序號。這個值也能與 startBattle 的 Faction 對照。
-		winner := source.Commander
 		if !winner.Valid() {
 			return fmt.Errorf("game: 攻方勝但來源省 %d 沒有司令", sim.From)
+		}
+		for _, u := range sim.Attacker {
+			if u == nil || !u.Alive() || u.General == 0 {
+				continue
+			}
+			i := int(u.General) - 1
+			if generals != nil && (i < 0 || i >= len(generals)) || units != nil && (i < 0 || i >= len(units)) {
+				return fmt.Errorf("game: 攻方將領 %d 超出結算槽位", u.General)
+			}
 		}
 		target.Capture(winner)
 		for _, u := range sim.Attacker {
@@ -105,15 +121,9 @@ func ApplyBattleSettlement(sim *BattleSim, table *ProvinceTable,
 			}
 			i := int(u.General) - 1
 			if generals != nil {
-				if i < 0 || i >= len(generals) {
-					return fmt.Errorf("game: 攻方將領 %d 超出 %d 個將領槽位", u.General, len(generals))
-				}
 				generals[i].Province = sim.At
 			}
 			if units != nil {
-				if i < 0 || i >= len(units) {
-					return fmt.Errorf("game: 執行期攻方將領 %d 超出 %d 個槽位", u.General, len(units))
-				}
 				units[i].Province = sim.At
 			}
 		}

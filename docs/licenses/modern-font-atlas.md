@@ -4,8 +4,8 @@ GEMF 字模來源為 Noto Sans／Serif CJK TC，face index 3。完整作者與�
 
 | 字模 | 字數 | 大小 | SHA-256 |
 |---|---:|---:|---|
-| sans | 2625 | 2709020 | `44632e260518b76ef00f1f0bef20577bbea5c401db2b1038597eb74557574be4` |
-| serif | 2625 | 2709020 | `389a35de18b350e2bb346a4a0f598e2c14976d30b4d35fed215f01538c599094` |
+| sans | 2660 | 2745140 | `287a7192bb62a9a704f89be26f73c3f287e49132dae41b95800e103457c00529` |
+| serif | 2660 | 2745140 | `4f23a7ebe2ad0dbdea2d8303df94ad19622b8700fa0571ec6cc575154356cbd4` |
 
 原始來源：NotoSansCJK-Regular.ttc SHA-256 b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a；NotoSerifCJK-Regular.ttc SHA-256 a04178ec485dffdff7cc0c0c20e1fce9202d7e2160d805e8e44a4c8841c58481。
 
@@ -24,3 +24,11 @@ GEMF 字模來源為 Noto Sans／Serif CJK TC，face index 3。完整作者與�
 [SPEC-58](../spec/58-modern-interaction.md)的三語 Modern 表單補入八字，兩包增加 16,512 bytes。全部既有 2,614 字模逐筆核對不變，來源與 face index 保留；工具與收據為 `workplace/hoi4-ui-prototype/modern-native-20261016/font.py`、`font-report.json`。
 
 [SPEC-60](../spec/60-original-hd-music.md)的音樂選單補入三字，兩包增加 6,192 bytes。全部既有 2,622 字模 bytes 保留；沿用同一重生工具及字型，收據為 `workplace/hoi4-ui-prototype/release-v.1.1.0-20261017/font-report.json`。
+
+[SPEC-63](../spec/63-post-unification-invasion.md)及 [SPEC-64](../spec/64-light-hd-interface.md)補入 `捗竺` 兩字，兩包增加 4,128 bytes。`捗` 用於新增日文設定說明；`竺` 是目前語系資料中未覆蓋的既有字。全部 2,625 舊字模 bytes、來源字型與 face index 保留，工具與收據為 `workplace/hoi4-ui-prototype/invasion-20261018/font_update.py`、`font-report.json`。
+
+[SPEC-66](../spec/66-original-keyboard-feedback.md)補入原版新操作提示所需字元；所有既有 2,627 字模逐筆保留，來源字型與 face index 不變。精確新增字元、尺寸與雜湊見 `workplace/hoi4-ui-prototype/keyboard-feedback-20261018/font-report.json`，工具為同目錄 `font_update.py`。
+
+[SPEC-63](../spec/63-post-unification-invasion.md)的守軍撤退提示補入日文「隣」。全部既有 2,628 字模逐筆保留，含原版鍵盤提示的「号」；來源字型與 face index 不變。工具及精確收據為 `workplace/hoi4-ui-prototype/invasion-20261018/late-font-update.py`、`late-font-report.json`。
+
+[SPEC-63](../spec/63-post-unification-invasion.md)的宣戰與日軍人物補字採目前字庫追加，所有既有字模 bytes 保留。精確來源與收據為 `workplace/hoi4-ui-prototype/invasion-20261018/finish-font-update.py`、`finish-font-report.json`。

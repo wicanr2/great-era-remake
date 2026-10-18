@@ -27,7 +27,7 @@ func DeskSidebarButton(i int) Rect   { return Rect{12, 134 + i*54, 155, 45} }
 func DeskFormRow(i int) Rect         { return Rect{218, 274 + i*57, 764, 42} }
 func DeskListRow(i, scroll int) Rect { return Rect{218, 405 + i*60 - scroll, 764, 54} }
 func DeskToolbarField(i int) Rect {
-	fields := [...]Rect{{51, 11, 202, 36}, {298, 11, 201, 36}, {540, 11, 159, 36}, {744, 11, 273, 36}, {1062, 11, 202, 36}}
+	fields := [...]Rect{{46, 11, 146, 36}, {236, 11, 148, 36}, {423, 11, 127, 36}, {594, 11, 200, 36}, {837, 11, 183, 36}, {1120, 11, 144, 36}}
 	if i < 0 || i >= len(fields) {
 		return Rect{}
 	}
@@ -49,6 +49,10 @@ func DeskToolbarMenu(field, rows, noteLines int) Rect {
 	}
 	if field == 4 {
 		r.W = 318
+		r.X = DeskWidth - r.W - 12
+	}
+	if field == 5 {
+		r.W = 360
 		r.X = DeskWidth - r.W - 12
 	}
 	if noteLines > 0 {

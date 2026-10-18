@@ -94,7 +94,7 @@ func (a *app) closeToolbar() {
 
 func (a *app) toolbarView() render.ToolbarView {
 	b := a.toolbar
-	key := fmt.Sprintf("%s/%s/%t/%s/%s/%s", a.themeMode, a.room.Mode, a.preferences.KeyboardOnly, a.wordingMode, a.audioMode, a.preferences.MusicTrack)
+	key := fmt.Sprintf("%s/%s/%t/%s/%s/%s/%s/%s", a.themeMode, a.room.Mode, a.preferences.KeyboardOnly, a.wordingMode, a.audioMode, a.preferences.MusicTrack, a.militaryStatus(), a.preferences.UIAppearance)
 	if b.viewKey != key {
 		word := func(key string) string {
 			s, err := a.wordingText("toolbar." + key)
@@ -104,8 +104,11 @@ func (a *app) toolbarView() render.ToolbarView {
 			return s
 		}
 		v := render.ToolbarView{}
-		v.Labels = [l.ToolbarFields]string{word("art"), word("interface"), word("ai"), word("music"), word("input")}
-		v.Options = [l.ToolbarFields][]string{{word("art.original"), word("art.hd")}, {word("interface.original"), word("interface.command")}, {word("ai.current.long")}, {word("music.hd"), word("music.original"), word("music.off"), word("music.auto")}, {word("input.mouse"), word("input.keyboard")}}
+		v.Labels = [l.ToolbarFields]string{word("art"), word("interface"), word("ai"), word("music"), word("input"), a.militaryText("title")}
+		v.Options = [l.ToolbarFields][]string{{word("art.original"), word("art.hd")}, {word("interface.original"), word("interface.command"), word("interface.light")}, {word("ai.current.long")}, {word("music.hd"), word("music.original"), word("music.off"), word("music.auto")}, {word("input.mouse"), word("input.keyboard")}, {a.militaryText("option.off"), a.militaryText("option.on")}}
+		if a.militaryStatus() != "off" {
+			v.Selected[5] = 1
+		}
 		for _, track := range musicTracks {
 			v.Options[3] = append(v.Options[3], word("music."+string(track)))
 		}
@@ -126,6 +129,9 @@ func (a *app) toolbarView() render.ToolbarView {
 		}
 		if a.commandInterface() {
 			v.Selected[1] = 1
+			if a.lightInterface() {
+				v.Selected[1] = 2
+			}
 		}
 		if a.preferences.KeyboardOnly {
 			v.Selected[4] = 1
@@ -134,10 +140,16 @@ func (a *app) toolbarView() render.ToolbarView {
 			v.Values[i] = v.Options[i][v.Selected[i]]
 		}
 		v.Values[2] = word("ai.current")
+		v.Values[5] = a.militaryText(a.militaryStatus())
 		b.notes = [l.ToolbarFields][]string{}
 		b.notes[2] = render.ToolbarNoteLines(word("ai.note.1")+"\n"+word("ai.note.2")+"\n"+word("ai.note.3"), 306)
 		b.notes[4] = render.ToolbarNoteLines(word("input.note"), 318)
 		b.notes[3] = render.ToolbarNoteLines(word("music.note"), 356)
+		note := a.militaryText("note")
+		if a.militaryStatus() == "locked" {
+			note = a.militaryText("locked.note")
+		}
+		b.notes[5] = render.ToolbarNoteLines(note, 336)
 		b.view, b.viewKey = v, key
 	}
 	v := b.view
@@ -178,7 +190,11 @@ func (a *app) applyToolbarOption(field, row int) error {
 		if row == 0 {
 			return a.setInterfacePreference(l.InterfaceOriginal)
 		}
-		return a.setInterfacePreference(l.InterfaceModern)
+		appearance := "dark"
+		if row == 2 {
+			appearance = "light"
+		}
+		return a.setInterfaceAppearance(l.InterfaceModern, appearance)
 	case 3:
 		mode, track := a.audioMode, uiaudio.Track(a.preferences.MusicTrack)
 		if row < 3 {
@@ -191,6 +207,8 @@ func (a *app) applyToolbarOption(field, row int) error {
 		return a.setMusic(mode, track, true)
 	case 4:
 		return a.setKeyboardOnly(row == 1)
+	case 5:
+		return a.setMilitaryEnabled(row == 1)
 	}
 	return nil // Current AI is informational; it never invokes a rule setter.
 }
@@ -351,6 +369,7 @@ func (a *app) drawToolbar(dst *ebiten.Image) {
 			height = max(l.DeskToolbarHeight, v.MenuRect().Bottom())
 		}
 		c := render.NewCanvas(l.ToolbarWidth, height)
+		c.UseLightUI(a.lightInterface())
 		if v.Desk {
 			c.DrawDeskToolbar(a.eten, v)
 		} else {

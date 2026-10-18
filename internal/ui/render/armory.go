@@ -24,6 +24,7 @@ type ArmoryUnit struct {
 	Convert, Reinforce       bool
 }
 type ArmoryData struct {
+	LightUI                                    bool
 	Fonts                                      *assets.EtenFonts
 	Labels                                     map[string]string
 	Page, Category, Focus, UnitPage, UnitPages int
@@ -101,6 +102,7 @@ func ArmoryTargets(d ArmoryData) []ArmoryTarget {
 
 func DrawArmory(d ArmoryData) *Canvas {
 	c := NewCanvas(1280, 720)
+	c.UseLightUI(d.LightUI)
 	ink, muted, gold := openingColor(229, 212, 181), openingColor(179, 165, 142), openingColor(209, 170, 104)
 	bg, panel, line := openingColor(25, 24, 23), openingColor(39, 36, 32), openingColor(101, 87, 71)
 	openingFill(c, l.Rect{0, 0, 1280, 720}, bg)
@@ -241,10 +243,10 @@ func DrawArmory(d ArmoryData) *Canvas {
 	label(selected.Name, l.Rect{1012, 217, 236, 29}, ink, 20)
 	openingFill(c, l.Rect{1012, 254, 236, 60}, openingColor(40, 40, 39))
 	for x := 1012; x < 1248; x += 16 {
-		c.line(x, 254, x, 314, line)
+		c.lineUI(x, 254, x, 314, line)
 	}
 	for y := 254; y < 314; y += 16 {
-		c.line(1012, y, 1248, y, line)
+		c.lineUI(1012, y, 1248, y, line)
 	}
 	armoryWeapon(c, selected.Model.Class, l.Rect{1022, 259, 216, 50}, ink)
 	progress := selected.Status
@@ -321,7 +323,7 @@ func armoryWeapon(c *Canvas, class game.EquipmentClass, r l.Rect, ink assets.RGB
 	for _, path := range paths {
 		for i := 1; i < len(path); i++ {
 			p, q := path[i-1], path[i]
-			c.line(r.X+p[0]*r.W/190, r.Y+p[1]*r.H/75, r.X+q[0]*r.W/190, r.Y+q[1]*r.H/75, ink)
+			c.lineUI(r.X+p[0]*r.W/190, r.Y+p[1]*r.H/75, r.X+q[0]*r.W/190, r.Y+q[1]*r.H/75, ink)
 		}
 	}
 }

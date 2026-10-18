@@ -185,8 +185,8 @@ func TestCampaignImportUnknownBytesAndFailedLoad(t *testing.T) {
 		t.Fatal(err)
 	}
 	data, _ := os.ReadFile(a.savePath)
-	var dto campaignSnapshot
-	raw, err := game.DecodeCampaignSave(data, &dto)
+	var dto campaignV4
+	raw, err := game.DecodeCampaignSaveVersion(data, &dto, 4)
 	if err != nil {
 		t.Fatal(err)
 	}
